@@ -65,7 +65,7 @@ for(const [budget,count] of [[0,0],[10000,0],[100000,1],[325000,3]])test(`accept
  else assert.doesNotMatch(html,/No alternative staffing option|One alternative staffing option/);
  assert.match(html,/<button[^>]*disabled=""[^>]*>Review selected Action Plan/);
  // Like ordinary entry, an over-budget proposal can be reviewed explicitly; its status remains visible.
- assert.ok(actual.options.filter(o=>o.candidate.status==='not-met').every(o=>html.includes('not-met')));
+ assert.ok(actual.options.filter(o=>o.candidate.status==='not-met').every(o=>html.includes('Outside entered limits')));
 });
 
 test('compact save review separates assumed qualified capacity from measured outcomes',()=>{
