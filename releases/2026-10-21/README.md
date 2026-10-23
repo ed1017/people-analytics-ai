@@ -1,12 +1,14 @@
 # Versioned application source
 
-This directory contains the reviewed fictional skills-baseline source promoted to production after CI and hosted acceptance.
+This directory contains the reviewed production source through the optional-clarification repair.
 
-- Production runtime: `2854b6e4de0c36f88198cb916f713af843d4ad94`.
-- Earlier candidate protected preview: `dpl_57oy8nsYAd8UA6uxc6ckdT2VQwtH` (same data and logic; final candidate changes two proficiency labels).
-- Package SHA-256: `799d1c917753338a8438053a27d9c71a2e0f4bd58af798734c6fdbf0003eed45`.
-- `source/` contains 806 exact reviewed source files. `manifest.json` pins their bytes. All 19 public aggregate responses match the tested staging release; desktop/mobile Skills, Learning and staged explicit save/reopen checks passed without provider calls.
-- Production deployment: `dpl_7gtJCa1dHkKEbnzd6fND27h6SoKA`, public dataset token `workforce-demo-9037-public-aggregates-v3:4`. Previous runtime `7ea8bc36e814396530c70d5889ebd1f5aa24da3d` and deployment `dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA` remain the rollback basis.
+- Production runtime: `52490f460599892415836e8b34cb5f0e5d17bf6b`.
+- Production deployment: `dpl_GkmMgh7GUvtiiQ8sm5eSLec4T4pZ`; public alias verified.
+- Package SHA-256: `8dbb020d2d223b4666f373d1d845423219771403435d1de3473457e2a85b2d5b`.
+- `source/` contains 807 exact reviewed source files pinned by `manifest.json`.
+- PR375: six focused tests, independent review, required CI and protected/public desktop/mobile captured-response replay passed. Timing questions no longer create an unrelated additional-versus-total hint. Unknown budget remains unknown. No paid provider call was used for this repair.
+- Dataset remains `workforce-demo-9037-public-aggregates-v3:4`; prior skills release evidence and saved-version guarantees remain unchanged. Runtime `2854b6e4de0c36f88198cb916f713af843d4ad94` / deployment `dpl_7gtJCa1dHkKEbnzd6fND27h6SoKA` is the immediate rollback basis.
+- This presentation repair does not establish a fix for the historical intermittent model-answer rejection.
 
 Verify without dependencies, credentials or network:
 
