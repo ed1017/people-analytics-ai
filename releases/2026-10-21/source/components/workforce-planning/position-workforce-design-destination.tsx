@@ -1,3 +1,5 @@
+import {KeyFindings} from "@/components/key-findings";
+import {designFindings} from "@/lib/context-findings";
 import type { ComponentProps } from "react";
 
 import { PositionActionSimulator } from "./position-action-simulator";
@@ -60,6 +62,7 @@ export function PositionWorkforceDesignDestination({
         </span>
       </div>
 
+      {!positionModelingLoading && !structuralActionProps.loading && !structuralActionProps.error && <KeyFindings findings={designFindings(structuralPositionResult, selectedPlanningScenario)} />}
       <PositionActionSimulator
         {...positionActionProps}
       />

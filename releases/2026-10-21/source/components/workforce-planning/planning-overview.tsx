@@ -1,3 +1,5 @@
+import {KeyFindings} from "@/components/key-findings";
+import {scenarioFindings} from "@/lib/context-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
 import {PlanningAssumptionIllustration} from "../planning-assumption-illustration";
 import {
@@ -138,6 +140,7 @@ export function PlanningOverview({
 
   return (
     <div className="space-y-6">
+      <KeyFindings findings={scenarioFindings(activePlanningScenario)} />
       <section className="rounded-lg border p-4" aria-label="Current planning scenario">
         <h3 className="font-semibold">{cards[0].value}</h3>
         <p className="mt-2 text-sm">{cards[0].detail} {cards[1].detail}</p>

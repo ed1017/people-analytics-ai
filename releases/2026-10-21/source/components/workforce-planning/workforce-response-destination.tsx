@@ -1,3 +1,5 @@
+import {KeyFindings} from "@/components/key-findings";
+import {allocationFindings} from "@/lib/context-findings";
 import type { ComponentProps } from "react";
 
 import { PositionModelingSummary } from "./position-modeling-summary";
@@ -69,6 +71,7 @@ export function WorkforceResponseDestination({
             : selectedPlanningScenario}
         </span>
       </div>
+      {!positionModelingLoading && !portfolioSectionProps?.portfolioProps.loading && !portfolioSectionProps?.portfolioProps.error && <KeyFindings findings={allocationFindings(portfolioSectionProps?.portfolioProps.result?.allocation ?? null, selectedPlanningScenario)} />}
       {!structuralPositionResult && (
         <div className="mb-5 rounded-md border bg-muted/20 p-4">
           <p className="font-medium">

@@ -1,3 +1,5 @@
+import {KeyFindings} from "@/components/key-findings";
+import {scenarioFindings} from "@/lib/context-findings";
 import { TrainingTimingPanel } from "@/components/training-timing-panel";
 import {HeadcountDemoWorkspace} from './headcount-demo-workspace';
 import type { ComponentProps } from "react";
@@ -42,6 +44,7 @@ export function ScenarioModelingDestination({
       className={visible ? "evidence-pane space-y-6" : "hidden"}
     >
       <HeadcountDemoWorkspace>
+      {!planningLoading && <KeyFindings findings={scenarioFindings(activePlanningScenario)} />}
       <ScenarioModelingPanel
         {...panelProps}
         visible

@@ -1,4 +1,5 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
 
 import type { ReactNode } from "react";
 import { marketComparisons, marketCarryEvidence, oewsOccupations, oewsAreas, oewsProvenance, defaultMarketSelection } from "@/lib/oews-reference.mjs";
@@ -25,6 +26,11 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
   const evidence = comparisons?.selected;
   const outlook = nationalOutlookEvidence(selection.soc);
   return <section aria-label="Occupation and location comparison" className="min-w-0 space-y-6">
+    <KeyFindings findings={evidence ? {scope:`${evidence.selected.OCC_TITLE} · ${evidence.selected.AREA_TITLE} · BLS OEWS May 2025`,items:[
+      `Median annual wage: ${money(evidence.selected.A_MEDIAN)}; wages exclude other employer costs.`,
+      `Recorded employment: ${count(evidence.selected.TOT_EMP)} wage-and-salary jobs, not available candidates.`,
+      'This occupation and location reference does not establish internal pay, hiring time or individual compensation.',
+    ]} : {scope:'Selected labor-market reference',items:['No comparable occupation/location record is available for this selection.','Company metrics and national outlook are separate evidence.']}} />
     <div>
       <h2 className="text-xl font-semibold">Occupation pay, employment and outlook</h2>
       <p className="mt-2 text-sm text-muted-foreground">Public BLS references · separate from internal workforce and pay</p>

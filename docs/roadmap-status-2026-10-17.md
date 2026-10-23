@@ -113,3 +113,26 @@ This increment adds deterministic observations, not model-generated conclusions 
 Recommendation/visual acceptance: hiring count, cost and monthly presence derive from one calculated result; mixed staffing uses the same selected option for its concrete conditional sentence, costs and stepped monthly role-coverage chart. Monthly role readiness is not projected company headcount. Historical actuals are unchanged. Missing timing does not create a fabricated trajectory. Targeted browser replay covers mix/quantity changes and saved/reopened state; no fresh provider call is part of this increment.
 
 Outstanding: selected reference/quote takeaways and consistent compact summaries in the existing planning tools. This is an explicit bounded follow-on to the all-applicable-pages request, not a claim that every page is finished. Pinning findings, welcome/video and live-company tenancy remain deferred.
+
+
+## Key findings coverage closure - October 23 follow-on
+
+This supersedes the pending reference/planning coverage in the previous increment. Release identity and hosted acceptance are recorded in the associated PR; these are deterministic summaries, not fresh AI answers.
+
+| Pages | Final treatment |
+| --- | --- |
+| Home; Workforce/legacy Overview | Existing scoped snapshot/company findings; presentation-only legacy Demo prefixes removed from findings scope labels. Record/filter IDs remain unchanged. |
+| Attrition; Talent Acquisition; Employee Listening; Finance; Compensation; Skills; Learning & Development; Career Growth; Succession | PR357 findings retained with scope, dates, missing-value and suppression rules. Legacy Career Interests redirects to Workforce; its existing component retains preference-specific findings. |
+| Occupational References | Selected occupation/release/source mode and mapping status; explicitly not employee proficiency or available capacity. |
+| Labor Market | Selected occupation/location OEWS median annual wage and recorded employment, with May 2025 period, plus existing separate dated national indicators. Employment is not candidates; wage is not loaded employer cost. |
+| Training & Coaching | Selected simulated/unverified quote, currency and per-person/per-cohort per-session fee basis; blank fee remains unknown. No outcome inference. |
+| Development Planning | Each selected quote's current calculator cash cost, employee hours and total including time value; invalid inputs suppress numeric findings. No currency conversion or automatic ranking. Empty workspace asks for a quote rather than fabricating findings. |
+| Planning Overview; Scenario Modeling; legacy Workforce Planning | Main workload worksheet shows current final-month required FTE and signed gap, labeled preview versus entered assumptions. Stored-plan summaries remain explicitly separate in their existing disclosure. Existing custom/BU scenario result cards remain authoritative for their own scope. |
+| Position & Workforce Design | Calculated authorized positions/vacancies, source date, no availability claims. Retained results hidden during structural rerun/error. |
+| Workforce Response | Calculated build/move/buy role-capacity allocation; no confirmation of people, readiness, cost or arrivals. Empty/incomplete state explicit. |
+| Execution & Feasibility | Conditional schedule period and final uncovered role capacity; does not erase earlier shortages or imply all constraints pass. No result means no schedule claim. |
+| Future of Work | Existing labeled illustrative task calculation is the summary; no company analytical findings exist. |
+| Decision brief; Action plans; Track | Existing goal-specific proposal and manually entered outcome summaries retained. Adding a generic dataset summary would misstate scope; new pinning/action integration remains deferred. |
+| Assess & Evaluate | Placeholder without analytical data; findings inapplicable until implemented. |
+
+The requested informational coverage is implemented with the applicability boundaries above. No new forecasting, candidate availability, causal conclusions, pinning or action integration. Welcome/video and live-company tenancy remain deferred. No paid provider calls, ledger mutations or permission changes in this follow-on.

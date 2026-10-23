@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {quoteFindings, developmentFindings} from "@/lib/context-findings";
 import { PlanningGuide } from "@/components/planning-guide";
 
 import { useId, useState } from "react";
@@ -32,6 +34,7 @@ export function DevelopmentCatalog({ session, onChange, onOpen }: { session: Dev
   };
   return <section aria-label="Development quote catalog" className="development-catalog mb-6 min-w-0 rounded-lg border p-4">
     <h2 className="text-xl font-semibold">Explore training and coaching</h2>
+    <KeyFindings findings={quoteFindings(chosen)} />
     <p className="mt-2 text-sm text-muted-foreground">All named providers below are fictional; their quotes are simulated examples, not vendor offers or evidence of results. Custom quotes are unverified user input. With a selected goal, quotes and inputs are saved in this browser; without a goal they last only in this tab. Workforce filters do not select participants.</p>
     <p id={`${catalogId}-help`} className="mt-3 text-sm">Select one quote to compare in Planning. Select the same card again to clear it.</p>
     <div className="development-quotes my-4 grid min-w-0 gap-3 xl:grid-cols-3">{quotes.map(q => <button type="button" key={q.id} aria-label={q.provider} aria-pressed={session.selected === q.id} aria-describedby={`${catalogId}-${q.id}-source ${catalogId}-${q.id}-focus ${catalogId}-${q.id}-format ${catalogId}-${q.id}-sessions ${catalogId}-${q.id} ${catalogId}-help`} onClick={() => onChange({ ...session, selected: session.selected === q.id ? "" : q.id })} className="development-quote min-w-0 rounded border p-3 text-left text-sm">
@@ -78,6 +81,7 @@ export function DevelopmentPlanning({ session, onChange, onCatalog }: { session:
         <p className="text-sm">{q.provenance === "simulated" ? "Fictional provider · Simulated quote" : "User-provided quote · Unverified"} · {q.currency}</p>
         <p className="my-3 break-words text-sm"><strong>Carried goal:</strong> {option.goal}</p>
         <p className="mb-3 text-sm">{q.focus} · {q.format}. Quoted: {quoteQuantity(q.sessions, "session")}, {quoteQuantity(q.hours, "hour")}/session, capacity {q.capacity || "unknown"}. Fee basis: per {q.basis === "person" ? "person" : "cohort package"} per session.</p>
+        <KeyFindings findings={developmentFindings(q, result)} />
         <div className="grid gap-3">{([["participants","Participants"],["sessions","Sessions per participant"],["hours","Hours per participant per session"],["fee",`Quote fee (${q.currency}) per ${q.basis === "person" ? "person" : "cohort"} per session`],["additionalFees",`Additional fees total (${q.currency}; blank = unknown)`],["hourlyCost",`Loaded hourly cost (${q.currency}; optional)`]] as const).map(([key,label]) => <Field key={key} numeric label={label} value={option.inputs[key]} onChange={v => update(key,v)} />)}</div>
         {result.errors.length ? <p role="alert" className="mt-3 text-sm text-destructive">{result.errors.join(" ")}</p> : <dl className="mt-4 space-y-2 text-sm">
           {[["Cohorts",result.cohorts ?? "Unknown"],["Quote fees",money(result.quoteTotal)],["Cash cost incl. additional fees",money(result.cashCost)],["Employee hours",result.employeeHours ?? "Unknown"],["Employee time cost",money(result.timeCost)],["Total incl. employee time",money(result.total)]].map(([label,value]) => <div key={label} className="flex flex-wrap justify-between gap-2"><dt>{label}</dt><dd className="font-medium">{value}</dd></div>)}
