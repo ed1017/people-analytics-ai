@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "600a4b2f22ed81a606fb83f761055b66cbb34806",
+  "sourceCommit": "cb1a61c2443da89069017741f66383a33cd5222f",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -244,8 +244,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "496e462b37fbdb67d45803bd80dd7ce56b96a6097af2935b745d67822c2c4ade",
-      "bytes": 50953
+      "sha256": "dc00a4ba36ca00af0138371b7e69c0bee27dd50a6edc76f1b0c48c0b1a100517",
+      "bytes": 51462
     },
     {
       "path": "app/layout.tsx",
@@ -309,8 +309,8 @@
     },
     {
       "path": "components/app-header.tsx",
-      "sha256": "47c678d022850df1245ed8d4dc5ed22e80a4f835243e31b3c4758749390158de",
-      "bytes": 7628
+      "sha256": "ad46d1479102a6479fda521da71cb0ba300a2b54ef4a1514821a09a8e0a3e063",
+      "bytes": 7737
     },
     {
       "path": "components/app-sidebar.tsx",
@@ -854,8 +854,8 @@
     },
     {
       "path": "components/project-case-study.tsx",
-      "sha256": "79942c994458cff94bbf662da756b91c15d985f2ef50881824463f2771abbb5c",
-      "bytes": 2048
+      "sha256": "feb880cc569b4496340c4f5a014bb591e35a71d15b006c40665b02d980e70f62",
+      "bytes": 2117
     },
     {
       "path": "components/projection-backtest-details.tsx",
@@ -919,7 +919,7 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "73f8b37c9a6186044d100884dd21fc1a51ac44ea65233b5e8936e66aad713cbc",
+      "sha256": "14bef975f8bcaa4dce0a5827e499a7dbef74f02d9a49c396de5299c5b8957a4c",
       "bytes": 40071
     },
     {
@@ -1354,8 +1354,8 @@
     },
     {
       "path": "lib/app-navigation.ts",
-      "sha256": "ce463f572bfbc64a594e042203d87b8528b18921a90a9647c7dca50c7253be15",
-      "bytes": 7394
+      "sha256": "82d38ce2b2fb0f578fceda870a4dcec1ce6eeadc0ffebf488ad2e33e5e5e2647",
+      "bytes": 7385
     },
     {
       "path": "lib/app-page-url.ts",
@@ -1424,8 +1424,8 @@
     },
     {
       "path": "lib/chat-navigation.ts",
-      "sha256": "953112ab41702b6c4205eacdd3f33cb0543cb24c51e6c11da7a06d4fb5fb4bd7",
-      "bytes": 4953
+      "sha256": "f7432eeb5c06b7405bf72d683c05800aafa6a818ee51709fc54c4c17a9dca6c3",
+      "bytes": 4944
     },
     {
       "path": "lib/chat-request-deadline.ts",
@@ -2314,8 +2314,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "2ec98148c079907af73c6e93bdc59be27b600969900e744e0a8e065a316277bc",
-      "bytes": 29458
+      "sha256": "59def1d5f2fd9ddeb4597f30340ade567282cbaa28e20edaa985ecc044555d31",
+      "bytes": 29512
     },
     {
       "path": "lib/home-pinned-goals.ts",
@@ -2934,8 +2934,8 @@
     },
     {
       "path": "lib/public-9037-options.mjs",
-      "sha256": "0bb32fb001a9e792e65a402990fc18117ad0511842a7c9d6f50b0996edd3426f",
-      "bytes": 1958
+      "sha256": "939c3e2748f0664087c4c2693f6fa02cd8b2ea2e745b1ea7c474a8d71925941d",
+      "bytes": 1967
     },
     {
       "path": "lib/public-9037-projection.mjs",
@@ -3509,8 +3509,8 @@
     },
     {
       "path": "lib/workspace-navigation.ts",
-      "sha256": "32fdeb16a16d66c70cf2daf4088debcd5130ec7ca58a37a07fe853f8494789bb",
-      "bytes": 1671
+      "sha256": "ff65efc2ce887fc1ab4472993bfc77bdff1c2adfc0c6f44dc4a3fcedc5864a88",
+      "bytes": 1677
     },
     {
       "path": "next-env.d.ts",
@@ -3644,8 +3644,8 @@
     },
     {
       "path": "components/staffing-options-table.tsx",
-      "sha256": "16b0ad179a1fe23e3ad463b6e8254ceb603c22d31f2832b275b7d252a58ab7aa",
-      "bytes": 1374
+      "sha256": "f8d752d7816068c932fc7163114287435ad8b85490f78ca4ac48c8549b2fa95a",
+      "bytes": 1639
     },
     {
       "path": "lib/guided-business-planning.ts",
@@ -3956,8 +3956,18 @@
       "path": "tests/navigation-preference.test.mjs",
       "sha256": "32db69f75d49dbed834152fc0fcfcb990c25b2eb590598a3030436b824bfbca0",
       "bytes": 2100
+    },
+    {
+      "path": "app/about/page.tsx",
+      "sha256": "5a0c89ef746323f6123bea98a50fba376d59c82355b2245937ebc7fb87d5664d",
+      "bytes": 775
+    },
+    {
+      "path": "tests/review-polish-contracts.test.mjs",
+      "sha256": "df3702903b855ce60b0c8deebe4aea87fc7fa94c99e9b8c0d43420cebfa5655d",
+      "bytes": 1535
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "8642aef4bd6c0b93a9b35cb1dfe2456f53860401c2c8233ba856b9be754ef3f1"
+  "verifiedDeployedArchiveSha256": "8d88225f7117e279fcbfc57f455b54483d249261106648b0fd38a0ecd9980178"
 }

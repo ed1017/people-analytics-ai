@@ -111,7 +111,7 @@ export function AppHeader({
           <h2 className="font-semibold">Workforce planning by Ed Om</h2>
           <p className="my-2 text-sm">An independently developed portfolio project, built with AI assistance. Explore workforce evidence and compare explicit planning assumptions.</p>
           <p className="my-2 text-sm">Workforce data is synthetic. Public reference data has separate sources and dates. Calculations are tested against defined contracts; scenario outputs are conditional, not verified business outcomes.</p>
-          <ProjectCaseStudy/>
+          <ProjectCaseStudy/><a href="/about" className="inline-block py-2 text-sm underline underline-offset-4">Open project overview</a>
           {contact}
         </div></details>
         <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<p className="mt-3 text-xs text-muted-foreground">Plans are stored in this browser. Use the saved-work controls to review storage status and manage local work.</p></div></details>

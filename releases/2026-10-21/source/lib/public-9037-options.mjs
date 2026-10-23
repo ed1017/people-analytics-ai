@@ -22,5 +22,5 @@ export function public9037RequestAllowed(options,request){
  if(u.protocol!=='https:'||u.port||!hosts.includes(u.hostname))return false;
  try{if(decodeURIComponent(u.pathname)!==u.pathname)return false;}catch{return false;}
  if(u.pathname.startsWith('/api'))return local9037OperationAllowed(request.method,u.pathname);
- return ['GET','HEAD'].includes(request.method)&&(['/','/planning/headcount-demo','/planning/assumptions','/favicon.ico'].includes(u.pathname)||u.pathname.startsWith('/_next/static/'));
+ return ['GET','HEAD'].includes(request.method)&&(['/','/about','/planning/headcount-demo','/planning/assumptions','/favicon.ico'].includes(u.pathname)||u.pathname.startsWith('/_next/static/'));
 }

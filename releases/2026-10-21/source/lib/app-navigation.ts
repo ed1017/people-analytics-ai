@@ -107,7 +107,7 @@ export const appPageMetadata: Record<
       "Company-wide recorded succession-plan coverage and source-assessment readiness signals.",
   },
   "planning-overview": {
-    label: "Demand & scenarios",
+    label: "Scenarios",
     section: "Planning",
     description:
       "Compare assumed monthly workload with available capacity; open earlier planning tools when needed.",

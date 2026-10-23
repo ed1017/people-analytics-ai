@@ -938,3 +938,10 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .baseline-ai-entry button:hover { filter: brightness(.94); }
 .baseline-ai-entry button:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
 @media (max-width: 767px) { .baseline-ai-entry button { width: 100%; } }
+
+/* Keep comparison labels readable; the contained table scrolls on narrow panes. */
+.staffing-options-table { min-width: 48rem; overflow-wrap: normal; word-break: normal; font-variant-numeric: tabular-nums; }
+.staffing-options-table :is(th, td) { padding: .625rem .75rem; vertical-align: top; }
+.staffing-options-table th { white-space: normal; }
+.staffing-options-table td:nth-child(4) { white-space: nowrap; }
+.staffing-options-scroll:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
