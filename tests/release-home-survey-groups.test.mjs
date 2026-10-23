@@ -26,7 +26,7 @@ test('all eligible BU citations carry comparison date and permit only supplied g
  assert.equal(homeAnswerScopeViolation('Group 7 has 43% favorable in the pulse survey [S1].',p),true);
  const missing=data();missing.business_units.pop();const unavailable=pack(missing);assert.equal(actionEvidenceCatalog(unavailable).some(c=>c.id.startsWith('S1:businessUnit:')),false);
 });
-test('fresh public grounding validates complete group fields and rejects changed rows/date',async()=>{const d=data(),p=pack(d),binding={router:{bootstrapToken:()=>P.token,current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:2})},handle:async()=>Response.json(d,{headers:{'x-workforce-dataset':P.token}})},verify=createPublicHomeGroundingTestAdapter({enabled:true,hostname,loadPublicBinding:()=>binding}).verify;
+test('fresh public grounding validates complete group fields and rejects changed rows/date',async()=>{const d=data(),p=pack(d),binding={router:{bootstrapToken:()=>P.token,current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:P.generation})},handle:async()=>Response.json(d,{headers:{'x-workforce-dataset':P.token}})},verify=createPublicHomeGroundingTestAdapter({enabled:true,hostname,loadPublicBinding:()=>binding}).verify;
  const request={datasetToken:P.token,filters,scope,evidence:p};await verify(request);
  for(const mutate of [c=>c.rows[7].favorable_pct=99,c=>c.rows.pop(),c=>c.asOf='2026-06-30',c=>c.rows[0].respondents=11]){const bad=structuredClone(request);mutate(comparison(bad.evidence));await assert.rejects(verify(bad));}
 });
