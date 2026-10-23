@@ -1,11 +1,11 @@
 # Versioned application source
 
-This directory contains the reviewed candidate source for the coordinated 9,037-person synthetic baseline revision. Production promotion is recorded separately after hosted acceptance and CI. It is not a deployable replacement for the root development application.
+This directory contains the reviewed production source for the coordinated 9,037-person synthetic baseline revision. It was promoted after hosted acceptance, independent review and CI. It is not a deployable replacement for the root development application.
 
-- Candidate runtime: `7ea8bc36e814396530c70d5889ebd1f5aa24da3d`.
-- Protected candidate preview: `dpl_4hwHRmwMrHUEgC5kuUb8gEwjGrCx`. Production remains unchanged pending release gates.
-- Candidate package SHA-256: `fb857b754b8618ebea13b00d89056988e23b9d93fbd563fb43db6e53f216cf21`.
-- `source/` contains 804 exact reviewed source files. `manifest.json` pins their bytes. The protected build restored the candidate package and passed build/type checks; production promotion remains gated on CI.
+- Deployed runtime: `7ea8bc36e814396530c70d5889ebd1f5aa24da3d`.
+- Verified production deployment: `dpl_2n3Ey5BtR4xJQwCWNrXgDzx7jBwA`.
+- Deployed package SHA-256: `fb857b754b8618ebea13b00d89056988e23b9d93fbd563fb43db6e53f216cf21`.
+- `source/` contains 804 exact reviewed source files. `manifest.json` pins their bytes. The protected build restored the candidate package and passed build/type checks; production promotion and public verification are complete.
 
 Verify without dependencies, credentials or network:
 
