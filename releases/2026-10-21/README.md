@@ -1,14 +1,15 @@
 # Versioned application source
 
-This directory contains the reviewed production source through the optional-clarification repair.
+This directory contains the reviewed production source through the coherent fictional geography revision.
 
-- Production runtime: `52490f460599892415836e8b34cb5f0e5d17bf6b`.
-- Production deployment: `dpl_GkmMgh7GUvtiiQ8sm5eSLec4T4pZ`; public alias verified.
-- Package SHA-256: `8dbb020d2d223b4666f373d1d845423219771403435d1de3473457e2a85b2d5b`.
-- `source/` contains 807 exact reviewed source files pinned by `manifest.json`.
-- PR375: six focused tests, independent review, required CI and protected/public desktop/mobile captured-response replay passed. Timing questions no longer create an unrelated additional-versus-total hint. Unknown budget remains unknown. No paid provider call was used for this repair.
-- Dataset remains `workforce-demo-9037-public-aggregates-v3:4`; prior skills release evidence and saved-version guarantees remain unchanged. Runtime `2854b6e4de0c36f88198cb916f713af843d4ad94` / deployment `dpl_7gtJCa1dHkKEbnzd6fND27h6SoKA` is the immediate rollback basis.
-- This presentation repair does not establish a fix for the historical intermittent model-answer rejection.
+- Runtime: `834f3b9da202c977021c5f12d1de015302e9824c`.
+- Deployment: `dpl_HZcrSFM67bCLnb6c5QnmAN4CT1Ng`; public alias verified.
+- Package SHA-256: `d477ad694d047a944f07ffead6efe6d75d143622ec29b71a21903ce43e09c492`.
+- `source/` contains 808 exact reviewed source files pinned by `manifest.json`.
+- PR377: independent review and CI passed. Six geography tests, 2,527 reconciled group transitions, 62 PostgreSQL query replays, all 1,287 supported dashboard intersections, historical saved-plan isolation, and protected/public desktop/mobile country-filter checks passed. All 19 public aggregate responses exactly match the reviewed stage.
+- Dataset is `workforce-demo-9037-public-aggregates-v4:5`. Geography follows explicit fictional operating-footprint assumptions; event dates, monthly company totals, pay, hierarchy and skills are unchanged. Country differences are not calibrated geographic effects. Existing seasonal hiring/departure patterns are preserved.
+- Prior v3:4 saved plans keep their original basis. Runtime `52490f460599892415836e8b34cb5f0e5d17bf6b` / deployment `dpl_GkmMgh7GUvtiiQ8sm5eSLec4T4pZ` remains the rollback basis.
+- No provider calls, accounting changes or live database mutation were used. This dataset revision does not establish a fix for the historical intermittent model-answer rejection.
 
 Verify without dependencies, credentials or network:
 
