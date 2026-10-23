@@ -44,7 +44,7 @@ export function EvidenceScopeNotice({
         scope.populationLabel;
 
   return (
-    <div className="evidence-scope-notice mb-6 rounded-lg border bg-muted/20 p-4 text-sm">
+    <div className="evidence-scope-notice mb-4 border-b pb-3 text-sm">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-semibold">
           Evidence scope: {scope.label}
@@ -57,7 +57,9 @@ export function EvidenceScopeNotice({
         </span>
       </div>
 
-      <p className="mt-2 text-muted-foreground">
+      {selectedNarrow && <p className="mt-1 font-medium">Company-wide evidence; selected filters are not applied.</p>}
+      <details className="mt-2 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Scope and methodology</summary>
+      <p className="mt-2">
         Selected business context:{" "}
         {selectedContext.country} ·{" "}
         {selectedContext.businessUnit} ·{" "}
@@ -70,6 +72,7 @@ export function EvidenceScopeNotice({
           : `Country, business-unit, and level dashboard filters do not narrow ${filterScopeLabel}.`}
         {note ? " " + note : ""}
       </p>
+      </details>
     </div>
   );
 }

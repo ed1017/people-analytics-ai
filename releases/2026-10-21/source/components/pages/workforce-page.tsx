@@ -74,7 +74,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
               ["Headcount", summary.headcount.toLocaleString(), summary.fte.toLocaleString() + " FTE", "Number of active employees in the current workforce snapshot. Headcount counts people; FTE reflects capacity."],
               ["People Managers", summary.people_managers.toLocaleString(), summary.avg_span_of_control.toFixed(1) + " avg span", "Employees with at least one direct report in the current snapshot. Average span is direct reports per people manager."],
               ["Average Tenure", summary.avg_tenure_years.toFixed(1) + " yrs", summary.full_time_headcount.toLocaleString() + " full-time", "Average completed years of service among employees in the current workforce snapshot."],
-              ["Hybrid Workforce", ((summary.hybrid_headcount / summary.headcount) * 100).toFixed(1) + "%", summary.remote_headcount.toLocaleString() + " remote", "Share of current employees classified as hybrid under the synthetic work-arrangement field."],
+              ["Hybrid Workforce", summary.headcount > 0 ? ((summary.hybrid_headcount / summary.headcount) * 100).toFixed(1) + "%" : "Unavailable", summary.remote_headcount.toLocaleString() + " remote", "Share of current employees classified as hybrid under the synthetic work-arrangement field."],
             ].map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">
                 <p
@@ -90,7 +90,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
             ))}
           </div>
           {publicConstruction && <aside aria-label="Synthetic construction context" className="mt-3 text-sm text-muted-foreground">
-            <p>Synthetic construction: reporting lines are generated; work arrangement is fixed to hybrid.</p>
+
             <details className="mt-1">
               <summary className="cursor-pointer">How these figures were constructed</summary>
               <p className="mt-2">People managers are employees with at least one generated direct report, independently of career level. Reporting lines connect employees to the next populated higher level within their business unit. Average span is direct reports per people manager.</p>
@@ -106,7 +106,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
                   <LineChart data={data.trend}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.25} />
                     <XAxis dataKey="snapshot_date" tickFormatter={monthLabel} tick={{ fontSize: 11 }} />
-                    <YAxis width={58} tick={{ fontSize: 11 }} />
+                    <YAxis width={58} allowDecimals={false} tickFormatter={formatWholeCount} tick={{ fontSize: 11 }} />
                     <Tooltip
                       labelFormatter={(v) => monthLabel(String(v))}
                       formatter={(value) => formatWholeCount(Number(value))}

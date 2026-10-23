@@ -101,7 +101,7 @@ export function AppHeader({
   return (
     <header ref={header} data-mobile-menu-open={mobileMenuOpen?"":undefined} className="app-top-header sticky top-0 z-30 border-b bg-card">
       <div className="calm-header-row">
-        <div className="calm-brand"><h1 id="app-page-title">{title}</h1>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
+        <div className="calm-brand"><h1 id="app-page-title">{title}</h1><span className="text-xs font-medium text-muted-foreground" title="Workforce records are synthetic; public reference sources are identified separately.">Synthetic data</span>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
         <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close workspace':'Workspace'}</button>
         <div id="guided-header-navigation" className="guided-header-navigation">
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">

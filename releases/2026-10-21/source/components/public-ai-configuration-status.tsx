@@ -8,5 +8,5 @@ import {usePublicAiReadiness} from './use-public-ai-readiness';
 export function PublicAiConfigurationStatus({route}:{route:string}){
  const configured=usePublicAiReadiness(route);
  if(!PUBLIC_AI_ENABLED||datasetSession.snapshot()!==PUBLIC_9037.token||!configured)return null;
- return <p role="status" className="text-xs text-muted-foreground">Configured; budget checked when you submit.</p>;
+ return <details className="text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">AI configured</summary><p className="mt-1">Budget and provider availability are checked when you submit.</p></details>;
 }

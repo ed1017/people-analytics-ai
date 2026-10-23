@@ -200,6 +200,8 @@ export default function Home() {
       // Next supports native history for local query changes without reloading the shell.
       window.history.pushState(null, "", href);
       window.dispatchEvent(new Event(APP_PAGE_CHANGE_EVENT));
+      // Only explicit new navigation starts at the top; Back/Forward keeps browser restoration.
+      window.scrollTo({top: 0, left: 0, behavior: "instant"});
     }
   };
 
@@ -1972,13 +1974,13 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        {evidenceDrawer && <div className="evidence-ai-toolbar"><p>Explore the evidence, then ask a question with your goal as context.</p><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>Open Workforce AI</button></div>}
+        {evidenceDrawer && <div className="evidence-ai-toolbar"><span className="sr-only">Ask about this evidence</span><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>Open Workforce AI</button></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
         <SelectedProgressEntry/>
         {pageDataLoading&&<div className="m-4"><DataLoadingStatus/></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<WorkforceSolutionPanel optionActions={optionActions} page={activePage} onNavigate={setActivePage}/>}
-        {!["home","decision-brief","assess-evaluate","compensation","future-of-work","action-plans","plan-track"].includes(activePage)&&<p className="px-6 pt-3 text-xs text-muted-foreground" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p>}
+        {!["home","decision-brief","assess-evaluate","compensation","future-of-work","action-plans","plan-track"].includes(activePage)&&<details className="px-6 pt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">Source details</summary><p className="mt-1" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p></details>}
         <div hidden={activePage !== "home"}>
           <HomeChatShell>
           <OverallOverviewPage overviewEntry projectionOverview={{overview:overviewData,receipt:overviewScope,requested:{country:selectedCountry,org:selectedOrg,level:selectedLevel},scopeLabel:`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`,loading:dashboardLoading,error:dashboardError,trend:headcountTrend}} renderWelcome={controls=><HomeChatWelcome {...controls} trend={headcountTrend} overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError}/>} renderPlanPane={savedWork=><HomePlanPane onNavigate={setActivePage} onExample={()=>setDemoActive(true)}>{savedWork}</HomePlanPane>} onCloseDemo={()=>{setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus({preventScroll:true}));}} guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></HomeChatShell></div>
