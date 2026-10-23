@@ -86,7 +86,7 @@ export function CareerGrowthMobilityPage({
     ) ?? [];
 
   return (
-    <section className="evidence-pane min-w-0 p-6">
+    <section className="evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={!loading && !error && data ? growthFindings(data) : null} />
       <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
       <section className="mt-6" aria-labelledby="recorded-movement-history-heading">

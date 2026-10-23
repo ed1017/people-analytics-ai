@@ -50,7 +50,7 @@ export function LearningDevelopmentPage({
 }: LearningDevelopmentPageProps) {
   const data = !loading && !error ? sourceData : null;
   return (
-    <section className="learning-development-page min-w-0 p-6">
+    <section className="learning-development-page evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={data ? learningFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
@@ -95,7 +95,7 @@ export function LearningDevelopmentPage({
 
       {data ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
                 Current Gap Skills

@@ -151,3 +151,22 @@ Remaining naming limitation: the supplied public catalogue stores constructed BU
 Learning, Succession and Attrition now use compact, keyboard-accessible methodology disclosures instead of repeated expanded caveat panels. Learning retains visible course-coverage versus readiness distinction; illustrative succession flags remain labeled and suppression notices remain visible. Repeated Demo wording removed from succession labels without changing values, calculations or identities. Source definitions remain available on demand. Desktop/mobile and publication evidence belong to the release PR.
 
 No further manager/span/hybrid/regrettable-exit calculation defect was demonstrated by the reviewed schema and existing tests, so no data changed. Full BU names remain blocked by the constructed catalogue's lack of a verified code/name mapping; codes are retained instead of invented expansions. Chat layout, sliders, synthetic indicator, dates, pricing and accounting remain unchanged. Paid AI tests, onboarding/video, pinning, broad redesign and dataset regeneration are excluded.
+
+## Critique closure checklist - October 23 evidence hierarchy
+
+This reconciles the forwarded review findings and agreed scope; the complete original review attachments were not retrievable for a fresh exhaustive attribution. Release checks and deployment identity are recorded in the associated PR.
+
+| Item | Status |
+| --- | --- |
+| Repeated caveats | Shared disclosures in PR359 and page disclosures in PR361 implemented. Legacy explanations remain where decision-critical; not a claim that all copy is finished. |
+| Evidence spacing and hierarchy | Pane-responsive KPI grids replace cramped four-column viewport grids in Learning, Succession and legacy Career. Shared flat KPI strips, heading hierarchy, wrapping headers and mobile padding implemented in this increment. |
+| Recommendation-first, recalculating sliders/visuals, save/reopen | Previously implemented and replay-verified; preserved. No new model-quality claim. |
+| Chat left / visuals right / resizing | Preserved; targeted responsive verification applies to this increment. |
+| Chart ticks, fresh-navigation scroll, scoped Key findings | PR359 implemented. Existing scoped findings coverage from PR357/358 retained. |
+| Full BU names | Blocked on a verified code/name mapping; constructed codes retained rather than invented expansions. |
+| Manager/span | September 30 source: 5,192 manager flags among 9,037 people, average span 1.7. Views count manager flags and average their spans; generated reporting lines are independent of career level. No demonstrated calculation defect; no source values changed. |
+| Hybrid | 9,037 / 9,037 = 100%, zero remote/onsite, matching the fixed source work-arrangement field. Not observed work behavior. Zero-headcount guard already shipped. |
+| Regrettable exits | Jan-Sep 1,069 exits, 786 voluntary, zero true regrettable flags. Label now says Exits flagged regrettable. Zero does not establish assessment completeness; missing remains unavailable. |
+| Credits/onboarding popup/video, pinning/action integration, dark-mode work, wholesale redesign, source regeneration | Explicitly deferred or outside this pass. |
+
+No paid AI calls, financial changes, permission changes or dataset regeneration. The exact remaining naming and critique-provenance gaps above do not block the independent visual repairs.
