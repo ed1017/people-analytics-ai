@@ -136,3 +136,12 @@ This supersedes the pending reference/planning coverage in the previous incremen
 | Assess & Evaluate | Placeholder without analytical data; findings inapplicable until implemented. |
 
 The requested informational coverage is implemented with the applicability boundaries above. No new forecasting, candidate availability, causal conclusions, pinning or action integration. Welcome/video and live-company tenancy remain deferred. No paid provider calls, ledger mutations or permission changes in this follow-on.
+
+
+## Focused presentation polish — October 23
+
+Implemented in the associated release: compact Key findings hierarchy and shared typography; persistent synthetic-data indicator; source/methodology and AI-configuration detail disclosures; narrow-filter mismatch stays visible; explicit new-page navigation starts at top while Back/Forward remains browser-managed; whole-number automatic headcount ticks; evidence-based headcount change, full-time share, aged-requisition share and voluntary share of exits. Chat-left/visuals-right and controls remain unchanged.
+
+Verified metric semantics against the versioned analytics schema: regrettable exits count true flags, not completeness of classification; manager count uses manager flags and span averages those managers; hybrid uses the work-arrangement field. Existing disclosure explains the constructed hierarchy and fixed hybrid field. No data regenerated. Empty headcount now displays hybrid share as unavailable rather than dividing by zero.
+
+Remaining naming limitation: the supplied public catalogue stores constructed BU codes rather than full names. No invented name mapping was introduced. Expanded actual BU names require a verified code/name source. Decision-critical unknown costs, dates, scope and feasibility limitations remain visible; this pass does not remove every legacy explanation. Credits/onboarding/video, dark mode, new features and pinning/action integration remain out of scope. No paid AI calls or accounting/access changes.

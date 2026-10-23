@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0063a2de15957e1bca0a2b365235947b3cd0eb21",
+  "sourceCommit": "2f583f9674eb5ac6afb41ca5a658ce8a48507112",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -244,8 +244,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "63da30420165e6a20a380b2bd99685be5962d456d2e92ed4d2a9d7bdb4102c79",
-      "bytes": 48759
+      "sha256": "c770ec8d2bca66214902e8ce963820ce14af0c389fcbe4a292b3351d0e5cbbab",
+      "bytes": 49170
     },
     {
       "path": "app/layout.tsx",
@@ -259,8 +259,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "5549d1ba19d19a147399a9c2ef688220f9fa0e853d32b1b3033b576a061012d2",
-      "bytes": 87214
+      "sha256": "c76d6f7d618da3ce27bd4599bd824b6679090c94e797b032b9e3d857eb401c8d",
+      "bytes": 87451
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -309,8 +309,8 @@
     },
     {
       "path": "components/app-header.tsx",
-      "sha256": "6768d287116a02b3ece80019a3c9a331d904bc9f233827015aa377b6b86e62d2",
-      "bytes": 7454
+      "sha256": "47c678d022850df1245ed8d4dc5ed22e80a4f835243e31b3c4758749390158de",
+      "bytes": 7628
     },
     {
       "path": "components/app-sidebar.tsx",
@@ -404,8 +404,8 @@
     },
     {
       "path": "components/evidence-scope-notice.tsx",
-      "sha256": "0da01f853a61ad9e3e81c9e3cf62f19f3ccac4563c18afb383e9176d91f65a87",
-      "bytes": 1989
+      "sha256": "469d665ec5cf0766806e461a66b434f0f5029a312bfc46d24eb73f1afaf00007",
+      "bytes": 2221
     },
     {
       "path": "components/evidence-table-region.tsx",
@@ -544,8 +544,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "797ecc7e2d02f07de83e9a8d5d67b73a12535406d12c8cf7bc8202d9638a7a6b",
-      "bytes": 17506
+      "sha256": "2bca05304905d8b7e952f837ddc9e2b1f52eebe4f758ce607217d20030e88703",
+      "bytes": 17496
     },
     {
       "path": "components/home-data-status.tsx",
@@ -749,8 +749,8 @@
     },
     {
       "path": "components/pages/overview-page.tsx",
-      "sha256": "a58420666a20bfbf59460e45e2c025c9d84d5b5f79afe77ffb21c87e9b073271",
-      "bytes": 9807
+      "sha256": "76fe1f13d2ec5fcda1897c70d2391448850ea33c3ff8ee918b75318564b0bfa8",
+      "bytes": 9476
     },
     {
       "path": "components/pages/skills-page.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/workforce-page.tsx",
-      "sha256": "b71ef3359ccc958021449f97049568b3950eff8c2396e4f3bea571cb9e5e6ff1",
-      "bytes": 11891
+      "sha256": "fc3c90e50bb7add7904589b07aa4285743f3ede24a80d1d33f7bd746262ad46f",
+      "bytes": 11876
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/public-ai-configuration-status.tsx",
-      "sha256": "46883a54b5b0f353d9af4b179e1f994458ccd66a884b1e2a41ee2a33657f98e9",
-      "bytes": 666
+      "sha256": "f3b9f8446f0de80b840228db7ab7b5c216dad19e268c15928b556dbd249a5aab",
+      "bytes": 773
     },
     {
       "path": "components/retention-what-if-panel.tsx",
@@ -3909,13 +3909,13 @@
     },
     {
       "path": "components/key-findings.tsx",
-      "sha256": "71c152ee757458dea7aed9b0ac6816f7623f8cf695f1e013a02373d89b2e1716",
-      "bytes": 650
+      "sha256": "ef37b058af8f973ef2c409260a56dcf1ffe5c8f6755306f683ffd1ff8da7ca1e",
+      "bytes": 700
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "c7bd557aa37d53cddc879f855404647401cc74ad8563b2fd9aa5d709fc918bd0",
-      "bytes": 7785
+      "sha256": "708c5191bbe629b0af8f027eaa11852a1a8e96a28fec018789c6674cc995b61d",
+      "bytes": 8834
     },
     {
       "path": "tests/key-findings.test.mjs",
@@ -3936,8 +3936,13 @@
       "path": "tests/context-findings.test.mjs",
       "sha256": "589d4efa6dda8ac55b32f841feb673112a78b000edc87a55b913db93c7b2419d",
       "bytes": 4494
+    },
+    {
+      "path": "tests/polish-findings.test.mjs",
+      "sha256": "2b8803547962844af953c9700a23fce8e2f59f7fcfb48cb6a4a8aed411dc2d38",
+      "bytes": 2104
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "79ee2f91c7881aa90f6ee1cdbf49465d3c2b56c599332fe5768c55e31db87ac2"
+  "verifiedDeployedArchiveSha256": "0fecdd29285023ad92995b98809c5d2f726bcfd0fd9dc03b520ae661ab28c81f"
 }

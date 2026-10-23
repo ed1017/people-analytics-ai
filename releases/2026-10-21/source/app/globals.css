@@ -910,3 +910,10 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 
 /* Keep plain-text template fields distinct without changing submitted values. */
 .home-workspace textarea#overview-question { line-height: 1.75; }
+
+/* Shared evidence hierarchy; preserve each workspace's responsive layout. */
+.evidence-pane h2 { letter-spacing: -.02em; line-height: 1.25; }
+.evidence-pane h3 { line-height: 1.4; }
+.evidence-metric-grid, .evidence-pane :is(td, th) { font-variant-numeric: tabular-nums; }
+.key-findings { max-width: 85ch; }
+.evidence-scope-notice summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }

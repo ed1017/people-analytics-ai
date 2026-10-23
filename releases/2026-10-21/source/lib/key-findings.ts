@@ -14,20 +14,25 @@ export const snapshotFindings = (d: OverviewData, scope: string) => result(`${sc
   fact(d.open_positions, v => `${n(v)} positions are open in the selected snapshot; this is not a hiring forecast.`),
   fact(d.voluntary_turnover_ytd_pct, v => `Voluntary turnover is ${n(v)}% year to date, not a full-year total turnover rate.`),
 ]);
-export const workforceFindings = (d: WorkforceResponse) => result(`Company workforce · ${d.as_of}`, [
-  fact(d.summary.headcount, v => `${n(v)} people are recorded${numeric(d.summary.fte) ? `, representing ${n(d.summary.fte)} FTE` : ''}.`),
-  fact(d.summary.avg_tenure_years, v => `Average recorded tenure is ${n(v)} years.`),
-  fact(d.summary.people_managers, v => `${n(v)} people managers are recorded; manager counts do not establish management effectiveness.`),
-]);
+export const workforceFindings = (d: WorkforceResponse) => {
+  const trend = [...(d.trend ?? [])].filter(row => numeric(row.headcount)).sort((a,b)=>a.snapshot_date.localeCompare(b.snapshot_date));
+  const first=trend[0], last=trend.at(-1);
+  const change=first && last && first.snapshot_date!==last.snapshot_date ? last.headcount-first.headcount : null;
+  return result(`Company workforce · ${d.as_of}`, [
+    change !== null ? `Headcount ${change > 0 ? 'increased' : change < 0 ? 'decreased' : 'was unchanged'}${change === 0 ? '' : ` by ${n(Math.abs(change))} people`} between ${first.snapshot_date} and ${last!.snapshot_date}.` : fact(d.summary.headcount,v=>`${n(v)} people are recorded in the current snapshot.`),
+    numeric(d.summary.headcount) && d.summary.headcount>0 && numeric(d.summary.full_time_headcount) && d.summary.full_time_headcount<=d.summary.headcount ? `${n(100*d.summary.full_time_headcount/d.summary.headcount)}% of recorded employees are full-time.` : null,
+    fact(d.summary.avg_tenure_years,v=>`Average recorded tenure is ${n(v)} years.`),
+  ]);
+};
 export const attritionFindings = (d: AttritionResponse) => result(`Company workforce · year to date through ${d.as_of}`, [
   fact(d.summary.total_exits, v => `${n(v)} total exits are recorded${numeric(d.summary.total_turnover_ytd_pct) ? ` (${n(d.summary.total_turnover_ytd_pct)}% total turnover)` : ''}.`),
   fact(d.summary.voluntary_exits, v => `${n(v)} exits were voluntary${numeric(d.summary.voluntary_turnover_ytd_pct) ? ` (${n(d.summary.voluntary_turnover_ytd_pct)}% voluntary turnover)` : ''}.`),
-  'Total and voluntary turnover use different exit definitions; neither establishes why people left.',
+  numeric(d.summary.total_exits) && d.summary.total_exits > 0 && numeric(d.summary.voluntary_exits) && d.summary.voluntary_exits <= d.summary.total_exits ? `${n(100*d.summary.voluntary_exits/d.summary.total_exits)}% of recorded exits were voluntary; this does not establish why people left.` : null,
 ]);
 export const recruitingFindings = (d: TalentAcquisitionResponse) => result(`Recruiting snapshot · ${d.as_of}`, [
   fact(d.summary.median_time_to_fill_days, v => `Recorded median time to fill is ${n(v)} days; it is not a promise for a future hire.`),
   fact(d.summary.open_requisitions, v => `${n(v)} requisitions currently have open status.`),
-  fact(d.summary.open_reqs_over_60_days, v => `${n(v)} open requisitions are older than 60 days.`),
+  fact(d.summary.open_reqs_over_60_days, v => numeric(d.summary.open_requisitions) && d.summary.open_requisitions > 0 && v <= d.summary.open_requisitions ? `${n(100*v/d.summary.open_requisitions)}% of open requisitions (${n(v)} of ${n(d.summary.open_requisitions)}) are older than 60 days.` : `${n(v)} open requisitions are older than 60 days.`),
 ]);
 export const surveyFindings = (d: SurveySentimentResponse) => result(`Company employee listening · ${d.data_meta?.listeningPeriod ?? d.as_of}`, [
   fact(d.summary.engagement_favorable_pct, v => `Engagement favorability is ${n(v)}%${numeric(d.summary.engagement_respondents) ? ` among ${n(d.summary.engagement_respondents)} respondents` : ''}.`),

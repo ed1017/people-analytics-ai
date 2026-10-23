@@ -233,19 +233,8 @@ export function OverviewPage({
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis
-                  domain={[
-                    (dataMin: number) =>
-                      Math.max(
-                        0,
-                        Math.floor(
-                          dataMin * 0.95
-                        )
-                      ),
-                    (dataMax: number) =>
-                      Math.ceil(
-                        dataMax * 1.05
-                      ),
-                  ]}
+                  domain={["auto", "auto"]}
+                  allowDecimals={false}
                   tickFormatter={(
                     value: number
                   ) => formatWholeCount(value)}
