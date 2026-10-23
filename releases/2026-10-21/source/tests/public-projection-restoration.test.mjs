@@ -57,7 +57,7 @@ test('actual approved9037 public source: snapshot, filters, public digest and ga
  const source=await loadPublicProjectionSource({hostname:'people-analytics-gkl61lnek-ed-56dc.vercel.app',production:true});
  const preview=await loadPublicProjectionSource({hostname:'people-analytics-gkl61lnek-ed-56dc.vercel.app',production:false});assert.equal((await preview.projection(filters)).opening,9037);
  const all=await source.projection(filters),scoped=await source.projection({...filters,country:'US',level:'L1'});
- assert.equal(all.opening,9037);assert.equal(all.datasetVersion.publicDigest,'b320608fd2edd49f838e9834cdcd13dea1a2cfc3167bdc84c5fbe487a4d0dc97');assert.equal(all.baseline[0].planning_month,'2027-01-01');assert.ok(scoped.opening>0&&scoped.opening<9037);assert.equal(scoped.defaults,null);
+ assert.equal(all.opening,9037);assert.equal(all.datasetVersion.publicDigest,'5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54');assert.equal(all.baseline[0].planning_month,'2027-01-01');assert.ok(scoped.opening>0&&scoped.opening<9037);assert.equal(scoped.defaults,null);
  await assert.rejects(calculateHeadcountProjection({...spec,method:'configured_scenario',months:1,changes:[]},all,[],[]),/complete forward window/);
  const receipt=await source.currentness(filters);assert.equal(receipt.inputs.opening,9037);
 });

@@ -1,3 +1,5 @@
+> Candidate status: the current fixture is a local replay of the reviewed public-route projection, not a hosted or production capture. No model output is included.
+
 # Local reproduction with public synthetic fixtures
 
 This recipe starts the versioned release's actual Home and analytics components against a pinned replay of 19 public-schema aggregate GET responses. It uses no private runtime inputs, credentials, database, provider calls or production access. It creates a separate local application; the immutable source snapshot and repository root app are not modified.

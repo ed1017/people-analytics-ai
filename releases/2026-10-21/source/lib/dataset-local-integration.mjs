@@ -10,7 +10,7 @@ import {deepFreeze, exact, validateDemoBundle, validateDemoRequest} from './data
 import {createLocalApiPresenter} from './dataset-local-api.mjs';
 import {createConversationAdapters} from './dataset-conversation-adapters.mjs';
 import {createCandidateConversationInputs} from './dataset-conversation-inputs.mjs';
-import {OFFLINE_9037_DATASET_ID, isReviewed9037Provider} from './dataset-9037-offline-provider.mjs';
+import {OFFLINE_9037_DATASET_ID, isReviewed9037Provider, reviewed9037PresenterContract} from './dataset-9037-offline-provider.mjs';
 import {is9037CompanyAnalytics} from './dataset-9037-company-analytics.mjs';
 
 const supported = {
@@ -48,7 +48,7 @@ export function createLocalDatasetIntegration({router, candidateDatasetId, candi
     candidate();
     const request = {method: 'GET', url: 'http://local.invalid/', hasBody: false};
     const parts = Object.fromEntries(await Promise.all(DATASET_COMPONENTS.map(async name => [name, await releases.read(name, request)])));
-    validateDemoBundle(parts);
+    validateDemoBundle(parts, offline9037 ? {skillPopulationByCode: reviewed9037PresenterContract(candidateProvider).skillPopulationByCode} : undefined);
     return deepFreeze({...identity(), dataClass: 'constructed-synthetic', publicationApproved: false, components: parts});
   }
   return Object.freeze({

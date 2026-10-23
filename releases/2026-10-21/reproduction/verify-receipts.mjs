@@ -4,7 +4,7 @@ import {LOCAL_COMPANY_GET_ROUTES} from '../source/lib/dataset-company-routes.mjs
 import {PUBLIC_9037} from '../source/lib/public-9037-contract.mjs';
 import {projectPublic9037,public9037Metadata,public9037Fields} from '../source/lib/public-9037-projection.mjs';
 
-export const OBSERVED_PUBLIC_DIGEST='b320608fd2edd49f838e9834cdcd13dea1a2cfc3167bdc84c5fbe487a4d0dc97';
+export const OBSERVED_PUBLIC_DIGEST='5918dc315d87bed5098c25405ca7c90b2d63ff277fdd41042901dbab6cbedf54';
 const placeholder='public-projection-digest-placeholder';
 const convention='hire_date is accepted offer; start_date drives headcount inflow. Internal hires are movements, not external starts.';
 const fail=()=>{throw Error('Public receipt contract mismatch.');};

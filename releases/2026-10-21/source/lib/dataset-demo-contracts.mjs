@@ -126,9 +126,13 @@ export function validateDemoPayload(name, value, contract, args) {
 }
 
 /** Run on the full company bundle, never on an arbitrary filtered response. */
-export function validateDemoBundle(parts) {
+export function validateDemoBundle(parts, {skillPopulationByCode} = {}) {
   ensure(exact(parts, Object.keys(DEMO_CONTRACTS)), 'Complete eight-component bundle required');
   const stock = parts.workforce.data[0];
-  ensure(parts.ratings.data.counts.population === stock.headcount && parts.survey.data.at(-1).eligible === stock.headcount && parts.skills.data.every(r => r.employees_in_roles_requiring_skill === stock.headcount) && parts.planning.data.every(r => r.planned_headcount === stock.headcount && r.planned_fte === stock.fte && r.planned_labor_cost_usd === stock.labor_cost_usd), 'Cross-component stock mismatch');
+  const skills=parts.skills.data;
+  const skillStockMatches=skillPopulationByCode===undefined
+    ? skills.every(r=>r.employees_in_roles_requiring_skill===stock.headcount)
+    : exact(skillPopulationByCode,skills.map(r=>r.skill_code)) && new Set(skills.map(r=>r.skill_code)).size===skills.length && skills.every(r=>Number.isSafeInteger(skillPopulationByCode[r.skill_code])&&skillPopulationByCode[r.skill_code]>0&&skillPopulationByCode[r.skill_code]<=stock.headcount&&r.employees_in_roles_requiring_skill===skillPopulationByCode[r.skill_code]);
+  ensure(parts.ratings.data.counts.population === stock.headcount && parts.survey.data.at(-1).eligible === stock.headcount && skillStockMatches && parts.planning.data.every(r => r.planned_headcount === stock.headcount && r.planned_fte === stock.fte && r.planned_labor_cost_usd === stock.labor_cost_usd), 'Cross-component stock mismatch');
   return parts;
 }

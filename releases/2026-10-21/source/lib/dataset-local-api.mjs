@@ -107,7 +107,7 @@ export function createLocalApiPresenter({router, analytics, releases}) {
   }
   async function skills() {
     const rows = (await component('skills')).data, counts = (await analytics.read('skill_catalog_counts'))[0];
-    must(exact(counts,['active_skills','total_job_profiles','onet_mapped_job_profiles']) && Object.values(counts).every(count) && counts.active_skills === 5 && counts.total_job_profiles === 50 && counts.onet_mapped_job_profiles === 0, 'Skill catalog counts');
+    must(exact(counts,['active_skills','total_job_profiles','onet_mapped_job_profiles']) && Object.values(counts).every(count) && counts.active_skills === contract().skillCatalogSize && counts.total_job_profiles === 50 && counts.onet_mapped_job_profiles === 0, 'Skill catalog counts');
     const population = sum(rows,'employees_in_roles_requiring_skill');
     return {as_of:DEMO_CUTOFF,summary:{...counts,current_workforce:contract().population,skills_with_demand:rows.length,skills_below_60_pct:rows.filter(r=>r.requirement_met_pct<60).length,skills_below_75_pct:rows.filter(r=>r.requirement_met_pct<75).length,weighted_requirement_met_pct:round(rows.reduce((n,r)=>n+r.requirement_met_pct*r.employees_in_roles_requiring_skill,0)/population),average_profile_coverage_pct:round(sum(rows,'profile_coverage_pct')/rows.length)},largest_gaps:sort(rows,'requirement_met_pct'),highest_demand:sort(rows,'employees_in_roles_requiring_skill',true),strongest_coverage:sort(rows,'requirement_met_pct',true),data_meta:metadata({sourceLabel:contract().provenance.skills,externalReferences:'Zero local role mappings; independently dated O*NET/BLS reference content is not part of this workforce bundle.'})};
   }

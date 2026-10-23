@@ -29,7 +29,7 @@ export function createDomainPresenters({analytics,component,metadata,contract=()
  async function learning(){
   const [skills,workforce,courses,jobs]=await Promise.all([component('skills'),component('workforce'),analytics.read('learning_courses'),analytics.read('learning_jobs')]);
   must(workforce.data[0]?.headcount===contract().population,'Learning workforce');
-  must(courses.length===5&&unique(courses,r=>r.skill_id)&&unique(courses,r=>r.skill_code),'Learning skill catalog');
+  must(courses.length===contract().skillCatalogSize&&unique(courses,r=>r.skill_id)&&unique(courses,r=>r.skill_code),'Learning skill catalog');
   for(const c of courses)must(exact(c,['skill_id','skill_code','active_course_count','shortest_catalog_duration_hours','avg_catalog_duration_hours'])&&label(c.skill_id)&&label(c.skill_code)&&count(c.active_course_count)&&duration(c.shortest_catalog_duration_hours)&&duration(c.avg_catalog_duration_hours)&&
    (c.active_course_count>0||c.shortest_catalog_duration_hours===null&&c.avg_catalog_duration_hours===null),'Learning course aggregate');
   must(jobs.length===50&&unique(jobs,r=>r.job_profile_code),'Learning role catalog');
