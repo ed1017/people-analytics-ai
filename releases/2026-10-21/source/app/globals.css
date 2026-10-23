@@ -945,3 +945,14 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .staffing-options-table th { white-space: normal; }
 .staffing-options-table td:nth-child(4) { white-space: nowrap; }
 .staffing-options-scroll:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+.scenario-decision-summary { border-left:3px solid #5eead4; padding:.85rem 1rem; background:#102b40; color:#f0f7fb; border-radius:.5rem; }
+.scenario-decision-summary h3 { font-size:1.2rem; font-weight:700; line-height:1.35; }
+.scenario-decision-summary > p { font-size:.85rem; margin:.4rem 0 .8rem; color:#c2d2df; }
+.scenario-decision-options { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:1rem; }
+.scenario-decision-options h4 { font-size:.8rem;color:#99f6e4;font-weight:600; }
+.scenario-decision-options p { font-size:.9rem;margin:.25rem 0 .6rem; }
+.scenario-decision-options dl { display:flex;flex-wrap:wrap;gap:.6rem 1.5rem; }
+.scenario-decision-options dt { font-size:.75rem;color:#c2d2df; }
+.scenario-decision-options dd { font-size:.95rem;font-weight:650; }
+.scenario-essential-inputs { padding:.7rem 0; border-block:1px solid var(--border); }

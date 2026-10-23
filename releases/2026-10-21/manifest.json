@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7d30cff8bd1e122519c6d2c6892da82972e1e25d",
+  "sourceCommit": "a6ec3fc74e1e7965bcbd180764c331fadf7435d7",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -244,8 +244,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "dc00a4ba36ca00af0138371b7e69c0bee27dd50a6edc76f1b0c48c0b1a100517",
-      "bytes": 51462
+      "sha256": "fbf19298cf671d6c93f9b96581953b4d01e4f71b6fc317f6a05a09cab10a8f05",
+      "bytes": 52353
     },
     {
       "path": "app/layout.tsx",
@@ -884,8 +884,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "7961d50108ea0d6e0717b9717fb6c4ef995cb70af4756e7034109e1e40f48d4f",
-      "bytes": 10591
+      "sha256": "a23b32af8989a28b31d78589d5f1810e82d98e7d44ba4574c15589a8015ec139",
+      "bytes": 10120
     },
     {
       "path": "components/site-footer.tsx",
@@ -3654,8 +3654,8 @@
     },
     {
       "path": "lib/staffing-choice-summary.ts",
-      "sha256": "5b56c9dd69e916bd8b071bc60d362aca16629dbeefbdb2e2b67cb3d621c2685e",
-      "bytes": 2607
+      "sha256": "3494b2fb8876ab914d530fafe1c336a3c84bd44eda44b86dacc11de6c4120f23",
+      "bytes": 2840
     },
     {
       "path": "lib/staffing-monthly-capacity.ts",
@@ -3966,8 +3966,18 @@
       "path": "tests/review-polish-contracts.test.mjs",
       "sha256": "7cbb52b452e24e26eb4a81cb321a1bb998d429484c4c5f32ae875062c826e730",
       "bytes": 1805
+    },
+    {
+      "path": "components/scenario-decision-summary.tsx",
+      "sha256": "ea3c1b66278d3c951aab73c0ca92ef3ba1c7e41157e2b3ca43f66fdb867bb038",
+      "bytes": 2262
+    },
+    {
+      "path": "tests/scenario-decision-summary.test.mjs",
+      "sha256": "e62fe4f5a9b7428128a3ab8c931846bc2cce69347e3edb2d05fb4db4324b4f51",
+      "bytes": 3074
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "3ee5f22d967193aa3674e59ce9855f957ba40f92068e8301e7b2a0ec0c05dd3f"
+  "verifiedDeployedArchiveSha256": "2afb6f22e31c37d7249a548ff19179806652dd85a5f1cc88b2650498a3259979"
 }

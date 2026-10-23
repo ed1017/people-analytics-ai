@@ -224,3 +224,12 @@ The parent re-read both original text critiques and supplied their findings. Thi
 | Authorship/credits intro, popup/video/demo, dark mode, pinning/action integration, wholesale redesign, regeneration | Deferred under the user's agreed scope. |
 
 No claim of complete subjective visual polish or unrestricted AI reliability. This closes the specific static-title defect and records the remaining design/data dependencies. No paid provider calls or financial/access changes.
+
+
+## October 23 approved credibility and decision-first sequence
+
+- PR368 shipped: truthful conditional AI description, working read-only `/about`, normalized snapshot prefix, consistent Scenarios/Workforce/save labels, readable staffing statuses and contained comparison scroll. Production runtime `7d30cff8bd1e122519c6d2c6892da82972e1e25d`, deployment `dpl_JCMSx1LckrcMpUwGnbQ4eM6UPU2i`; desktop/mobile public checks passed without provider calls.
+- Decision-first showcase: reviewed implementation keeps the same calculator and explicit fictional-assumption adoption; presents cash/coverage tradeoffs, staffing mix, conditional readiness and uncovered hours together, with primary workload/budget controls visible. No automatic selection or save. Hosted acceptance and CI are release gates.
+- Coordinated synthetic realism is now approved for assessment, superseding the earlier blanket regeneration deferral. The original 9037 generation pipeline was located and key manifest hashes matched; exact final 62-query capture reproduction remains unproven. First establish an isolated unchanged baseline, then propose a separate manager/span and work-arrangement candidate. Do not hand-edit aggregates. Any new dataset needs coherent 33-snapshot reporting links and new identity/pins; turnover/skills changes have broader cross-domain dependencies.
+- Raw constructed skill labels and BU expansions still require authoritative mappings; labels are not invented. Popup/video, tornado charts, extra scenarios and wholesale redesign remain deferred.
+- No paid AI, financial, access or credential changes in these increments.
