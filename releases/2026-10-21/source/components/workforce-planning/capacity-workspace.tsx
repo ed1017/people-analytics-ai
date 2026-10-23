@@ -1,4 +1,6 @@
 'use client';
+import {KeyFindings} from "@/components/key-findings";
+import {capacityFindings} from "@/lib/context-findings";
 import {useRef} from 'react';
 import {SkillClientDemand} from './skill-client-demand';
 import {CapacityProjection} from './capacity-projection';
@@ -45,6 +47,7 @@ export function CapacityWorkspace(){
   requestAnimationFrame(()=>feedback.current?.focus());
  }
  return <section aria-label="Workload capacity planning" className="capacity-workspace @container/capacity space-y-4">
+  <KeyFindings findings={!error ? capacityFindings(result, isPreview) : null} />
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
   {draft.sourceNote&&<aside aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><strong>Illustrative handoff origin</strong><p>{draft.sourceNote}</p><p>Origin values are retained for review. Later edits below are independent; the reduction is not applied again. No observed savings or staffing release is established.</p></aside>}
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>

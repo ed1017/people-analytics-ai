@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3d04c5070776ed3daadef2cbe301a31ceaa88d9b",
+  "sourceCommit": "0063a2de15957e1bca0a2b365235947b3cd0eb21",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -394,8 +394,8 @@
     },
     {
       "path": "components/development-workspace.tsx",
-      "sha256": "a49917be0c313288015c3d5c8fba667025fc457faf8e3608089e2bbef1a369df",
-      "bytes": 12952
+      "sha256": "fece226bd32a812167d93ddb69af156f64c5971b49842bcc5c15643bab312eef",
+      "bytes": 13201
     },
     {
       "path": "components/elapsed-waiting-time.tsx",
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/market-reference.tsx",
-      "sha256": "1a04146138954344a432dd53ab6771f8962c84993f1f08976d35a8c28f745a7a",
-      "bytes": 15001
+      "sha256": "4af1670b5d934f134ee92c42b65c22fca58c588cfc53426bb097441eece39096",
+      "bytes": 15737
     },
     {
       "path": "components/model-capability-planner.tsx",
@@ -689,8 +689,8 @@
     },
     {
       "path": "components/occupational-reference.tsx",
-      "sha256": "84d0e82f48684ce203319bd87612ea5a5ba259bafeae6e0189446a7abf8a6e07",
-      "bytes": 20487
+      "sha256": "ec1b1380bdebfb14de416eb7e6f5b741427a69617f20b21ae91a0b47504b71de",
+      "bytes": 20661
     },
     {
       "path": "components/option-switcher.tsx",
@@ -1109,8 +1109,8 @@
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "d734676ba848bb085899d13210db1f6d323fc583294d78e8e36a90bf3338e6b7",
-      "bytes": 12776
+      "sha256": "2ba1cfceca6449b19c3aaec2de61330e2895aad54e6e3aec4237839e3564865c",
+      "bytes": 12969
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -1139,8 +1139,8 @@
     },
     {
       "path": "components/workforce-planning/execution-feasibility-destination.tsx",
-      "sha256": "105d0e5f5154825bc9246602da4787afa357da6e9467b1fef05f0dcb0258567f",
-      "bytes": 4397
+      "sha256": "fa419b65c1228c6a8675de1ab22ca0cf650a280ba8fea072f4e866aa2450c838",
+      "bytes": 4743
     },
     {
       "path": "components/workforce-planning/execution-result-summary.tsx",
@@ -1164,8 +1164,8 @@
     },
     {
       "path": "components/workforce-planning/planning-overview.tsx",
-      "sha256": "45f01190e9275ae9c9550d0d45d8a71b09fa8dd1efed09cf9843903c5e7b5fe0",
-      "bytes": 9545
+      "sha256": "f70e3aa4a73689a1ed037056613f4b20de15e53ec4f7b7ce44f1955f40ff8939",
+      "bytes": 9731
     },
     {
       "path": "components/workforce-planning/planning-session-context.tsx",
@@ -1184,8 +1184,8 @@
     },
     {
       "path": "components/workforce-planning/position-workforce-design-destination.tsx",
-      "sha256": "1e4227141cb0fca4b38d39f55705e1537e3fb0f2a38818a11dcbcc411d96829d",
-      "bytes": 2910
+      "sha256": "bb1e87e12f5b9998545f83138de20d12bf3d61b08d8b0c755d2a2b3420484747",
+      "bytes": 3216
     },
     {
       "path": "components/workforce-planning/response-portfolio-allocation-section.tsx",
@@ -1219,8 +1219,8 @@
     },
     {
       "path": "components/workforce-planning/scenario-modeling-destination.tsx",
-      "sha256": "f0d55cd0ced35a657a137c96fb0d6cde13e94db13528ca9f210afd67d0cdb7c5",
-      "bytes": 3684
+      "sha256": "737ae3984226364304f695d1cfaf18d7aeba254e57a1ed88b9c5d4d90adc3bed",
+      "bytes": 3892
     },
     {
       "path": "components/workforce-planning/scenario-modeling-panel.tsx",
@@ -1289,8 +1289,8 @@
     },
     {
       "path": "components/workforce-planning/workforce-response-destination.tsx",
-      "sha256": "e9e756e83830c363b0bd51ea370828bcb6c0ea5e0c47ed82e6bea76816d58e2c",
-      "bytes": 5211
+      "sha256": "b5c7bf856b0f2f307827935ae57942365f10bf1af74baf5b78a3e4e9e8b1bf9d",
+      "bytes": 5597
     },
     {
       "path": "components/workforce-selection-handoff.tsx",
@@ -3914,8 +3914,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "a123b4089a7d8f808fcc47188a4b3a1b7cdefa6653bdade511a1946c129c49ac",
-      "bytes": 7735
+      "sha256": "c7bd557aa37d53cddc879f855404647401cc74ad8563b2fd9aa5d709fc918bd0",
+      "bytes": 7785
     },
     {
       "path": "tests/key-findings.test.mjs",
@@ -3926,8 +3926,18 @@
       "path": "tests/succession-display-release.test.mjs",
       "sha256": "ec41a867e8219f9664f24ba847f073df022cb5bc13b804c6d8a76ad17bac2f17",
       "bytes": 2561
+    },
+    {
+      "path": "lib/context-findings.ts",
+      "sha256": "b5acc8f687129d24087a348e833be78f7691192b6b353dfde18ba7d2d32faa65",
+      "bytes": 6755
+    },
+    {
+      "path": "tests/context-findings.test.mjs",
+      "sha256": "589d4efa6dda8ac55b32f841feb673112a78b000edc87a55b913db93c7b2419d",
+      "bytes": 4494
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "bdf2eb2bae7f814c05840be87174551d8eb0b825c7e2150651b3b0691245ec0c"
+  "verifiedDeployedArchiveSha256": "79ee2f91c7881aa90f6ee1cdbf49465d3c2b56c599332fe5768c55e31db87ac2"
 }

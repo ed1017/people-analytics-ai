@@ -1,3 +1,5 @@
+import {KeyFindings} from "@/components/key-findings";
+import {executionFindings} from "@/lib/context-findings";
 import type { ComponentProps } from "react";
 
 import { PositionModelingSummary } from "./position-modeling-summary";
@@ -64,6 +66,7 @@ export function ExecutionFeasibilityDestination({
         </span>
       </div>
 
+      {!positionModelingLoading && !executionPanelProps?.responseExecutionLoading && !executionPanelProps?.responseExecutionError && <KeyFindings findings={executionFindings(executionPanelProps?.responseExecutionResult ?? null)} />}
       {!responseReady && (
         <div className="mb-5 rounded-md border bg-muted/20 p-4">
           <p className="font-medium">

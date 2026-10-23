@@ -1,4 +1,6 @@
 "use client";
+import {KeyFindings} from "@/components/key-findings";
+import {occupationFindings} from "@/lib/context-findings";
 import {datasetFetch} from "@/lib/dataset-client.mjs";
 
 import { useEffect, useMemo, useState } from "react";
@@ -85,6 +87,7 @@ export function OccupationalReference({ onEvidenceChange }: { onEvidenceChange?:
   useEffect(() => () => onEvidenceChange?.(null), [onEvidenceChange]);
 
   return <section aria-label="Occupational reference explorer" className="space-y-5">
+    <KeyFindings findings={occupationFindings(evidence)} />
     <div className={cardClass}>
       <h2 className="text-xl font-semibold">Explore roles and occupations</h2>
       <p className="mt-2 text-sm text-muted-foreground">Explore job profiles and occupational guidance. Mappings do not establish employee skill attainment.</p>
