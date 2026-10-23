@@ -36,6 +36,8 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
  const storage=useDecisionStorage(),[draft,setDraft]=useState<BundleDraft|null>(null),[draftDataset,setDraftDataset]=useState<string|null>(null),[comparison,setComparison]=useState<Comparison|null>(null),[edit,setEdit]=useState<BundleEditPreview|null>(null),[selection,setSelection]=useState<string|null>(null),[review,setReview]=useState<Selection|null>(null),[pending,setPending]=useState(false),[notice,setNotice]=useState('');
  const [showOptions,setShowOptions]=useState(false),[chatScenario,setChatScenario]=useState(false);
  const [demoOpen,setDemoOpen]=useState(false),[restartRequested,setRestartRequested]=useState(false);
+ const [comparisonFirst,setComparisonFirst]=useState(false);
+ const [resumeKey,setResumeKey]=useState<string|null>(null);
  const [inputReview,setInputReview]=useState<{question:string;identity:string}|null>(null);
  const suspended=useRef(false);
  const [demandBridge,setDemandBridge]=useState<SwpDemandBridge|null>(null),[demandStale,setDemandStale]=useState(false);
@@ -57,7 +59,7 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
  useEffect(()=>{restore();},[conversation.activeGoalId,conversation.focusedIssue,token]);
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Navigation cancels the currently owned calculation and closes its review.
  useEffect(()=>{if(!active){generation.current++;abort.current?.abort();if(opening.current&&ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}opening.current=false;setPending(false);setReview(null);}},[active]);
- function exit(){setChatScenario(false);suspended.current=false;setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'']);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
+ function exit(){setResumeKey(null);setComparisonFirst(false);setChatScenario(false);suspended.current=false;setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'']);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
  const handleReset=useEffectEvent(()=>{if(resetSeen.current!==conversation.resetEpoch){resetSeen.current=conversation.resetEpoch;exit();}});
  useEffect(()=>{handleReset();},[conversation.resetEpoch]);
  const draftKey=draft?bundleInputKey(draft):'',matches=!!draft&&(suspended.current||ownedIsolation.current===draft.binding.goalId||!conversation.activeGoalId||conversation.activeGoalId===draft.binding.goalId&&conversation.focusedIssue===draft.binding.goal)&&token===draftDataset;
@@ -78,7 +80,7 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
   }
   if(text===swpDemoPrompt){
    if(draft&&matches&&!demandBridge&&!acceptedExample){resumeDemo();return '';}
-   setDemoOpen(true);setRestartRequested(false);
+   setComparisonFirst(false);setResumeKey(null);setDemoOpen(true);setRestartRequested(false);
    setShowOptions(false);
    demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);
    const id='guided-swp-'+crypto.randomUUID(),job=++generation.current,reset=conversation.resetEpoch;conversation.beginGuidedExploration(id);ownedIsolation.current=id;opening.current=true;setPending(true);
@@ -97,7 +99,7 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
   catch(error){setEdit(null);return `${(error as Error).message} The draft and saved plans are kept. Use a displayed assumption name, or discuss an unsupported choice without treating it as calculated.`;}
  }
  useLayoutEffect(()=>{commandRef.current=handle;modelContextRef.current=active&&(demandBridge||demoOpen||chatScenario)&&draft&&matches&&!demandStale?{conversationMode:SWP_CONVERSATION_MODE,goalId:draft.binding.goalId,classification:'fictional-scenario',acceptedOperationalReview:demandBridge?{spec:demandBridge.review.spec,result:demandBridge.review.result,reviewedAt:demandBridge.reviewedAt,acceptance:'Scenario use only; original provenance retained.'}:null,datasetToken:token,revision:draft.revision,...(chatScenario?{draft:structuredClone(draft),inputKey:draftKey}:{}),selectedCandidateId:selection,selectedSavedPlanId:saved?.selectedPlanId??null,goal:draft.binding.goal,objective:draft.inputs.scope.requirements,scope:draft.inputs.scope,budget:draft.inputs.budget,reviewState:edit?'pending-edits':currentComparison?'calculated-unsaved':'not-calculated',options:currentComparison?.options.map(o=>({id:o.id,label:o.label,mix:o.candidate.mix,wholePeriodEffort:demandBridge?serviceOptionEffort(o,demandBridge):null,conditionalCoverage:o.coverage,fullCoverageDate:o.candidate.metrics?.fullCoverageDate??null,incrementalCash:o.candidate.cash.complete,staffHours:o.candidate.effort?.totalHours??null,addedCompanyEmployees:o.candidate.metrics?.addedEmployees??null,status:o.candidate.status}))??[],limitations:['End-date staffing and cash limits do not prove whole-period effort coverage; review any separately calculated shortfall.','Additional-role demand is a reviewed assumption, not inferred from growth.','Skill coverage does not establish available staff or causal uplift.','Contract and automate are discussion-only here; no calculated benefit.','Changing staffing inputs requires the displayed local assumption review and recalculation.']} : null;});
- function closeDemo(){setChatScenario(false);
+ function closeDemo(){setResumeKey(null);setChatScenario(false);
   suspended.current=true;generation.current++;abort.current?.abort();setPending(false);setDemoOpen(false);
   if(ownedIsolation.current){conversation.endGuidedExploration();ownedIsolation.current=null;}
  }
@@ -106,8 +108,11 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
   try{if(conversation.activeGoalId!==draft.binding.goalId){conversation.beginGuidedExploration(draft.binding.goalId);ownedIsolation.current=draft.binding.goalId;}}
   catch(error){setNotice((error as Error).message);return;}
   suspended.current=false;setDemoOpen(true);setRestartRequested(false);setReview(null);
+  setComparisonFirst(!edit&&!demandStale);
+  if(!currentComparison&&!edit&&!demandStale)setResumeKey(draftKey);
  }
  async function restartDemo(){
+  setResumeKey(null);setComparisonFirst(false);
   if(busy||pending||!active||!storage.saved)return;
   const epoch=++generation.current,currentToken=token;abort.current?.abort();setPending(true);
   try{const id='guided-swp-'+crypto.randomUUID(),next=await createSwpDemo(id,new Date().toISOString());
@@ -143,6 +148,16 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
    setDraft(next);setDraftDataset(token);setDemandBridge(bridge);setDemandStale(false);setComparison(result);setSelection(null);setReview(null);setEdit(null);setNotice('Provisional routes use separate illustrative staffing assumptions. End-date limits do not establish whole-period workload coverage.');
   }finally{if(abort.current===controller){abort.current=null;setPending(false);}}
  }
+ // One explicit reopen requests one local calculation. Failure never auto-retries.
+ const resumeComparison=useEffectEvent(()=>{
+  if(!resumeKey)return;
+  if(!active||!demoOpen||resumeKey!==draftKey||!matches||edit||demandStale){setResumeKey(null);return;}
+  if(busy||pending)return;
+  setResumeKey(null);
+  if(!currentComparison)void calculate();
+ });
+ // eslint-disable-next-line react-hooks/set-state-in-effect -- Consume an explicit reopen once after goal isolation has committed; cancel it when context changes.
+ useEffect(()=>{resumeComparison();},[resumeKey,active,demoOpen,draftKey,matches,busy,pending]);
  const hasEdit=!!edit;
  const autoCompare=useEffectEvent(()=>{if((demandBridge||demoOpen||chatScenario)&&showOptions&&draft?.inputs.guidedWorkload&&matches&&active&&!edit&&!comparison&&!pending&&!busy)void calculate();});
  useEffect(()=>{autoCompare();},[draftKey,matches,active,hasEdit]);
@@ -188,7 +203,7 @@ export function SwpGuidedJourney({onGeneralQuestion,scenarioTarget,onScenarioCha
      <button className={button} disabled={!selected||pending||busy||exactSaved} onClick={()=>void prepare()}>{exactSaved?'This choice is already saved':'Review selected Action Plan'}</button>
     </>}
    </>}
-   </>:<SimpleSwpDemo key={draft.binding.goalId} reviewing={!!review} draft={draft} comparison={currentComparison} edit={edit} selection={selection} disabled={busy||pending||!active||!storage.saved} pending={pending} editingDisabled={busy||!active||!storage.saved}
+   </>:<SimpleSwpDemo comparisonFirst={comparisonFirst} key={draft.binding.goalId} reviewing={!!review} draft={draft} comparison={currentComparison} edit={edit} selection={selection} disabled={busy||pending||!active||!storage.saved} pending={pending} editingDisabled={busy||!active||!storage.saved}
     onPrimaryChange={request=>{abort.current?.abort();setPending(false);setComparison(null);setSelection(null);clearReview();setDraft(acceptBundleChatEdit(draft,previewBundleChatEdit(draft,request)));}} onSelect={id=>{setSelection(id);clearReview();}} onEdit={value=>{setEdit(value);setComparison(null);setSelection(null);clearReview();}}
     onAccept={()=>{try{setDraft(acceptBundleChatEdit(draft,edit!));setEdit(null);setComparison(null);setSelection(null);clearReview();}catch(e){setNotice((e as Error).message);}}} onCancel={()=>{setEdit(null);clearReview();}} onCalculate={()=>void calculate()} onPrepare={()=>void prepare()} alreadySaved={exactSaved}/>}
    {review&&selected&&<section aria-label="Review and save workforce plan" className="space-y-2 rounded border p-3 text-sm"><h3 className="font-semibold">3. Save and review</h3>{checkpoints[0]&&<p className="rounded bg-accent p-3"><strong>Next proposed checkpoint: {checkpoints[0].date??'Unknown'}</strong><br/>{checkpoints[0].name} · {checkpoints[0].ownerRole} (proposed owner role)</p>}<GuidedPlanSummary draft={selected.draft} compact/>{demandBridge&&<><p>{effortText(selected,demandBridge)}</p><p>Accepted for scenario use only: demand inputs retain their original proposed/reported provenance. Internal pools, distinct membership, release, zero backfills and hire delivery are separate unverified staffing premises. This saves an incomplete conditional staffing proposal when effort remains uncovered.</p><details><summary>Accepted operational assumptions and history</summary><pre className="overflow-auto whitespace-pre-wrap text-xs">{JSON.stringify({spec:demandBridge.review.spec,reviewedAt:demandBridge.reviewedAt,priorAccepted:demandBridge.priorAccepted},null,2)}</pre></details></>}<p><strong>Goal:</strong> {draft.binding.goal}</p>{demandBridge&&<p>{draft.inputs.scope.population.value} · target {draft.inputs.scope.demand.value} roles by {swpEnd(draft)}. Funding, availability and capability remain unverified.</p>}<details><summary className="min-h-11 cursor-pointer py-2 font-medium">All proposed checkpoints and owners</summary><p>Proposed owners are roles, not assigned people.</p><ul className="list-disc pl-5">{checkpoints.map(c=><li key={c.id}>{c.name} - proposed owner: {c.ownerRole}; checkpoint: {c.date??'Unknown'}.</li>)}</ul><p><strong>Success measure:</strong> {swpMetric} in this unit and role. Assess readiness before deployment; training completion alone does not meet the target.</p></details><p className="text-xs">Saving records a conditional proposal, not operational authorization. Review cost breakdown before saving; confirm funding and unentered obligations before acting.</p><div className="flex flex-wrap gap-2"><button className={button} disabled={busy||pending||review.alreadySaved} onClick={save}>Save reviewed plan and goal</button><button className={button} onClick={()=>setReview(null)}>Cancel review</button></div></section>}

@@ -16,7 +16,7 @@ import type {BundleEditPreview} from '@/lib/home-bundle-chat-edit';
 const button='min-h-11 rounded border px-3 py-2 text-sm disabled:opacity-50';
 const money=(n:number|null|undefined)=>n==null?'Cost unknown':'$'+n.toLocaleString('en-US');
 type Comparison=Awaited<ReturnType<typeof compareSwpDemo>>;
-export function SimpleSwpDemo({reviewing,draft,comparison,edit,selection,disabled,editingDisabled,pending,onSelect,onEdit,onAccept,onCancel,onCalculate,onPrepare,onPrimaryChange,alreadySaved}:{reviewing:boolean;draft:BundleDraft;comparison:Comparison|null;edit:BundleEditPreview|null;selection:string|null;disabled:boolean;editingDisabled:boolean;pending:boolean;onSelect:(id:string)=>void;onEdit:(value:BundleEditPreview)=>void;onAccept:()=>void;onCancel:()=>void;onCalculate:()=>void;onPrepare:()=>void;onPrimaryChange:(request:string)=>void;alreadySaved:boolean}){
+export function SimpleSwpDemo({comparisonFirst=false,reviewing,draft,comparison,edit,selection,disabled,editingDisabled,pending,onSelect,onEdit,onAccept,onCancel,onCalculate,onPrepare,onPrimaryChange,alreadySaved}:{comparisonFirst?:boolean;reviewing:boolean;draft:BundleDraft;comparison:Comparison|null;edit:BundleEditPreview|null;selection:string|null;disabled:boolean;editingDisabled:boolean;pending:boolean;onSelect:(id:string)=>void;onEdit:(value:BundleEditPreview)=>void;onAccept:()=>void;onCancel:()=>void;onCalculate:()=>void;onPrepare:()=>void;onPrimaryChange:(request:string)=>void;alreadySaved:boolean}){
  const [valid,setValid]=useState(true),[formVersion,setFormVersion]=useState(0);
  const workload=guidedWorkloadResult(draft.inputs),n=(v:number|null|undefined)=>!valid||v==null?'Unknown':v.toLocaleString('en-US',{maximumFractionDigits:2});
  const demand=workload?.workloadHours!=null&&workload.productiveHoursInHorizon?workload.workloadHours/workload.productiveHoursInHorizon:null,supply=workload?.qualifiedAllocatedFte??null,gap=workload?.additionalFte;
@@ -24,14 +24,15 @@ export function SimpleSwpDemo({reviewing,draft,comparison,edit,selection,disable
  const maximum=Math.max(demand??0,supply??0,1);
  const options=comparison?.options??[],primary=comparison?swpTradeoffOptions(comparison.evaluation):[],feasible=primary.filter(o=>o.candidate.status==='met');
  const selected=options.find(o=>o.id===selection);
- return <div className="simple-demo space-y-3">
- <ol aria-label="Planning steps" className="demo-stepper"><li aria-current={!comparison&&!reviewing?'step':undefined}>1 Understand the gap</li><li aria-current={comparison&&!reviewing?'step':undefined}>2 Compare options</li><li aria-current={reviewing?'step':undefined}>3 Save and review</li></ol>
- {!reviewing&&<section className="scenario-question-hero" aria-labelledby="scenario-business-question">
+ const introduction=<section className="scenario-question-hero" aria-labelledby="scenario-business-question">
   <p className="scenario-question-eyebrow">Your staffing decision</p>
   <h3 id="scenario-business-question">{valid&&gap!=null&&draft.inputs.budget?.amount.value!=null?<>{gap>0?<>How would you close a <strong>{n(gap)} FTE</strong> capacity gap</>:<>How would you sustain capacity</>} with a <strong>{money(draft.inputs.budget.amount.value)} USD</strong> budget?</>:<>What capacity gap and budget should this plan address?</>}</h3>
   <p>Compare developing, moving and hiring people. Find a staffing mix that fits your timeline and incremental cash budget.</p>
   {!valid&&<p>Complete the inputs below to update this question.</p>}
- </section>}
+ </section>;
+ return <div className="simple-demo space-y-3">
+ <ol aria-label="Planning steps" className="demo-stepper"><li aria-current={!comparison&&!reviewing?'step':undefined}>1 Understand the gap</li><li aria-current={comparison&&!reviewing?'step':undefined}>2 Compare options</li><li aria-current={reviewing?'step':undefined}>3 Save and review</li></ol>
+ {!reviewing&&(comparisonFirst&&valid&&!edit&&comparison?.evaluation.context.status==='ready'?<details className="scenario-introduction"><summary className="min-h-11 cursor-pointer py-2 text-sm">About this scenario</summary>{introduction}</details>:introduction)}
  {!reviewing&&<><header><p className="text-xs text-muted-foreground">Scenario · {draft.inputs.scope.population.value} · {date(draft.inputs.scope.startMonth.value!+'-01')}–{date(swpEnd(draft))}</p><p className="text-sm">{valid?`Incremental cash budget: ${money(draft.inputs.budget?.amount.value)} USD.`:'Review the incomplete inputs below.'}</p></header>
  <div aria-label="Capacity gap" className="simple-capacity-gap"><div className="simple-demo-gap-metrics"><span>Work needs <strong>{n(demand)} FTE</strong></span><span>Qualified capacity <strong>{n(supply)} FTE</strong></span><span>Gap <strong>{n(gap)} FTE</strong></span></div><div aria-hidden="true" className="capacity-gap-track"><span style={{width:`${(Math.min(valid?(supply??0):0,demand??0))/maximum*100}%`}}/><i style={{width:`${Math.max(0,valid?(demand??0)-(supply??0):0)/maximum*100}%`}}/></div></div>
 
