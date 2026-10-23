@@ -85,6 +85,7 @@ import {
   type PlanningEvidenceHandoff,
 } from "@/lib/evidence-handoff";
 import {
+  getAppPageMetadata,
   getDefaultPageForWorkspace,
   getWorkspaceForPage,
   type AppWorkspaceKey,
@@ -1940,6 +1941,7 @@ export default function Home() {
   return (
     <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} carriedGoalActions={planningEvidenceHandoff&&!conversation.activeGoalId?{businessGoal:planningEvidenceHandoff.businessGoal,goals:conversation.goals,disabled:!conversation.storageReady||!conversation.saved||conversation.loading||!!conversation.issueEditor,onCreate:statement=>attachCarriedPlanningGoal({statement}),onSelect:id=>attachCarriedPlanningGoal({id})}:undefined} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
+      <title>{`${getAppPageMetadata(activePage).label} | Workforce Intelligence`}</title>
       {/* Top header */}
       <AppHeader contextLabel={`${conversation.focusedIssue||"General exploration"} · ${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} onNavigate={setActivePage}
         activePage={activePage}
