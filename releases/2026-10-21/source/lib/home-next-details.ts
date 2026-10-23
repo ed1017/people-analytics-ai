@@ -8,7 +8,9 @@ export function homeNextDetails(state:SolutionState, questions:readonly string[]
  const supplied=(value:unknown)=>value!==null&&value!==undefined&&value!=='';
  const constraint=(field:string)=>state.constraints.some(c=>c.field===field&&c.action==='set'&&(supplied(c.number)||supplied(c.text)));
  const topics=[
-  {pattern:/\b(additional|total)\b.*\b(FTE|capacity)|\bFTEs?\b.*\b(additional|total)\b/i,known:constraint('population'),hint:'Whether the FTE requirement is additional capacity or the total needed.'},
+  // Mentioning additional capacity in a timing/cost question is not a request
+  // to clarify population. Require an explicit contrast or a polar question.
+  {pattern:/^(?=.*\b(?:FTEs?|capacity)\b)(?:.*\b(?:additional(?:\s+(?:FTEs?|capacity))?\s+(?:or|versus|vs\.?|rather than|instead of)\s+(?:the\s+)?total|total(?:\s+(?:FTEs?|capacity))?\s+(?:or|versus|vs\.?|rather than|instead of)\s+(?:the\s+)?additional)\b|^\s*(?:[-*]\s*)?(?:is|are|whether)\s+(?:(?:this|that|these|those|it|the|your|our)\s+)?(?:\d+(?:\.\d+)?\s+)?(?:(?:additional|total)\s+(?:FTEs?|capacity)\b|(?:FTEs?|capacity)\s+(?:additional|total)\b)\s*\??\s*$)/i,known:constraint('population'),hint:'Whether the FTE requirement is additional capacity or the total needed.'},
   {pattern:/\b(readiness|ready|arrival|deadline|when|timeframe|time frame)\b/i,known:supplied(hiring?.arrivalDate)||supplied(state.staffingDeliveryTarget?.months),hint:'When the capacity needs to be ready.'},
   {pattern:/\bbudget\b/i,known:supplied(staffing?.budget)||supplied(hiring?.budget)||constraint('budget_usd'),hint:'The available budget and currency for this scenario.'},
   {pattern:/\b(role|job title)\b/i,known:supplied(staffing?.role)||supplied(hiring?.role),hint:'The role or type of work to cover.'},

@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "2854b6e4de0c36f88198cb916f713af843d4ad94",
-  "deployment": "dpl_7gtJCa1dHkKEbnzd6fND27h6SoKA",
+  "sourceCommit": "52490f460599892415836e8b34cb5f0e5d17bf6b",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2434,8 +2434,8 @@
     },
     {
       "path": "lib/home-next-details.ts",
-      "sha256": "237b144e2f7b484b6bd8bc2c244b7e8ad6d9838d9d55ecfdee2092d158ef27e3",
-      "bytes": 2447
+      "sha256": "97361946b4f90436cd8c881017c5d0a87f7e559e9cd18435719cb6949d02b278",
+      "bytes": 2983
     },
     {
       "path": "lib/home-onboarding.ts",
@@ -4041,6 +4041,11 @@
       "path": "vercel.json",
       "sha256": "c9f33c545b21f6eb391cdd09a24827c71dd2e3bc016b18b68f7258900d981f98",
       "bytes": 435
+    },
+    {
+      "path": "tests/home-next-details.test.mjs",
+      "bytes": 3930,
+      "sha256": "f5bf440d6e3fa23e0f3086694793eafc2613c1dc4e829639e4177d52e120fa77"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
