@@ -170,3 +170,23 @@ This reconciles the forwarded review findings and agreed scope; the complete ori
 | Credits/onboarding popup/video, pinning/action integration, dark-mode work, wholesale redesign, source regeneration | Explicitly deferred or outside this pass. |
 
 No paid AI calls, financial changes, permission changes or dataset regeneration. The exact remaining naming and critique-provenance gaps above do not block the independent visual repairs.
+
+
+## Original critique reconciliation — October 23 follow-through
+
+The parent re-read both original text critiques and supplied their findings. This supersedes the earlier missing-text attribution gap. Local Library materialization failed because its helper requires os.setxattr on Windows; the consuming executor did not inspect the original image. The image is directional, not an implementation specification.
+
+| Critique | Disposition |
+| --- | --- |
+| Repeated caveats, operational chatter, nested borders, typography/spacing | PR359/361/362 implemented shared disclosures, flatter pane-responsive KPI cards, compact headers and consistent padding. Some decision-critical scope/unknown-cost/readiness explanations remain intentionally visible; legacy copy is partially condensed. |
+| KPIs too low, narrow evidence, empty chat, mobile helpers/composer | Earlier Home placement and PR356 helper/layout changes shipped; PR362 verified seven evidence pages at 1440/390 and maximum chat width. Automatic collapse of a resumed conversation or removing navigation is not silently added. |
+| Static browser tab title | This increment follows the actual page label, including ordinary navigation and history changes. |
+| Raw BU codes | Still blocked on verified full-name mapping; no invented expansions. |
+| Regrettable zero, manager count/span, hybrid | Verified source construction as recorded above. Explicit flag label shipped; null remains unavailable. No data regeneration. |
+| Odd percentage/number ticks and Scenarios scroll | PR359 corrected whole-headcount ticks and fresh-navigation top reset while preserving intentional history restoration. No global integer rule applied to legitimate percentage values. |
+| Dense comparison, long conditional recommendation, delayed planning comparison | Prior compact recommendation-first/sliders work retained. Further removal or reordering of planning stages requires a focused design decision; no new calculator or omitted assumptions. |
+| Findings repeating values | PR359 added supported dated change and composition comparisons; unavailable comparisons are not invented. |
+| Competing navigation and broad layout proposals | Future design decision. Existing navigation/features and chat-left/evidence-right remain. |
+| Authorship/credits intro, popup/video/demo, dark mode, pinning/action integration, wholesale redesign, regeneration | Deferred under the user's agreed scope. |
+
+No claim of complete subjective visual polish or unrestricted AI reliability. This closes the specific static-title defect and records the remaining design/data dependencies. No paid provider calls or financial/access changes.

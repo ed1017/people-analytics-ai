@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "ff39e7565a66ee8afe8b877c1b80c5bbcd87401f",
+  "sourceCommit": "2070bc39ef52d967a8d352e7dcb95181bc006781",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -259,8 +259,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "c76d6f7d618da3ce27bd4599bd824b6679090c94e797b032b9e3d857eb401c8d",
-      "bytes": 87451
+      "sha256": "105fe5e787d283ca95d8eb70d4d684af686171373695788c2a51c7e55f86d207",
+      "bytes": 87602
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -3949,5 +3949,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "608ca229ecad1df6262bd4c745a4abe29a4022d11ca33e4a8eb5607dd896b68e"
+  "verifiedDeployedArchiveSha256": "e6351da5c6d0b7dd5eb31d63dd97d442036eff4b03b14b16e7cf86f614407e05"
 }

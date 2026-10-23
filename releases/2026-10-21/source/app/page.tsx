@@ -85,6 +85,7 @@ import {
   type PlanningEvidenceHandoff,
 } from "@/lib/evidence-handoff";
 import {
+  getAppPageMetadata,
   getDefaultPageForWorkspace,
   getWorkspaceForPage,
   type AppWorkspaceKey,
@@ -146,6 +147,9 @@ const PLANNING_VIEW_TO_PAGE: Record<
 
 export default function Home() {
   const activePage = useSyncExternalStore(subscribeToAppPage, currentAppPage, serverAppPage);
+  useEffect(() => {
+    document.title = `${getAppPageMetadata(activePage).label} | Workforce Intelligence`;
+  }, [activePage]);
   const conversation = useProblemConversation(activePage);
   const capacityState=useCapacitySessionState(conversation.workspaceKey);
   const [workspacePalette]=useWorkspacePalette();
