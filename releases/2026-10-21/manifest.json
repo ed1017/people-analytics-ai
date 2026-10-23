@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0fbb520860fc78bfa2c9f916b34f9b53316455fe",
+  "sourceCommit": "600a4b2f22ed81a606fb83f761055b66cbb34806",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -244,8 +244,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "f2c822f1ed9c94a7dce8552c527ba9ea118b630b8f56b846f07cac4441b82e78",
-      "bytes": 50225
+      "sha256": "496e462b37fbdb67d45803bd80dd7ce56b96a6097af2935b745d67822c2c4ade",
+      "bytes": 50953
     },
     {
       "path": "app/layout.tsx",
@@ -259,8 +259,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "373a7f39ed3a1a2ddd3d9659c40a8aa02f4b0c829a18cab298cd8740d69d0b55",
-      "bytes": 87831
+      "sha256": "41db5086e041be783b3eccdd3435738b6a29d9ba18f05c1c5829450192b78d7f",
+      "bytes": 88259
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -3959,5 +3959,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "3928a46af586300b88fa344fe02e3d927c9e166298e87bc82b49aec61d08ee20"
+  "verifiedDeployedArchiveSha256": "8642aef4bd6c0b93a9b35cb1dfe2456f53860401c2c8233ba856b9be754ef3f1"
 }

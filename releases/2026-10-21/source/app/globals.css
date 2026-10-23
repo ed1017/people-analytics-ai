@@ -931,3 +931,10 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .evidence-pane h3:not(.key-findings h3) { font-family: Arial, Helvetica, sans-serif; font-size: 1rem; font-weight: 600; }
 .evidence-pane .key-findings { margin-bottom: 1rem; }
 .evidence-pane .evidence-scope-notice { padding-block: .5rem; background: transparent; }
+
+/* Baseline keeps full-width evidence; its existing chat remains one clear action away. */
+.evidence-ai-toolbar.baseline-ai-entry { justify-content: flex-start; border-inline-start: 4px solid var(--primary); background: color-mix(in srgb, var(--primary) 7%, var(--card)); }
+.baseline-ai-entry button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px 20px; font-size: 16px; font-weight: 650; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
+.baseline-ai-entry button:hover { filter: brightness(.94); }
+.baseline-ai-entry button:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
+@media (max-width: 767px) { .baseline-ai-entry button { width: 100%; } }

@@ -1977,7 +1977,7 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
-        {evidenceDrawer && <div className="evidence-ai-toolbar"><span className="sr-only">Ask about this evidence</span><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>Open Workforce AI</button></div>}
+        {evidenceDrawer && <div className={`evidence-ai-toolbar${activePage === "workforce" ? " baseline-ai-entry" : ""}`}><span className="sr-only">Ask about this evidence</span><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>{activePage === "workforce" && <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 10h8M8 14h5"/></svg>}Open Workforce AI</button></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
         <SelectedProgressEntry/>
