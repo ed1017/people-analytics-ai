@@ -1,3 +1,13 @@
+## October 23 owner-feedback credibility repair (publication checks pending)
+
+- Corrected stale About copy that said live AI was disabled. Availability remains conditional on configuration and admission; no model/financial controls changed.
+- Added the exact public read-only `/about` document using the existing case study, with no broader API permission. Existing header disclosure remains.
+- Made workforce-snapshot scope prefix idempotent; underlying selected scope remains unchanged.
+- Aligned Workforce/Scenarios destination labels and Save and review step labels.
+- Comparison headers/cells now retain readable words and dates in a keyboard-accessible horizontal region; internal feasibility status codes use plain-language labels. No calculations changed.
+- Constructed skill codes are retained until an authoritative semantic mapping exists; no invented skills.
+- Next explicitly approved sequence: bounded decision-first planning showcase, then assess a coordinated synthetic-data realism batch and report its scope/risks before production changes. This supersedes the earlier blanket deferral only for that bounded work. Popup/video, tornado charts, extra scenario features and wholesale app redesign remain deferred. No paid calls.
+
 ## Active roadmap — October 23, after PR366
 
 Production: [PR366](https://github.com/ed1017/people-analytics-ai/pull/366), runtime `600a4b2f22ed81a606fb83f761055b66cbb34806`, deployment `dpl_Di6RhyQdpEWr5oSYVwru4sudQk18`. This reconciliation changes documentation only. Dated sections below are historical checkpoints; their pending labels are not the active queue.

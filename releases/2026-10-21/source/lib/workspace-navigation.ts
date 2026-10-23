@@ -6,8 +6,8 @@ import {planningJourney,planningEvidence} from './planning-journey.ts';
 
 export const mainNavigation=[
  {key:'overview',label:'Overview',page:'home'},
- {key:'plan',label:'Plan',page:'planning-overview'},
- {key:'evidence',label:'Evidence',page:'workforce'},
+ {key:'plan',label:'Scenarios',page:'planning-overview'},
+ {key:'evidence',label:'Workforce',page:'workforce'},
 ] as const;
 export type MainNavigationSection=typeof mainNavigation[number]['key'];
 /** Section state is navigation context, never a claim that a planning step is complete. */
