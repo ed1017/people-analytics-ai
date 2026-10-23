@@ -379,11 +379,11 @@
 .evidence-workspace :is(h1, h2) { letter-spacing: -0.025em; }
 .evidence-workspace > .mb-6.flex > div { min-width: 0; }
 .evidence-workspace > .mb-6.flex p { max-width: 78ch; line-height: 1.6; }
-.evidence-workspace :is(.rounded-lg, .rounded-md).border:not([class*="border-"]):not([role="alert"]):not(input, select, textarea, button, .evidence-scope-notice) {
+.evidence-workspace :is(.rounded-lg, .rounded-md).border:not([class*="border-"]):not([role="alert"]):not(input, select, textarea, button, .evidence-scope-notice, .evidence-metric-grid > div) {
   border-color: var(--evidence-line);
   border-radius: 0.8rem;
 }
-.evidence-workspace .grid > .border:has(> p.text-3xl) {
+.evidence-workspace .grid:not(.evidence-metric-grid) > .border:has(> p.text-3xl) {
   box-shadow: inset 0 2px 0 #487e77;
 }
 .evidence-workspace .text-3xl { font-variant-numeric: tabular-nums; }
@@ -917,3 +917,17 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .evidence-metric-grid, .evidence-pane :is(td, th) { font-variant-numeric: tabular-nums; }
 .key-findings { max-width: 85ch; }
 .evidence-scope-notice summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+
+/* KPI summaries are a typographic strip, not another layer of boxed panels.
+   Auto-fit responds to the evidence pane when the adjacent chat is resized. */
+.evidence-pane > .mb-6.flex { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: .75rem; margin-bottom: 1rem; }
+.evidence-pane > .mb-6.flex > div { min-width: 0; flex: 1 1 15rem; }
+.evidence-pane > .mb-6.flex > span { flex-shrink: 0; }
+.evidence-metric-grid > div.rounded-lg.border {
+  border: 0; border-inline-start: 2px solid var(--border); border-radius: 0;
+  padding: .5rem 1rem; background: transparent; box-shadow: none;
+}
+.evidence-metric-grid > div > p.text-3xl { font-size: clamp(1.5rem, 5cqi, 1.875rem); line-height: 1.2; letter-spacing: -.025em; }
+.evidence-pane h3:not(.key-findings h3) { font-family: Arial, Helvetica, sans-serif; font-size: 1rem; font-weight: 600; }
+.evidence-pane .key-findings { margin-bottom: 1rem; }
+.evidence-pane .evidence-scope-notice { padding-block: .5rem; background: transparent; }

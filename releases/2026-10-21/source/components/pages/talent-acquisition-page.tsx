@@ -32,7 +32,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
   const extension = !loading&&!error ? resolveTaResponseExtension(data) : null;
 
   return (
-    <section className="evidence-workspace evidence-pane min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={data ? recruitingFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>

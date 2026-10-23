@@ -43,7 +43,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
   const trend2026 = useMemo(() => (data?.trend ?? []).filter((row) => row.month >= "2026-01-01"), [data?.trend]);
 
   return (
-    <section className="evidence-workspace evidence-pane min-w-0 p-6">
+    <section className="evidence-workspace evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={data ? attritionFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
@@ -68,7 +68,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
             {[
               ["Voluntary Turnover YTD", summary.voluntary_turnover_ytd_pct.toFixed(1) + "%", summary.voluntary_exits.toLocaleString() + " voluntary exits", "Voluntary exits year to date divided by average monthly headcount over the same period."],
               ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep", "Current year-to-date voluntary turnover converted to a 12-month run rate. It is a pace indicator, not a forecast."],
-              ["Regrettable Exits", typeof summary.regrettable_exits==='number'?summary.regrettable_exits.toLocaleString():'Unavailable', typeof summary.regrettable_share_of_voluntary_pct==='number'?summary.regrettable_share_of_voluntary_pct.toFixed(1)+'% of voluntary exits':'Classification share unavailable', "Source-reported exits flagged as regrettable. Zero means none flagged in the supplied data; it does not establish that every exit was assessed. Missing counts remain unavailable."],
+              ["Exits flagged regrettable", typeof summary.regrettable_exits==='number'?summary.regrettable_exits.toLocaleString():'Unavailable', typeof summary.regrettable_share_of_voluntary_pct==='number'?summary.regrettable_share_of_voluntary_pct.toFixed(1)+'% of voluntary exits':'Classification share unavailable', "Source-reported exits flagged as regrettable. Zero means none flagged in the supplied data; it does not establish that every exit was assessed. Missing counts remain unavailable."],
               ["Total Exits YTD", summary.total_exits.toLocaleString(), summary.total_turnover_ytd_pct.toFixed(1) + "% total turnover", "All recorded separations year to date, including voluntary, involuntary, retirement, and other recorded exits."],
             ].map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">

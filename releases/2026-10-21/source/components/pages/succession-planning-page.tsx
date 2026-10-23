@@ -63,7 +63,7 @@ export function SuccessionPlanningPage({
     data?.filled_critical_positions === 0;
 
   return (
-    <section className="min-w-0 p-4 sm:p-6">
+    <section className="evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={!loading && !error && data ? successionFindings(data) : null} />
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -117,7 +117,7 @@ export function SuccessionPlanningPage({
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="evidence-metric-grid grid gap-4">
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">
                 {illustrative ? 'Illustrative Plan Coverage' : 'Recorded Plan Coverage'}
@@ -181,7 +181,7 @@ export function SuccessionPlanningPage({
             </div>
           </div>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">
                 Company Coverage

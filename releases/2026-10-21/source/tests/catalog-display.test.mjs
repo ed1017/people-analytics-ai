@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+import ts from 'typescript';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import * as labels from '../lib/catalog-display.ts';
+import * as display from '../lib/display-format.ts';
+import * as findings from '../lib/key-findings.ts';
+import * as contracts from '../lib/legacy-source-contracts.ts';
+import {PUBLIC_9037} from '../lib/public-9037-contract.mjs';
+const require=createRequire(import.meta.url);
+function component(file,extra={}){const exports={};const code=ts.transpileModule(fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(code,{exports,require:id=>id==='@/lib/catalog-display'?labels:extra[id]??require(id)});return exports;}
+test('catalog prefix is display-only and non-prefix names stay intact',()=>{for(const [raw,shown]of [['Demo AI-ARCH','AI-ARCH'],['Demo AI-ENG','AI-ENG'],['Demo BI-ANA','BI-ANA'],['Demo BI-DEV','BI-DEV'],['Demo level 11','level 11'],['Demo BU-DATAAI','BU-DATAAI'],['Demography Lead','Demography Lead'],['Product Demo Lead','Product Demo Lead'],['Demo','Demo']])assert.equal(labels.catalogDisplayLabel(raw),shown);});
+const countries={IN:'India',CA:'Canada',JP:'Japan',AU:'Australia',SG:'Singapore',BR:'Brazil',GB:'United Kingdom',US:'United States',DE:'Germany',FR:'France'};
+test('country codes have recognizable display names and unknown labels are retained',()=>{for(const[code,name]of Object.entries(countries))assert.equal(labels.countryDisplayLabel('Demo '+code,code),name);assert.equal(labels.countryDisplayLabel('Ireland','IE'),'Ireland');assert.equal(labels.countryDisplayLabel('Demo XY','XY'),'XY');});
+test('shared filter text and titles change while option values and input records stay exact',()=>{const {GlobalWorkforceFilters}=component('global-workforce-filters.tsx',{'@/components/use-phone-layout':{usePhoneLayout:()=>false}});const options={countries:[{value:'IN',label:'Demo IN'}],business_units:[{value:'BU-DATAAI',label:'Demo BU-DATAAI'}],levels:[{value:'L11',label:'Demo level 11'}]},before=JSON.stringify(options);const html=renderToStaticMarkup(React.createElement(GlobalWorkforceFilters,{page:'workforce',options,country:'IN',org:'BU-DATAAI',level:'L11',loading:false,onCountry:()=>{},onOrg:()=>{},onLevel:()=>{},onReset:()=>{}}));assert.match(html,/value="IN" selected="">India<\/option>/);assert.match(html,/title="India"/);assert.match(html,/value="L11" selected="">level 11<\/option>/);assert.match(html,/value="BU-DATAAI" selected="">BU-DATAAI<\/option>/);assert.doesNotMatch(html,/Demo /);assert.equal(JSON.stringify(options),before);});
+test('Geographic Footprint shows all ten names without changing counts or source records',()=>{const {WorkforcePage}=component('pages/workforce-page.tsx',{'@/components/key-findings':component('key-findings.tsx'),'@/lib/key-findings':findings,'@/components/evidence-table-region':{EvidenceTableRegion:({children})=>React.createElement('div',null,children)},'@/lib/display-format':display,'@/lib/legacy-source-contracts':contracts,'@/lib/public-9037-contract.mjs':{PUBLIC_9037}});const data={as_of:'2026-09-30',summary:{headcount:10,fte:10,people_managers:1,avg_span_of_control:9,avg_tenure_years:2,full_time_headcount:10,hybrid_headcount:10,remote_headcount:0},trend:[],business_units:[],levels:[],movements:[],countries:Object.keys(countries).map(country_code=>({country_code,country_name:'Demo '+country_code,headcount:1,avg_tenure_years:2}))},before=JSON.stringify(data);const html=renderToStaticMarkup(React.createElement(WorkforcePage,{data,loading:false,error:null}));for(const name of Object.values(countries))assert.ok(html.includes(name),name);assert.doesNotMatch(html,/Demo (?:IN|CA|JP|AU|SG|BR|GB|US|DE|FR)/);assert.equal(JSON.stringify(data),before);});
