@@ -1,4 +1,5 @@
 "use client";
+import {useNavigationPreference} from "@/components/use-navigation-preference";
 import {capacityChatContext} from '@/lib/capacity-chat-context';
 import {SelectedProgressEntry} from '@/components/goal-progress-entry-review';
 import {progressEntryContext,retainProgressEntryProposal} from '@/lib/goal-progress-entry-store';
@@ -159,13 +160,13 @@ export default function Home() {
   const [marketSelection,setMarketSelection]=useGoalWorkspace(conversation.workspaceKey,goalWorkspaceKeys,defaultMarketSelection,"marketSelection");
   const [marketCarry,setMarketCarry]=useGoalWorkspace<MarketCarry|null>(conversation.workspaceKey,goalWorkspaceKeys,emptyMarketCarry,"marketCarry");
   const [talentResponseEvidenceContext, setTalentResponseEvidenceContext] = useGoalWorkspace<string | null>(conversation.workspaceKey, goalWorkspaceKeys, emptyTalentContext,"talentContext");
-  const [navCollapsed, setNavCollapsed] = useState(false);
   const [aiCollapseChoice, setAiCollapsed] = useState<boolean | null>(null);
   // Planning starts compact; an explicit toggle or Explain action wins across navigation.
   const evidenceDrawer = activePage === "workforce" || activePage === "skills";
   const [drawerPage, setDrawerPage] = useState<string | null>(null);
   const drawerOpen = drawerPage === activePage;
   const aiCollapsed = aiCollapseChoice ?? getWorkspaceForPage(activePage) === "strategy";
+  const [navCollapsed, setNavCollapsed] = useNavigationPreference(activePage === "home" || (!["decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) && (evidenceDrawer ? drawerOpen : !aiCollapsed)));
   const [aiWidth, setAiWidth] = useState(500);
 
   const [workforcePerformance, setWorkforcePerformance] = useState<unknown>(null);

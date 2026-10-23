@@ -1,12 +1,14 @@
-## Current decision queue — October 23 follow-through
+## Current decision queue - October 23 follow-through
 
-Current delivery: PR363 live. Earlier dated status sections below are history, not the active queue.
+Current production before this increment: PR364 (compact Career Growth disclosures). Earlier dated sections below are history, not the active queue.
 
-1. **In this increment:** compact Career Growth unavailable-measure panels; collapse retained rating/source/interpretation explanations while keeping missing-data, incomplete-history and scope visible. No arithmetic changes.
-2. **Navigation reconciliation and next proposal:** the phone already has a native “Browse pages” drawer; do not rebuild it. For desktop evidence pages with chat open, recommend starting the existing sidebar in its compact icon-rail state, with its current expand control and labels/tooltips preserved. Benefit: more evidence width without removing destinations or moving chat right. Tradeoff: less immediate discoverability for first-time users. This default change awaits product direction; explicit user resizing/collapse choices must continue to win.
-3. **Next proposed planning-flow change (awaiting product direction):** when a valid existing comparison is available, open on its compact recommendation and options, with the original intro accessible through “How this comparison works.” With missing inputs, keep clarification first. Benefit: returning users reach options sooner; tradeoff: first-time users may miss context unless the disclosure is clear. No automatic selection or hidden assumptions.
-4. **Independent remaining constraint:** full BU names require a verified mapping. No guessed expansions. Broader unpaid reliability regressions can proceed under the existing roadmap when a concrete failure or acceptance gap is identified; do not repeat paid model tests or invent new scope.
-5. **Deferred:** onboarding/video/credits, dark-mode work, pinning/action integration, wholesale redesign and dataset regeneration.
+1. **Approved, implemented and locally verified in this increment:** desktop navigation defaults to the existing compact rail only when chat is visible. Explicit expansion/collapse is saved and wins across pages and reloads; the mobile drawer is unchanged. Home, drawer pages and pages without chat use their actual visibility.
+2. **Approved, implemented and locally verified:** reopen a valid existing scenario at its comparison with the introduction under "About this scenario." Saved inputs are recalculated locally once, not trusted as cached results. First-use assumptions remain explicit; pending edits, stale context and missing inputs do not acquire valid comparison status. Closing/navigation cancels pending work. Desktop/mobile save-reload retained identical options. No automatic choice or save.
+3. **Baseline AI diagnostic:** current production has an "Open Workforce AI" button; a read-only browser check confirms it opens the composer. Baseline and Skills retain the older on-demand drawer design. No user-approved removal was found, and no Baseline behavior is changed here.
+4. **Remaining decision/data constraint:** full BU names require a verified source mapping; no guessed expansions. Broader unpaid reliability work should address concrete failures or named acceptance gaps, not duplicate completed checks. No further navigation redesign is included.
+5. **Deferred:** onboarding/video/credits, dark mode, pinning/action integration, wholesale redesign and dataset regeneration.
+
+Validation: 15 existing scenario/parity/disclosure tests, three new preference tests, focused lint, TypeScript and production build; independent review corrected a chat-visibility edge case. Local desktop/mobile browser verification passed. CI, protected hosted checks and promotion are release gates. No paid AI, accounting or access changes.
 
 ## October 22, compact planner verification
 
