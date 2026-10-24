@@ -58,6 +58,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
   /** The owning chat supplies its existing composer; this component never submits requests. */
   composer?: ReactNode;
   templates?: ReactNode;
+  plannerVisual?: ReactNode;
   /** From the same dataset-scoped dashboard response as overview and receipt. */
   trend?: readonly HeadcountTrendPoint[];
 };
@@ -138,9 +139,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
-    <HomeConversationSplit enabled visuals={<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
+    <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <h2>Plan the workforce your business needs</h2>
     <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
     <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>

@@ -1,6 +1,6 @@
 'use client';
 import {previewProjectionEdit,verifyProjectionEditSource,type ProjectionEdit} from '@/lib/headcount-projection-edit';
-import type {HeadcountProjection} from '@/lib/home-solution-projection';
+import {calculateHeadcountProjection,type HeadcountProjection} from '@/lib/home-solution-projection';
 import {selectBusinessPlanningMix} from '@/lib/home-business-planning';
 import {homeAnswerVisualField,restoreHomeAnswerVisual} from '@/lib/home-answer-visual-save';
 import {annualTurnoverEvidenceQuestion} from '@/lib/home-turnover-chat';
@@ -178,6 +178,27 @@ export function useHomeSolutionConversation(props:Props){
    currentProps.current.conversation.selectProposalGoal(goal,revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Action Plan pinned. Staffing assumptions remain unconfirmed.');
   }catch(error){setNotice(error instanceof Error?error.message:'The staffing plan could not be saved.');}finally{setSaving(false);}
  }
+ async function saveProjectionEntry(base:HeadcountProjection,turnId:string){
+  if(controller.current||pending||saving)throw Error('Finish the current operation before saving this projection.');
+  const snapshot=requireCurrent(),state=memoryRef.current,context=liveKey.current,initialEpoch=epoch.current,token=datasetSession.snapshot();
+  if(state.analyses.length>=6||state.turns.length>=32)throw Error('This conversation has reached its revision limit. Existing projections are retained; start a new conversation for further revisions.');
+  const latest=state.analyses.find(p=>p.id===base.id);
+  const filters=new URLSearchParams(currentProps.current.query),active={country:filters.get('country')||'all',org:filters.get('org')||'all',level:filters.get('level')||'all'};
+  if(latest||base.revision!==1||base.spec.base!==null||!equal(active,base.inputs.filters))throw Error('The projection revision or active scope changed. Reopen the current scenario.');
+  const abort=new AbortController();controller.current=abort;setSaving(true);setNotice('');const timer=setTimeout(()=>abort.abort(),20000);
+  const current=()=>!abort.signal.aborted&&mounted.current&&context===liveKey.current&&initialEpoch===epoch.current&&token===datasetSession.snapshot()&&snapshot.data.revision===decisionStore.getSnapshot().data.revision&&state===memoryRef.current;
+  try{
+   const response=await datasetFetch('/api/home-solution-conversation?'+new URLSearchParams(active),{method:'GET',cache:'no-store',signal:abort.signal});
+   if(!response.ok)throw Error('Current projection inputs could not be checked. Your saved revision is unchanged.');
+   await verifyProjectionEditSource(base,await response.json(),token);
+   const projection=await calculateHeadcountProjection(base.spec,base.inputs,[],[turnId]);
+   if(!current())throw Error('The conversation or source changed during verification. No projection was saved.');
+   requireCurrent();
+   const text=`Saved local projection assumptions: ${base.spec.months} months; ${Object.entries(base.assumptions).map(([k,v])=>`${k.replaceAll('_',' ')} ${v}`).join('; ')}. These are conditional scenario inputs, not observed outcomes.`;
+   persist(readSolutionState({...state,analyses:[...state.analyses,projection],turns:[...state.turns,{id:turnId,role:'user',text}],verifiedMetrics:state.verifiedMetrics.filter(ref=>ref.kind!=='projection'||ref.id!==base.id)}));
+   setNotice(`Saved projection revision 1; earlier conversation remains unchanged.`);
+  }finally{clearTimeout(timer);if(controller.current===abort)controller.current=null;setSaving(false);}
+ }
  async function saveProjectionEdit(base:HeadcountProjection,edit:ProjectionEdit,turnId:string){
   if(controller.current||pending||saving)throw Error('Finish the current operation before saving this projection.');
   const snapshot=requireCurrent(),state=memoryRef.current,context=liveKey.current,initialEpoch=epoch.current,token=datasetSession.snapshot();
@@ -252,5 +273,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }
