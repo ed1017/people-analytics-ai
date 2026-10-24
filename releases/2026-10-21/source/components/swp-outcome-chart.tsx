@@ -17,7 +17,7 @@ export function StaffingCoverageChart({target,scope,start,months,options}:{targe
   <figcaption id={id} className="font-semibold">Expected scenario outcome · {swpMetric.toLowerCase()}</figcaption>
   <p className="text-sm">{scope} · {start}–{swpMonth(start,months-1)}. Target {target} roles. Conditional estimates, not achieved outcomes or company headcount.</p>
   <ul aria-label="Scenario legend" className="flex flex-wrap gap-x-4 gap-y-1 text-sm"><li>Dashed line: target</li>{options.map((o,i)=><li key={o.id}><span aria-hidden style={{color:colors[i]}}>━ </span>{o.label}: Build {o.mix.build}, Move {o.mix.move}, Buy {o.mix.buy}</li>)}</ul>
-  <CompactChart label="Monthly conditional role coverage by plan and target" title="Monthly calculated role coverage. Exact values are in Assumptions & limits." minWidth={420}>{width=><>
+  <CompactChart label="Monthly conditional role coverage by plan and target" title="Monthly calculated role coverage. Exact values are in Assumptions & limits." minWidth={300}>{width=><>
     <path d={`M54 30V185H${width-36}`} stroke="currentColor" opacity=".3" fill="none"/>
     {[0,max].map(value=><text key={value} x="44" y={y(value)+4} textAnchor="end" fontSize="14" fill="currentColor">{value}</text>)}
     <path d={`M54 ${y(target)}H${width-36}`} stroke="currentColor" strokeDasharray="5 4" opacity=".6"/>

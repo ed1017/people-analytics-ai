@@ -1,4 +1,7 @@
 "use client";
+import {ScenarioPlannerWorkspace} from '@/components/scenario-planner-workspace';
+import {scenarioPlannerEntry} from '@/lib/scenario-planner-entry';
+import {swpDemoPrompt} from '@/lib/swp-demo';
 import {PublicAiConfigurationStatus} from '@/components/public-ai-configuration-status';
 import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
 import {publicAiReadiness,usePublicAiReadiness} from '@/components/use-public-ai-readiness';
@@ -326,6 +329,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
 
   function submitStarterQuestion(prompt:string,purpose?:'swp-business'){
     if(conversation.issueEditor)return;
+    if(prompt!==swpDemoPrompt&&scenarioPlannerEntry(prompt)){
+      setInput(current=>!current.trim()?prompt:current.includes(prompt)?current:current+'\n\n'+prompt);
+      focusQuestion();return;
+    }
     const starter=!conversation.focusedIssue?homeStarterGoal(prompt):null;
     if(ready)queueSuggestion('starter:'+prompt,()=>{if(solutionConversationEnabled&&purpose==='swp-business')demandControl.current?.begin();void send(prompt,false,false,false,false,'default',starter??undefined,undefined,true);},true);
   }
@@ -635,6 +642,8 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const visualForecast=legacyVisualsAllowed&&currentVisualAnswer&&visualForecastDomain&&(visualForecastDomain!=='hiring'||visualTaReady)?<HomeForecastChart datasetContext={pack.datasetContext} datasetToken={decisionStore.getDatasetToken()} taReady={visualTaReady} question={visualQuestion} answer={currentVisualAnswer.content}/>:null;
   const visualStarter=legacyVisualsAllowed&&currentVisualAnswer&&(starterForecasts.get(currentVisualAnswer)?.forecast.domain!=='hiring'||visualTaReady)?renderStarterForecast(currentVisualAnswer):null;
   const visualExit=currentVisualAnswer&&!solutionConversationEnabled?renderExitReasonChart(currentVisualAnswer):null;
+  const plannerIntent=scenarioPlannerEntry(input)||scenarioPlannerEntry([...messages].reverse().find(m=>m.role==='user')?.content??'');
+  const plannerResult=Boolean(solutions.state.businessPlanning||solutions.state.hiringBudget||solutions.state.requiredStaffing||solutions.state.working.length||solutions.state.analyses.length);
   const planningReviewPanel=solutionConversationEnabled?<HomeSolutionConversationReview onShowProjection={projectionReady&&conversation.activeGoalId&&publicAiReadiness.available('/api/home-solution-conversation') ? (id,revision)=>{void homeProjection.show(id,revision);} : undefined} planningNotes={followUp?[followUp.reference,followUp.planningNotes,followUp.explanation].filter(Boolean).join('\n\n'):undefined} capacityRisk={followUp?.capacityRisk} controller={solutions} goal={conversation.focusedIssue} pack={pack} showSaved={recoveryPlanChoice?.goalId!==conversation.activeGoalId}/>:null;
   const currentVisualSupplement=visualForecast||visualStarter||visualExit?<>{visualForecast}{visualStarter}{visualExit}</>:null;
   const conversationPanel=(
@@ -718,7 +727,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     </div>
     {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
     {riskRequest?.context===contextKey&&<GroupCapacityRisk key={contextKey+':'+riskRequest.months} months={riskRequest.months} question={riskRequest.question} scopeQuery={workforceQuery} onClose={()=>setRiskRequest(null)}/>}
-    <div hidden={riskRequest?.context===contextKey}><HomeConversationSplit enabled={scenarioChat||overviewEntry&&!welcomeComposer} visuals={<><aside hidden={!scenarioChat} ref={setScenarioTarget} id="home-scenario-visuals" aria-label="Scenario calculations and assumptions" className="min-w-0"/><div hidden={scenarioChat}>{(Boolean(currentVisualAnswer)||chatLoading||solutions.pending||Boolean(chatError)||!solutions.state.businessPlanning)&&<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>}<section aria-label="Planning workspace" className="mt-4 space-y-3">{overviewEntry&&planningReviewPanel}</section></div></>} >
+    <div hidden={riskRequest?.context===contextKey}><HomeConversationSplit enabled={scenarioChat||plannerIntent||overviewEntry&&!welcomeComposer} visuals={<><aside hidden={!scenarioChat} ref={setScenarioTarget} id="home-scenario-visuals" aria-label="Scenario calculations and assumptions" className="min-w-0"/><div hidden={scenarioChat}>{(Boolean(currentVisualAnswer)||chatLoading||solutions.pending||Boolean(chatError)||!solutions.state.businessPlanning)&&<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>}<section aria-label="Planning workspace" className="mt-4 space-y-3"><ScenarioPlannerWorkspace active={plannerIntent} hasResult={plannerResult}>{overviewEntry&&planningReviewPanel}</ScenarioPlannerWorkspace></section></div></>} >
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions publicEvidenceContext={publicEvidenceContext} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney onGeneralQuestion={text=>{conversation.startNewProblem(text);setScenarioQuestion({text,token:datasetSession.snapshot(),reset:conversation.resetEpoch,workspace:conversation.workspaceKey.slice(0,conversation.workspaceKey.lastIndexOf(':')+1)});}} scenarioTarget={scenarioTarget} onScenarioChatChange={setScenarioChat} onDemoStateChange={setSwpDemoVisible} discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}

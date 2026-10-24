@@ -1,8 +1,9 @@
 'use client';
-import {HiringScenarioControls} from './hiring-scenario-controls';
+import {InteractivePlanner} from './interactive-planner';
+import {hiringPlanningSummary} from '@/lib/home-hiring-budget';
+import {HiringScenarioControls,HiringScenarioVisual} from './hiring-scenario-controls';
 import {AssumptionsDisclosure} from '@/components/assumptions-disclosure';
 import {useState,type ReactNode} from 'react';
-import {HiringPlanningSummary} from './hiring-planning-summary';
 import {calculateHiringBudget,hiringBudgetFields,type HiringBudgetInput,type HiringBudgetField} from '@/lib/hiring-budget';
 import type {HiringBudgetReview} from '@/lib/home-hiring-budget';
 const labels:Record<HiringBudgetField,string>={role:'Comparable role',level:'Level',location:'Location',snapshotDate:'Salary snapshot date',hires:'Number of hires',budget:'Optional budget ceiling for the period',currency:'Currency',startMonth:'Planning start month',months:'Planning horizon (months)',arrivalDate:'Hire arrival date',ftePerHire:'FTE per hire',annualBasePay:'Annual base pay override',payBasis:'Base pay basis',annualAdditionalCostPerHire:'Annual non-base cost per hire',recruitingFeePerHire:'One-time recruiting cost per hire',otherCostsComplete:'All other costs included'};
@@ -13,12 +14,16 @@ type Props={children?:ReactNode;recommended?:boolean;onDirtyChange?:(dirty:boole
 export function HomeHiringBudgetReview({review,onUpdate,onRestore,onDirtyChange,disabled,children,recommended=false}:Props){
  const [editorEdit,setEditorEdit]=useState<{key:string;dirty:boolean}|null>(null);const reviewKey=JSON.stringify(review),editorDirty=editorEdit?.key===reviewKey&&editorEdit.dirty;
  const result=calculateHiringBudget(review.inputs,review.datasetToken),salary=result.salary,unit=review.inputs.currency??'currency unspecified';
+ const summary=hiringPlanningSummary(result);
  const money=(v:number|null)=>v===null?'Unknown':`${number(v)} ${unit}`;
  return <section aria-label="Hiring budget estimate" className="space-y-3 rounded border p-3 text-sm">
-  <h3 className="font-semibold">{recommended?'Recommended Action Plan · conditional hiring':'Hiring budget estimate'}</h3>
-  <HiringPlanningSummary result={result}/>
-  <p><strong>Budget check:</strong> {review.inputs.budget===null?'Budget not provided; affordability not assessed':result.budgetStatus==='within'?'Within the entered period budget, subject to the stated cost coverage':result.budgetStatus==='over'?'Known costs exceed the budget':'Unknown until costs, currency and coverage are supplied'}. Hiring feasibility remains unverified.</p>
-  {onRestore&&<HiringScenarioControls review={review} onUpdate={onUpdate} onRestore={onRestore} disabled={disabled||editorDirty}/>}
+  <InteractivePlanner scope={`${review.inputs.role??'Role unknown'} · ${review.inputs.startMonth??'Start unknown'} · ${review.inputs.months??'Unknown'} months`}
+   outcome={summary.hires===null?'Set a hiring quantity to compare this option.':result.budgetStatus==='over'?`Revise this ${number(summary.hires)}-hire option: known costs exceed the budget.`:`Consider ${number(summary.hires)} hires; confirm arrival and availability.`}
+   metrics={[{label:'Proposed hires',value:number(summary.hires)},{label:({complete:'Complete period cost',listed:'Listed period costs',subtotal:'Known cost subtotal',allowance:'Budget allowance per hire',unknown:'Cost estimate'} as const)[summary.cost.kind],value:money(summary.cost.amount)},{label:'Arrival',value:summary.arrivalDate??'Unknown'},{label:'Budget assessment',value:review.inputs.budget===null?'Not assessed':result.budgetStatus==='within'?'Within entered ceiling':result.budgetStatus==='over'?'Over ceiling':'Unknown'}]}
+   levers={onRestore?<HiringScenarioControls review={review} onUpdate={onUpdate} onRestore={onRestore} disabled={disabled||editorDirty}/>:<p>Use the input editor below to adjust this estimate.</p>}
+   visual={<HiringScenarioVisual review={review}/>}
+   assumptions={summary.cost.kind==='allowance'?'Allowance is not compensation. Hiring feasibility and complete costs are unverified.':'Entered scenario assumptions; hiring feasibility is unverified. Presence is headcount, not productive capacity.'}
+  />
   {children}
   <details><summary className="min-h-11 cursor-pointer py-2">Calculation details and unknowns</summary><div className="space-y-3">
   {Object.values(review.origins).some(b=>b.kind==='model-proposed')&&<p className="font-medium">Model-proposed scenario assumptions · unconfirmed</p>}

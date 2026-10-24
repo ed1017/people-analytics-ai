@@ -1,3 +1,6 @@
+'use client';
+import {useId,useState} from 'react';
+import {InteractivePlanner} from './interactive-planner';
 import {calculateRequiredStaffing,staffingInputLabels,type StaffingInputField,type RequiredStaffingOption} from '@/lib/required-staffing';
 import {staffingDeliveryConflict,type RequiredStaffingReview} from '@/lib/home-required-staffing';
 const number=(n:number|null)=>n===null?'Unknown':n.toLocaleString('en-US',{maximumFractionDigits:2});
@@ -6,12 +9,20 @@ export function StaffingOptionSummary({option:o,currency,costMonths,deliveryMont
 
 }
 export function HomeRequiredStaffingReview({review,onClear,onPin,disabled,pinned,deliveryMonths=null,deliveryIssue,notes}:{review:RequiredStaffingReview;onClear:()=>void;onPin?:(id:string)=>void;disabled:boolean;pinned?:(id:string)=>number|undefined;deliveryMonths?:number|null;deliveryIssue?:string|null;notes?:string}){
+ const radioId=useId();
+ const [choice,setChoice]=useState<{key:string;id:string}|null>(null);
  const r=calculateRequiredStaffing(review.inputs),unit=r.input.currency??'currency unknown';
  const costRecommendation=r.recommendation;
  if(deliveryIssue||r.options.some(o=>o.id===r.recommendation?.optionId&&staffingDeliveryConflict(o,r.input,deliveryMonths)))r.recommendation=null;
  const selected=r.options.find(o=>o.id===r.recommendation?.optionId),missing=[review.inputs.internalRelease===null&&selected&&(selected.train+selected.redeploy)>0?'whether internal staff can be released':null,selected?.readyAfterMonths===null?'readiness dates':null,review.inputs.backfillCostPerInternalPerson===null&&selected&&(selected.train+selected.redeploy)>0?'backfill costs':null].filter(Boolean);
+ const choiceKey=JSON.stringify([review,deliveryMonths,deliveryIssue]),shown=r.options.find(o=>o.id===(choice?.key===choiceKey?choice.id:selected?.id))??null;
  return <section aria-label="Fixed-role staffing comparison" className="min-w-0 space-y-3 rounded border p-3 text-sm">
-  <h3 className="font-semibold">Staffing options</h3>
+  <InteractivePlanner scope={`${r.input.role??'Role unknown'} · ${r.input.months??'Unknown'}-month cost horizon · delivery ${deliveryMonths??'unknown'} months`}
+   outcome={shown?`Review ${shown.train} train, ${shown.redeploy} redeploy and ${shown.hire} hire under these assumptions.`:'Compare the available staffing options; no feasible mix is assumed.'}
+   metrics={[{label:'Required people',value:number(r.input.requiredRoles)},{label:'Selected allocation',value:shown?number(shown.coveredRoles)+' people':'Not selected'},{label:'Complete period cost',value:shown?number(shown.completeCash)+' '+unit:'Not selected'},{label:'Ready after',value:shown?number(shown.readyAfterMonths)+' months':'Not selected'}]}
+   levers={<fieldset disabled={disabled}><legend className="text-sm font-medium">Compare a staffing mix</legend>{r.options.map(o=><label key={o.id} className="flex min-h-11 items-center gap-2 text-sm"><input type="radio" name={radioId} checked={shown?.id===o.id} onChange={()=>setChoice({key:choiceKey,id:o.id})}/>Train {o.train}, redeploy {o.redeploy}, hire {o.hire}</label>)}<p className="text-xs">Change quantities, rates or readiness in chat. Selection alone does not save or approve a plan.</p></fieldset>}
+   visual={<figure aria-label="Selected staffing allocation" className="space-y-3"><figcaption className="font-semibold">People allocated by channel</figcaption>{shown?<>{[['Train',shown.train],['Redeploy',shown.redeploy],['Hire',shown.hire]].map(([label,value])=><div key={label} className="text-sm"><span>{label}: {value} people</span><div aria-hidden="true" className="h-3 rounded bg-muted"><div className="h-3 rounded bg-primary" style={{width:`${Number(value)/Math.max(1,r.input.requiredRoles??0,shown.coveredRoles)*100}%`}}/></div></div>)}<p className="text-xs">Allocation, not monthly productive capacity. No readiness trajectory is invented from a total.</p></>:<p>Select an option to inspect its allocation.</p>}</figure>}
+  />
   {deliveryIssue&&<p role="status">{deliveryIssue}</p>}
   {r.missing.map(line=><p key={line}>{line}</p>)}
   <div className="grid min-w-0 gap-3 md:grid-cols-3">{r.options.map(o=><article key={o.id} aria-label={`Train ${o.train}, redeploy ${o.redeploy}, hire ${o.hire}`} className={`min-w-0 space-y-2 rounded border p-3 ${r.recommendation?.optionId===o.id?'border-primary bg-muted/30':''}`}>
