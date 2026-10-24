@@ -37,7 +37,7 @@ Onboarding popup/video/credits flow, dark mode, pinning/action integration, torn
 
 The earlier blanket synthetic-regeneration deferral was superseded only for the delivered coordinated realism batches. Remaining illustrative limitations are global USD compensation, possible cross-country reporting, regular within-month event dates and compositional country turnover differences. Stronger seasonal/geographic effects would require explicit fictional operating assumptions and another versioned historical baseline; they are not a cosmetic follow-on.
 
-Coding pacing target remains Monday afternoon October26 New York with a buffer, not a guaranteed reset. This reconciliation makes no paid call, data change, renewal, accounting or permission change.
+Coding pacing target remains Monday afternoon October26 New York with a buffer, not a guaranteed reset. The diagnostic call above is the only new paid attempt in this batch. No data regeneration, renewal, accounting-control or permission change.
 
 ---
 
