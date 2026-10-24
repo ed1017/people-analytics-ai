@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "b073fd082b4ffe16eb06ac2c0d13fe9322a8958f",
+  "sourceCommit": "0cd30a612f1103e409d382936bacc605621f5aa6",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -849,8 +849,8 @@
     },
     {
       "path": "components/planning-assumption-slider.tsx",
-      "sha256": "49081457ef8868eeadb14ef551d6ab725bc23043bfdc97449d3e4ded09f1d529",
-      "bytes": 2680
+      "sha256": "1399bbaa2a9cb184e47f5424389d79f4f8a35178bfb14dff1f1a7bfeffce952a",
+      "bytes": 3814
     },
     {
       "path": "components/planning-calculator-dialog.tsx",
@@ -3084,8 +3084,8 @@
     },
     {
       "path": "lib/planning-slider.ts",
-      "sha256": "b63f4e8601891f9476f2a61285eb3047399b0c8ad44b7c359090a7d354fc49af",
-      "bytes": 1631
+      "sha256": "4265274c5661d973ca8219244a8a717aa2248c9cee692d76e495b955a6efe7b8",
+      "bytes": 1973
     },
     {
       "path": "lib/position-action-engine.ts",
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "383df2a44748a26c2ffd128647c5a9048169c4aaa1c88058eeb9f4d1815f3083",
-      "bytes": 5924
+      "sha256": "5a07cd3e642332bc73d4101a76259aafb5748320e3b0e37cae62c4c927e562fa",
+      "bytes": 6217
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "977d9ca31dca6cb19590c1d5d34f24803a46a62afac5d8c6484784c11f5fdc8b",
-      "bytes": 5379
+      "sha256": "d8089e698a2e5b04ec8b6992f468603af732ef562914acc63fa0dbd81b9756b9",
+      "bytes": 5639
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4191,8 +4191,13 @@
       "path": "components/group-workforce-trend.module.css",
       "sha256": "b5392d70102673ce50167357aa6913813476ef110f2c7b4cab0eca64798f1e2e",
       "bytes": 1392
+    },
+    {
+      "path": "tests/month-slider.test.mjs",
+      "sha256": "7d3825373ab16cee8e1ceebc171b4c3f4d7ce5e0c9ce25d70ede0884e4bd6ba9",
+      "bytes": 1119
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "a8b6f68908f0d2cdf4172674de047d851ad736c3837a10934d2937b593ed4f5e"
+  "verifiedDeployedArchiveSha256": "e7ec89c0ec3c1725215538f157dc27661b73abb21e2d10a5cbbafb639dcaacb6"
 }
