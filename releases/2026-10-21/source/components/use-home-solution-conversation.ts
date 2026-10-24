@@ -136,6 +136,14 @@ export function useHomeSolutionConversation(props:Props){
    setNotice(`Action Plan #${outcome.plan.number} pinned with the goal “${desired.statement}”.`);
   }catch(error){setNotice(error instanceof Error?error.message:'The proposal could not be saved.');}finally{setSaving(false);}
  }
+ async function previewPlanningInputs(item:SolutionEvaluation,changes:PlanningInputChange[]){
+  const snapshot=requireCurrent(),key=liveKey.current,captured=epoch.current;
+  const request=makeRequest('Preview adjusted planning assumptions without saving.');
+  const revised=await editSolutionPlanningInputs(request,item,changes);
+  if(key!==liveKey.current||captured!==epoch.current||snapshot.data.revision!==requireCurrent().data.revision)throw Error('The conversation changed. Reopen the current plan.');
+  if(revised.blocking.length||!revised.draft)throw Error(revised.blocking.join(' ')||'This adjustment cannot be calculated.');
+  return revised.draft;
+ }
  async function editPlanningInputs(item:SolutionEvaluation,changes:PlanningInputChange[]){
   if(controller.current||pending||saving)return;
   const snapshot=requireCurrent(),request=makeRequest(`Edit planning assumptions for ${item.candidate.name}: ${changes.map(change=>`${change.field}${change.target?' ('+change.target+')':''} = ${change.value??'Unknown'}`).join('; ')}.`),key=liveKey.current,captured=epoch.current;
@@ -273,5 +281,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

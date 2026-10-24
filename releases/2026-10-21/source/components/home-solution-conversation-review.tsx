@@ -37,6 +37,8 @@ type ProposalEdit={statement:string;dirty:boolean;values?:string[]};
 const proposalEditKey=(item:SolutionEvaluation)=>JSON.stringify([item.id,item.revision,item.requestId]);
 type ProposalProps={item:SolutionEvaluation;controller:Controller;goal:string;number:number;recommended?:boolean;notes?:string;capacityRisk?:string;edit:ProposalEdit;onEdit:(value:Partial<ProposalEdit>)=>void;supporting?:boolean};
 function Proposal({item,controller,goal,number:proposalNumber,recommended=false,notes,capacityRisk,edit,onEdit,supporting=false}:ProposalProps){
+ const [editing,setEditing]=useState(!!item.candidate.base);
+ const source=item.candidate.base,comparisonDraft=source?.kind==='working'?controller.state.working.find(row=>row.id===source.id&&row.revision===source.revision)?.draft:source?.kind==='saved'?controller.saved?.plans.find(row=>row.id===source.id&&row.draft.revision===source.revision)?.draft:null;
  const statement=edit.statement,planningDirty=edit.dirty,setStatement=(statement:string)=>onEdit({statement}),setPlanningDirty=(dirty:boolean)=>onEdit({dirty});
  const stale=JSON.stringify(item.constraints)!==JSON.stringify(controller.state.constraints),saved=controller.saved?.plans.find(plan=>plan.operation?.proposalKey===JSON.stringify(item.candidate));
  if(supporting)return <section aria-label={`Supporting details: ${item.candidate.name}`} className="space-y-4"><h4 className="font-semibold">{item.candidate.name}</h4>
@@ -51,7 +53,7 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
    {!item.candidate.activities.some(activity=>(item.draft?.bundle.components.find(part=>part.id===activity.id)?.firstStep??activity.step).trim()===item.candidate.nextStep.trim())&&<p>Follow-up: {item.candidate.nextStep}</p>}</section>
    {!!controller.state.constraints.length&&<section><h4 className="font-semibold">Current interpreted constraints</h4>{controller.state.constraints.map(item=><p key={item.field}>{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</section>}
    <ActionPlanCalculationDetails draft={item.draft} result={item.result}/>
-   {item.draft&&proposedPlanningEstimate(item.draft)&&<ProposedPlanningEditor inline values={edit.values} onValuesChange={values=>onEdit({values})} draft={item.draft} onDirtyChange={setPlanningDirty} disabled={controller.pending||controller.saving||!controller.canSend||stale||!!saved} onReview={changes=>controller.editPlanningInputs(item,changes)}/>}
+
    <section><h4 className="font-semibold">Tracking</h4><p>{item.draft?.inputs.successMeasure?successMeasureText(item.draft.inputs.successMeasure,item.draft.inputs.successMeasure.scopeKey===measurementScope(item.draft.inputs)):`${item.candidate.successMeasure} · Baseline: Unknown; Target: Unknown.`}</p><p>Confirm owner, baseline, target and review date before starting.</p></section>
    <HistoricalMetricContext inline goal={item.draft?.binding.goal??goal} measure={item.draft?.inputs.successMeasure}/>
    <section><h4 className="font-semibold">Inputs and changes</h4><ul className="list-disc space-y-1 pl-5">{[...item.interpretations,...item.changes].map((line,index)=><li key={index}>{line}</li>)}</ul>{!item.interpretations.length&&<p>No new quantities were supplied. Missing assumptions remain unknown.</p>}</section>
@@ -63,6 +65,10 @@ function Proposal({item,controller,goal,number:proposalNumber,recommended=false,
   <p className={recommended?"whitespace-normal break-words text-sm font-bold":"inline-flex rounded bg-muted px-2 py-1 text-xs font-medium"}>{recommended?'My recommendation based on the information you’ve provided':`Alternative ${proposalNumber}`}{saved?' · saved':''}</p>
   <h3 aria-label={recommended?'Recommendation summary':undefined} className="font-semibold">{item.candidate.name} · revision {item.revision}</h3>
   <ActionPlanQuickSummary compact draft={item.draft} result={item.result} fallbackActions={item.candidate.activities}/>
+  {item.draft&&proposedPlanningEstimate(item.draft,true)&&<>
+   <button type="button" className={button} aria-expanded={editing} disabled={controller.pending||controller.saving||!controller.canSend||stale} onClick={()=>setEditing(value=>!value)}>{editing?'Hide editor':'Edit plan'}</button>
+   {editing&&<ProposedPlanningEditor inline comparisonDraft={comparisonDraft??undefined} title={item.candidate.name} values={edit.values} onValuesChange={values=>onEdit({values})} draft={item.draft} onDirtyChange={setPlanningDirty} disabled={controller.pending||controller.saving||!controller.canSend||stale} onPreview={changes=>controller.previewPlanningInputs(item,changes)} onReview={changes=>controller.editPlanningInputs(item,changes)}/>}
+  </>}
   {[...item.blocking,...(stale?['Current constraints changed. Refine this proposal in chat before saving.']:[])].map((line,index)=><p key={index} role="status">{line}</p>)}
   {planningDirty&&<p role="status">Recalculate or discard input changes before saving.</p>}
   {!saved&&<p className="text-xs text-muted-foreground">Save keeps this proposal and its assumptions with your goal. It does not approve or apply a workforce change.</p>}

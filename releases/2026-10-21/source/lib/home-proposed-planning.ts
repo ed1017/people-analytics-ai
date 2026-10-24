@@ -12,10 +12,10 @@ export function proposedPlanningInputs(draft:BundleDraft):PlanningInput[]{
  for(const expense of input.expenses.filter(row=>row.kind==='cash'&&row.months.value===1))rows.push({field:'cash',target:expense.id,label:expense.label,unit:'USD',assumption:expense.amount});
  return rows;
 }
-export function proposedPlanningEstimate(draft:BundleDraft){
+export function proposedPlanningEstimate(draft:BundleDraft,includeUnproposed=false){
  if(draft.bundle.origin!=='conversation-v1'||draft.inputs.capacity)return null;
  const input=draft.inputs,rows=proposedPlanningInputs(draft);
- if(!rows.some(row=>row.assumption.kind==='model-proposed'||row.assumption.basis?.includes('planning assumptions editor'))&&!input.expenses.some(row=>row.months.kind==='model-proposed'))return null;
+ if(!includeUnproposed&&!rows.some(row=>row.assumption.kind==='model-proposed'||row.assumption.basis?.includes('planning assumptions editor'))&&!input.expenses.some(row=>row.months.kind==='model-proposed'))return null;
  const ids=[...new Set(input.memberships.flatMap(row=>row.groupIds))],groups=ids.map(id=>input.groups.find(group=>group.id===id)!);
  const covered=draft.bundle.components.every(component=>input.memberships.some(row=>row.componentId===component.id&&row.groupIds.length>0));
  const counts=groups.map(group=>group.count.value);

@@ -87,7 +87,8 @@
       "fix/planner-first-use": false,
       "polish/compact-risk-view": false,
       "feat/risk-comparison-bars": false,
-      "fix/discrete-month-sliders": false
+      "fix/discrete-month-sliders": false,
+      "feat/action-plan-scenarios": false
     }
   }
 }
