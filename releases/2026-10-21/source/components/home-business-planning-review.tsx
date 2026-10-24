@@ -1,4 +1,5 @@
 'use client';
+import {InteractivePlanner} from './interactive-planner';
 import {StaffingMixControls} from './staffing-mix-controls';
 import {StaffingCoverageChart} from './swp-outcome-chart';
 import {StaffingOptionsTable} from './staffing-options-table';
@@ -24,15 +25,18 @@ export function HomeBusinessPlanningReview({controller}:{controller:Controller})
    : `Plan cannot be saved yet. ${[...r.missing,...(staffing?.result.missing??[])].join(' ')||'Complete the staffing assumptions in chat to calculate a reviewable option.'}`
   : null;
  return <section aria-label="Business planning assumptions" className="space-y-3 rounded border p-3 text-sm">
-  <h3 className="font-semibold">Provisional business plan</h3><p>{s.objective}</p><p>{s.scope??'Role slice needs clarification'} · {s.startMonth??'Start unknown'} · {s.months??'Unknown'} months</p>
-  {r.status==='calculated'?<p>Workload: {number(r.workloadHours)} hours · existing available capacity: {number(r.capacityHours)} hours · gap: {number(r.gapHours)} hours ({number(r.additionalRoles)} additional whole roles).</p>:<p>{r.missing.join(' ')}</p>}
-  <p>Proposed and user-supplied inputs remain unverified. Correct any assumption in chat; no mode or separate input form is required.</p>
+  <InteractivePlanner scope={`${s.scope??'Role slice unknown'} · ${s.startMonth??'Start unknown'} · ${s.months??'Unknown'} months`}
+   outcome={staffing?.result.status==='calculated'?(staffing.selectedMix?adjustedStaffingSummary(staffing.result.options[0]):staffingChoiceSummary(staffing.result.options)):r.status==='calculated'?`Review options for ${number(r.additionalRoles)} additional whole roles.`:'Complete the operating assumptions to calculate the gap.'}
+   metrics={[{label:'Work required',value:number(r.workloadHours)+' hours'},{label:'Existing capacity',value:number(r.capacityHours)+' hours'},{label:'Workload gap',value:number(r.gapHours)+' hours'},{label:'Additional whole roles',value:number(r.additionalRoles)}]}
+   levers={<><StaffingMixControls state={state} disabled={busy} onChange={controller.adjustBusinessMix}/>{!staffing&&<p>Describe the role, workload and timing in chat. Known inputs are retained; missing values remain unknown.</p>}</>}
+   visual={staffing?.result.options.length?<StaffingCoverageChart target={r.additionalRoles} scope={s.scope} start={s.startMonth} months={s.months} options={staffing.result.options.map((o,index)=>({id:o.id,label:staffing.selectedMix?'Adjusted mix':index===0?'All-hire reference':`Option ${index}`,mix:o.mix,coverage:o.monthly.length===s.months?o.monthly.map(m=>m.roles):null}))}/>:<p role="status">{r.missing.join(' ')||'Review staffing costs and readiness to calculate option coverage.'}</p>}
+   assumptions="Entered or proposed assumptions; readiness and availability remain unverified. End-date coverage does not prove full-period delivery."
+  />
   {saveUnavailable?<p role="status">{saveUnavailable}</p>:<p><strong>Save plan:</strong> Choose an option to review below, then select Save plan. Saving keeps its assumptions with your goal; it does not approve a workforce change.</p>}
-  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.status==='calculated'&&<p>{staffing.selectedMix?adjustedStaffingSummary(staffing.result.options[0]):staffingChoiceSummary(staffing.result.options)}</p>}{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
+  {staffing&&<><h4 className="font-semibold">Calculated provisional options</h4>{staffing.result.missing.map(line=><p key={line}>{line}</p>)}
    {staffing.result.status==='no-gap'&&<p>No positive workload gap; no staffing plan was generated.</p>}
-   <StaffingMixControls state={state} disabled={busy} onChange={controller.adjustBusinessMix}/>
    <StaffingOptionsTable options={staffing.result.options} enumerated={staffing.result.enumerated} action={option=><button className={button} disabled={busy||option.status==='invalid'||!!selected(option.id)} onClick={async()=>{setPreparing(true);setError('');try{setReview(await controller.reviewBusinessOption(option.id));}catch(e){setError((e as Error).message);}finally{setPreparing(false);}}}>{selected(option.id)?`Pinned Action Plan #${selected(option.id)!.number}`:`Review to save: ${option.mix.build}/${option.mix.move}/${option.mix.buy}`}</button>}/>
-   {staffing.result.options.length>0&&<StaffingCoverageChart target={r.additionalRoles} scope={s.scope} start={s.startMonth} months={s.months} options={staffing.result.options.map((o,index)=>({id:o.id,label:staffing.selectedMix?'Adjusted mix':index===0?'All-hire reference':`Option ${index}`,mix:o.mix,coverage:o.monthly.length===s.months?o.monthly.map(m=>m.roles):null}))}/>}
+
    <p>End-date coverage does not prove full-period delivery. “Met” applies only to entered limits; actual availability, readiness and release remain unverified.</p>
   </>}
   <details><summary className="min-h-11 cursor-pointer py-2">Inputs and calculation limits</summary>

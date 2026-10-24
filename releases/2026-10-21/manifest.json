@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "6fa58dc5500f4f3c868262306b2973b553bc435c",
+  "sourceCommit": "9e1c4d069611ec826e53e8cc60c8565828f38202",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -489,8 +489,8 @@
     },
     {
       "path": "components/hiring-scenario-controls.tsx",
-      "sha256": "f53f6d6a26da78df48035a41c6c9da20fc93112fe2f7e20e23dc63484fdcf32e",
-      "bytes": 4220
+      "sha256": "426248860ffca2dfec95a6b158688194d3aed77111e3ad928616c10e4e710381",
+      "bytes": 4467
     },
     {
       "path": "components/historical-metric-context.tsx",
@@ -539,8 +539,8 @@
     },
     {
       "path": "components/home-business-planning-review.tsx",
-      "sha256": "b1eabf2762d5a95ac4da6891a379fab43c029038f83c767b66fe782c93ffe982",
-      "bytes": 8572
+      "sha256": "4fc022a41262341bfa77c6b94733068849332b47c3a282d166a5420a870175bb",
+      "bytes": 9009
     },
     {
       "path": "components/home-candidate-options.tsx",
@@ -599,8 +599,8 @@
     },
     {
       "path": "components/home-hiring-budget-review.tsx",
-      "sha256": "9c83de3d490c4e236dbae2288ec4915e9604aa386e28160d4ff895d29c3548d3",
-      "bytes": 8750
+      "sha256": "c1f2cec932328caae9da35e1090d9ab9d902df0fbf9ed436feba377ddabd2a39",
+      "bytes": 9669
     },
     {
       "path": "components/home-hiring-plan-review.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "7b7860fd386e7dc37fb066141147246ededb642af9f0c81963ae8c2312d149dc",
-      "bytes": 5558
+      "sha256": "861060fb28bc5b456bffcc8933066a15eae3d7908380c11805bae8c990d8c180",
+      "bytes": 7830
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "a09ba831c71baa38180001e233d759e0e79def401e2cdea016acabed39040b0c",
-      "bytes": 100957
+      "sha256": "b1137efc0a7edaf2565bffb0f115b21a80a2a58dbfffe3951d74fdff2d561b8a",
+      "bytes": 101801
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -849,8 +849,8 @@
     },
     {
       "path": "components/planning-assumption-slider.tsx",
-      "sha256": "c9c9417e0407518a4d8cd2c11905759a194026a678b16684a2917fdacd0282ca",
-      "bytes": 2284
+      "sha256": "d206a7a77e6cc9ce861494952e81d76c43d39209f5fdd4a5ae8ac17e6d598e5b",
+      "bytes": 2310
     },
     {
       "path": "components/planning-calculator-dialog.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "a23b32af8989a28b31d78589d5f1810e82d98e7d44ba4574c15589a8015ec139",
-      "bytes": 10120
+      "sha256": "7091571fa63462f82bc69064a0a0e3c3c97ffaeb68b1ec5ef35662782c9e10b1",
+      "bytes": 10406
     },
     {
       "path": "components/site-footer.tsx",
@@ -974,7 +974,7 @@
     },
     {
       "path": "components/swp-outcome-chart.tsx",
-      "sha256": "b3255b0e3298347e388971c10283fa2d08817117649a298e2c1bda0980b47811",
+      "sha256": "29e186496ffc3b23e3b863ae20043e27f4d1b0f02965b6d8f21e18f3ce2bc760",
       "bytes": 4407
     },
     {
@@ -3084,8 +3084,8 @@
     },
     {
       "path": "lib/planning-slider.ts",
-      "sha256": "a76ffaaea5f7116d69bb58ff8b4131ca2e097a68f24cb89b390cead48f77073e",
-      "bytes": 1387
+      "sha256": "b63f4e8601891f9476f2a61285eb3047399b0c8ad44b7c359090a7d354fc49af",
+      "bytes": 1631
     },
     {
       "path": "lib/position-action-engine.ts",
@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "c69ceb164636cb6d9741cb94bcff69549952798b8a9d04960c007451d360773d",
-      "bytes": 12446
+      "sha256": "4fa441ce731d3b2f43d2416aeba6583f182699a2c5ffa812c62bbe65b6c799b6",
+      "bytes": 14639
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4121,8 +4121,33 @@
       "path": "tests/chart-pointer-tooltip.test.mjs",
       "sha256": "a4e050f23b0373f6249ad8cc2bdc280923a9c42f5ae082a00528f22f77e8ad5b",
       "bytes": 1672
+    },
+    {
+      "path": "components/interactive-planner.module.css",
+      "sha256": "2e01185eee9bd752517319cf5aad8247c52947942decd02f7972280aae671517",
+      "bytes": 1038
+    },
+    {
+      "path": "components/interactive-planner.tsx",
+      "sha256": "d8ec42c786b22033edd45ba749c85793988816acdc1b7712fb91f6802cb7ccae",
+      "bytes": 1148
+    },
+    {
+      "path": "components/scenario-planner-workspace.tsx",
+      "sha256": "1d10f8ba58cca9531274dda7ffa73ce34a3f502aa4b7cccd51eed899d5fddd3a",
+      "bytes": 1248
+    },
+    {
+      "path": "lib/scenario-planner-entry.ts",
+      "sha256": "7ef185ebb0742329d15c4c6cc880b1acf3514b2a443009afd0b5314a67069d6e",
+      "bytes": 585
+    },
+    {
+      "path": "tests/scenario-planner-entry.test.mjs",
+      "sha256": "a0809c727a5aa4fd178687589bd78ce8ca079be80662cca6f42e7796e86b7825",
+      "bytes": 1374
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "42942dd96d1bebbd28558be59773fb09b853fdd2fbe26e85f90e0ea91ee35641"
+  "verifiedDeployedArchiveSha256": "87390b063d5fe3736907fde10c4be5edb26ec9519c0ccbd3641955c6854725f5"
 }
