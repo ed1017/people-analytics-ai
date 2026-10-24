@@ -9,6 +9,8 @@ import {CatalogComposer,PromptTemplates} from '@/components/catalog-composer';
 import {homeNextDetails} from '@/lib/home-next-details';
 import {homeRecruitingKpi,type HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import {HomeHeadcountSummary,type HomeSnapshotProps} from '@/components/home-chat-welcome';
+import {GroupCapacityRisk} from '@/components/group-capacity-risk';
+import {capacityRiskIntent} from '@/lib/group-capacity-risk';
 import {useHomeProjection} from '@/components/use-home-projection';
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {isVerifiedDashboardScope} from '@/lib/dashboard-scope';
@@ -129,6 +131,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
 }) {
   const storage=useDecisionStorage();
   const liveChatAvailable=usePublicAiReadiness('/api/home-solution-conversation');
+  const readinessStatus=useSyncExternalStore(publicAiReadiness.subscribe,publicAiReadiness.status,()=> 'checking');
   const [guidedActions]=useState(()=>new GuidedActionRegistry());
   const swpCommand=useRef<((text:string)=>Promise<string|null>)|null>(null),swpModelContext=useRef<unknown>(null);
   const demandControl=useRef<DemandIntakeControl|null>(null),demandReview=useRef<((review:DemandReview)=>void)|null>(null),demandContext=useRef<unknown>(null);
@@ -226,7 +229,9 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   type FindingTurn={message:ChatMessage;findings:HomeFindingFollowup[];context:string;epoch:number;goalId:string;goal:string;selectionGoal:string;sourceKey:string};
   const [findingTurn,setFindingTurn]=useState<FindingTurn|null>(null);
   const liveFindingTurn=useRef<FindingTurn|null>(null);
+  const [riskRequest,setRiskRequest]=useState<{months:number;question:string;context:string}|null>(null);
   function resetHomeConversation(){
+    setRiskRequest(null);
     conversation.resetConversation();requestAnimationFrame(()=>composer.current?.focus());
   }
   function changeQuestion(value:string){setRecoveryConfirmation(null);setLocalAction(null);setInput(value)}
@@ -328,6 +333,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default',starter?:HomeStarterGoal,onAnswered?:()=>void, keepComposer=false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
+    const riskMonths=actionPlan?null:capacityRiskIntent(message);
+    if(riskMonths!==null&&(!ready||!conversation.storageReady)){setChatError('Workforce evidence is still loading. Your question is kept; submit when loading finishes.');return;}
+    if(riskMonths!==null&&active&&!chatLoading&&!sending.current){setRiskRequest({months:riskMonths,question:message,context:contextKey});setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:'Review business-unit capacity exposure using the recorded snapshot and explicit forward assumptions. No risk ranking is inferred before the required inputs are entered or a demo baseline is adopted.'}]);setChatError(null);if(!keepComposer||input.trim()===message)setInput('');return;}
+    setRiskRequest(null);
     if(message)setInstructionsDismissed(value=>value+1);
     if(message&&active&&!chatLoading&&!sending.current&&swpCommand.current){
       try{const answer=await demandControl.current?.command(message)??await swpCommand.current(message);if(answer!==null){if(answer){setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:answer}]);if(!keepComposer)setInput(current=>current.trim()===message?'':current);setChatError(null);}return;}}
@@ -594,7 +603,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const followUp=followUpMessage?planDiscussions.get(followUpMessage):undefined;
   const followUpQuestions=homeNextDetails(solutions.state,solutions.state.questions,messages.at(-1)===followUpMessage?followUp?.furtherReading??'':'',ready&&!chatLoading&&messages.at(-1)?.role==='assistant'&&(messages.at(-1)===followUpMessage||solutions.state.turns.at(-1)?.role==='assistant'&&solutions.state.turns.at(-1)?.text===messages.at(-1)?.content));
   const questionComposer=(
-    <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">{!liveChatAvailable&&(<div role="status" className="rounded border p-3 text-sm text-muted-foreground"><p>{PUBLIC_AI_ENABLED?'Live AI configuration is unavailable or needs checking. Your draft and saved plans are kept.':'Live AI chat is currently disabled. Use the planning scenario to edit assumptions and compare staffing options, or open a planning tool above. Calculations run without a live AI call.'}</p>{PUBLIC_AI_ENABLED&&<button type="button" className="mt-2 min-h-11 rounded border px-3 py-2" onClick={()=>void publicAiReadiness.refresh()}>Check AI configuration</button>}</div>)}<PublicAiConfigurationStatus route="/api/home-solution-conversation"/>
+    <form onSubmit={event => { event.preventDefault(); void send(); }} className="home-chat-form shrink-0">{!liveChatAvailable&&(<div role="status" className="rounded border p-3 text-sm text-muted-foreground"><p>{PUBLIC_AI_ENABLED?(readinessStatus==='checking'?'Checking AI configuration…':'AI configuration could not be verified. Check configuration before submitting.'):'Live AI chat is currently disabled. Use the planning scenario to edit assumptions and compare staffing options, or open a planning tool above. Calculations run without a live AI call.'}</p>{PUBLIC_AI_ENABLED&&<button type="button" className="mt-2 min-h-11 rounded border px-3 py-2" onClick={()=>void publicAiReadiness.refresh()}>Check AI configuration</button>}</div>)}<PublicAiConfigurationStatus route="/api/home-solution-conversation"/>
       {visibleScopeChoice && <div aria-label="Requested country scope" className="mb-3 text-sm"><p>{visibleScopeChoice.kind==="ambiguous" ? "Which country should this workforce snapshot use?" : visibleScopeChoice.kind==="unsupported" ? "That country scope is not fully supported. Choose an available country or keep the current scope; missing evidence stays unavailable." : "Use country-specific workforce evidence for this question?"}</p><div className="mt-2 flex flex-wrap gap-2">{visibleScopeChoice.options.map(option=><button key={option.value} type="button" onClick={()=>applyCountry(option)} className="min-h-11 rounded border border-primary px-3 py-2 font-semibold text-primary">Apply {option.label} and answer</button>)}<button type="button" onClick={()=>void send(visibleScopeChoice.message,false,true)} className="min-h-11 px-2 text-primary underline">Answer with current scope</button></div><p className="mt-1 text-xs text-muted-foreground">Only the workforce snapshot changes. Other filters stay selected; company-wide sources retain their scope.</p></div>}
       {recoveredPlanNeedsConfirmation(input)&&<section aria-label="Confirm plan for recovered request" className="mb-3 space-y-2 rounded border p-3 text-sm">
         <p>Your recovered request does not name a plan. Another tab may have changed the selection. Select the intended Action Plan tab, then confirm it here before sending.</p>
@@ -708,7 +717,8 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       {active&&<WorkforceSolutionPanel hideEntry optionActions={optionActions} page="home" onNavigate={onNavigate}/>}
     </div>
     {homeProjection.requested&&conversation.focusedIssue&&projectionOverview&&<HomeHeadcountSummary {...projectionOverview} recruitingKpi={recruitingKpi} recruitingPending={!sourcesSettled} flows={flows} projection={homeProjection.value} projectionStatus={homeProjection.status}/>}
-    <HomeConversationSplit enabled={scenarioChat||overviewEntry&&!welcomeComposer} visuals={<><aside hidden={!scenarioChat} ref={setScenarioTarget} id="home-scenario-visuals" aria-label="Scenario calculations and assumptions" className="min-w-0"/><div hidden={scenarioChat}>{(Boolean(currentVisualAnswer)||chatLoading||solutions.pending||Boolean(chatError)||!solutions.state.businessPlanning)&&<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>}<section aria-label="Planning workspace" className="mt-4 space-y-3">{overviewEntry&&planningReviewPanel}</section></div></>} >
+    {riskRequest?.context===contextKey&&<GroupCapacityRisk key={contextKey+':'+riskRequest.months} months={riskRequest.months} question={riskRequest.question} scopeQuery={workforceQuery} onClose={()=>setRiskRequest(null)}/>}
+    <div hidden={riskRequest?.context===contextKey}><HomeConversationSplit enabled={scenarioChat||overviewEntry&&!welcomeComposer} visuals={<><aside hidden={!scenarioChat} ref={setScenarioTarget} id="home-scenario-visuals" aria-label="Scenario calculations and assumptions" className="min-w-0"/><div hidden={scenarioChat}>{(Boolean(currentVisualAnswer)||chatLoading||solutions.pending||Boolean(chatError)||!solutions.state.businessPlanning)&&<HomeAnswerVisuals pending={chatLoading||solutions.pending} error={Boolean(chatError)} current={Boolean(currentVisualAnswer)} series={currentVisualSeries} supplement={currentVisualSupplement}/>}<section aria-label="Planning workspace" className="mt-4 space-y-3">{overviewEntry&&planningReviewPanel}</section></div></>} >
     <div ref={conversationViewport} style={{overflowAnchor:"none"}} aria-label="Home chat workspace" role="region" tabIndex={0} className="min-h-0 max-h-[70dvh] space-y-3 overflow-y-auto pr-1">
     {storage.data.workspaces[conversation.activeGoalId]?.fields.homeActionDraftV1!==undefined&&<details><summary className="min-h-11 cursor-pointer py-2">Previous action drafts and their saved scenarios</summary><HomeActionOptions publicEvidenceContext={publicEvidenceContext} goalId={conversation.activeGoalId} goal={conversation.focusedIssue} pack={pack} persona={persona} goalContext={conversation.goalContext} marketReference={marketReference} active={active} ready={ready} busy={chatLoading||!conversation.saved} pin={null} hasPlanningWork={hasPlan||hasRetention} onResume={compareWorkforceOptions}/></details>}
     {!guidedExampleActive&&<SwpGuidedJourney onGeneralQuestion={text=>{conversation.startNewProblem(text);setScenarioQuestion({text,token:datasetSession.snapshot(),reset:conversation.resetEpoch,workspace:conversation.workspaceKey.slice(0,conversation.workspaceKey.lastIndexOf(':')+1)});}} scenarioTarget={scenarioTarget} onScenarioChatChange={setScenarioChat} onDemoStateChange={setSwpDemoVisible} discussionKey={JSON.stringify([workforceScope,workforceQuery,persona])} conversation={conversation} active={active} busy={chatLoading||solutions.pending||solutions.saving} commandRef={swpCommand} modelContextRef={swpModelContext} demandControlRef={demandControl} demandReviewRef={demandReview} demandContextRef={demandContext} sources={sources??[]} onNavigate={onNavigate}/>}
@@ -733,7 +743,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     <div hidden={swpDemoVisible&&!demoChatOpen}>{!welcomeComposer&&questionComposer}</div>
       {liveChatAvailable&&!solutionConversationEnabled&&structuredPlansEnabled&&recoveryPlanChoice?.goalId===conversation.activeGoalId&&<label className="flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={structuredMode} onChange={event=>{selectedPlanForChat.current?.discard();setStructuredMode(event.target.checked);}}/>Discuss saved plans · turn off to use existing chat controls</label>}
       {actionOffers.length>0&&<details className="mt-3"><summary className="min-h-11 cursor-pointer py-2 text-sm">Option action suggestions</summary><section aria-label="Workforce option actions" className="mt-3 space-y-2"><p className="text-sm text-muted-foreground">{input.trim()?'Your draft is kept. Clear it to choose an option action.':'Click to open the local action. Saving, calculation and search remain explicit.'}</p><div className="flex flex-wrap gap-2">{actionOffers.map(offer=><button key={offer.id} type="button" disabled={suggestionPending||chatLoading||Boolean(input.trim())} onClick={()=>submitOption(offer.id)} className="min-h-11 rounded-lg border px-3 py-2 text-left text-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">{offer.label}</button>)}</div></section></details>}
-      </HomeConversationSplit>
+      </HomeConversationSplit></div>
   </section>
     {renderPlanPane ? null : savedWork}
   </div></HomeGuidedActionsContext.Provider>;

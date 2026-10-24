@@ -14,14 +14,16 @@ import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
 import styles from './home-chat-shell.module.css';
 import {swpDemoPrompt} from '@/lib/swp-demo';
 import {HomeConversationSplit,HomeSplitProvider} from './home-answer-visuals';
+import {capacityRiskPrompt} from '@/lib/group-capacity-risk';
 
 export const planningEntries = [
   {label:'How has our headcount changed?'},
   {label:'What was turnover last year?'},
   {label:'What are our recorded workforce costs?'},
   {label:'How can we close a staffing gap?'},
+  {label:capacityRiskPrompt},
 ] as const;
-const icons = [ChartNoAxesCombined, Sparkles, Wallet, Users];
+const icons = [ChartNoAxesCombined, Sparkles, Wallet, Users, ChartNoAxesCombined];
 export const welcomeCurrency = (value:number) => ({compact:'USD '+new Intl.NumberFormat('en-US',{notation:value>=1000?'compact':'standard',maximumFractionDigits:2,minimumFractionDigits:value<1000?2:0}).format(value),exact:'USD '+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:20})});
 const known = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
