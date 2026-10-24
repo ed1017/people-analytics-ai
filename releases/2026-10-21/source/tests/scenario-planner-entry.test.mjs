@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {scenarioPlannerEntry} from '../lib/scenario-planner-entry.ts';
 import {sliderNumber,sliderEdit} from '../lib/planning-slider.ts';
 test('ordinary planning variations reveal the UI without treating exploration as planning',()=>{
- for(const q of ['How can we close a staffing gap?','We need 12 people in HR at level 10','Compare hiring and redeployment','What if demand increases?','Create a scenario plan','I need FTE to fill a capacity gap'])assert.equal(scenarioPlannerEntry(q),true,q);
+ for(const q of ['How can we close a staffing gap?','We need 12 people in HR at level 10','Compare hiring and redeployment','What if demand increases?','Create a scenario plan','I need FTE to fill a capacity gap','Project headcount over six months assuming five hires and three exits per month. Label this as a hypothetical scenario.','How should we approach adding people?'])assert.equal(scenarioPlannerEntry(q),true,q);
  for(const q of ['', 'Which groups are at risk of a capacity gap in the next 3 months?','What was turnover last year?','Which roles had the fastest time to fill?','How has our headcount changed?'])assert.equal(scenarioPlannerEntry(q),false,q);
 });
 test('risk sliders retain adopted fractional rates and increment from the actual value',()=>{
