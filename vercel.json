@@ -74,7 +74,8 @@
       "fix/coherent-geography": false,
       "docs/geography-release-evidence": false,
       "fix/pricing-window-242314": false,
-      "docs/pricing-renewal-242314": false
+      "docs/pricing-renewal-242314": false,
+      "docs/roadmap-after-380": false
     }
   }
 }
