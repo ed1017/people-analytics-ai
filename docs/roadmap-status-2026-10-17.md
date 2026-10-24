@@ -1,12 +1,12 @@
-# Active roadmap - October 24, reviewed service-target candidate
+# Active roadmap - October 24, PR382 live
 
 Owner direction now authorizes clearly fictional business-unit labels and editable service targets. Candidate runtime `c48c342d3c191db9c16d9424e2a316cd12f07e9d` implements all eight display names without changing codes, query vocabulary, data or saved identities. The existing coverage deadline and new optional acceptable-uncovered-hours target share the ordinary/guided calculator. Unknown remains distinct from zero; meeting a modeled target does not establish operational sufficiency. Clearing a saved deadline withdraws its active measurement through an append-only history event rather than erasing history or retaining a stale target.
 
-Independent review, 38 focused checks, six input-contract checks, TypeScript and exact packaged-source verification passed. Fifteen older broad-suite failures remain harness/copy debt; this is not a claim that the whole broad suite passes. Protected browser acceptance, CI and promotion are pending. Production identity below remains unchanged until verified promotion.
+PR382 merged as `e70986ec652ff4003121623c6619fa881a67fda0`. Independent review, 38 focused checks, six input-contract checks, TypeScript and exact packaged-source verification passed. Required CI40083886070 passed, including five explicit service-target/history regressions. Fifteen older broad runtime-suite failures remain harness/copy debt; this is not a claim that that entire suite passes. Protected and public 1440px/390px browser checks passed: eight stable code/name pairs, 1,000-hour target producing the offered 2 develop/2 move/1 hire option ($126,000; 960 uncovered hours), explicit save/reload and no overflow. Exact promoted deployment: `dpl_9KWyULyBbmazTyCrHuf93pjayVd1`, runtime `c48c342d3c191db9c16d9424e2a316cd12f07e9d`, archive `c4748fb144e2d78b46aca432188c7aec852c380765e57d6f0ea66ed2f5bea0f2`.
 
-The latest read-only current-deployment failure scan returned no matching records for October23 21:32–October24 09:32 UTC. The original rejected answer is unavailable and predates detailed diagnostic classifications. No speculative validation relaxation or automatic retry has been added; the historical intermittent rejection remains unresolved. No provider call, accounting change or pricing renewal was made for this candidate.
+The latest read-only failure scan returned no matching records for October23 21:32–October24 09:32 UTC. One authorized ordinary Finance diagnostic on the preceding production runtime succeeded in three model rounds/two tools at09:56UTC. It returned a conditional six-hire interpretation, keeping costs/timing/affordability unknown; it did not reproduce the old rejection. Three automatically settled charges totaled $0.481497, leaving $24.868845 under the existing cumulative cap with uncertain liabilities unchanged. No speculative validation relaxation, automatic retry, accounting-control change or pricing renewal was made. The historical rejected output is unavailable and predates detailed diagnostics; intermittent reliability remains unproven.
 
-This is the current queue. Dated sections below are historical records, not unfinished tasks. Latest production runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`, deployment `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`, dataset `workforce-demo-9037-public-aggregates-v4:5`. PR379 deployed the date-only renewal; PR380 records verified release evidence. The owner is reviewing later Saturday afternoon; no new user review is claimed.
+This is the current queue. Dated sections below are historical records, not unfinished tasks. Latest production runtime: `c48c342d3c191db9c16d9424e2a316cd12f07e9d`, deployment `dpl_9KWyULyBbmazTyCrHuf93pjayVd1`, unchanged dataset `workforce-demo-9037-public-aggregates-v4:5`. PR379's pricing windows remain unchanged. The owner is reviewing later Saturday afternoon; no new user review is claimed.
 
 ## Completed agreed work
 
@@ -24,12 +24,12 @@ This is the current queue. Dated sections below are historical records, not unfi
 
 | Priority | Remaining item | Next useful action / boundary |
 | --- | --- | --- |
-| 1 | Intermittent final-answer rejection | The retained October22 failure identifies calculation-reference validation but lacks the rejected output and predates finer subreason diagnostics. PR375 confirmed safe allowlisted diagnostics already exist. A read-only scan of the current deployment, October23 22:44 through October24 03:44UTC, returned no matching Home failure records; this is not proof of reliability. Next concrete action is to replay a diagnostic-bearing failure if one is captured, or conduct a separately justified bounded provider test. No evidence supports relaxing validation, automatic paid retries or another speculative code patch. |
+| 1 | Intermittent final-answer rejection | The retained October22 failure identifies calculation-reference validation but lacks the rejected output and predates finer subreason diagnostics. PR375 confirmed safe allowlisted diagnostics already exist. A retained read-only scan of the preceding deployment, October23 22:44 through October24 03:44UTC, returned no matching Home failure records; this is not proof of reliability. Next concrete action is to replay a diagnostic-bearing failure if one is captured, or conduct a separately justified bounded provider test. No evidence supports relaxing validation, automatic paid retries or another speculative code patch. |
 | 2 | Owner acceptance of the delivered workflows | Review ordinary questions, recommendation/slider changes and saved/reopened plans on the current release; turn any observed failure into a specific regression. Existing replay/provider evidence stays distinguished. No need to repeat completed full catalogue audits while waiting. |
-| 3 | Full BU display names | Approved fictional mapping implemented and reviewed; hosted acceptance and publication pending. Stable codes remain authoritative identifiers. |
-| 3 | Service targets and outcome claims | Editable deadline and optional uncovered-hours target implemented and reviewed; hosted acceptance pending. Actual outcome metric/population/period and operational approval still require service-specific evidence. |
+| Complete | Full BU display names | Approved fictional mapping is live and checked on desktop/mobile. Stable codes remain authoritative identifiers. |
+| Complete / evidence limit | Service targets and outcome claims | Editable deadline and optional uncovered-hours target are live with save/reload coverage. Actual outcome metric/population/period and operational approval still require service-specific evidence; the software no longer requires a product decision to enter a target. |
 
-Complete the current candidate's hosted acceptance and checked release, then pursue only diagnostic-bearing evidence for the intermittent rejection. These items are independent; missing historical output does not block labels or editable targets.
+Both implementation gaps are closed. For the intermittent rejection, the next useful evidence is an actual diagnostic-bearing failure, not repeated successful paid attempts or relaxed validation. No pending user decision blocks the shipped label/target features. Existing outcome-evidence boundaries and explicit deferrals remain.
 
 ## Explicit deferrals and realism limits
 
@@ -37,7 +37,7 @@ Onboarding popup/video/credits flow, dark mode, pinning/action integration, torn
 
 The earlier blanket synthetic-regeneration deferral was superseded only for the delivered coordinated realism batches. Remaining illustrative limitations are global USD compensation, possible cross-country reporting, regular within-month event dates and compositional country turnover differences. Stronger seasonal/geographic effects would require explicit fictional operating assumptions and another versioned historical baseline; they are not a cosmetic follow-on.
 
-Coding pacing target remains Monday afternoon October26 New York with a buffer, not a guaranteed reset. This reconciliation makes no paid call, data change, renewal, accounting or permission change.
+Coding pacing target remains Monday afternoon October26 New York with a buffer, not a guaranteed reset. The diagnostic call above is the only new paid attempt in this batch. No data regeneration, renewal, accounting-control or permission change.
 
 ---
 
