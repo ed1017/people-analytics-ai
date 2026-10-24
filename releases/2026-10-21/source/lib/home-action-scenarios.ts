@@ -15,7 +15,7 @@ export type ScenarioInputs=Record<string,string>;
 export type ScenarioOrigins=Record<string,AssumptionOrigin>;
 export type ScenarioCalculation={revision:number;method:string;inputs:ScenarioInputs;origins:ScenarioOrigins;result:WorkforceIncrement|RetentionResult};
 export type ActionScenario={version:1;status:'proposal';binding:ActionBinding;actionSignature:string;route:ScenarioRoute;revision:number;inputs:ScenarioInputs;origins:ScenarioOrigins;calculation:ScenarioCalculation|null};
-export type ActionScenarioStore={version:1;entries:ActionScenario[]};
+export type ActionScenarioStore={version:1;entries:ActionScenario[];history?:ActionScenario[]};
 const canonical=(value:unknown)=>JSON.stringify(value,(_,item)=>plain(item)?Object.fromEntries(Object.entries(item).sort(([a],[b])=>a.localeCompare(b))):item);
 const same=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
 const bounded=(text:unknown,max:number):text is string=>typeof text==='string'&&text.length<=max;
@@ -90,17 +90,20 @@ export function adoptActionAssumptions(scenario:ActionScenario,source:SavedScena
 export function readActionScenarioStore(raw:unknown):ActionScenarioStore|null{
  if(raw===undefined)return {version:1,entries:[]};
  if(!validateJson(raw)||new TextEncoder().encode(JSON.stringify(raw)).length>192*1024)return null;
- const value=plain(raw);if(!value||!exactKeys(value,['version','entries'])||value.version!==1||!Array.isArray(value.entries)||value.entries.length>12)return null;
+ const value=plain(raw);if(!value||!exactKeys(value,value.history===undefined?['version','entries']:['version','entries','history'])||value.version!==1||!Array.isArray(value.entries)||value.entries.length>12)return null;
  const entries=value.entries.map(parseScenario);if(entries.some(item=>!item))return null;
  const keys=entries.map(item=>canonical([item!.binding,item!.actionSignature]));if(new Set(keys).size!==keys.length||new Set(entries.map(item=>item!.binding.goalId)).size>1)return null;
- return {version:1,entries:entries as ActionScenario[]};
+ const history=value.history===undefined?[]:Array.isArray(value.history)&&value.history.length<=36?value.history.map(parseScenario):null;
+ if(!history||history.some(item=>!item)||history.some(item=>!entries.some(latest=>same(latest!.binding,item!.binding)&&latest!.actionSignature===item!.actionSignature&&latest!.revision>item!.revision)))return null;
+ const revisions=history.map(item=>canonical([item!.binding,item!.actionSignature,item!.revision]));if(new Set(revisions).size!==revisions.length)return null;
+ return {version:1,entries:entries as ActionScenario[],...(value.history===undefined?{}:{history:history as ActionScenario[]})};
 }
 export function saveActionScenarioPatch(previous:unknown,scenario:ActionScenario){
  const store=readActionScenarioStore(previous),valid=parseScenario(scenario);if(!store||!valid)throw Error('Saved action assumptions cannot be verified. Existing records are kept.');
  const index=store.entries.findIndex(item=>same(item.binding,valid.binding)&&item.actionSignature===valid.actionSignature);
  if(store.entries.some(item=>item.binding.goalId!==valid.binding.goalId))throw Error('The proposal store belongs to another goal.');
  if(index>=0){const latest=store.entries[index];if(valid.revision<latest.revision||valid.revision===latest.revision&&(!same(valid.inputs,latest.inputs)||!same(valid.origins,latest.origins)||!!latest.calculation&&(!valid.calculation||valid.calculation.revision<latest.calculation.revision)))throw Error('Saved assumptions changed. Reopen this proposal before replacing them.');}
- if(index<0)store.entries.push(valid);else store.entries[index]=valid;
+ if(index<0)store.entries.push(valid);else {const original=store.entries[index];if(valid.revision>original.revision)store.history=[...(store.history??[]),copy(original)];store.entries[index]=valid;}
  if(!readActionScenarioStore(store))throw Error('Action proposal storage limit reached. Existing records are kept.');
  return {field:homeActionScenarioField,value:store};
 }

@@ -140,3 +140,16 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
  s.revision++;return readRequiredStaffingReview(s)!;
 }
 export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: staffingDeliveryTarget in the supplied context is the explicit user delivery deadline, captured separately from cost months. Preserve it; months in this calculator is only the cost horizon. Never replace that deadline with an annual cost period or claim readiness from a target alone. When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
+
+/** Explicit local controls use the same provenance and scope checks as interpreted edits. */
+export function editRequiredStaffingLocally(request:SolutionRequest,datasetToken:string,expected:string,input:RequiredStaffingInput){
+ const previous=currentRequiredStaffing(request,datasetToken);
+ if(!previous||JSON.stringify(previous)!==expected)throw Error('The staffing comparison changed. Reopen its current inputs.');
+ const next=readRequiredStaffingInput(input);
+ if(next.role!==previous.inputs.role||next.currency!==previous.inputs.currency)throw Error('Change role or currency in the conversation so its scope can be reviewed.');
+ const fields=requiredStaffingFields.filter(field=>!same(next[field],previous.inputs[field]));
+ if(!fields.length)return previous;
+ const text='Adjust staffing assumptions: '+fields.map(field=>`${field} = ${next[field]??'Unknown'}`).join('; ');
+ const edited={...request,message:{...request.message,text}};
+ return editRequiredStaffing(edited,datasetToken,fields.map(field=>({field,value:next[field],basis:{kind:'user-supplied',turnId:edited.message.id,quote:text,explanation:'Explicitly edited in the staffing scenario controls; not operational verification.'}})));
+}

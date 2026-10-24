@@ -11,10 +11,11 @@ import {publicAiEvidenceField,publicSolutionEnvelope,capturePublicWorkingRecipes
 import {conversationPlanCatalog} from '@/lib/home-conversation-plan-catalog';
 import {usePendingRequest} from './use-pending-request';
 import {requiredStaffingPlanIdentity} from '@/lib/home-required-staffing-plan';
-import {currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
+import {editRequiredStaffingLocally,currentRequiredStaffing,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget} from '@/lib/home-required-staffing';
 import {prepareRequiredStaffingPlan,requiredStaffingPlanFields} from '@/lib/home-required-staffing-plan-save';
 import {prepareHiringPlan,prepareConditionalHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
 import {currentHiringBudget,editHiringBudgetLocally,restoreHiringBudgetBaseline,type HiringBudgetReview} from '@/lib/home-hiring-budget';
+import type {RequiredStaffingInput} from '@/lib/required-staffing';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
@@ -160,6 +161,12 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
+ function updateRequiredStaffing(expected:string,inputs:RequiredStaffingInput){
+  if(controller.current||pending||saving)throw Error('Wait for the current request before applying staffing changes.');
+  requireCurrent();const request=makeRequest('Apply locally reviewed staffing assumptions.');
+  const review=editRequiredStaffingLocally(request,decisionStore.getDatasetToken(),expected,inputs);
+  persist({...memoryRef.current,requiredStaffing:review});
+ }
  function clearRequiredStaffing(){
   if(controller.current||pending||saving)throw Error('Wait for the current request before clearing this comparison.');
   requireCurrent();persist({...memoryRef.current,requiredStaffing:null,currentCalculationKinds:memoryRef.current.currentCalculationKinds?.filter(kind=>kind!=='required-staffing')});
@@ -281,5 +288,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {updateRequiredStaffing,saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }
