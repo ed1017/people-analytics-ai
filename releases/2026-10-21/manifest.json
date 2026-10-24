@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "b6fc25d9463e2e50d9abb112218f78d4928658e1",
-  "deployment": "dpl_APisNdExKzZQuSgTAcxeBnG8hcpz",
+  "sourceCommit": "b073fd082b4ffe16eb06ac2c0d13fe9322a8958f",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "67f13c6e96275291d5a99b178418522d354c86476e2010f7158b652602c49154",
-      "bytes": 7752
+      "sha256": "156ea30e2e2e92a5756b867accd84e33bf6d991b818fadd2d821973ea678431f",
+      "bytes": 8387
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -4189,10 +4189,10 @@
     },
     {
       "path": "components/group-workforce-trend.module.css",
-      "sha256": "00b7144007815c7bd0058fd47879f1edb02a6e0b39f1de002c2ebb54a03baf59",
-      "bytes": 605
+      "sha256": "b5392d70102673ce50167357aa6913813476ef110f2c7b4cab0eca64798f1e2e",
+      "bytes": 1392
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "0a021071fda3d7ce315c84db33f861c91c31a97f4240d78f2a9e2f45e6afa60e"
+  "verifiedDeployedArchiveSha256": "a8b6f68908f0d2cdf4172674de047d851ad736c3837a10934d2937b593ed4f5e"
 }

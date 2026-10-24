@@ -415,3 +415,7 @@ PR390 is live at runtime 72549e35a019ae6fa67dc92c3815c54cf678e574, deployment dp
 ### Compact risk comparison - staged polish
 
 The risk view now uses a compact opt-in presentation with tighter desktop ranking rows, a bounded chart height and readable HTML axis labels. Touch ranking targets retain 44px. Observed rates display to two decimals only while unfocused; focus reveals the unchanged raw value. Intentional manual edits and saved inputs retain full precision. Calculator, source history and scope contracts are unchanged. Local laptop/mobile checks verified focus/blur without mutation, exact edited-value save/reopen and chart updates. Independent review found no source blocker. Hosted preview, final CI and parent screenshot inspection precede public promotion. No paid calls or new renewal.
+
+
+### Signed group FTE comparison — preview awaiting visual review
+The compact risk ranking now includes a common-scale diverging bar for each calculated signed FTE change, with numeric FTE and people changes, accessible selected-group buttons, and the existing selected-group trend. No probability or demand-gap claim is inferred. Local production build, focused calculator tests, independent review, and laptop/mobile browser checks passed, including precise edits, zero/missing values and save/reopen. Preview screenshot: libfile_428954da3af48191a917cd6ca06e68d0. Production remains PR391 until preview review, CI and hosted checks pass. No paid provider calls or operational-control changes.
