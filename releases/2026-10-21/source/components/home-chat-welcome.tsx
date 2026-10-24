@@ -4,7 +4,6 @@ import {snapshotFindings} from '@/lib/key-findings';
 
 import {HomeWorkforceFlows} from './home-workforce-flows';
 import type {WorkforceFlow} from '@/lib/home-workforce-flows';
-import { ChartNoAxesCombined, Sparkles, Wallet, Users } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { HomeOverviewSummaryProps } from './home-overview-summary';
 import type {HomeRecruitingKpi} from '@/lib/home-kpi-source';
@@ -14,16 +13,8 @@ import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
 import styles from './home-chat-shell.module.css';
 import {swpDemoPrompt} from '@/lib/swp-demo';
 import {HomeConversationSplit,HomeSplitProvider} from './home-answer-visuals';
-import {capacityRiskPrompt} from '@/lib/group-capacity-risk';
+import {HomePromptCategories} from './home-prompt-categories';
 
-export const planningEntries = [
-  {label:'How has our headcount changed?'},
-  {label:'What was turnover last year?'},
-  {label:'What are our recorded workforce costs?'},
-  {label:'How can we close a staffing gap?'},
-  {label:capacityRiskPrompt},
-] as const;
-const icons = [ChartNoAxesCombined, Sparkles, Wallet, Users, ChartNoAxesCombined];
 export const welcomeCurrency = (value:number) => ({compact:'USD '+new Intl.NumberFormat('en-US',{notation:value>=1000?'compact':'standard',maximumFractionDigits:2,minimumFractionDigits:value<1000?2:0}).format(value),exact:'USD '+value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:20})});
 const known = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0;
 const validDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
@@ -148,14 +139,7 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
     <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>
     <p className={styles.demoNote}>Edit assumptions, compare staffing options and save a proposal in this browser. No live AI call.</p>
     <h3>What decision are you facing?</h3>
-    <div className={styles.questions}>
-      {planningEntries.map((entry, index) => {
-        const Icon = icons[index];
-        return <button key={entry.label} type="button" disabled={disabled} onClick={() => onQuestion(entry.label)} className={index === 0 ? styles.featured : undefined}>
-          <Icon size={19} aria-hidden="true"/><span>{entry.label}</span>
-        </button>;
-      })}
-    </div>
+    <HomePromptCategories onQuestion={onQuestion} disabled={disabled}/>
     {templates}
     {composer && <div className={styles.composer}>{composer}</div>}
     </HomeConversationSplit>

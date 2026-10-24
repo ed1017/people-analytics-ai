@@ -361,3 +361,11 @@ Capacity-risk hosted acceptance: protected deployment dpl_8bg2VvoP3F6266UaWsPJZF
 
 
 Final compact risk editor: runtime28d51fefcf90d210beae90ee6999d2ce85f150af, archive3fe6a4f4af70e1a8884ee5858e79f1371a084859a16b033f70ed80f0f1d35619, deploymentdpl_FXermZ6oPLn1Q3qZuENsAqSPV1o7. The numeric editor uses an accessible disclosure so mobile results are not pushed below a long form. Group selection, save and reopen remain immediately available. Calculations are unchanged. Independent review and TypeScript pass. Implementation is complete; exact CI, hosted/public verification and promotion status are tracked in [PR384](https://github.com/ed1017/people-analytics-ai/pull/384). Intermittent model rejection remains unproven; no new paid tests or unrelated features are included.
+
+### Compact prompt categories - October 24
+
+Home now groups existing ordinary questions under Explore, Capacity Planning and Future of Work. Risk discovery belongs only to Explore. Future of Work starts with the recorded skills-gap list and learning pathways; these do not imply complete skill inventories or automated job-replacement forecasts. Templates remain separate. Category changes preserve drafts; initial suggestions recede after submission and return on reset. Arrow keys, Home/End and touch controls are supported.
+
+Runtime234a4957ff16216be0fe1219811c287111e39974. Independent review, 11 focused regressions, TypeScript, production build and local1440/390 browser checks passed. Clicked and typed questions were captured at the ordinary chat transport with provider calls blocked; fresh model answers were not tested. Hosted acceptance and CI remain release gates recorded in the PR. No data/accounting/access changes.
+
+Dependent planning-template auto-opening is pending clarification of the requested existing toggle: fill-in composer template versus expandable scenario assumptions editor. No extra toggle has been added. Renaming Capacity Planning to Scenario Planning is proposed, not yet confirmed. This release does not add model engines.

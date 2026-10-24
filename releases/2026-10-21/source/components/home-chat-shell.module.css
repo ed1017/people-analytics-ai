@@ -266,3 +266,8 @@
 .welcome .historyFigure figcaption { margin-bottom: 6px; }
 
 .shell :global(.home-answer-empty) { padding: 4px 0; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); overflow-wrap: anywhere; }
+
+.promptCategories { display:flex; flex-wrap:wrap; gap:4px; margin:8px 0; }
+.promptCategories button { min-height:44px; padding:6px 10px; border-radius:7px; font-size:13px; font-weight:600; border:1px solid transparent; }
+.promptCategories button[aria-selected="true"] { color:var(--primary); background:var(--accent); border-color:var(--border); }
+.promptCategories button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
