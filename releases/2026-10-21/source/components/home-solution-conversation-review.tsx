@@ -1,4 +1,5 @@
 'use client';
+import {HeadcountProjectionPlanner} from './headcount-projection-planner';
 import {ElapsedWaitingTime} from './elapsed-waiting-time';
 import {HistoricalMetricContext} from './historical-metric-context';
 import {canReviewCostedHiringPlan} from '@/lib/home-hiring-plan';
@@ -75,17 +76,18 @@ function ProposalGroup({items,recommended,controller,goal,notes,capacityRisk,cur
  const props=(item:SolutionEvaluation,index:number):ProposalProps=>{const key=proposalEditKey(item);return {item,controller,goal,number:currentSolutionProposals(controller.state).findIndex(p=>p.id===item.id)+1,recommended:current&&recommended?.id===item.id&&recommended.revision===item.revision&&recommended.requestId===item.requestId,notes:index===0?notes:undefined,capacityRisk:index===0?capacityRisk:undefined,edit:{statement:goal||item.candidate.goal.statement,dirty:false,...edits[key]},onEdit:value=>onEdit(key,value)};};
  return <section aria-label={current?'Current Action Plan options':'Earlier Action Plan options'} className="@container space-y-3"><div className={`grid min-w-0 gap-3 ${items.length===1?'grid-cols-1':items.length===2?'md:@min-[40rem]:grid-cols-2':'md:@min-[40rem]:grid-cols-2 md:@min-[60rem]:grid-cols-3'}`}>{items.map((item,index)=><Proposal key={item.id+':'+item.revision} {...props(item,index)}/>)}</div>{!!missing.length&&<p className="text-sm">If you tell me {missing.join(', ')}, I can update the plans and recommendation.</p>}<details><summary className="min-h-11 cursor-pointer py-2 font-medium">Assumptions &amp; caveats</summary><div className="space-y-4">{items.map((item,index)=><Proposal key={item.id+':'+item.revision} supporting {...props(item,index)}/>)}</div></details></section>;
 }
-export function SolutionProjectionChart({analysis,onShowOnHome,showOnHomeDisabled=false}:{analysis:HeadcountProjection;onShowOnHome?:(id:string,revision:number)=>void;showOnHomeDisabled?:boolean}){
- const values=[analysis.inputs.opening,...analysis.points.map(p=>p.headcount)],low=Math.min(...values),high=Math.max(...values),span=Math.max(1,high-low),min=Math.max(0,low-span*.12),max=high+span*.12;
- const x=(index:number,width:number)=>64+index/Math.max(1,values.length-1)*(width-84),y=(value:number)=>190-(value-min)/(max-min)*150;
+export function SolutionProjectionChart({analysis,onShowOnHome,showOnHomeDisabled=false,baseline=null,compact=false}:{analysis:HeadcountProjection;baseline?:HeadcountProjection|null;compact?:boolean;onShowOnHome?:(id:string,revision:number)=>void;showOnHomeDisabled?:boolean}){
+ const values=[analysis.inputs.opening,...analysis.points.map(p=>p.headcount)],reference=baseline?[baseline.inputs.opening,...baseline.points.map(p=>p.headcount)]:[],all=[...values,...reference],length=Math.max(values.length,reference.length),low=Math.min(...all),high=Math.max(...all),span=Math.max(1,high-low),min=Math.max(0,Math.floor(low-span*.12)),max=Math.ceil(high+span*.12);
+ const x=(index:number,width:number)=>64+index/Math.max(1,length-1)*(width-84),y=(value:number)=>190-(value-min)/(max-min)*150;
  return <section aria-label="Headcount scenario" className="min-w-0 space-y-2 rounded border p-3 text-sm">
-  <h3 className="font-semibold">Headcount scenario · {analysis.points.length} months</h3><p>{analysis.inputs.scope} · opening {number(analysis.inputs.opening)} as of {analysis.inputs.asOf} → {number(analysis.points.at(-1)?.headcount)} at {analysis.points.at(-1)?.month.slice(0,7)}.</p>
-  <p>Assumption-based scenario, not a trained forecast.</p>
+  <h3 hidden={compact} className="font-semibold">Headcount scenario · {analysis.points.length} months</h3><p hidden={compact}>{analysis.inputs.scope} · opening {number(analysis.inputs.opening)} as of {analysis.inputs.asOf} → {number(analysis.points.at(-1)?.headcount)} at {analysis.points.at(-1)?.month.slice(0,7)}.</p>
+  <p>{baseline?`Solid: edited scenario. Dashed: saved revision ${baseline.revision}.`:"Scenario headcount (people)."}</p>
   <CompactChart label="Projected headcount from the active opening snapshot" title="Projected headcount; complete values follow in Assumptions & limits.">{width=><>
    <path d={`M64 30V190H${width-20}`} fill="none" stroke="currentColor" opacity=".4"/>
-   <polyline points={values.map((value,index)=>`${x(index,width)},${y(value)}`).join(' ')} fill="none" stroke="currentColor" strokeWidth="3"/>
+   <polyline aria-label="Saved revision comparison" points={reference.map((value,index)=>`${x(index,width)},${y(value)}`).join(' ')} fill="none" stroke="currentColor" opacity=".5" strokeDasharray="6 4" strokeWidth="2"/>
+   <polyline aria-label="Edited headcount scenario" points={values.map((value,index)=>`${x(index,width)},${y(value)}`).join(' ')} fill="none" stroke="currentColor" strokeWidth="3"/>
    <text x="2" y="40" fontSize="14" fill="currentColor">{number(max)}</text><text x="2" y="190" fontSize="14" fill="currentColor">{number(min)}</text>
-   <text x="64" y="217" fontSize="14" fill="currentColor">{analysis.inputs.asOf.slice(0,7)}</text><text x={width-20} y="217" textAnchor="end" fontSize="14" fill="currentColor">{analysis.points.at(-1)?.month.slice(0,7)}</text>
+   <text x="64" y="217" fontSize="14" fill="currentColor">{analysis.inputs.asOf.slice(0,7)}</text><text x={width-20} y="217" textAnchor="end" fontSize="14" fill="currentColor">{(reference.length>values.length?baseline:analysis)?.points.at(-1)?.month.slice(0,7)}</text>
    {values.map((value,index)=><circle key={index} cx={x(index,width)} cy={y(value)} r="3" fill="currentColor"><title>{index===0?analysis.inputs.asOf:analysis.points[index-1].month}: {number(value)}</title></circle>)}
   </>}</CompactChart>
   {onShowOnHome&&<button type="button" className={button} disabled={showOnHomeDisabled} onClick={()=>onShowOnHome(analysis.id,analysis.revision)}>Show on Home</button>}
@@ -113,7 +115,7 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved,p
    <HomeRequiredStaffingReview notes={planningNotes} deliveryMonths={controller.staffingDeliveryTarget().months} deliveryIssue={controller.staffingDeliveryTarget().issue} onPin={id=>void controller.pinRequiredStaffing(id)} pinned={controller.pinnedRequiredStaffing} review={controller.state.requiredStaffing} onClear={controller.clearRequiredStaffing} disabled={controller.pending||controller.saving||!controller.canSend}/>
   </details>}
   {controller.state.requiredStaffing&&controller.state.businessPlanning?<details><summary className="min-h-11 cursor-pointer py-2">Separate workload assumptions</summary><HomeBusinessPlanningReview controller={controller}/></details>:<HomeBusinessPlanningReview controller={controller}/>}
-  {analyses.map(item=><SolutionProjectionChart key={item.id+item.revision} analysis={item} onShowOnHome={onShowProjection} showOnHomeDisabled={!controller.canSend||controller.pending||controller.saving}/>)}
+  {analyses.map(item=><HeadcountProjectionPlanner key={item.id+item.revision} analysis={item} disabled={!controller.canSend||controller.pending||controller.saving} onSave={controller.saveProjectionEdit} visual={(value,baseline)=><SolutionProjectionChart compact analysis={value} baseline={baseline} onShowOnHome={value===item?onShowProjection:undefined} showOnHomeDisabled={!controller.canSend||controller.pending||controller.saving}/>}/>)}
   <ProposalGroup edits={edits} onEdit={onEdit} items={current} recommended={presentation.recommended} controller={controller} goal={goal} notes={planningNotes} capacityRisk={capacityRisk}/>
   {!!presentation.earlier.length&&<details><summary className="min-h-11 cursor-pointer py-2">Earlier proposals ({presentation.earlier.length})</summary><ProposalGroup edits={edits} onEdit={onEdit} current={false} items={presentation.earlier} recommended={null} controller={controller} goal={goal}/></details>}
   {showSaved&&controller.saved&&<details><summary className="cursor-pointer py-2 font-semibold">Saved Action Plans</summary>{controller.saved.order.map(id=><PlanAlternativeCard key={id} plan={controller.saved!.plans.find(item=>item.id===id)!} catalog={controller.saved!} measurePack={pack} contextCurrent={false}/>)}</details>}
