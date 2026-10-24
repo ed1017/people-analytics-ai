@@ -85,7 +85,8 @@
       "feat/headcount-projection-controls": false,
       "fix/pricing-window-251925": false,
       "fix/planner-first-use": false,
-      "polish/compact-risk-view": false
+      "polish/compact-risk-view": false,
+      "feat/risk-comparison-bars": false
     }
   }
 }
