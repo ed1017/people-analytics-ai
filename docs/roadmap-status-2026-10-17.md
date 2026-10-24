@@ -423,3 +423,9 @@ The compact risk ranking now includes a common-scale diverging bar for each calc
 
 ### Whole-month slider correction — reviewed candidate
 Shared discrete month controls snap to whole months; typed drafts retain the existing chart until commit. Decimal commits round/clamp with a visible notice; blank/transient edits restore the previous value, and Escape cancels. Fractional FTE and rates keep their precision. Initial and saved projection charts remain labeled as previous calculations while recalculating, with saving gated until current verification. Invalid legacy months are still rejected, not silently migrated. Local desktop/touch-mobile interactions and ten focused tests pass; CI, hosted checks and preview review precede release. No paid calls or accounting changes.
+
+
+### Interactive action-plan scenarios — preview candidate
+Supported conversation action plans now expose Edit plan using the shared interactive layout and existing proposal evaluator. Duration, participation, effort and one-time allowance controls recalculate an effort comparison; no proficiency curve or inferred labor cost is invented. Contextual parameter revisions open the editor with their exact prior working/saved basis when available. Applying creates a working revision; saving remains explicit. Blank inputs stay unknown, month controls remain discrete, and saved originals are retained. Factual answers are not forced into a planner.
+
+Local evaluator/month/parity tests (12), typecheck, lint, build and desktop/touch-mobile replay edit/reset/apply/save/reopen checks passed. Independent review cleared the corrected unknown-input edge cases. Preview/CI and screenshot review are pending; production remains PR393. Natural-language what-if interpretation is covered through interpreted-parameter replay, not fresh provider execution. No paid calls or accounting/access/pricing changes.

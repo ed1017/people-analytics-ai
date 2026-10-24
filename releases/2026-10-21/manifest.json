@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0cd30a612f1103e409d382936bacc605621f5aa6",
+  "sourceCommit": "3c5a7aa9fd348d743f6d013105fbf9004c4ce284",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "eda5d41e0fbc1ca4655dc221fb46488297952b8a2d58268d56b8d1d9501f0e7a",
-      "bytes": 22093
+      "sha256": "dd77c9f4edb414fe08917fb990dc5364775ffbd9c2504c6133bb04ec7b032442",
+      "bytes": 22841
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "17cd0ab8018055edd5b55202699250d4a5fdda255be9128d265e480c4dee6593",
-      "bytes": 103328
+      "sha256": "a9a3eea2998f8e559091f4cb837042b5cee64b7688469b91847b068568153ec9",
+      "bytes": 103462
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -899,8 +899,8 @@
     },
     {
       "path": "components/proposed-planning-editor.tsx",
-      "sha256": "84a24d5568033ca70aee6d8efd4859fabacab0c312d55e01393e8358fae08c8f",
-      "bytes": 3106
+      "sha256": "3f37b4e4a83ace0416414971af03d11fe394c2bbbb07b232f3772ad289b1643b",
+      "bytes": 6139
     },
     {
       "path": "components/public-ai-configuration-status.tsx",
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "a86143246ff9f8fd11d22ef02146fcef122152d2ed16f12ed56814be8b90f4b7",
-      "bytes": 37693
+      "sha256": "3206e36d7bba551f6ad2fa04bd9456a291b193daf16f5551d1e5d72d9cbb89d3",
+      "bytes": 38376
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -2564,8 +2564,8 @@
     },
     {
       "path": "lib/home-proposed-planning.ts",
-      "sha256": "9eb5811a26bd95deaffd249771d613fc0eba03cb87a7c70b1902f9514c28243b",
-      "bytes": 3753
+      "sha256": "6e69187cfbdcf9356e7c0050fc74c4b888ffe52bddeddbfb85daa94f9bf7b567",
+      "bytes": 3797
     },
     {
       "path": "lib/home-question-text.ts",
@@ -4196,8 +4196,13 @@
       "path": "tests/month-slider.test.mjs",
       "sha256": "7d3825373ab16cee8e1ceebc171b4c3f4d7ce5e0c9ce25d70ede0884e4bd6ba9",
       "bytes": 1119
+    },
+    {
+      "path": "tests/action-planner-edit.test.mjs",
+      "sha256": "92ca98cd797375790ec714739160f54c1f1b48ad21cdb809ca49bfe43251e390",
+      "bytes": 5223
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "e7ec89c0ec3c1725215538f157dc27661b73abb21e2d10a5cbbafb639dcaacb6"
+  "verifiedDeployedArchiveSha256": "69ba4f3ff823f81854f3372c4532b35694143d6f401ba2410af0d5eb91df683a"
 }
