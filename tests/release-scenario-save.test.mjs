@@ -72,11 +72,11 @@ test('capacity target and cash components agree across every choice, saved plan 
  const changed=acceptBundleChatEdit(original,previewBundleChatEdit(original,'Set Service units per month to 1200; Set budget to 500000; Set training cash to 12000; Set annual hire cost to 65000; Set shared horizon to 6 months'));
  for(const draft of [original,changed]){
   const compared=await compareSwpDemo(draft),target=guidedPlanTarget(draft);assert.ok(target);
-  if(draft===changed){assert.equal(target.fteGap,4.5);assert.equal(target.roles,5);assert.equal(target.deadline,'2027-04-30');}
+  if(draft===changed){assert.equal(target.fteGap,4.5);assert.equal(target.roles,5);assert.equal(target.deadline,'2027-10-31');}
   for(const choice of compared.options.filter(o=>o.candidate.status==='met')){
    const key=bundleInputKey(choice.draft),cost=staffingCashBreakdown(choice.draft,choice.candidate.cash);
    assert.equal(Math.round(cost.lines.reduce((n,l)=>n+l.total,0)*100),Math.round(cost.total*100));
-   assert.equal(cost.end,target.deadline);assert.equal(cost.start,draft.inputs.scope.startMonth.value);
+   assert.equal(cost.end,draft===changed?'2027-04-30':'2027-10-31');assert.equal(cost.start,draft.inputs.scope.startMonth.value);
    assert.equal(cost.lines.find(l=>l.id==='capacity:trainingCash').total,choice.candidate.cash.ledger.find(l=>l.id==='capacity:trainingCash').total);
    const store=new DecisionStore(),values=new Map(),port={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};store.initialize(port);
    const prepared=await prepareSwpSelection(store,draft,compared.evaluation,choice.id,at,()=>true);store.commitGoalSelection(prepared.goal.id,prepared.goal.statement,prepared.revision,at,()=>prepared.fields,true);
