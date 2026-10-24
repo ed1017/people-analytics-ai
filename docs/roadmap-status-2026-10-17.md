@@ -1,4 +1,10 @@
-# Active roadmap — October 24, after PR380
+# Active roadmap - October 24, reviewed service-target candidate
+
+Owner direction now authorizes clearly fictional business-unit labels and editable service targets. Candidate runtime `c48c342d3c191db9c16d9424e2a316cd12f07e9d` implements all eight display names without changing codes, query vocabulary, data or saved identities. The existing coverage deadline and new optional acceptable-uncovered-hours target share the ordinary/guided calculator. Unknown remains distinct from zero; meeting a modeled target does not establish operational sufficiency. Clearing a saved deadline withdraws its active measurement through an append-only history event rather than erasing history or retaining a stale target.
+
+Independent review, 38 focused checks, six input-contract checks, TypeScript and exact packaged-source verification passed. Fifteen older broad-suite failures remain harness/copy debt; this is not a claim that the whole broad suite passes. Protected browser acceptance, CI and promotion are pending. Production identity below remains unchanged until verified promotion.
+
+The latest read-only current-deployment failure scan returned no matching records for October23 21:32–October24 09:32 UTC. The original rejected answer is unavailable and predates detailed diagnostic classifications. No speculative validation relaxation or automatic retry has been added; the historical intermittent rejection remains unresolved. No provider call, accounting change or pricing renewal was made for this candidate.
 
 This is the current queue. Dated sections below are historical records, not unfinished tasks. Latest production runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`, deployment `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`, dataset `workforce-demo-9037-public-aggregates-v4:5`. PR379 deployed the date-only renewal; PR380 records verified release evidence. The owner is reviewing later Saturday afternoon; no new user review is claimed.
 
@@ -20,10 +26,10 @@ This is the current queue. Dated sections below are historical records, not unfi
 | --- | --- | --- |
 | 1 | Intermittent final-answer rejection | The retained October22 failure identifies calculation-reference validation but lacks the rejected output and predates finer subreason diagnostics. PR375 confirmed safe allowlisted diagnostics already exist. A read-only scan of the current deployment, October23 22:44 through October24 03:44UTC, returned no matching Home failure records; this is not proof of reliability. Next concrete action is to replay a diagnostic-bearing failure if one is captured, or conduct a separately justified bounded provider test. No evidence supports relaxing validation, automatic paid retries or another speculative code patch. |
 | 2 | Owner acceptance of the delivered workflows | Review ordinary questions, recommendation/slider changes and saved/reopened plans on the current release; turn any observed failure into a specific regression. Existing replay/provider evidence stays distinguished. No need to repeat completed full catalogue audits while waiting. |
-| 3 | Full BU display names | Need an approved code-to-name mapping for the eight constructed units. Current codes remain truthful; no invented expansions. |
-| 3 | Operational sufficiency / outcome claims | Need the specific service's acceptable uncovered-work threshold and outcome metric/population/period before claiming operational sufficiency or measured business impact. Current calculations and conditional tradeoffs can remain available without these claims. |
+| 3 | Full BU display names | Approved fictional mapping implemented and reviewed; hosted acceptance and publication pending. Stable codes remain authoritative identifiers. |
+| 3 | Service targets and outcome claims | Editable deadline and optional uncovered-hours target implemented and reviewed; hosted acceptance pending. Actual outcome metric/population/period and operational approval still require service-specific evidence. |
 
-No additional unblocked product implementation was established by this reconciliation. That is an evidence/scope boundary, not whole-project completion. Continue concrete repairs when a reproducible defect or an already-agreed missing acceptance step is identified; do not add features to fill the queue.
+Complete the current candidate's hosted acceptance and checked release, then pursue only diagnostic-bearing evidence for the intermittent rejection. These items are independent; missing historical output does not block labels or editable targets.
 
 ## Explicit deferrals and realism limits
 

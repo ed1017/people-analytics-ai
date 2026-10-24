@@ -4,7 +4,7 @@ import {public9037Metadata} from './public-9037-projection.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {homeSurveyGroups} from './home-survey-groups.mjs';
 import {queryAggregate} from './home-aggregate-registry.mjs';
-import {catalogDisplayLabel} from './catalog-display.ts';
+import {catalogSourceLabel as catalogDisplayLabel} from './catalog-display.ts';
 export const isHomeAssociationQuestion=text=>typeof text==='string'&&/\b(?:sentiment|engagement|favorability)\b/i.test(text)&&/\b(?:turnover|attrition)\b/i.test(text)&&/\b(?:correlat\w*|relat\w*|associat\w*|link\w*|connect\w*|compar\w*|contrast\w*|versus|vs|caus\w*|predict\w*)\b/i.test(text);
 const limitation='The available comparison is across all eight business units, not departments, HR subgroups or individual employees: September 2026 engagement favorability versus January-September 2026 voluntary turnover. Clear filters and ask for that business-unit comparison. Other populations, periods and causal or predictive questions need separate evidence.';
 /** Complete public partitions only; never pair sampled Home rows or employee records. */

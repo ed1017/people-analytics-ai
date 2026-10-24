@@ -4,7 +4,7 @@ import {readBundleDraft, type BundleDraft, type Assumption, type CapacityMix} fr
 // @ts-expect-error Native Node tests share TypeScript source.
 import {emptyWorkforcePlanInput, workforcePlanFields} from './workforce-increment.ts';
 import type {HomeMixRequest, HomeMixObjective} from './home-mix-context';
-export type HomeMixConstraints={maxAddedEmployees?:Assumption<number>;maxStaffHours?:Assumption<number>;deadlineMonth?:Assumption<string>;objective?:Assumption<HomeMixObjective>};
+export type HomeMixConstraints={maxAddedEmployees?:Assumption<number>;maxStaffHours?:Assumption<number>;maxUncoveredHours?:Assumption<number>;deadlineMonth?:Assumption<string>;objective?:Assumption<HomeMixObjective>};
 export const homeMixPlanningVersion='home-planning-source-v1';
 const assumed=<T>(value:T,basis:string):Assumption<T>=>({value,kind:'illustrative',basis});
 export function homeMixPlanningRequest(original:BundleDraft):{request:HomeMixRequest;notes:string[]}{

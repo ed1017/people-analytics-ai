@@ -14,7 +14,7 @@ export function guidedBusinessPlanning(draft:BundleDraft,datasetToken:string):Bu
  if(!w||!c||!i.mixScenario)throw Error('Review explicit workload and staffing inputs.');
  validateGuidedWorkload(w);
  // The ordinary comparison currently models independent paths. Do not drop additional constraints.
- if(draft.bundle.components.some(x=>x.dependsOn.length)||i.mixConstraints||i.mixScenario.bounds.build.value?.min!==0||i.mixScenario.bounds.move.value?.min!==0||i.mixScenario.bounds.buy.value?.min!==0)throw Error('These extra dependency or search constraints need a separate review; they cannot be discarded by the shared adapter.');
+ if(draft.bundle.components.some(x=>x.dependsOn.length)||(i.mixConstraints&&Object.keys(i.mixConstraints).some(k=>!['deadlineMonth','maxUncoveredHours'].includes(k)))||i.mixScenario.bounds.build.value?.min!==0||i.mixScenario.bounds.move.value?.min!==0||i.mixScenario.bounds.buy.value?.min!==0)throw Error('These extra dependency or search constraints need a separate review; they cannot be discarded by the shared adapter.');
  const scope=i.scope.population.value,turn={id:'guided-explicit-objective',text:draft.binding.goal};
  const assumed:DemandBasis={kind:'illustrative',turnId:null,quote:null,explanation:'Explicit reviewed scenario inputs; not workforce facts or operational approval.'};
  const basis=(value:unknown):DemandBasis=>value===null?{kind:'unknown',turnId:null,quote:null,explanation:'Not supplied.'}:assumed;
@@ -23,6 +23,8 @@ export function guidedBusinessPlanning(draft:BundleDraft,datasetToken:string):Bu
  const review=createDemandReview({objective:turn.text,objectiveTurnId:turn.id,scope,scopeBasis:basis(scope),linkageBasis:assumed,startMonth:i.scope.startMonth.value,months:i.scope.months.value,startBasis:basis(i.scope.startMonth.value),monthsBasis:basis(i.scope.months.value),linkage:'Monthly service units multiplied by work hours per service unit; qualified allocation is separate from the internal pools.',contracts:q(w.volume.value),hoursPerContract:q(w.hoursPerUnit.value,'month'),productiveHoursPerFte:q(w.productiveHours.value,'month'),existingRoles:q(w.existingPeople.value),existingFtePerRole:q(w.ftePerPerson.value),availabilityPct:q(w.allocationPct.value===null||w.skillCoveragePct.value===null?null:w.allocationPct.value*w.skillCoveragePct.value/100),ftePerRole:q(1),explicitAdditionalRoles:q(null),budgetUsd:q(i.budget?.amount.value??null)},context,'guided-explicit-inputs',[turn]);
  if(i.mixScenario.bounds.buy.value===null||review.result.additionalRoles!==null&&i.mixScenario.bounds.buy.value.max<review.result.additionalRoles)throw Error('The reviewed hiring maximum is narrower than the ordinary comparison supports; it must not be discarded.');
  const value=(field:StaffingField):number|string|boolean|null=>{
+  if(field==='maxUncoveredHours')return i.mixConstraints?.maxUncoveredHours?.value??null;
+  if(field==='deadlineMonth'&&i.mixConstraints?.deadlineMonth)return i.mixConstraints.deadlineMonth.value;
   if(field==='buildMax'||field==='moveMax'){
    const path=field==='buildMax'?'build':'move',bound=i.mixScenario!.bounds[path].value,flow=i.mixScenario!.flows.find(f=>f.path===path),count=i.groups.find(g=>g.id===flow?.groupId)?.count.value;
    return bound&&count!=null?Math.min(bound.max,count):null;

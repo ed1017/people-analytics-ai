@@ -13,18 +13,18 @@ import {emptyWorkforcePlanInput,planDate,type WorkforcePlanInput} from './workfo
 // @ts-expect-error Native Node tests share TypeScript source.
 import {preflightWorkforceMixes,canonical} from './workforce-mix-search-core.ts';
 
-const numeric=['buildMax','moveMax','backfills','annualHireCost','hireFee','annualBackfillCost','backfillFee','internalAnnualCostChange','trainingCash','trainingHours','maxAddedEmployees'] as const;
+const numeric=['buildMax','moveMax','backfills','annualHireCost','hireFee','annualBackfillCost','backfillFee','internalAnnualCostChange','trainingCash','trainingHours','maxAddedEmployees','maxUncoveredHours'] as const;
 const dates=['arrivalDate','buildMonth','moveMonth','backfillDate','deadlineMonth'] as const;
 const flags=['internalPoolsDistinct','internalRelease','costsCompleteAndDistinct'] as const;
 export const staffingFields=[...numeric,...dates,...flags] as const;
 export type StaffingField=typeof staffingFields[number];
 export type StaffingAtom={value:number|string|boolean|null;basis:DemandBasis};
-export type StaffingInputs={scope:string;startMonth:string;values:Record<StaffingField,StaffingAtom>;basisTurns:DemandReview['basisTurns']};
+export type StaffingInputs={scope:string;startMonth:string;values:Record<Exclude<StaffingField,'maxUncoveredHours'>,StaffingAtom>&Partial<Record<'maxUncoveredHours',StaffingAtom>>;basisTurns:DemandReview['basisTurns']};
 const obj=(properties:Record<string,typeof serviceDemandSchema>)=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const basis=serviceDemandSchema.properties!.scopeBasis;
 const changes=staffingFields.map(field=>obj({field:{type:'string',enum:[field]},value:{anyOf:[{type:'null'},numeric.includes(field as typeof numeric[number])?{type:'number',minimum:0,maximum:100000000}:flags.includes(field as typeof flags[number])?{type:'boolean'}:{type:'string',minLength:7,maxLength:10}]},basis}));
 export const compareServiceStaffingTool={type:'function' as const,name:'compare_service_staffing',strict:true,
- description:'Compare provisional Build/Move/Hire mixes for the current checked demand review. Copy its reviewRef. Changes are explicit typed assumptions, not approvals; omitted values retain their exact values and provenance. New inputs start Unknown. A quoted current-user withdrawal may set a value to null while retaining its user-supplied basis. No demo, cost quote, dates, internal pool, release or zero backfill is supplied by code. Training cash/hours and annual internal uplift are TOTAL path amounts held fixed across mixes, not per-person rates. Internal pools must explicitly be distinct from each other and the already counted capacity, and releasable. Units: rates USD/year, fees USD/hire, cash USD total, hours total, counts whole roles, dates YYYY-MM-DD, months YYYY-MM. Missing budget permits a comparison with unknown affordability. Read-only; never accepts or saves.',
+ description:'Compare provisional Build/Move/Hire mixes for the current checked demand review. Copy its reviewRef. Changes are explicit typed assumptions, not approvals; omitted values retain their exact values and provenance. New inputs start Unknown. A quoted current-user withdrawal may set a value to null while retaining its user-supplied basis. No demo, cost quote, dates, internal pool, release or zero backfill is supplied by code. Training cash/hours and annual internal uplift are TOTAL path amounts held fixed across mixes, not per-person rates. Internal pools must explicitly be distinct from each other and the already counted capacity, and releasable. Units: rates USD/year, fees USD/hire, cash USD total, hours total, counts whole roles, dates YYYY-MM-DD, months YYYY-MM. maxUncoveredHours is the explicit acceptable total shortfall across the planning horizon, in hours; no default is implied and meeting it is not operational approval. Missing budget permits a comparison with unknown affordability. Read-only; never accepts or saves.',
  parameters:obj({reviewRef:{type:'string',minLength:1,maxLength:180},changes:{type:'array',minItems:0,maxItems:staffingFields.length,items:{anyOf:changes}}})};
 const unknown=():StaffingAtom=>({value:null,basis:{kind:'unknown',turnId:null,quote:null,explanation:'Not supplied or proposed.'}});
 const equal=(a:unknown,b:unknown)=>canonical(a)===canonical(b);
@@ -41,9 +41,9 @@ function checkAtom(field:StaffingField,atom:StaffingAtom,turns:DemandReview['bas
 }
 export function readStaffingInputs(raw:unknown):StaffingInputs{
  const s=raw as StaffingInputs;
- if(!s||Object.keys(s).sort().join()!=='basisTurns,scope,startMonth,values'||typeof s.scope!=='string'||!s.scope.trim()||s.scope.length>240||!planDate(s.startMonth+'-01')||!Array.isArray(s.basisTurns)||s.basisTurns.length>64||!s.values||Object.keys(s.values).sort().join()!==[...staffingFields].sort().join())throw Error('Staffing input identity is invalid.');
+ if(!s||Object.keys(s).sort().join()!=='basisTurns,scope,startMonth,values'||typeof s.scope!=='string'||!s.scope.trim()||s.scope.length>240||!planDate(s.startMonth+'-01')||!Array.isArray(s.basisTurns)||s.basisTurns.length>64||!s.values||Object.keys(s.values).sort().join()!==staffingFields.filter(f=>f!=='maxUncoveredHours'||Object.hasOwn(s.values,f)).sort().join())throw Error('Staffing input identity is invalid.');
  if(s.basisTurns.some(t=>!t||typeof t.id!=='string'||typeof t.text!=='string'||t.text.length>10000)||new Set(s.basisTurns.map(t=>t.id)).size!==s.basisTurns.length)throw Error('Staffing provenance turns are invalid.');
- for(const field of staffingFields)checkAtom(field,s.values[field],s.basisTurns);
+ for(const field of staffingFields)if(field!=='maxUncoveredHours'||Object.hasOwn(s.values,field))checkAtom(field,s.values[field]!,s.basisTurns);
  return structuredClone(s);
 }
 export function editStaffingInputs(review:DemandReview,previous:StaffingInputs|null,raw:unknown,current:{id:string;text:string},turns:DemandReview['basisTurns']):StaffingInputs{
@@ -57,7 +57,7 @@ export function editStaffingInputs(review:DemandReview,previous:StaffingInputs|n
   if(!staffingFields.includes(c.field))throw Error('Unsupported staffing assumption.');
   const atom={value:c.value,basis:c.basis};checkAtom(c.field,atom,s.basisTurns);
   if(c.basis.kind==='user-supplied'&&c.basis.turnId!==current.id)throw Error('Corrections require the current user turn.');
-  if((s.values[c.field].value!==null||s.values[c.field].basis.kind==='user-supplied')&&!equal(s.values[c.field],atom)&&c.basis.kind!=='user-supplied')throw Error('An existing staffing premise can change only through a current-user correction.');
+  if((s.values[c.field]?.value!=null||s.values[c.field]?.basis.kind==='user-supplied')&&!equal(s.values[c.field],atom)&&c.basis.kind!=='user-supplied')throw Error('An existing staffing premise can change only through a current-user correction.');
   s.values[c.field]=structuredClone(atom);
  }
  return readStaffingInputs(s);
@@ -79,12 +79,12 @@ export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs,
  if(d.scope!.length>100){missing.push('Use a role-slice label of at most 100 characters for this calculator; the full objective is retained.');return result;}
  if(r.additionalRoles===0)return {...result,status:'no-gap'};
  if(r.additionalRoles===null||r.additionalRoles>20||d.ftePerRole.value!==1){missing.push('This comparison supports a positive gap of at most 20 whole full-time roles; the demand calculation is retained.');return result;}
- const value=(key:StaffingField)=>s.values[key].value;
+ const value=(key:StaffingField)=>s.values[key]?.value??null;
  const internal=value('internalPoolsDistinct')===true&&value('internalRelease')===true&&value('backfills')!==null;
  if(!internal)missing.push('Build/Move excluded until separate internal pools, release and backfill premises are supplied; exclusion does not prove no internal capacity.');
  const roles=r.additionalRoles,build=internal?Math.min(Number(value('buildMax')??0),roles):0,move=internal?Math.min(Number(value('moveMax')??0),roles):0;
  const input={...emptyWorkforcePlanInput(),businessUnit:d.scope!,jobProfile:d.scope!,intent:'additional',roles:String(roles),build:'0',move:'0',buy:String(roles),planningMonth:d.startMonth!,months:String(d.months),arrivalMode:'explicit',budget:d.budgetUsd.value===null?'':String(d.budgetUsd.value)};
- for(const key of [...numeric,...dates])if(!['buildMax','moveMax'].includes(key))input[key as keyof WorkforcePlanInput]=value(key)===null?'':String(value(key));
+ for(const key of [...numeric,...dates])if(!['buildMax','moveMax','maxUncoveredHours'].includes(key))input[key as keyof WorkforcePlanInput]=value(key)===null?'':String(value(key));
  try{
   const {enumerated,withinBudget}=preflightWorkforceMixes(roles,{build:{min:0,max:build},move:{min:0,max:move},buy:{min:0,max:roles},maxEvaluations:256,maxResults:64,resultFilter:'all',assumptionPolicy:'preserve-reviewed-path-totals-and-timing'});
   if(!withinBudget)throw Error('The explicit staffing bounds exceed the calculation budget.');
@@ -94,7 +94,7 @@ export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs,
   for(let b=0;b<=build;b++)for(let m=0;m<=Math.min(move,roles-b);m++){
    const buy=roles-b-m,mix={build:b,move:m,buy};
    const candidateInput={...input,build:String(b),move:String(m),buy:String(buy),backfills:b+m?input.backfills:''};
-   result.options.push(staffingOption(`build-${b}-move-${m}-buy-${buy}`,mix,candidateInput,review,value('costsCompleteAndDistinct')===true));
+   result.options.push(staffingOption(`build-${b}-move-${m}-buy-${buy}`,mix,candidateInput,review,value('costsCompleteAndDistinct')===true,value('maxUncoveredHours') as number|null));
   }
   if(selectedMix){
    const selected=result.options.find(o=>o.mix.build===selectedMix.build&&o.mix.move===selectedMix.move&&o.mix.buy===selectedMix.buy);
@@ -110,7 +110,7 @@ export function calculateServiceStaffing(review:DemandReview,raw:StaffingInputs,
 import {calculateWorkforceIncrement} from './workforce-increment.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {monthlyCapacityEffort} from './guided-plan-summary.ts';
-function staffingOption(id:string,mix:ServiceStaffingOption['mix'],input:WorkforcePlanInput,review:DemandReview,complete:boolean):ServiceStaffingOption{
+function staffingOption(id:string,mix:ServiceStaffingOption['mix'],input:WorkforcePlanInput,review:DemandReview,complete:boolean,maxUncoveredHours:number|null):ServiceStaffingOption{
  const base:ServiceStaffingOption={id,mix,input,cash:null,listedCash:null,staffHours:null,addedEmployees:mix.buy,coverageDate:null,additionalHours:null,shortfallHours:null,status:'invalid',reason:null,monthly:[]};
  try{
   const p=calculateWorkforceIncrement(input,null),hours=Number(input.build)>0?(input.trainingHours===''?null:Number(input.trainingHours)):0;
@@ -128,7 +128,7 @@ function staffingOption(id:string,mix:ServiceStaffingOption['mix'],input:Workfor
    additionalHours=effort.additionalHours;shortfallHours=effort.shortfallHours;
   }
   const budget=review.spec.budgetUsd.value,checks=p.checks.filter(c=>c.name!=='Incremental cash budget');
-  const status=checks.some(c=>c.status==='not met')||cash!==null&&budget!==null&&cash>budget?'not-met':checks.some(c=>c.status==='unknown')||cash===null||budget===null?'unknown':'met';
+  const status=(maxUncoveredHours!==null&&shortfallHours!==null&&shortfallHours>maxUncoveredHours)||checks.some(c=>c.status==='not met')||cash!==null&&budget!==null&&cash>budget?'not-met':(maxUncoveredHours!==null&&shortfallHours===null)||checks.some(c=>c.status==='unknown')||cash===null||budget===null?'unknown':'met';
   return {...base,cash,listedCash:p.totalCash,staffHours:hours,addedEmployees:p.maxAddedEmployees,coverageDate:monthly.some(row=>row.roles===null)?null:coverageDate,additionalHours,shortfallHours,status,monthly};
  }catch(error){return {...base,reason:error instanceof Error?error.message:'Invalid staffing inputs.'};}
 }

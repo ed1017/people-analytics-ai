@@ -7,7 +7,7 @@ import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 import {public9037Metadata,public9037Fields} from './public-9037-projection.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {aggregateRegistry,queryAggregate} from './home-aggregate-registry.mjs';
-import {catalogDisplayLabel,countryDisplayLabel} from './catalog-display.ts';
+import {catalogSourceLabel as catalogDisplayLabel,countryDisplayLabel} from './catalog-display.ts';
 import {readDashboardScopeReceipt} from './dashboard-scope.ts';
 import {queryWorkforceHistory} from './home-history-query.mjs';
 import {withBusinessUnitTurnover} from './home-bu-turnover.mjs';

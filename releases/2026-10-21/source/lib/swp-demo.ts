@@ -5,7 +5,7 @@ import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,busines
 // @ts-expect-error Native Node tests share application source.
 import {selectStaffingOptions} from './staffing-option-presentation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {optionMonthlyCoverage,monthlyCapacityEffort,guidedOptionEffort as guidedEffortForRanking} from './guided-plan-summary.ts';
+import {guidedPlanTarget,optionMonthlyCoverage,monthlyCapacityEffort,guidedOptionEffort as guidedEffortForRanking} from './guided-plan-summary.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {defaultGuidedWorkload,syncGuidedWorkloadDemand} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
@@ -25,7 +25,7 @@ import {prepareHomeMixCommit,homeMixHistoryField} from './home-mix-history.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {createPlanAlternatives,readPlanAlternatives,proposeStaffingAlternative,associatePlanProposal,packPlanAlternatives,planAlternativesField} from './home-plan-alternatives.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {appendGoalProgressEvent,emptyGoalProgress,readGoalProgressLedger,goalProgressField} from './goal-progress.ts';
+import {latestMeasurement,appendGoalProgressEvent,emptyGoalProgress,readGoalProgressLedger,goalProgressField} from './goal-progress.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {bundleSignature} from './home-solution-bundles.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -179,10 +179,11 @@ export async function prepareSwpSelection(store:DecisionStore,draft:BundleDraft,
   const next=readPlanAlternatives(shared[planAlternativesField],{goalId:goal.id,goal:goal.statement})!;
   const planId=shared[businessPlanningReceiptField].at(-1)!.planId,plan=next.plans.find(p=>p.id===planId)!;
   const existing=fields[goalProgressField];let ledger=existing===undefined?emptyGoalProgress(goal.id,'demo'):readGoalProgressLedger(existing,goal.id);
-  const prior=ledger.events.filter(e=>e.kind==='measurement').at(-1),measurementId='swp-measure-'+revision;
-  ledger=appendGoalProgressEvent(ledger,{id:measurementId,at,supersedes:prior?.id??null,kind:'measurement',data:{metric:'additional-role-coverage',definition:'Conditional additional roles in the named unit and role; not company headcount.',unit:'roles',direction:'increase',scope:{country:'Fictional scenario',org:draft.inputs.scope.businessUnit.value!,level:draft.inputs.scope.jobProfile.value!},lineageId:'swp-demo-conditional-coverage',baselineId:null,target:{value:draft.inputs.scope.demand.value!,date:swpEnd(draft)},maxAgeDays:90,provenance:'Reviewed fictional scenario target; no baseline or realized outcome asserted.'}});
+  const prior=latestMeasurement(ledger),measurementId='swp-measure-'+revision,target=guidedPlanTarget(draft);
+  if(!target&&prior)ledger=appendGoalProgressEvent(ledger,{id:'swp-withdraw-'+revision,at,supersedes:prior.id,kind:'measurement-withdrawn',data:{reason:'Coverage deadline explicitly removed from the reviewed scenario; prior target retained as history.'}});
+  if(target)ledger=appendGoalProgressEvent(ledger,{id:measurementId,at,supersedes:prior?.id??null,kind:'measurement',data:{metric:'additional-role-coverage',definition:'Conditional additional roles in the named unit and role; not company headcount.',unit:'roles',direction:'increase',scope:{country:'Fictional scenario',org:draft.inputs.scope.businessUnit.value!,level:draft.inputs.scope.jobProfile.value!},lineageId:'swp-demo-conditional-coverage',baselineId:null,target:{value:draft.inputs.scope.demand.value!,date:target!.deadline},maxAgeDays:90,provenance:'Reviewed fictional scenario target; no baseline or realized outcome asserted.'}});
   ledger=appendGoalProgressEvent(ledger,{id:'swp-link-'+revision,at,supersedes:null,kind:'plan-linked',data:{planId,revision:plan.draft.revision,inputKey:plan.result.inputKey,evidenceDigest:plan.draft.binding.evidenceDigest,datasetToken:token}});
-  if(prepared.option.coverageDate)ledger=appendGoalProgressEvent(ledger,{id:'swp-milestone-'+revision,at,supersedes:null,kind:'milestone-proposed',data:{measurementId,value:draft.inputs.scope.demand.value!,date:prepared.option.coverageDate,provenance:'Proposed conditional role-coverage checkpoint; readiness and operational release require validation.'}});
+  if(target&&prepared.option.coverageDate)ledger=appendGoalProgressEvent(ledger,{id:'swp-milestone-'+revision,at,supersedes:null,kind:'milestone-proposed',data:{measurementId,value:draft.inputs.scope.demand.value!,date:prepared.option.coverageDate,provenance:'Proposed conditional role-coverage checkpoint; readiness and operational release require validation.'}});
   guard();return {alreadySaved:false as const,goal,revision,fields:{...shared,[swpDemoField]:{version:1,datasetToken:token,draft,candidateId,selectedPlanId:planId},[goalProgressField]:ledger} as unknown as Record<string,Json>};
  }
 

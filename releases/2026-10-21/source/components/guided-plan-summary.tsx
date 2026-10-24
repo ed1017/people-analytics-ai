@@ -8,6 +8,7 @@ export function GuidedPlanSummary({draft,compact=false}:{draft:BundleDraft;compa
   <p><strong>{summary.mix.build} develop / {summary.mix.move} move / {summary.mix.buy} hire</strong></p>
   <p>Incremental cash: {summary.cash===null?'Unknown':'$'+n(summary.cash)+' USD'}. Conditional readiness: {summary.ready??'Unknown'}.</p>
   <p>Uncovered work over this period: {summary.effort?n(summary.effort.shortfallHours)+' hours':'Unknown'}. End-date role coverage does not erase earlier shortfalls.</p>
+  <p>Acceptable uncovered work: {summary.serviceTarget===null?'Not set':n(summary.serviceTarget)+' hours'}.{summary.serviceTarget!==null&&summary.effort&&(summary.effort.shortfallHours<=summary.serviceTarget?' Within the entered target.':' Exceeds the entered target.')} This is a planning target, not operational approval.</p>
   {summary.target&&(compact?<div aria-label="Conditional capacity target">
    <p><strong>Scenario target:</strong> {summary.target.roles} whole roles by {summary.target.deadline}.</p>
    <p>{summary.target.population} · {summary.target.metric}. Roles are not added company headcount.</p>
