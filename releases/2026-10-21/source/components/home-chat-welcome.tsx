@@ -1,4 +1,5 @@
 'use client';
+import {useChartPointerTooltip} from './chart-pointer-tooltip';
 import {KeyFindings} from './key-findings';
 import {snapshotFindings} from '@/lib/key-findings';
 
@@ -63,12 +64,15 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
 
 export type HomeSnapshotProps = Pick<HomeChatWelcomeProps, 'overview'|'receipt'|'requested'|'scopeLabel'|'loading'|'error'|'trend'>;
 export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string}) {
+  const {point:tooltipPoint,tooltip}=useChartPointerTooltip(JSON.stringify([requested,receipt,loading,error,overview?.snapshot_date,overview?.headcount,trend,projection,projectionStatus]));
   const verified = isVerifiedDashboardScope(receipt) && (['country', 'org', 'level'] as const).every(key => receipt?.effective?.[key] === requested[key]);
   const snapshotDate = overview?.snapshot_date ?? '';
   const current = !loading && !error && verified && validDate(snapshotDate) ? overview : null;
   const headcount = current?.headcount;
   const recruiting = current && recruitingKpi?.asOf===snapshotDate ? recruitingKpi : null;
-  const history = current && known(headcount) ? welcomeHistory(trend, snapshotDate, headcount) : [];
+  const recordedHistory = current && known(headcount) ? welcomeHistory(trend, snapshotDate, headcount) : [];
+  const history = recordedHistory.filter(point=>point.snapshot_date.slice(0,4)===snapshotDate.slice(0,4));
+  const pointDescription=(point:HeadcountTrendPoint)=>{const previous=recordedHistory.find(p=>monthIndex(p.snapshot_date)===monthIndex(point.snapshot_date)-1);const delta=previous?point.headcount-previous.headcount:null;return point.snapshot_date+' · '+point.headcount.toLocaleString()+' people'+(delta===null?'':' · Net change '+(delta>0?'+':'')+delta.toLocaleString()+' people from previous month');};
   const checked = current && projection?.analysis.inputs.asOf === snapshotDate && projection.analysis.inputs.opening === headcount && (['country','org','level'] as const).every(key=>projection.analysis.inputs.filters[key]===requested[key]) ? projection : null;
   const projected = checked?.analysis.points ?? [];
   const first = history[0], last = history.at(-1);
@@ -91,32 +95,35 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
         <p className={styles.watch}>Watch: Not assessed</p>
       </div>
-      <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
+
       <p className={styles.scope}>{scopeLabel} · Recorded workforce history</p>
+      <div className={styles.snapshotGrid}><div className={styles.snapshotCharts}>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
-        <svg  role="img" aria-label={'Recorded synthetic headcount history in people. ' + axisLabel + ' ' + periodContext + ' ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
+        <svg role="group" aria-label={'Recorded synthetic headcount history in people. ' + axisLabel + ' ' + periodContext + ' ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
           <line x1="12%" y1="96" x2="97%" y2="96" className={styles.chartAxis}/>
           {scale.ticks.map(tick=><g key={tick}><line x1="12%" y1={chartY(tick)} x2="97%" y2={chartY(tick)} className={styles.chartAxis}/><text x="10%" y={chartY(tick)+4} textAnchor="end">{format(tick)}</text></g>)}
           {dateMarks.map((date,index)=><text key={date} x={(monthSpan?12+85*(monthIndex(date)-startMonth)/monthSpan:54.5)+'%'} y="120" textAnchor={index===0?'start':index===dateMarks.length-1?'end':'middle'}>{dateLabel(date)}</text>)}
           {plot.map((point, index) => <g key={point.snapshot_date}>
             {index > 0 && monthIndex(point.snapshot_date) === monthIndex(plot[index - 1].snapshot_date) + 1 && <line x1={plot[index - 1].x+'%'} y1={plot[index - 1].y} x2={point.x+'%'} y2={point.y} className={styles.historyLine}/>}
-            <circle cx={point.x+'%'} cy={point.y} r="3" className={styles.historyPoint}/>
+            <circle {...tooltipPoint(pointDescription(point))} cx={point.x+'%'} cy={point.y} r="10" fill="transparent"/><circle aria-hidden="true" pointerEvents="none" cx={point.x+'%'} cy={point.y} r="3" className={styles.historyPoint}/>
           </g>)}
           {futurePlot.slice(1).map((point,index)=><line key={'projection-'+point.month} x1={futurePlot[index].x+'%'} y1={futurePlot[index].y} x2={point.x+'%'} y2={point.y} className={styles.projectionLine}/>)}
         </svg>
-        <figcaption><span>{axisLabel} {periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
+        <figcaption><span>{periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
-      {current&&<HomeWorkforceFlows rows={flows}/>}
+      {tooltip}{current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
-        <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><small>Company-wide · monthly</small></li>
-        <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><small>Source-reported · not annualized</small></li>
-        <li><span>Average time to fill</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.timeToFillDays) ? format(recruiting.timeToFillDays)+' days' : 'Unavailable'}</b><small>Company-wide · recorded hires through {snapshotDate || 'unavailable date'}</small></li>
-        <li><span>FTE capacity</span><b>{loading ? 'Loading.' : known(current?.fte) ? format(current.fte)+' FTE' : 'Unavailable'}</b><small>Full-time-equivalent capacity · {current ? snapshotDate : 'Snapshot unavailable'}</small></li>
-        <li><span>Open positions</span><b>{loading ? 'Loading.' : Number.isSafeInteger(current?.open_positions)&&known(current?.open_positions) ? format(current.open_positions)+' positions' : 'Unavailable'}</b><small>Recorded vacancies · {current ? snapshotDate : 'Snapshot unavailable'}</small></li>
-        <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></li>
-        <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></li>
-      </ul>
+        <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting hires scope and definition">ⓘ</summary><small>Company-wide · monthly</small></details></li>
+        <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="Voluntary turnover YTD scope and definition">ⓘ</summary><small>Source-reported · not annualized</small></details></li>
+        <li><span>Average time to fill</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.timeToFillDays) ? format(recruiting.timeToFillDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average time to fill scope and definition">ⓘ</summary><small>Company-wide · recorded hires through {snapshotDate || 'unavailable date'}</small></details></li>
+        <li><span>FTE capacity</span><b>{loading ? 'Loading.' : known(current?.fte) ? format(current.fte)+' FTE' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="FTE capacity scope and definition">ⓘ</summary><small>Full-time-equivalent capacity · {current ? snapshotDate : 'Snapshot unavailable'}</small></details></li>
+        <li><span>Open positions</span><b>{loading ? 'Loading.' : Number.isSafeInteger(current?.open_positions)&&known(current?.open_positions) ? format(current.open_positions)+' positions' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="Open positions scope and definition">ⓘ</summary><small>Recorded vacancies · {current ? snapshotDate : 'Snapshot unavailable'}</small></details></li>
+        <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average open requisition age scope and definition">ⓘ</summary><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></details></li>
+        <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting offers scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></details></li>
+      </ul></div>
+      <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
+        <p>{axisLabel} Recorded charts share the snapshot year; conditional projections are separately labeled.</p>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}
       <dl className={styles.movementNotes} aria-label="Workforce movements"><div><dt>Projected hires</dt><dd>{checked ? format(flowTotal('hires')) : 'Not available'}</dd></div><div><dt>Projected departures</dt><dd>{checked ? format(flowTotal('exits')) : 'Not available'}</dd></div></dl>
       {checked&&(flowTotal('transfersIn')>0||flowTotal('transfersOut')>0)&&<p className={styles.setupNote}>Also projected over this period: {format(flowTotal('transfersIn'))} transfers in and {format(flowTotal('transfersOut'))} transfers out.</p>}

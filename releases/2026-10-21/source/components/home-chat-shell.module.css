@@ -271,3 +271,34 @@
 .promptCategories button { min-height:44px; padding:6px 10px; border-radius:7px; font-size:13px; font-weight:600; border:1px solid transparent; }
 .promptCategories button[aria-selected="true"] { color:var(--primary); background:var(--accent); border-color:var(--border); }
 .promptCategories button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+
+/* Snapshot-local rail: the chat split remains unchanged. Stack only when the
+   actual evidence pane is too narrow to retain a readable chart and rail. */
+.historySummary { container-name: snapshot; }
+.snapshotGrid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; align-items:start; }
+.snapshotCharts { min-width:0; }
+.historySummary .kpiRow { margin:0; padding:0; gap:0; border:1px solid var(--border); border-radius:9px; overflow:hidden; background:var(--card); }
+.historySummary .kpiRow li { text-align:left; border:0; border-bottom:1px solid var(--border); border-radius:0; padding:7px 10px; }
+.historySummary .kpiRow li:last-child { border-bottom:0; }
+.historySummary .kpiRow span { font-size:12px; line-height:1.3; font-weight:500; }
+.historySummary .kpiRow b { font-size:18px; line-height:1.2; margin:3px 0; }
+.historySummary .kpiRow small { font-size:11px; line-height:1.3; }
+.snapshotCharts svg circle[tabindex]:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
+@container snapshot (min-width:490px) {
+ .snapshotGrid { grid-template-columns:minmax(280px,1fr) 178px; }
+ .historySummary .kpiRow { grid-template-columns:minmax(0,1fr); }
+ .historySummary .kpiRow li { grid-column:auto; }
+ .snapshotCharts .historyFigure svg text { font-size:11px; }
+}
+.historySummary .kpiRow li { position:relative; padding:8px 10px; }
+.historySummary .kpiRow li > span { padding-right:20px; }
+.kpiDetail { position:absolute; right:4px; top:4px; }
+.kpiDetail > summary { width:28px; min-height:28px; display:grid; place-items:center; list-style:none; cursor:pointer; color:var(--muted-foreground); font-size:14px; }
+.kpiDetail > summary::-webkit-details-marker { display:none; }
+.kpiDetail > summary:focus-visible { outline:2px solid var(--ring); border-radius:4px; }
+.kpiDetail[open] { position:static; }
+.kpiDetail[open] > summary { position:absolute; right:4px; top:4px; }
+.kpiDetail[open] small { margin-top:4px; }
+.snapshotCharts figure > h3 { margin:8px 0 4px; font-size:14px; line-height:1.4; }
+.snapshotCharts figure > p,.snapshotCharts figure > div { font-size:12px; line-height:1.4; }
+.kpiScope { display:block; font-size:11px; line-height:1.3; font-style:normal; color:var(--muted-foreground); }

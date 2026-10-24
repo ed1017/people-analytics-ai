@@ -369,3 +369,13 @@ Home now groups existing ordinary questions under Explore, Capacity Planning and
 Runtime234a4957ff16216be0fe1219811c287111e39974. Independent review, 11 focused regressions, TypeScript, production build and local1440/390 browser checks passed. Clicked and typed questions were captured at the ordinary chat transport with provider calls blocked; fresh model answers were not tested. Hosted acceptance and CI remain release gates recorded in the PR. No data/accounting/access changes.
 
 Dependent planning-template auto-opening is pending clarification of the requested existing toggle: fill-in composer template versus expandable scenario assumptions editor. No extra toggle has been added. Renaming Capacity Planning to Scenario Planning is proposed, not yet confirmed. This release does not add model engines.
+
+### Home chart window and KPI rail - October 24
+
+Recorded headcount and hires/separations now share the snapshot year (January–September2026 for the current release). Full source history remains available for validation and December-to-January flow/delta calculations. The headcount displayed-period change now correctly compares January-end to September-end, not the older2024baseline. Conditional projections stay explicitly separate.
+
+Seven existing KPIs move into a compact rail beside the charts when the actual pane is wide enough; mobile/narrow panes stack them. Company-wide recruiting qualifiers stay visible under filtered workforce scopes. Metric-specific disclosures retain source definitions. Pointer-following tooltips clamp to viewport edges, support keyboard/touch, expose signed net change, and cannot display stale values after evidence/loading changes.
+
+Runtime6fa58dc5500f4f3c868262306b2973b553bc435c.20focused regressions, independent review and production build passed. Local1440x900/1366x768/390x844 browser checks confirmed shared periods, seven metrics, above-fold desktop/laptop rail, tooltip interaction and no overflow. CI/staging/public acceptance tracked in release PR. No paid AI, data, accounting, access or pricing changes.
+
+Follow-on approved: shared interactive scenario planner hierarchy (outcome, compact KPIs, relevant controls left/chart right, real save/compare). This resolves the earlier fill-in-template ambiguity; implementation is separate and not included here. Library reference materialization remains blocked on Windows by the transfer helper requiring os.setxattr; actual local dashboard pixels were inspected instead, without claiming reference-image inspection.
