@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "383a92a5abec2b1666596483e6391f86266be4f9",
-  "deployment": "dpl_8bg2VvoP3F6266UaWsPJZFzF63nd",
+  "sourceCommit": "28d51fefcf90d210beae90ee6999d2ce85f150af",
+  "deployment": "dpl_FXermZ6oPLn1Q3qZuENsAqSPV1o7",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "df0b0e16ecbe52c60dc6f6cc6e587dc246ced1c431cae121f2e8732da827ec8f",
-      "bytes": 12326
+      "sha256": "c69ceb164636cb6d9741cb94bcff69549952798b8a9d04960c007451d360773d",
+      "bytes": 12446
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4099,5 +4099,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "6e0e0076df67fe9dbb3fb94768bbad6ad584f0301273125de9a15a6087ba0c68"
+  "verifiedDeployedArchiveSha256": "3fe6a4f4af70e1a8884ee5858e79f1371a084859a16b033f70ed80f0f1d35619"
 }
