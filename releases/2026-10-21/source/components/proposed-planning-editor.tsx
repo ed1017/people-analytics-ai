@@ -13,10 +13,10 @@ export function ProposedPlanningEditor({draft,comparisonDraft,disabled,onReview,
  const updateValues=(next:string[])=>{if(onValuesChange)onValuesChange(next);else setValues(next);onDirtyChange(rows.some((row,index)=>(next[index].trim()===''?null:Number(next[index]))!==row.assumption.value));};
  const changes=rows.flatMap((row,index)=>{const value=values[index].trim()===''?null:Number(values[index]);return value===row.assumption.value?[]:[{field:row.field,target:row.target,value}];});
  const valid=rows.every((row,index)=>values[index].trim()===''||(Number.isFinite(Number(values[index]))&&Number(values[index])>=0&&(row.field!=='horizon_months'||Number.isInteger(Number(values[index]))&&Number(values[index])>=1&&Number(values[index])<=24)&&(row.field!=='participants'||Number.isInteger(Number(values[index])))));
- const key=JSON.stringify(values),previewRef=useRef(onPreview);previewRef.current=onPreview;
- const [preview,setPreview]=useState<{key:string;draft:BundleDraft}|null>(null),[error,setError]=useState('');
- useEffect(()=>{let live=true;setError('');if(!changes.length||!valid||disabled)return;
-  const timer=setTimeout(()=>{void previewRef.current(changes).then(value=>{if(live)setPreview({key,draft:value});}).catch(reason=>{if(live)setError(reason instanceof Error?reason.message:'Unable to calculate this adjustment.');});},180);
+ const key=JSON.stringify(values),previewRef=useRef(onPreview);useEffect(()=>{previewRef.current=onPreview;},[onPreview]);
+ const [preview,setPreview]=useState<{key:string;draft:BundleDraft}|null>(null),[failure,setFailure]=useState<{key:string;message:string}|null>(null);const error=failure?.key===key?failure.message:'';
+ useEffect(()=>{let live=true;if(!changes.length||!valid||disabled)return;
+  const timer=setTimeout(()=>{void previewRef.current(changes).then(value=>{if(live)setPreview({key,draft:value});}).catch(reason=>{if(live)setFailure({key,message:reason instanceof Error?reason.message:'Unable to calculate this adjustment.'});});},180);
   return ()=>{live=false;clearTimeout(timer);};
  // The serialized values identify this revision's entire edit, including unknowns.
  // eslint-disable-next-line react-hooks/exhaustive-deps
