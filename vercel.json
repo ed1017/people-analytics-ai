@@ -84,7 +84,8 @@
       "feat/shared-interactive-planner": false,
       "feat/headcount-projection-controls": false,
       "fix/pricing-window-251925": false,
-      "fix/planner-first-use": false
+      "fix/planner-first-use": false,
+      "polish/compact-risk-view": false
     }
   }
 }

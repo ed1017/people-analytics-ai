@@ -404,3 +404,14 @@ The real starter path now opens local headcount controls immediately from explic
 Risk discovery now starts with each business unit's last three complete monthly net workforce changes, anchored to September 30, 2026. All eight groups are compared with editable lookback/horizon and net-flow assumptions. These are conditional workforce-stock exposures, not demand-gap forecasts or isolated turnover effects. Public group evidence does not provide matched monthly gross hiring/exits, and demand remains unknown. The user can open demand/staffing modeling explicitly; net movement is never silently converted into gross hires. Trend save/reopen is source-bound and separate from existing demand scenarios.
 
 Runtime 72549e35a019ae6fa67dc92c3815c54cf678e574; archive be2791c6c63b23c8fd929bec38af5e66b1533a3b2757281ee0989fae8d6a251a. Independent source review, 19 focused tests, lint, TypeScript and production build passed. Local desktop/mobile checks use real read-only source receipts and block all provider submissions: clicked/typed entry, single split, resize/reset, explicit save/reload, server evidence acceptance, risk initial comparison, edits, save and return. Hosted checks and CI remain release gates. No fresh model interpretation or intermittent-rejection fix is claimed. No data, accounting, pricing or access changes.
+
+
+### Verified first-use repair and renewal - PR389/PR390
+
+PR389 is live: all four pricing-verification windows expire October25,2026 at19:25UTC; earliest configuration cutoff is **October25 19:23UTC**, round-admission cutoff19:23:30UTC. The50USD cumulative cap, accounting, receipts, uncertain holds, reservations and access were preserved; no paid provider call accompanied renewal.
+
+PR390 is live at runtime72549e35a019ae6fa67dc92c3815c54cf678e574, deploymentdpl_3uTX9gvmf5MEVmhgH1Fr45LUxCNv. Final CI40127214700 and protected/public desktop/mobile checks passed. Immediate headcount controls, clicked/typed parity, single split, save/reopen and server continuation verification were checked without provider execution. Risk discovery uses eachBU's own recent net stock trends; monthly gross hiring/exits and demand remain unavailable in this public retrieval path, so no measured capacity gap is claimed.
+
+### Compact risk comparison - staged polish
+
+The risk view now uses a compact opt-in presentation with tighter desktop ranking rows, a bounded chart height and readable HTML axis labels. Touch ranking targets retain44px. Observed rates display to two decimals only while unfocused; focus reveals the unchanged raw value. Intentional manual edits and saved inputs retain full precision. Calculator, source history and scope contracts are unchanged. Local laptop/mobile checks verified focus/blur without mutation, exact edited-value save/reopen and chart updates. Independent review found no source blocker. Hosted preview, final CI and parent screenshot inspection precede public promotion. No paid calls or new renewal.
