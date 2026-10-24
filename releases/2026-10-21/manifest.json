@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "28d51fefcf90d210beae90ee6999d2ce85f150af",
-  "deployment": "dpl_FXermZ6oPLn1Q3qZuENsAqSPV1o7",
+  "sourceCommit": "234a4957ff16216be0fe1219811c287111e39974",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "903e7cadaee01d57e483f2507be2d1a5c7b01c9387911efec003a03121c3ebb5",
-      "bytes": 18477
+      "sha256": "4d48b7281b755d43407820e3a9710b4b58249dc966b8a5eda96a97e25f615b38",
+      "bytes": 18920
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "f05f31428187475f8853233cdf6b0fd45ea0321ce800f95f9b94e4e86f3d2cac",
-      "bytes": 17609
+      "sha256": "67c5689f563ad6e1beaa281a586124f8fa524917538ab77ce2fca0f2889db6bd",
+      "bytes": 16859
     },
     {
       "path": "components/home-data-status.tsx",
@@ -4096,8 +4096,23 @@
       "path": "tests/public-ai-ui-restoration.test.mjs",
       "sha256": "fa45cae9d0e206023853046497110cc1d8d4321d557a5bbb6bbda903d54606a1",
       "bytes": 19105
+    },
+    {
+      "path": "components/home-prompt-categories.tsx",
+      "sha256": "0e6a5bdfc0c5093db94ece644e0af00448c33ffb1b6afa403c2d27d9ce129a7b",
+      "bytes": 1608
+    },
+    {
+      "path": "lib/home-prompt-categories.ts",
+      "sha256": "7cbf19ba0a0775ccf4b3f9f6267f4059a1688d1fee80933f17856d4070b6dfe1",
+      "bytes": 840
+    },
+    {
+      "path": "tests/home-prompt-categories.test.mjs",
+      "sha256": "0c895e06125c2e1c451196d0995bccd1b40a9bff830a9cedec134413458911af",
+      "bytes": 2472
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "3fe6a4f4af70e1a8884ee5858e79f1371a084859a16b033f70ed80f0f1d35619"
+  "verifiedDeployedArchiveSha256": "bf563b91fbe9e6454c43c0fff897c264bfab7a8f6436579d0edbc771db54817e"
 }

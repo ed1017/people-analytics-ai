@@ -78,7 +78,8 @@
       "docs/roadmap-after-380": false,
       "feat/demo-service-targets": false,
       "docs/service-targets-release": false,
-      "feat/group-capacity-risk": false
+      "feat/group-capacity-risk": false,
+      "feat/home-prompt-categories": false
     }
   }
 }
