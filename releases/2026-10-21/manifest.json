@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "234a4957ff16216be0fe1219811c287111e39974",
+  "sourceCommit": "6fa58dc5500f4f3c868262306b2973b553bc435c",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "4d48b7281b755d43407820e3a9710b4b58249dc966b8a5eda96a97e25f615b38",
-      "bytes": 18920
+      "sha256": "dcbb75eddfdf7ffafcfa4a2ec816117e24bb4e37e89724bfec67735dba85e421",
+      "bytes": 21151
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "67c5689f563ad6e1beaa281a586124f8fa524917538ab77ce2fca0f2889db6bd",
-      "bytes": 16859
+      "sha256": "b9c80358da10e613b59eb10a8e42b83d0e5a1d0ac04e391de65579cbcea77232",
+      "bytes": 19072
     },
     {
       "path": "components/home-data-status.tsx",
@@ -689,8 +689,8 @@
     },
     {
       "path": "components/home-workforce-flows.tsx",
-      "sha256": "638a6a0e45bc40900fb632604011fe14ef15e1be3901ba44b01948abde68477a",
-      "bytes": 4009
+      "sha256": "feb2ace29c02a6a3c98918ccf175fe28ac84a62dbb9154308cfbaa2da8186edd",
+      "bytes": 4044
     },
     {
       "path": "components/key-findings.tsx",
@@ -3869,8 +3869,8 @@
     },
     {
       "path": "tests/home-flows-catalog.test.mjs",
-      "sha256": "81e4224b0b79e6a494e70c90482a5ba2cb6b16edab3c0a9e573681190dc5a337",
-      "bytes": 5426
+      "sha256": "d7ce43a8d8f10e0c00529d2f5ee5507c11c731348e753c217a56e6aeb07e93fe",
+      "bytes": 5502
     },
     {
       "path": "tests/home-headcount-chat.test.mjs",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "49305bbd5cc8140f3c97c7ead8a10c282c8a93ff5b48c4fb3741ce07e3316dc5",
-      "bytes": 13679
+      "sha256": "8334cef20145eadec525852115758fb5dad9c612c9de6b3f88fc5aff928cba4b",
+      "bytes": 14197
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4111,8 +4111,18 @@
       "path": "tests/home-prompt-categories.test.mjs",
       "sha256": "0c895e06125c2e1c451196d0995bccd1b40a9bff830a9cedec134413458911af",
       "bytes": 2472
+    },
+    {
+      "path": "components/chart-pointer-tooltip.tsx",
+      "sha256": "1f3b02678982eaf163c80caa89f8719cf108e32712b271f9ca03fd5e17f381df",
+      "bytes": 2045
+    },
+    {
+      "path": "tests/chart-pointer-tooltip.test.mjs",
+      "sha256": "a4e050f23b0373f6249ad8cc2bdc280923a9c42f5ae082a00528f22f77e8ad5b",
+      "bytes": 1672
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "bf563b91fbe9e6454c43c0fff897c264bfab7a8f6436579d0edbc771db54817e"
+  "verifiedDeployedArchiveSha256": "42942dd96d1bebbd28558be59773fb09b853fdd2fbe26e85f90e0ea91ee35641"
 }

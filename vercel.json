@@ -79,7 +79,8 @@
       "feat/demo-service-targets": false,
       "docs/service-targets-release": false,
       "feat/group-capacity-risk": false,
-      "feat/home-prompt-categories": false
+      "feat/home-prompt-categories": false,
+      "feat/home-dashboard-rail": false
     }
   }
 }

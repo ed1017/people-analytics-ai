@@ -27,19 +27,19 @@ const exports=loadModule(new URL('../components/home-chat-welcome.tsx',import.me
 const binding=await loadPublic9037Binding({hostname:'people-analytics-gkl61lnek-ed-56dc.vercel.app',production:true});
 async function read(filters={country:'all',org:'all',level:'all'}){const r=await binding.handle(new Request('https://www.ed-ai.app/api/dashboard?'+new URLSearchParams(filters)));assert.equal(r.status,200);return r.json();}
 function render(data,requested,loading=false,error=null){return renderToStaticMarkup(React.createElement(exports.HomeHeadcountSummary,{overview:data.overview,receipt:scope.readDashboardScopeReceipt(data.workforce_filter_scope),requested,scopeLabel:'Reviewed test scope',loading,error,trend:data.trend}));}
-test('public Home consumes 9037 snapshot and 33 history points after settlement; pending hides settled values',async()=>{
+test('public Home consumes 9037 snapshot and nine current-year history points after settlement; pending hides settled values',async()=>{
  const filters={country:'all',org:'all',level:'all'},d=await read(filters),html=render(d,filters);
- assert.match(html,/9,037/);assert.match(html,/33 recorded monthly snapshots/);assert.equal((html.match(/<circle/g)??[]).length,33);assert.doesNotMatch(html,/Verified headcount history unavailable|Verified snapshot needed/);
+ assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);assert.equal((html.match(/<circle/g)??[]).length,18);assert.doesNotMatch(html,/Verified headcount history unavailable|Verified snapshot needed/);
  assert.doesNotMatch(render(d,filters,true),/9,037/);assert.equal(Object.hasOwn(d.workforce_filter_scope,'artifactDigest'),false);
 });
 test('restored landing shows workforce evidence and one demo opener, never the five-FTE example inline',async()=>{
  const requested={country:'all',org:'all',level:'all'},d=await read(requested);
  const html=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,onQuestion:()=>{}}));
- assert.match(html,/Plan the workforce your business needs/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/33 recorded monthly snapshots/);
+ assert.match(html,/Plan the workforce your business needs/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);
  assert.equal((html.match(/Try a planning scenario/g)??[]).length,1);assert.match(html,/aria-haspopup="dialog"/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE capacity gap|\$325,000|Choose a staffing option|Develop and move your team/);
 });
 test('public filtered Home keeps exact requested/effective scope; malformed and stale receipts stay unavailable',async()=>{
- const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/33 recorded monthly snapshots/);
+ const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/9 recorded monthly snapshots/);
  assert.match(render(d,{...filters,country:'all'}),/Verified headcount history unavailable/);
  for(const patch of [{datasetToken:'legacy-v1:0'},{contract:'other'},{cutoff:'2026-08-31'},{artifactDigest:'a'.repeat(64)},{version:2},{status:'verified_aggregate'},{effective:{...filters,country:'all'}},{requested:{...filters,extra:'x'}},{metricContract:'other'},{stockStatus:'other'}]){
   const invalid={...d,workforce_filter_scope:{...d.workforce_filter_scope,...patch}};assert.equal(scope.readDashboardScopeReceipt(invalid.workforce_filter_scope),null);assert.match(render(invalid,filters),/Verified headcount history unavailable/);
@@ -52,12 +52,12 @@ test('public filtered Home keeps exact requested/effective scope; malformed and 
 test('Home questions submit their visible wording and the separate scenario CTA keeps its popup prompt',()=>{
  const navigation=[],questions=[];
  const tree=exports.HomeChatWelcome({requested:{country:'all',org:'all',level:'all'},scopeLabel:'Global workforce',loading:true,onNavigate:page=>navigation.push(page),onQuestion:question=>questions.push(question)});
- const buttons=[];
- function visit(node){if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(visit);return;}if(node.type==='button')buttons.push(node);visit(node.props?.children);}
+ const buttons=[],categories=[];
+ function visit(node){if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(visit);return;}if(node.type==='button')buttons.push(node);if(node.type?.name==='HomePromptCategories')categories.push(node);visit(node.props?.children);}
  visit(tree);
- assert.equal(buttons.length,5);
+ assert.equal(buttons.length,1);assert.equal(categories.length,1);categories[0].props.onQuestion('A normal category question');
  buttons.forEach(button=>button.props.onClick());
- assert.deepEqual(questions,['Start the workforce demo','How has our headcount changed?','What was turnover last year?','What are our recorded workforce costs?','How can we close a staffing gap?']);
+ assert.deepEqual(questions,['A normal category question','Start the workforce demo']);
  assert.deepEqual(navigation,[]);
 });
 
@@ -73,7 +73,7 @@ test('turnover and recorded change distinguish fresh/pending, success, zero, and
  }
  const ready=render(data,filters);
  assert.match(card(ready,'Voluntary turnover YTD'),/%$/);
- assert.match(ready,/Net change: \+637 people/);
+ assert.ok(ready.includes('Net change: +'+(data.overview.headcount-data.trend.find(p=>p.snapshot_date==='2026-01-31').headcount)+' people'));
  const zero={...data,overview:{...data.overview,voluntary_turnover_ytd_pct:0},trend:data.trend.map(p=>({...p,headcount:data.overview.headcount}))};
  assert.equal(card(render(zero,filters),'Voluntary turnover YTD'),'0%');
  assert.match(render(zero,filters),/Net change: 0 people/);
@@ -100,18 +100,18 @@ test('Home scale pads full, filtered, constant, small and projected series witho
 
 test('Home chart labels its nonzero axis and exact period values; monthly gaps remain unconnected',async()=>{
  const filters={country:'all',org:'all',level:'all'},data=await read(filters),html=render(data,filters);
- assert.match(html,/does not start at zero/);assert.match(html,/Start: 8,400 \(Jan 2024\)/);
- assert.match(html,/Latest: 9,037 \(Sep 2026\)/);assert.match(html,/Net change: \+637 people/);
+ assert.match(html,/does not start at zero/);const jan=data.trend.find(p=>p.snapshot_date==='2026-01-31');assert.ok(html.includes('Start: '+jan.headcount.toLocaleString()+' (Jan 2026)'));assert.doesNotMatch(html,/Jan 2024/);
+ assert.match(html,/Latest: 9,037 \(Sep 2026\)/);assert.ok(html.includes('Net change: +'+(data.overview.headcount-jan.headcount)+' people'));
  assert.match(html,/aria-label="Recorded synthetic headcount history in people\. Y axis:/);
  for(const match of html.matchAll(/<circle[^>]*cy="([^"]+)"/g))assert.ok(Number(match[1])>=20&&Number(match[1])<=96);
  assert.doesNotMatch(html,/<path|<polygon/);
- const gap={...data,trend:data.trend.filter((_,i)=>i!==10)};
+ const gap={...data,trend:data.trend.filter(p=>p.snapshot_date!=='2026-05-31')};
  const fullLines=(html.match(/<line/g)||[]).length,gapLines=(render(gap,filters).match(/<line/g)||[]).length;
  assert.equal(fullLines-gapLines,2);
  assert.doesNotMatch(render({...data,trend:[]},filters),/<svg/);
 });
 test('second metric row uses only the same verified dashboard scope and exact dates',async()=>{
- const card=(html,label)=>html.match(new RegExp('<li><span>'+label+'</span><b>(.*?)</b><small>(.*?)</small>'))?.slice(1);
+ const card=(html,label)=>html.match(new RegExp('<li><span>'+label+'</span><b>(.*?)</b>.*?<small>(.*?)</small>'))?.slice(1);
  for(const filters of [{country:'all',org:'all',level:'all'},{country:'US',org:'all',level:'L1'}]){
   const data=await read(filters),html=render(data,filters),first=data.trend.slice().sort((a,b)=>a.snapshot_date.localeCompare(b.snapshot_date))[0];
   const format=n=>n.toLocaleString(undefined,{maximumFractionDigits:2});
@@ -144,7 +144,7 @@ test('Home hiring metrics use actual released source and reject stale/suppressed
  const kpi=homeRecruitingKpi(result,true,PUBLIC_9037.token,date);
  assert.equal(kpi.timeToFillDays,33);assert.equal(kpi.openReqAgeDays,13.9);assert.equal(kpi.offers,85);
  const renderKpi=(k,recruitingPending=false)=>renderToStaticMarkup(React.createElement(exports.HomeHeadcountSummary,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested:filters,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,recruitingKpi:k,recruitingPending}));
- const html=renderKpi(kpi);assert.match(html,/33 days/);assert.match(html,/13.9 days/);assert.match(html,/Recruiting offers<\/span><b>85/);assert.match(html,/Company-wide/);
+ const html=renderKpi(kpi);assert.equal((html.match(/<em[^>]*>Company-wide<\/em>/g)||[]).length,4);assert.match(html,/aria-label="Average time to fill scope and definition"/);assert.match(html,/33 days/);assert.match(html,/13.9 days/);assert.match(html,/Recruiting offers<\/span><b>85/);assert.match(html,/Company-wide/);
  assert.doesNotMatch(renderKpi({...kpi,asOf:'2026-08-31'}),/33 days|13.9 days/);
  assert.doesNotMatch(renderKpi(kpi,true),/33 days|13.9 days/);
  assert.equal(homeRecruitingKpi(result,false,PUBLIC_9037.token,date),null);
