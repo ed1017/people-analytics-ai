@@ -7,6 +7,8 @@ import {local9037RequestAllowed} from './lib/dataset-9037-request-policy.mjs';
 // The normal application is unchanged when the private local launcher is absent.
 // In local mode, stop external-service and AI routes before their modules execute.
 export function proxy(request: NextRequest){
+ const url=new URL(request.url);
+ if(['GET','HEAD'].includes(request.method)&&url.pathname==='/'&&url.searchParams.getAll('page').length===1&&url.searchParams.get('page')==='about'){url.pathname='/about';url.searchParams.delete('page');return NextResponse.redirect(url,307);}
  const publicRelease=public9037Options(process.env);
  if(publicRelease){
   if(new URL(request.url).pathname==='/api/public-qa-diagnostic')return publicQaDiagnosticAllowed(process.env,request)?NextResponse.next():NextResponse.json({available:false},{status:404,headers:{'cache-control':'no-store'}});

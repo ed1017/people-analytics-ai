@@ -346,3 +346,18 @@ The first unpromoted production stage failed its organization-binding guard; reb
 ### Pricing verification renewal — October 23, 23:14 UTC
 
 PR379 date-only renewal is live, runtime 044f26e854d8cad6407b4c683f1c762858f7ebb8, deployment dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL. All four windows expire October24 23:14UTC; admission cutoff23:12:30UTC and configuration-receipt cutoff23:12:00UTC supersede the earlier09:55 window. Official prices rechecked, existing conservative rates and $50 cap preserved. Independent review,30 focused tests,CI and hosted configuration checks passed. Accounting/permissions unchanged; no paid provider call. Geography v4:5 and earlier saved-plan bases remain unchanged.
+
+
+### Group capacity risk — reviewed candidate, October 24
+
+Added the suggested question “Which groups are at risk of a capacity gap in the next 3 months?” and the same ordinary-question route. The supported all-BU/all-country/all-level, snapshot-relative scope requires explicit confirmation. All eight groups remain unranked until valid forward assumptions are entered or the clearly disclosed demo baseline is adopted. Starting stocks and historical total exits are checked against the complete released partition; future demand/hiring are never inferred from turnover alone.
+
+Group selection opens the same calculated assumptions and monthly capacity/demand visual. Hiring lag, 30-day ramp stages, productive availability, optional annual hire cash cost and demand edits recalculate locally. Saved risk assumptions are dataset/horizon bound and reopened through the calculator; existing action plans are untouched. This is scenario exposure, not a calibrated forecast. Opening-cohort departures, constant monthly launch/departure assumptions and no transfers/new-hire attrition remain explicit limitations.
+
+29 focused regressions, TypeScript, webpack production build, independent review and local desktop/mobile browser flows passed. Browser flows covered suggestion/typed parity, complete partition, changed assumptions/chart synchronization and save/reload. No provider calls. Hosted checks and CI pending. Also fixed pending AI readiness copy and the legacy About query alias; genuine unavailability remains visible. Runtime candidate383a92a. No accounting, dataset, permission or pricing changes.
+
+
+Capacity-risk hosted acceptance: protected deployment dpl_8bg2VvoP3F6266UaWsPJZFzF63nd (people-analytics-fotq2hxxh-ed-56dc.vercel.app) passed desktop1440/mobile390 ordinary typed/suggested entry, scope confirmation, all eight groups, demand/chart changes and saved-assumption reload checks. The legacy About query returns307 to /about. Independent review has no remaining findings. Initial CI40095130397 passed; final metadata CI and public promotion remain release gates. No model requests were made; this deterministic scenario capability does not establish resolution of the older intermittent model-answer rejection.
+
+
+Final compact risk editor: runtime28d51fefcf90d210beae90ee6999d2ce85f150af, archive3fe6a4f4af70e1a8884ee5858e79f1371a084859a16b033f70ed80f0f1d35619, deploymentdpl_FXermZ6oPLn1Q3qZuENsAqSPV1o7. The numeric editor uses an accessible disclosure so mobile results are not pushed below a long form. Group selection, save and reopen remain immediately available. Calculations are unchanged. Independent review and TypeScript pass. Implementation is complete; exact CI, hosted/public verification and promotion status are tracked in [PR384](https://github.com/ed1017/people-analytics-ai/pull/384). Intermittent model rejection remains unproven; no new paid tests or unrelated features are included.

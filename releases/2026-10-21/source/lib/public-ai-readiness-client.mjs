@@ -5,14 +5,15 @@ import {datasetFetch,datasetSession} from './dataset-client.mjs';
 /** Configuration is presentation state, not balance or provider health. Every submission still requires server budget admission.
  * No polling, model call, credential or environment lookup. */
 export function createPublicAiReadiness({enabled=PUBLIC_AI_ENABLED,session,transport,now=Date.now,timeoutMs=5000}={}){
- let receipt=null,pending=null,epoch=0,expiry,controller;
+ let receipt=null,pending=null,epoch=0,expiry,controller,status="checking";
  const listeners=new Set();
- const publish=next=>{receipt=next;for(const listener of listeners)listener();};
+ const publish=(next,nextStatus=next?.status??"unavailable")=>{receipt=next;status=nextStatus;for(const listener of listeners)listener();};
  const invalidate=()=>{epoch++;controller?.abort();clearTimeout(expiry);publish(null);};
  const available=route=>session?.snapshot()==='legacy-v1:0'||enabled===true&&session?.snapshot()===PUBLIC_9037.token&&receipt?.status==='configured'&&Date.parse(receipt.expiresAt)>now()&&PUBLIC_AI_ROUTES.includes(route)&&receipt.routes.includes(route);
  async function refresh(){
   if(enabled!==true||session?.snapshot()!==PUBLIC_9037.token||typeof transport!=='function')return;
   if(pending)return pending;
+  if(!receipt)publish(null,"checking");
   const captured=++epoch,token=session.snapshot(),abort=new AbortController();controller=abort;
   let timer;
   const expired=new Promise((_,reject)=>{timer=setTimeout(()=>{abort.abort();reject(Error('Readiness timed out'));},timeoutMs);});
@@ -28,14 +29,14 @@ export function createPublicAiReadiness({enabled=PUBLIC_AI_ENABLED,session,trans
    finally{abort.signal.removeEventListener('abort',cancelReader);await reader.cancel().catch(()=>{});}
    const joined=new Uint8Array(bytes);let offset=0;for(const chunk of chunks){joined.set(chunk,offset);offset+=chunk.byteLength;}
    const next=readPublicAiCapabilityReceipt(JSON.parse(new TextDecoder().decode(joined)),now());
-   if(!next||captured!==epoch||abort.signal.aborted||session.snapshot()!==token)return;
+   if(!next)throw Error('Invalid readiness receipt');if(captured!==epoch||abort.signal.aborted||session.snapshot()!==token)return;
    clearTimeout(expiry);publish(next);
    expiry=setTimeout(()=>{if(receipt===next)publish(null);},Math.max(0,Date.parse(next.expiresAt)-now()));
-  })(),expired]).catch(()=>{if(captured===epoch)publish(null);}).finally(()=>{clearTimeout(timer);abort.abort();if(controller===abort)controller=null;pending=null;});
+  })(),expired]).catch(()=>{if(captured===epoch)publish(null,"unavailable");}).finally(()=>{clearTimeout(timer);abort.abort();if(controller===abort)controller=null;pending=null;});
   return pending;
  }
  const stop=session?.subscribe(invalidate);
- return Object.freeze({available,refresh,invalidate,snapshot:()=>receipt,subscribe:listener=>{listeners.add(listener);return()=>listeners.delete(listener);},dispose:()=>{invalidate();stop?.();listeners.clear();}});
+ return Object.freeze({available,refresh,invalidate,snapshot:()=>receipt,status:()=>status,subscribe:listener=>{listeners.add(listener);return()=>listeners.delete(listener);},dispose:()=>{invalidate();stop?.();listeners.clear();}});
 }
 export const publicAiReadiness=createPublicAiReadiness({session:datasetSession,transport:datasetFetch});
 /** One logical attempt, with a stable identifier; no transport retry. */
