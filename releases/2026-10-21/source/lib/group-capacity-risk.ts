@@ -9,7 +9,7 @@ export function capacityRiskIntent(text:string):number|null {
  if(!match&&/\b(years?|weeks?|days?|quarters?|january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(text))return null;
  return match?Number(match[1]):3;
 }
-export type RiskGroup={code:string;label:string;asOf:string;headcount:number;fte:number;exits:number;historyMonths:number};
+export type RiskGroup={code:string;label:string;asOf:string;headcount:number;fte:number;exits:number;historyMonths:number;history?:{snapshot_date:string;headcount:number;fte:number}[]};
 export type RiskAssumptions={months:number;demandFte:number|null;monthlyExits:number|null;monthlyHires:number|null;hireLagDays:number|null;ftePerHire:number|null;existingAvailabilityPct:number|null;rampPct:[number|null,number|null,number|null];annualHireCost:number|null;basis:'entered'|'adopted-demo'};
 export function emptyRiskAssumptions(months=3):RiskAssumptions{return {months,demandFte:null,monthlyExits:null,monthlyHires:null,hireLagDays:null,ftePerHire:null,existingAvailabilityPct:null,rampPct:[null,null,null],annualHireCost:null,basis:'entered'};}
 export function demoRiskAssumptions(g:RiskGroup,months=3):RiskAssumptions{return {...emptyRiskAssumptions(months),demandFte:g.fte,monthlyExits:g.exits/g.historyMonths,monthlyHires:0,hireLagDays:30,ftePerHire:1,existingAvailabilityPct:100,rampPct:[50,75,100],basis:'adopted-demo'};}

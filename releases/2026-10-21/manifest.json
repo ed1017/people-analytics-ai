@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "1ca47e7304f467256b22afa3ea9dece974827a40",
-  "deployment": "dpl_6zXQSCjMM2ctXp5Frc9SXWSBNsxp",
+  "sourceCommit": "a691920e6672110a6722d1cbc227ad0b88613bc0",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "b9c80358da10e613b59eb10a8e42b83d0e5a1d0ac04e391de65579cbcea77232",
-      "bytes": 19072
+      "sha256": "bf68c2a9232dfabea6613dfff1f4a5b86f22a9a2c1a4d6a0e252097a229dcdf1",
+      "bytes": 19131
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "b1137efc0a7edaf2565bffb0f115b21a80a2a58dbfffe3951d74fdff2d561b8a",
-      "bytes": 101801
+      "sha256": "055f0a59b60b006aff8cb87dbf8323c94197939433bfd8ac202b310c057f6132",
+      "bytes": 102585
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "8047f6ccc4b3de73d22e1708017f5939487d8c1b615c044a10070acb587b9dc6",
-      "bytes": 35070
+      "sha256": "a86143246ff9f8fd11d22ef02146fcef122152d2ed16f12ed56814be8b90f4b7",
+      "bytes": 37693
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -4074,18 +4074,18 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "4fa441ce731d3b2f43d2416aeba6583f182699a2c5ffa812c62bbe65b6c799b6",
-      "bytes": 14639
+      "sha256": "b1a7b3fc073cec679e45a2e36c9e2ee259b6122fa62f6ae8e98a3a0c380cfd79",
+      "bytes": 15054
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
-      "sha256": "2cabfdd3be2f9af119202760fc77aa681e1176d8be2c315d20b5be31185c8f6f",
-      "bytes": 2816
+      "sha256": "1854a8184a8ee1446f4aed4606349720398b932e44fc676af4cbcca8362d5bc5",
+      "bytes": 2849
     },
     {
       "path": "lib/group-capacity-risk.ts",
-      "sha256": "9b7bcec486a660ac7438bf8dcfc880f78c960ffd7884e5bfa28c5bcade0a4802",
-      "bytes": 6080
+      "sha256": "0c094be94f9b6421f6dad0c681f1b6bc0370d473b46426eb124e9c77a40b609e",
+      "bytes": 6142
     },
     {
       "path": "tests/group-capacity-risk.test.mjs",
@@ -4134,8 +4134,8 @@
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
-      "sha256": "1d10f8ba58cca9531274dda7ffa73ce34a3f502aa4b7cccd51eed899d5fddd3a",
-      "bytes": 1248
+      "sha256": "cbdda42393cfee59c2131fe3579794a3d54f421d90316449f90b7ee92ce34afc",
+      "bytes": 661
     },
     {
       "path": "lib/scenario-planner-entry.ts",
@@ -4161,8 +4161,33 @@
       "path": "tests/headcount-projection-edit.test.mjs",
       "sha256": "78bbaa62f952db2fe5e4edca60da848571281cb19198790dc83a4242639ebac4",
       "bytes": 3908
+    },
+    {
+      "path": "components/group-workforce-trend.tsx",
+      "sha256": "ffc37ff22dd3e6aa302743adce1734b7e3beb8e4bd0eead6d570fca89f17387e",
+      "bytes": 8048
+    },
+    {
+      "path": "components/headcount-projection-entry.tsx",
+      "sha256": "977d9ca31dca6cb19590c1d5d34f24803a46a62afac5d8c6484784c11f5fdc8b",
+      "bytes": 5379
+    },
+    {
+      "path": "lib/group-workforce-trend.ts",
+      "sha256": "86a980d3b90b95d63f821bfc8f078e40511b8cdbe84dd5f10a73c11f0c0f360b",
+      "bytes": 1926
+    },
+    {
+      "path": "lib/projection-entry.ts",
+      "sha256": "0bc44ffece8861c72c2765d76893347a6233e6f9bd0ad1ef31da0f417b06d024",
+      "bytes": 2610
+    },
+    {
+      "path": "tests/planner-first-use.test.mjs",
+      "sha256": "fc927355de67658f4e67f078006b9f34a89c4826a4fd5c9caaf387b93961f37d",
+      "bytes": 3084
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "c7100a4ec6e88d879f8ea5590a9d9e3c9d4129f9e81a2a4c2e61a012e3133c81"
+  "verifiedDeployedArchiveSha256": "f373489ad4cf2923b76f59821853aa43815d773184c2cde711bf839793cff5b9"
 }
