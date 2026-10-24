@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "2738abada307d9fc84687693b51b5b07d8f5612a",
+  "sourceCommit": "3c5a7aa9fd348d743f6d013105fbf9004c4ce284",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -899,8 +899,8 @@
     },
     {
       "path": "components/proposed-planning-editor.tsx",
-      "sha256": "7e1471ba0e474193b8e893fb7ee6dcf03135d398d7a24ccffedcb9bdd495dcb3",
-      "bytes": 6120
+      "sha256": "3f37b4e4a83ace0416414971af03d11fe394c2bbbb07b232f3772ad289b1643b",
+      "bytes": 6139
     },
     {
       "path": "components/public-ai-configuration-status.tsx",
@@ -4204,5 +4204,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "b4f656c3f156e7054b07520cad24bab8805652d703dc4e7570ba4a6771fad7d1"
+  "verifiedDeployedArchiveSha256": "69ba4f3ff823f81854f3372c4532b35694143d6f401ba2410af0d5eb91df683a"
 }

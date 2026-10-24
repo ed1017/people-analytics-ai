@@ -16,7 +16,7 @@ export function ProposedPlanningEditor({draft,comparisonDraft,disabled,onReview,
  const key=JSON.stringify(values),previewRef=useRef(onPreview);useEffect(()=>{previewRef.current=onPreview;},[onPreview]);
  const [preview,setPreview]=useState<{key:string;draft:BundleDraft}|null>(null),[failure,setFailure]=useState<{key:string;message:string}|null>(null);const error=failure?.key===key?failure.message:'';
  useEffect(()=>{let live=true;if(!changes.length||!valid||disabled)return;
-  const timer=setTimeout(()=>{void previewRef.current(changes).then(value=>{if(live)setPreview({key,draft:value});}).catch(reason=>{if(live)setFailure({key,message:reason instanceof Error?reason.message:'Unable to calculate this adjustment.'});});},180);
+  const timer=setTimeout(()=>{void previewRef.current(changes).then(value=>{if(live){setPreview({key,draft:value});setFailure(null);}}).catch(reason=>{if(live)setFailure({key,message:reason instanceof Error?reason.message:'Unable to calculate this adjustment.'});});},180);
   return ()=>{live=false;clearTimeout(timer);};
  // The serialized values identify this revision's entire edit, including unknowns.
  // eslint-disable-next-line react-hooks/exhaustive-deps
