@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3fe4acbb37f015f8e6d8b712284a8c796d1e0a24",
+  "sourceCommit": "1b4b43ff8999d83723f3d0600cd654ef37442f94",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "d126ed835c6f04ef8c917788b54da483b7949dcd37a2064ece08a53674a364e5",
-      "bytes": 11702
+      "sha256": "0e39bd31fa559a8b5ad75f5d60f08a6bd639bf86bf57864abc206585acd2e5eb",
+      "bytes": 11766
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -4214,5 +4214,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "dc945fb9faaf8d416672ecb2c62d9eb91393bb8fa7882abb8e2d2bfd8ea11a20"
+  "verifiedDeployedArchiveSha256": "52973ea40aefa40396c42ccc1069bfbd23ce0c604d665fff6b27530b5659e277"
 }
