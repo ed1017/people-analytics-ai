@@ -1,3 +1,5 @@
+// @ts-expect-error Native Node tests share application source.
+import {latestMeasurement} from './goal-progress.ts';
 /** Reviewable interpretations only. A proposal is never an observation. */
 // @ts-expect-error Native Node tests share TypeScript source.
 import {assertSolutionShape} from './home-solution-conversation-schema.ts';
@@ -32,7 +34,7 @@ export function readProgressEntryState(raw:unknown):ProgressEntryState|null{
  assertSolutionShape(p.spec,progressEntrySpecSchema,'progress proposal');return structuredClone(state);
 }
 export function progressEntryCommands(p:ProgressEntryProposal,ledger:GoalProgressLedger,at:string,digest:string):ProgressEvent[]{
- const s=p.spec,m=s.measurement,o=s.observation,current=ledger.events.filter(e=>e.kind==='measurement').at(-1);
+ const s=p.spec,m=s.measurement,o=s.observation,current=latestMeasurement(ledger);
  const lineageId='user-reported:'+p.goalId,commands:ProgressEvent[]=[];
  if(o){commands.push({id:'entry-observation-'+p.id,kind:'observed',at,supersedes:o.supersedes,data:{metric:s.metric!,definition:s.definition!,unit:s.unit!,scope:s.scope!,period:{kind:'point',start:o.date!,end:o.date!},value:o.value,quality:{complete:o.complete!,suppressed:false,denominatorRequired:false,denominator:null},source:{classification:'user-reported',datasetToken:p.datasetToken,releaseId:'user-report-'+p.id,releaseDigest:digest,lineageId},capturedAt:at}});}
  if(m){commands.push({id:'entry-measurement-'+p.id,kind:'measurement',at,supersedes:current?.id??null,data:{metric:s.metric!,definition:s.definition!,unit:s.unit!,direction:m.direction!,scope:s.scope!,lineageId,baselineId:o?.useAsBaseline?'entry-observation-'+p.id:m.baselineId,target:{value:m.targetValue!,date:m.targetDate!},maxAgeDays:m.maxAgeDays!,provenance:'User-confirmed conversational interpretation; unverified user report. Proposal '+p.id}});}

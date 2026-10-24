@@ -10,7 +10,10 @@ import {componentOrder} from './home-solution-bundles.ts';
 import type {WorkforceIncrement, WorkforcePlanInput} from './workforce-increment';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {calculateWorkforceIncrement} from './workforce-increment.ts';
-import type {BundleDraft} from './home-bundle-reconciliation';
+// @ts-expect-error Native Node tests share application source.
+import {reviewBundleProposal,type BundleDraft} from './home-bundle-reconciliation.ts';
+// @ts-expect-error Native Node tests share application source.
+import {guidedOptionEffort} from './guided-plan-summary.ts';
 
 export type HomeMixMetrics = {incrementalCash: number | null; staffHours: number | null; addedEmployees: number; fullCoverageDate: string | null};
 type Check = {dimension: string; status: 'met' | 'not-met' | 'unknown'};
@@ -88,6 +91,14 @@ function project(source: Pick<HomeMixSource,'draft'|'input'|'request'>, plan: Wo
     {dimension: 'coverageDeadline', status: !staffing.deadlineMonth || !coverage ? 'unknown' : coverage.slice(0, 7) <= staffing.deadlineMonth ? 'met' : 'not-met'},
     ...(maxHours === undefined ? [] : [{dimension: 'staffHours', status: maxHours === null || effort.totalHours === null ? 'unknown' as const : effort.totalHours <= maxHours ? 'met' as const : 'not-met' as const}]),
   ];
+  const shortfallLimit=input.mixConstraints?.maxUncoveredHours;
+  if(shortfallLimit?.value!=null){
+    const measuredDraft=structuredClone(draft);
+    measuredDraft.inputs.capacity!.flows=measuredDraft.inputs.capacity!.flows.filter(flow=>Number(staffing[flow.path])>0);
+    const measured=input.guidedWorkload?guidedOptionEffort({draft:measuredDraft,coverage:reviewBundleProposal(measuredDraft).conditionalCoverage})?.shortfallHours??null:null;
+    checks.push({dimension:'uncoveredWork',status:shortfallLimit.value===null||measured===null?'unknown':measured<=shortfallLimit.value?'met':'not-met'});
+    if(measured===null)add('uncoveredWork','Uncovered work needs explicit workload and productive-capacity assumptions for this horizon.');
+  }
   if (budget === null) add('budget', 'Enter the complete incremental cash ceiling.');
   if (cap === null) add('maxAddedEmployees', 'Enter the added-employee ceiling.');
   if (!staffing.deadlineMonth) add('deadline', 'Enter the role-coverage deadline.');
@@ -156,7 +167,7 @@ export async function searchHomeMixes(context: ReadyHomeMixContext, signal?: Abo
     spec, bounds: source.bounds, objective: source.objective, staffingBasis: source.staffingBasis,
     assumptions: source.draft.inputs, assumptionOrigins: source.draft.inputs.capacity!.origins,
     constraints: {cashBudget: source.draft.inputs.budget?.amount.value ?? (source.draft.inputs.budget ? null : amount(source.input.budget)),
-      maxAddedEmployees: amount(source.input.maxAddedEmployees), deadlineMonth: source.input.deadlineMonth || null, maxStaffHours: source.request.maxStaffHours?.value ?? null},
+      maxAddedEmployees: amount(source.input.maxAddedEmployees), deadlineMonth: source.input.deadlineMonth || null, maxStaffHours: source.request.maxStaffHours?.value ?? null, ...(source.draft.inputs.mixConstraints?.maxUncoveredHours?{maxUncoveredHours:source.draft.inputs.mixConstraints.maxUncoveredHours.value}:{})},
     reference, selection, preferredOptionId: selection.candidateId,
     summary: {conclusion: !candidates.length ? 'no-mix-within-bounds' as const : selection.candidateId ? 'best-explored-feasible' as const
       : counts.unknown || counts.met ? 'needs-inputs' as const : 'no-match-within-bounds' as const,

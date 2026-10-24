@@ -22,7 +22,7 @@ export function applicablePlanComponents(draft:BundleDraft){
 export function guidedPlanSummary(draft:BundleDraft){
  if(!draft.inputs.guidedWorkload||!draft.inputs.capacity||!readBundleDraft(draft))return null;
  try{const candidate=projectSavedStaffingChoice(draft),coverage=reviewBundleProposal(draft).conditionalCoverage;
- return {mix:candidate.mix,cash:candidate.cash.complete,cashBreakdown:candidate.cash,target:guidedPlanTarget(draft),ready:candidate.metrics?.fullCoverageDate??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
+ return {mix:candidate.mix,cash:candidate.cash.complete,cashBreakdown:candidate.cash,target:guidedPlanTarget(draft),ready:candidate.metrics?.fullCoverageDate??null,serviceTarget:draft.inputs.mixConstraints?.maxUncoveredHours?.value??null,effort:guidedOptionEffort({draft,coverage})};}catch{return null;}
 }
 /** Monthly qualified roles prorate calendar days after all existing dependency gates. */
 export function optionMonthlyCoverage(option:Pick<SwpOption,'draft'|'coverage'>){
@@ -59,7 +59,9 @@ export const conditionalRoleEvidence='Record a dated baseline and later comparab
 /** Read the saved scenario; never add assumptions or alter its input identity. */
 export function guidedPlanTarget(draft:BundleDraft){
  if(!draft.inputs.guidedWorkload||!draft.inputs.capacity||!readBundleDraft(draft))return null;
- const scope=draft.inputs.scope,deadline=bundleHorizonEnd(scope).value,roles=scope.demand.value,workload=guidedWorkloadResult(draft.inputs);
+ const scope=draft.inputs.scope,entered=draft.inputs.mixConstraints?.deadlineMonth;
+ const month=entered?entered.value:draft.inputs.capacity.input.deadlineMonth||null;
+ const deadline=month?new Date(Date.UTC(Number(month.slice(0,4)),Number(month.slice(5)),0)).toISOString().slice(0,10):null,roles=scope.demand.value,workload=guidedWorkloadResult(draft.inputs);
  if(!deadline||roles===null||Number(draft.inputs.capacity.input.roles)!==roles)return null;
  return {baselineFte:workload?.qualifiedAllocatedFte??null,metric:'Conditional additional-role coverage',roles,deadline,population:scope.population.value,unit:scope.businessUnit.value,role:scope.jobProfile.value,fteGap:workload?.additionalFte??null,
   lines:[`Metric: Conditional additional-role coverage.`,`Scenario target: ${roles} whole roles by ${deadline}.`,`Scope: ${scope.population.value}; unit: ${scope.businessUnit.value}; role: ${scope.jobProfile.value}.`,

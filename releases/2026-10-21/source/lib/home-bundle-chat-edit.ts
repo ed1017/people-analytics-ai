@@ -39,7 +39,7 @@ function targets(input:BundleInputs,draft:BundleDraft){
   add({key:`mixScenario.${path}.${edge}`,label,type:'count',read:()=>({value:scenario.bounds[path].value?.[edge]??null,kind:scenario.bounds[path].kind,basis:scenario.bounds[path].basis}),write:value=>{if(value.value===null)fail('Search bounds must be explicit whole counts.');const old=scenario.bounds[path].value!;scenario.bounds[path]={value:{...old,[edge]:Number(value.value)},kind:value.kind==='model-proposed'?'illustrative':value.kind,basis:value.basis};}},[`${path} search ${edge==='min'?'minimum':'maximum'}`]);
  }}
  if(input.whatIf?.kind==='capacity'||input.capacity){
-  for(const [key,label,type,aliases] of [['maxAddedEmployees','Maximum added employees','count',['max added employees','headcount cap']],['maxStaffHours','Maximum staff hours','count',['max staff hours','staff hours cap']],['deadlineMonth','Coverage deadline','month',['coverage deadline month']],['objective','Search objective','text',['staffing objective']]] as const){
+  for(const [key,label,type,aliases] of [['maxAddedEmployees','Maximum added employees','count',['max added employees','headcount cap']],['maxStaffHours','Maximum staff hours','count',['max staff hours','staff hours cap']],['maxUncoveredHours','Acceptable uncovered work (hours)','decimal',['acceptable uncovered work','maximum uncovered hours','uncovered work limit']],['deadlineMonth','Coverage deadline','month',['coverage deadline month']],['objective','Search objective','text',['staffing objective']]] as const){
    add({key:'mixConstraints.'+key,label,type,read:()=>input.mixConstraints?.[key]??unknownAssumption(),write:value=>{input.mixConstraints={...input.mixConstraints,[key]:value};}},[...aliases]);
   }
  }

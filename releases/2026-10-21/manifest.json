@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "044f26e854d8cad6407b4c683f1c762858f7ebb8",
-  "deployment": "dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL",
+  "sourceCommit": "c48c342d3c191db9c16d9424e2a316cd12f07e9d",
+  "deployment": "dpl_9KWyULyBbmazTyCrHuf93pjayVd1",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -314,8 +314,8 @@
     },
     {
       "path": "components/app-header.tsx",
-      "sha256": "ad46d1479102a6479fda521da71cb0ba300a2b54ef4a1514821a09a8e0a3e063",
-      "bytes": 7737
+      "sha256": "8397adb4bd0d36af8be5fa38f591e10deaf4598c4234381d3d0b663b5e631ec2",
+      "bytes": 7880
     },
     {
       "path": "components/app-sidebar.tsx",
@@ -439,8 +439,8 @@
     },
     {
       "path": "components/global-workforce-filters.tsx",
-      "sha256": "8a97544aba781ca7d48b73f942aa204a735cd2458281a980c6b8812223b096fa",
-      "bytes": 5163
+      "sha256": "017ade9e6470c667c1ff4dc45bebcce5dbf35799e59e914ed8befe490ba6a0fe",
+      "bytes": 5246
     },
     {
       "path": "components/goal-conversation-messages.tsx",
@@ -474,8 +474,8 @@
     },
     {
       "path": "components/guided-plan-summary.tsx",
-      "sha256": "a4b3a7532f2d2e164ee990204ab8f2b6a06817e512a949d5cc96e798790f630b",
-      "bytes": 2326
+      "sha256": "50279250fb375965f9a5624e514379b25f686bb64a759749bf240a7bae0c683a",
+      "bytes": 2654
     },
     {
       "path": "components/guided-workload-summary.tsx",
@@ -539,8 +539,8 @@
     },
     {
       "path": "components/home-business-planning-review.tsx",
-      "sha256": "0f4ff57d98f2c42eadb66ca9297a29eb4c4da56d97db487ddca975291cdf21a5",
-      "bytes": 8454
+      "sha256": "b1eabf2762d5a95ac4da6891a379fab43c029038f83c767b66fe782c93ffe982",
+      "bytes": 8572
     },
     {
       "path": "components/home-candidate-options.tsx",
@@ -959,8 +959,8 @@
     },
     {
       "path": "components/swp-demo-inputs.tsx",
-      "sha256": "e471ec6e387f178df5c8df20f070f91da250596ebd985ea4d41daa2aed8ad306",
-      "bytes": 6757
+      "sha256": "bf4dd3c8965bedcb208be5fc69b82b9b186f0283348ddef6c77d706a8bd19bb3",
+      "bytes": 7648
     },
     {
       "path": "components/swp-guided-journey.tsx",
@@ -1449,8 +1449,8 @@
     },
     {
       "path": "lib/catalog-display.ts",
-      "sha256": "924b4f536b31e412203cfab100c4dcde8a76a428eea2dcfb4ae40928a42b1035",
-      "bytes": 1306
+      "sha256": "6f92c11ef456715fac7179491fd5a281e1522acfb277611641fe832f4d2f1904",
+      "bytes": 2069
     },
     {
       "path": "lib/chat-answer-style.ts",
@@ -1979,8 +1979,8 @@
     },
     {
       "path": "lib/goal-progress-entry.ts",
-      "sha256": "3a7809211bb926be192d7b3cc13cc3eece5448e9d4b8652b5f4ba29968b2d535",
-      "bytes": 14541
+      "sha256": "8b0f0cc7e29a7cf3a398e9ea772b995c3b6096d2f2bb8d29166c99c8717027cd",
+      "bytes": 14630
     },
     {
       "path": "lib/goal-progress-source.ts",
@@ -1999,13 +1999,13 @@
     },
     {
       "path": "lib/goal-progress.ts",
-      "sha256": "d7726fc60eed39f9bf90a8faf27b455becb037bbedb7dc7c4533c1684adec684",
-      "bytes": 23942
+      "sha256": "46ce91a26cd08ab6fb011d8e2cf2bfa46757e2de799fe1dec5d514ad33f2e253",
+      "bytes": 24306
     },
     {
       "path": "lib/guided-business-planning.ts",
-      "sha256": "52770e70a7ffcdd4d4894281e1935c715abbfc1d76b8dd7f9d0f4a2b038f3dc8",
-      "bytes": 4594
+      "sha256": "678d557baa9c54da2005c0b541c1277e0460b3255c86bb2a6b7e46867d11684f",
+      "bytes": 4884
     },
     {
       "path": "lib/guided-chat-contract.ts",
@@ -2014,8 +2014,8 @@
     },
     {
       "path": "lib/guided-plan-summary.ts",
-      "sha256": "83b10d1260bedebcd1c19a53dc8b02230870fa6a053eed37d3ae29bc88b9c992",
-      "bytes": 7080
+      "sha256": "927dfe88a1e3cdfe1b381a881c02f2cc26556b91d0aec4aec4978ef7f361d578",
+      "bytes": 7374
     },
     {
       "path": "lib/guided-planning-adapters.ts",
@@ -2129,8 +2129,8 @@
     },
     {
       "path": "lib/home-bundle-chat-edit.ts",
-      "sha256": "bfd74879efb2b4adc5a44535730267d9209401e1464616d903de27b330104558",
-      "bytes": 32696
+      "sha256": "38957137a2d4bac2aca118d755bb2cdac41549045e916492e0339ba049e22116",
+      "bytes": 32843
     },
     {
       "path": "lib/home-bundle-display.ts",
@@ -2149,8 +2149,8 @@
     },
     {
       "path": "lib/home-bundle-reconciliation.ts",
-      "sha256": "1a055fd577a35b160478cf83a2ac91e6ba4f72eb85e6edfb9bc94cfde1201c1c",
-      "bytes": 44916
+      "sha256": "dcfedb051f19c0c63a8a961b0e3ef706125f776fafd88aa69321d545f933786b",
+      "bytes": 45016
     },
     {
       "path": "lib/home-bundle-records.ts",
@@ -2179,8 +2179,8 @@
     },
     {
       "path": "lib/home-business-planning-save.ts",
-      "sha256": "85d380978753955038bda2109355dbd2b93a599ad2f88d8dbc7443df1e92afd0",
-      "bytes": 8383
+      "sha256": "de57108a0f653c6849a8eeb342f0551712346f6318ee823118617d507f846843",
+      "bytes": 8548
     },
     {
       "path": "lib/home-business-planning.ts",
@@ -2389,8 +2389,8 @@
     },
     {
       "path": "lib/home-mix-planning.ts",
-      "sha256": "c10d3126563ef331751dc1ca599f8d7e5da502320a3366a5fd459853a9a8d974",
-      "bytes": 7059
+      "sha256": "4cc4289f7f6d2826a0172bdcc8594c4150055351e6e930d3a3b3fc9c0c7319f9",
+      "bytes": 7097
     },
     {
       "path": "lib/home-mix-records.ts",
@@ -2414,8 +2414,8 @@
     },
     {
       "path": "lib/home-mix-search.ts",
-      "sha256": "ac753c8e741437bb75e083128562fe4ba2b7fa4ed6ece95c61bf0288243487f3",
-      "bytes": 18328
+      "sha256": "2f9ea83f620bb7881a17d03c3e41cee4c3385fd053fd9fe1dd8477b2d7fd9711",
+      "bytes": 19427
     },
     {
       "path": "lib/home-model-tool-schemas.ts",
@@ -2599,8 +2599,8 @@
     },
     {
       "path": "lib/home-service-staffing.ts",
-      "sha256": "276ec4168197022e314d4bbe116fd2ba25f6999de39ec28b940ab33e832a1e28",
-      "bytes": 15743
+      "sha256": "675c1bd13617c0b1788ab80c6c52574e413f919a4cbb10ee67c5307c1c70b72a",
+      "bytes": 16364
     },
     {
       "path": "lib/home-solution-bundles.ts",
@@ -3169,13 +3169,13 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "8334499bb90957b28f4650b3e528c1e51177068848e9f59e2595b292fc0832c0",
-      "bytes": 13077
+      "sha256": "080199bd8f038c582e81eeafa23e97cff553249183f9d79cd8fd5e89d9abf37c",
+      "bytes": 13099
     },
     {
       "path": "lib/public-home-association.server.mjs",
-      "sha256": "e1e4f125a897d69457fe1e887f34079f8facf8ec4681b458e430010ecab22bca",
-      "bytes": 5522
+      "sha256": "0df950e619eae2086d58d248910ec508e2eee4e6171b836f9310e2e5b56fa85f",
+      "bytes": 5544
     },
     {
       "path": "lib/public-home-grounding.server.mjs",
@@ -3499,8 +3499,8 @@
     },
     {
       "path": "lib/swp-demo.ts",
-      "sha256": "b85e4834d78a5a8824bad4a012cd4ecd7d60ebfdec5fa7220ee6d7468cfcd527",
-      "bytes": 27450
+      "sha256": "ab2eae3fe50e70d74fe34674f5cb1c8cc4ca14401e79dc698b493b3fb9ba611d",
+      "bytes": 27765
     },
     {
       "path": "lib/swp-history-qualification.ts",
@@ -3799,8 +3799,8 @@
     },
     {
       "path": "tests/catalog-display.test.mjs",
-      "sha256": "b8b16f043dd246f8205fe441c2de2a99f17c0ff16cf55f361f84184dafe85b3d",
-      "bytes": 4032
+      "sha256": "5406ece5b454532b5718e4024d6c1cc1946e1a1bf9255737b111c22d4a44933e",
+      "bytes": 6013
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
@@ -4051,8 +4051,28 @@
       "path": "tests/geography-version-transition.test.mjs",
       "bytes": 3032,
       "sha256": "76e8b8023ccd0b0a678edeee648c0575b2c9b76c6dbf352db547d47a79b7907b"
+    },
+    {
+      "path": "tests/catalog-prose-display.test.mjs",
+      "sha256": "325ecfb015700d7fa0eac7df7320f0c97f944b3de3eef0818104b429a658959e",
+      "bytes": 2449
+    },
+    {
+      "path": "tests/guided-demo-release.test.mjs",
+      "sha256": "27b0df7e67c87ea2cad0c55a17d8fe113229232edf1f3435f5b76db7d6c2e6ee",
+      "bytes": 9636
+    },
+    {
+      "path": "tests/service-targets.test.mjs",
+      "sha256": "bc9999f345710969948ce3552c33006b3dee24d1f88a9054390ac1754a3e8734",
+      "bytes": 5905
+    },
+    {
+      "path": "tests/urgent-input-contract.test.mjs",
+      "sha256": "7bfeca27d2f45237a51049c42726d4da1a9a78b94567b57a9efe4411c7aa3ec2",
+      "bytes": 7050
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "dac9d6b5ceaca89056661d7578698c43e67a998f3d1c996f3e2dd8cc18d8c97a"
+  "verifiedDeployedArchiveSha256": "c4748fb144e2d78b46aca432188c7aec852c380765e57d6f0ea66ed2f5bea0f2"
 }

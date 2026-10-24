@@ -30,7 +30,7 @@ export async function prepareBusinessPlanningSelection(raw:BusinessPlanning,opti
  const binding=await actionBinding(goal.id,goal.statement,{sources:[]},{origin:'natural-business-planning-v1',context:state.context,review:state.review,staffing:state.staffing!.inputs,optionId});
  const draft=createBundleDraft(bundle,binding),i=draft.inputs;
  i.scope={population:proposed(s.scope),businessUnit:proposed(s.scope),jobProfile:proposed(s.scope),startMonth:proposed(s.startMonth),months:proposed(s.months),demand:proposed(state.review.result.additionalRoles),capacityRequired:proposed(true),requirements:proposed(s.objective),comparisonConfirmed:unknownAssumption(),currency:'USD'};
- const origins=Object.fromEntries(workforcePlanFields.map(field=>[field,option.input[field]?{kind:'illustrative',basis:field in values?`${values[field as keyof typeof values].basis.kind}: ${values[field as keyof typeof values].basis.explanation}`.slice(0,240):note}:{kind:'unknown',basis:null}])) as CapacityMix['origins'];
+ const origins=Object.fromEntries(workforcePlanFields.map(field=>[field,option.input[field]?{kind:'illustrative',basis:field in values?`${values[field as keyof typeof values]!.basis.kind}: ${values[field as keyof typeof values]!.basis.explanation}`.slice(0,240):note}:{kind:'unknown',basis:null}])) as CapacityMix['origins'];
  i.capacity={input:structuredClone(option.input),origins,flows:components.map(c=>({id:'business-'+c.id,path:c.domain==='hiring'?'buy' as const:c.domain==='learning'?'build' as const:'move' as const,componentIds:[c.id],groupId:c.domain==='hiring'?null:'business-'+c.id}))};
  i.groups=components.filter(c=>c.domain!=='hiring').map(c=>({id:'business-'+c.id,label:c.name,count:proposed(c.domain==='learning'?option.mix.build:option.mix.move)}));
  i.memberships=components.map(c=>({componentId:c.id,groupIds:c.domain==='hiring'?[]:['business-'+c.id],complete:unknownAssumption()}));
@@ -40,6 +40,7 @@ export async function prepareBusinessPlanningSelection(raw:BusinessPlanning,opti
  i.costsDistinct=fromAtom<boolean>(values.costsCompleteAndDistinct);
  i.costReviews=components.map(c=>({componentId:c.id,complete:fromAtom<boolean>(values.costsCompleteAndDistinct)}));
  i.expenseLinks=[['hireStaffingCost','c1'],['recruitingFees',option.mix.buy?'c1':components[0].id],['backfillStaffingCost',components.find(c=>c.domain!=='hiring')?.id??components[0].id],['internalSalaryUplift',components.find(c=>c.domain!=='hiring')?.id??components[0].id],['trainingCash','c2']].filter(([,id])=>components.some(c=>c.id===id)).map(([field,id])=>({expenseId:'capacity:'+field,componentIds:[id],allocations:null}));
+ if(values.maxUncoveredHours)i.mixConstraints={maxUncoveredHours:fromAtom<number>(values.maxUncoveredHours),deadlineMonth:fromAtom<string>(values.deadlineMonth)};
  i.budget={amount:proposed(s.budgetUsd.value,`${s.budgetUsd.basis.kind}: ${s.budgetUsd.basis.explanation}`),basis:proposed('cash')};
  // Preserve the workload summary through the same save adapter for either entry.
  // availabilityPct already means qualified available allocation; represent it once,
