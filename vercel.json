@@ -81,7 +81,8 @@
       "feat/group-capacity-risk": false,
       "feat/home-prompt-categories": false,
       "feat/home-dashboard-rail": false,
-      "feat/shared-interactive-planner": false
+      "feat/shared-interactive-planner": false,
+      "feat/headcount-projection-controls": false
     }
   }
 }

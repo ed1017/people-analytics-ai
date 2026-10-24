@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "1bebeda2dae98f2f7c3137327f6aed0363ddddcb",
-  "deployment": "dpl_H7EZBLF487rvajDK21VppbNjowYh",
+  "sourceCommit": "5c22312d9055cfab09598e4a75b54a0d45b5aa4f",
+  "deployment": "dpl_9WJmLPqXi7bpPGGcYU2Pj6rkCsam",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "a8358226a13ff23400ab7486bb4244432757c26e41d5849272b649486847c002",
-      "bytes": 21132
+      "sha256": "eda5d41e0fbc1ca4655dc221fb46488297952b8a2d58268d56b8d1d9501f0e7a",
+      "bytes": 22093
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "3498bf953ee10691e802fb7820c5c229db1ed9875cc3850dbebda08e1b0aaffd",
-      "bytes": 32247
+      "sha256": "8047f6ccc4b3de73d22e1708017f5939487d8c1b615c044a10070acb587b9dc6",
+      "bytes": 35070
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -4146,8 +4146,23 @@
       "path": "tests/scenario-planner-entry.test.mjs",
       "sha256": "b4eecb31ed167fb2989b89cca1a1e6333b25184ffe6cb7453e4f4277d1132c04",
       "bytes": 1536
+    },
+    {
+      "path": "components/headcount-projection-planner.tsx",
+      "sha256": "383df2a44748a26c2ffd128647c5a9048169c4aaa1c88058eeb9f4d1815f3083",
+      "bytes": 5924
+    },
+    {
+      "path": "lib/headcount-projection-edit.ts",
+      "sha256": "550a4ac5725f4430154b1e795cb83baedeb20dc138cca8a482e9981a03c198c3",
+      "bytes": 3386
+    },
+    {
+      "path": "tests/headcount-projection-edit.test.mjs",
+      "sha256": "78bbaa62f952db2fe5e4edca60da848571281cb19198790dc83a4242639ebac4",
+      "bytes": 3908
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "0001fdf377853f37f455c813cf8c05eefed75489cb5e5ad96607b14b2f1b8e33"
+  "verifiedDeployedArchiveSha256": "6955062f2f538537f2092b5118043f6ca7c23d3742d8de32a17dee03dcdba2f7"
 }
