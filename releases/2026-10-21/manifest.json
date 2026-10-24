@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "72549e35a019ae6fa67dc92c3815c54cf678e574",
-  "deployment": "dpl_3uTX9gvmf5MEVmhgH1Fr45LUxCNv",
+  "sourceCommit": "b6fc25d9463e2e50d9abb112218f78d4928658e1",
+  "deployment": "dpl_APisNdExKzZQuSgTAcxeBnG8hcpz",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -849,8 +849,8 @@
     },
     {
       "path": "components/planning-assumption-slider.tsx",
-      "sha256": "d206a7a77e6cc9ce861494952e81d76c43d39209f5fdd4a5ae8ac17e6d598e5b",
-      "bytes": 2310
+      "sha256": "49081457ef8868eeadb14ef551d6ab725bc23043bfdc97449d3e4ded09f1d529",
+      "bytes": 2680
     },
     {
       "path": "components/planning-calculator-dialog.tsx",
@@ -4124,13 +4124,13 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "sha256": "2e01185eee9bd752517319cf5aad8247c52947942decd02f7972280aae671517",
-      "bytes": 1038
+      "sha256": "c044d33ed1c58f668797723c0d0880ce0e7f6f59d579c148d50fc70dd163f0d5",
+      "bytes": 1144
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "d8ec42c786b22033edd45ba749c85793988816acdc1b7712fb91f6802cb7ccae",
-      "bytes": 1148
+      "sha256": "a27c4b4e916f63ae58ae180494ed622fb459968721e51d1640cda2e74751c525",
+      "bytes": 1213
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "ffc37ff22dd3e6aa302743adce1734b7e3beb8e4bd0eead6d570fca89f17387e",
-      "bytes": 8048
+      "sha256": "67f13c6e96275291d5a99b178418522d354c86476e2010f7158b652602c49154",
+      "bytes": 7752
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -4186,8 +4186,13 @@
       "path": "tests/planner-first-use.test.mjs",
       "sha256": "fc927355de67658f4e67f078006b9f34a89c4826a4fd5c9caaf387b93961f37d",
       "bytes": 3084
+    },
+    {
+      "path": "components/group-workforce-trend.module.css",
+      "sha256": "00b7144007815c7bd0058fd47879f1edb02a6e0b39f1de002c2ebb54a03baf59",
+      "bytes": 605
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "be2791c6c63b23c8fd929bec38af5e66b1533a3b2757281ee0989fae8d6a251a"
+  "verifiedDeployedArchiveSha256": "0a021071fda3d7ce315c84db33f861c91c31a97f4240d78f2a9e2f45e6afa60e"
 }
