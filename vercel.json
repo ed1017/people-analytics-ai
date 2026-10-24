@@ -86,7 +86,8 @@
       "fix/pricing-window-251925": false,
       "fix/planner-first-use": false,
       "polish/compact-risk-view": false,
-      "feat/risk-comparison-bars": false
+      "feat/risk-comparison-bars": false,
+      "fix/discrete-month-sliders": false
     }
   }
 }
