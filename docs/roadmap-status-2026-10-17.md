@@ -1,3 +1,42 @@
+# Active roadmap — October 24, after PR380
+
+This is the current queue. Dated sections below are historical records, not unfinished tasks. Latest production runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`, deployment `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`, dataset `workforce-demo-9037-public-aggregates-v4:5`. PR379 deployed the date-only renewal; PR380 records verified release evidence. The owner is reviewing later Saturday afternoon; no new user review is claimed.
+
+## Completed agreed work
+
+| Milestone | Verified outcome and boundary |
+| --- | --- |
+| Aggregate grounding, historical filters and right-pane visuals | Historical country/BU/level intersections and multipart scopes shipped. Catalogue acceptance covers 70 metrics in 24 collections, both ranking directions (140 unpaid cases). Scalar, survey and role comparison visuals shipped; 50 roles tied at 33-day median time to fill are reported as a tie. This is not unrestricted natural-language or cross-domain-join acceptance. |
+| Ordinary planning, optional budget and editable templates | Estimate-first/unknown-budget semantics, complete catalogue, role multiselect, optional template fields and draft safety shipped. Captured and selected fresh-model journeys exist; they do not establish that intermittent final-answer rejection is eliminated. |
+| Shared recommendation, controls and saving | Compact recommendation-first presentation, supported mixed/hiring controls, synchronized costs/capacity/charts and saved/reopened state shipped. PR369 added the approved decision-first showcase with the same calculator. Protected/public desktop/mobile checks passed. Unknown costs and timing remain explicit; no invented trajectories or approved affordability. |
+| Informational findings and polish | Applicable analytics/reference/planning findings, compact disclosures, navigation preferences, comparison return, Baseline AI entry, route/title/copy corrections shipped through PR368/369. Pinning and action integration were not included. |
+| Reproducibility and coordinated realism | Isolated 83-table/58-view reconstruction and 62-query replay completed. PR371 introduced coherent hierarchy/grades/work arrangements; PR373 introduced 12 fictional skills and 155 role requirements; PR377 introduced varied geography. Latest geography checks include 2,527 reconciled group transitions, 1,287 filter combinations and 19 hosted aggregate routes. Old saved plans retain original bases. Monthly hiring/exit histories were preserved, not cosmetically redistributed. |
+| Optional clarification defect | PR375 removed the demonstrated spurious population hint from a timing question. Captured Finance replay passed; genuine missing inputs stay visible. This fixes presentation, not the unknown historical answer rejection. |
+| Operational renewal | PR379/380 verified all four pricing windows through October24 23:14UTC. Configuration cutoff23:12UTC; round admission cutoff23:12:30UTC. Cap, reservations, receipts, uncertain holds and permissions preserved. A further renewal is separate maintenance and is not authorized by this roadmap continuation. |
+
+## Remaining acceptance and exact dependencies
+
+| Priority | Remaining item | Next useful action / boundary |
+| --- | --- | --- |
+| 1 | Intermittent final-answer rejection | The retained October22 failure identifies calculation-reference validation but lacks the rejected output and predates finer subreason diagnostics. PR375 confirmed safe allowlisted diagnostics already exist. A read-only scan of the current deployment, October23 22:44 through October24 03:44UTC, returned no matching Home failure records; this is not proof of reliability. Next concrete action is to replay a diagnostic-bearing failure if one is captured, or conduct a separately justified bounded provider test. No evidence supports relaxing validation, automatic paid retries or another speculative code patch. |
+| 2 | Owner acceptance of the delivered workflows | Review ordinary questions, recommendation/slider changes and saved/reopened plans on the current release; turn any observed failure into a specific regression. Existing replay/provider evidence stays distinguished. No need to repeat completed full catalogue audits while waiting. |
+| 3 | Full BU display names | Need an approved code-to-name mapping for the eight constructed units. Current codes remain truthful; no invented expansions. |
+| 3 | Operational sufficiency / outcome claims | Need the specific service's acceptable uncovered-work threshold and outcome metric/population/period before claiming operational sufficiency or measured business impact. Current calculations and conditional tradeoffs can remain available without these claims. |
+
+No additional unblocked product implementation was established by this reconciliation. That is an evidence/scope boundary, not whole-project completion. Continue concrete repairs when a reproducible defect or an already-agreed missing acceptance step is identified; do not add features to fill the queue.
+
+## Explicit deferrals and realism limits
+
+Onboarding popup/video/credits flow, dark mode, pinning/action integration, tornado charts, extra scenario features and wholesale redesign remain deferred. Real-company live ingestion/tenancy is not implicitly authorized by the public synthetic MVP.
+
+The earlier blanket synthetic-regeneration deferral was superseded only for the delivered coordinated realism batches. Remaining illustrative limitations are global USD compensation, possible cross-country reporting, regular within-month event dates and compositional country turnover differences. Stronger seasonal/geographic effects would require explicit fictional operating assumptions and another versioned historical baseline; they are not a cosmetic follow-on.
+
+Coding pacing target remains Monday afternoon October26 New York with a buffer, not a guaranteed reset. This reconciliation makes no paid call, data change, renewal, accounting or permission change.
+
+---
+
+## Historical checkpoints (superseded by the active queue above)
+
 ## October 23 owner-feedback credibility repair (publication checks pending)
 
 - Corrected stale About copy that said live AI was disabled. Availability remains conditional on configuration and admission; no model/financial controls changed.
@@ -8,7 +47,7 @@
 - Constructed skill codes are retained until an authoritative semantic mapping exists; no invented skills.
 - Next explicitly approved sequence: bounded decision-first planning showcase, then assess a coordinated synthetic-data realism batch and report its scope/risks before production changes. This supersedes the earlier blanket deferral only for that bounded work. Popup/video, tornado charts, extra scenario features and wholesale app redesign remain deferred. No paid calls.
 
-## Active roadmap â€” October 23, after PR366
+## Archived roadmap â€” October 23, after PR366
 
 Production: [PR366](https://github.com/ed1017/people-analytics-ai/pull/366), runtime `600a4b2f22ed81a606fb83f761055b66cbb34806`, deployment `dpl_Di6RhyQdpEWr5oSYVwru4sudQk18`. This reconciliation changes documentation only. Dated sections below are historical checkpoints; their pending labels are not the active queue.
 
