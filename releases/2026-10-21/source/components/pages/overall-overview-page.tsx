@@ -344,7 +344,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     const message = (actionPlan ? planRequest! : question).trim();
     const riskMonths=actionPlan?null:capacityRiskIntent(message);
     if(riskMonths!==null&&(!ready||!conversation.storageReady)){setChatError('Workforce evidence is still loading. Your question is kept; submit when loading finishes.');return;}
-    if(riskMonths!==null&&active&&!chatLoading&&!sending.current){setRiskRequest({months:riskMonths,question:message,context:contextKey});setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:'Review business-unit capacity exposure using the recorded snapshot and explicit forward assumptions. No risk ranking is inferred before the required inputs are entered or a demo baseline is adopted.'}]);setChatError(null);if(!keepComposer||input.trim()===message)setInput('');return;}
+    if(riskMonths!==null&&active&&!chatLoading&&!sending.current){setRiskRequest({months:riskMonths,question:message,context:contextKey});setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:'Compare conditional workforce change using each business unit’s recent recorded trend. Demand is not supplied, so this is workforce exposure rather than a measured capacity gap.'}]);setChatError(null);if(!keepComposer||input.trim()===message)setInput('');return;}
     setRiskRequest(null);
     if(message)setInstructionsDismissed(value=>value+1);
     if(message&&active&&!chatLoading&&!sending.current&&swpCommand.current){
