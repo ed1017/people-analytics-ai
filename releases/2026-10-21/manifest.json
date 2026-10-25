@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "a4ef6524aa3fdc347b743dc4f15afe75e2ab4fee",
+  "sourceCommit": "3b42b25954db6209550dae52d73eeb03d84983ea",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2034,8 +2034,8 @@
     },
     {
       "path": "lib/hiring-budget-authority.ts",
-      "sha256": "78c4142c1fd1d50b6e3edb3af5cfd729e83d55934d598a721211292fe9e610e6",
-      "bytes": 1461
+      "sha256": "aa1b4ef45fddad3ed4d8d1dd427fc8a17b1f6c462817472128517c4e1aafc446",
+      "bytes": 2944
     },
     {
       "path": "lib/hiring-budget.ts",
@@ -2624,8 +2624,8 @@
     },
     {
       "path": "lib/home-solution-diagnostics.ts",
-      "sha256": "b060cc2dd4b67d0efdea20d3ed27547c531124de2bb945cf8761ad0500c05fdf",
-      "bytes": 12730
+      "sha256": "8ba916a5e763b70f94ba5616213eb9e75e86be434ee9fbd6f95db3e657ef1505",
+      "bytes": 12840
     },
     {
       "path": "lib/home-solution-grounding-source.ts",
@@ -2679,8 +2679,8 @@
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "0ec24f70a6ab8725b19a881c4cf5e22e232450e0c777338884b5dc0872bcb131",
-      "bytes": 1419
+      "sha256": "cf731575ed66f1924ce264ac9a8875698a9f56368f3b45b9147e4d095474fa27",
+      "bytes": 2240
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -3219,8 +3219,8 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "15fa22a65b700cc92dd26bb5fe4c0bee040cf156dded6e519b6c302913a3b07e",
-      "bytes": 15230
+      "sha256": "f9c820dc29675d273084b36fe070afc8c44ad8a2508bd85e685b83e11e0cce99",
+      "bytes": 15566
     },
     {
       "path": "lib/public-projection-contract.mjs",
@@ -3819,8 +3819,8 @@
     },
     {
       "path": "tests/hiring-answer-contract.test.mjs",
-      "sha256": "6acf6a57aada4e71646cf4236fbfdf3ee79722688d777b763744246df2b1df8c",
-      "bytes": 6075
+      "sha256": "d96e44f1f1aa622bdf8896e77353ea0d15c542902d96a10d716586ce142ec032",
+      "bytes": 6842
     },
     {
       "path": "tests/hiring-scenario-reset.test.mjs",
@@ -3974,8 +3974,8 @@
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
-      "bytes": 30334,
-      "sha256": "5dc04611b4a51f57433fce6f92dd3740680b5d835c2eef91333b8084caf0bbb0"
+      "sha256": "1915faa4256d06def35d2681bc0e16c382f9858e37eeba8fdc7e35d11a1a693d",
+      "bytes": 31586
     },
     {
       "path": "tests/public-planner-ledger.test.mjs",
@@ -3989,8 +3989,8 @@
     },
     {
       "path": "tests/public-planner-round.test.mjs",
-      "sha256": "0f5c0d21623a6da660383cf4cfb7a2357e656510758d4249dc90a4e11cc25eba",
-      "bytes": 14332
+      "sha256": "ea285a3ad56434723d3bc3523a9d3c2b7c449de3869dd5dd2128762960485458",
+      "bytes": 15668
     },
     {
       "path": "tests/public-projection-restoration.test.mjs",
@@ -4211,8 +4211,23 @@
       "path": "tests/planner-format-gaps.test.mjs",
       "sha256": "c7a9fe763f20bae8db07513a23412482bd5b8b8291f677556a5fbfbebab04b3d",
       "bytes": 5632
+    },
+    {
+      "path": "lib/public-planner-failure.mjs",
+      "sha256": "e37cd6f3124ba708968c9a071d8906eb7809f4fe7ced66a4265c12330449de64",
+      "bytes": 749
+    },
+    {
+      "path": "lib/staffing-template.ts",
+      "sha256": "7b719a2ee77b421cb217c18d68654447df2956a5bb45284661d8a011b5b51c1e",
+      "bytes": 824
+    },
+    {
+      "path": "tests/staffing-template-intake.test.mjs",
+      "sha256": "00bad563f27dabfa00ebb343d3a8dcb7086c37d95f99bcae7c83ded48e19996b",
+      "bytes": 3530
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "215089e4c821b14faa1651cd3afc72010244cd241aa2d214f1bd6d0aeb5229c4"
+  "verifiedDeployedArchiveSha256": "b9dcf1761d2d1033e8bb7004e37f16862cbc201e936e81dda4b3ba7c06365a36"
 }

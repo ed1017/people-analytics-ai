@@ -243,3 +243,15 @@ test('bounded two-round exhaustion is distinct from invalid final schema',async(
 test('pre-provider context overflow retains typed reason with zero attempts',async()=>{
  const {createSolutionDiagnostics}=await import('../lib/home-solution-diagnostics.ts');const {SolutionResponseError}=await import('../lib/home-solution-response-failure.ts');const logs=[];const original=console.error;console.error=(...args)=>logs.push(args);try{const d=createSolutionDiagnostics();d.stage('conversation_preparation');d.failure(new SolutionResponseError('context_bounds','DO_NOT_LOG_THIS_CONTEXT'),null,false,false);const entry=JSON.parse(logs[0][1]);assert.equal(entry.reason,'context_bounds');assert.equal(entry.modelAttempts,0);assert.doesNotMatch(JSON.stringify(logs),/DO_NOT_LOG/);}finally{console.error=original;}
 });
+
+test('multi-role template preserves all supplied details and returns an allocation question without a provider call',async()=>{
+ for(const [count,roles,budget]of [['12','AI-ENG, BI-ANA, BI-DEV','$2M'],['7.5','DATA-ENG, QA-ENG','']]){
+  const text=`Help me estimate the FTE needed and compare options. I can leave unknown details blank.\nDescription:\nFTE needed: ${count}\nBudget (optional): ${budget}\nRole: ${roles}\nBusiness unit: Client Operations (BU-CLIENTOPS)\nLevel: level 2 (L2)\nLocation:\nNeeded by:`;
+  const r=request(text);r.goal={id:'',statement:''};const original=structuredClone(r);
+  const route=createPublicHomeRouteTestAdapter(ports(()=>{throw Error('Must not dispatch for unresolved template allocation');}));
+  const response=await route.handle(http(r));assert.equal(response.status,200);const body=await response.json();
+  assert.deepEqual(body.usage,{modelRounds:0,toolCalls:0});assert.equal(body.state.questions.length,1);assert.match(body.answer,/split across/);
+  assert.equal(body.state.turns.at(-2).text,text);assert.deepEqual(r,original);assert.deepEqual(body.candidateIds,[]);assert.deepEqual(body.charts,[]);
+  assert.equal(body.state.requiredStaffing,undefined);assert.equal(body.state.hiringBudget,undefined);
+ }
+});
