@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "471bae3c767148969f4d6a5dea60e9528bed5a76",
+  "sourceCommit": "5b3df826b47eccf19a08164801603d6eeaf29707",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "da4fe014083f682c4454eca9bbaaed8402331f5c3ad1518ff0c389781d75e399",
-      "bytes": 103863
+      "sha256": "b6e5ada5d3e78e10e104f200e6d6ec8d6af0a1da330611624e4558f3536428a4",
+      "bytes": 104417
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -3149,8 +3149,8 @@
     },
     {
       "path": "lib/public-ai-evidence-client.mjs",
-      "sha256": "a8b88dbe6ad27e84bed9d359c90eb0cc969b2bbc0f197b15ed30335877ed8c3b",
-      "bytes": 5615
+      "sha256": "ce5d2520f3fd66061e08b0ebaa7fd82fe0b24347d0093f38ec6d7508c1886613",
+      "bytes": 6179
     },
     {
       "path": "lib/public-ai-readiness-client.mjs",
@@ -4311,6 +4311,11 @@
       "path": "tests/staffing-intake-continuity.test.mjs",
       "bytes": 4006,
       "sha256": "6229e93ee19998b76d7dac39e3b1add0e0b27ec246191218bf136c452968251b"
+    },
+    {
+      "path": "tests/public-evidence-recovery.test.mjs",
+      "bytes": 3456,
+      "sha256": "6a88927d993f2274f5258509a8ede9824871f7ba655755d5357d4259977f942c"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
