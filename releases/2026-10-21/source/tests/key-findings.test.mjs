@@ -9,7 +9,7 @@ test('scope and date change with selected snapshot; zero is not unavailable', ()
  const a=findings.snapshotFindings(d,'Canada / Finance / Level 8');
  assert.match(a.scope,/Canada \/ Finance \/ Level 8/); assert.match(a.items.join(' '),/0 people/);assert.doesNotMatch(a.items.join(' '),/turnover/);
  const b=findings.snapshotFindings({...d,snapshot_date:'2026-08-31',headcount:12,voluntary_turnover_ytd_pct:0},'US / Sales / Level 7');
- assert.match(b.scope,/2026-08-31/);assert.match(b.items.join(' '),/12 people/);assert.match(b.items.join(' '),/0% year to date/);
+ assert.match(b.scope,/2026-08-31/);assert.match(b.items.join(' '),/12 people/);assert.match(b.items.join(' '),/0% YTD/);
 });
 test('null/nonfinite recruiting metrics do not turn into zero or a forecast',()=>{
  const a=findings.recruitingFindings({as_of:'2026-09-30',summary:{median_time_to_fill_days:null,open_requisitions:NaN,open_reqs_over_60_days:Infinity}});

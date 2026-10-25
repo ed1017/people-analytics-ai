@@ -11,8 +11,8 @@ function result(scope: string, items: (string | null)[]): Findings {
 }
 export const snapshotFindings = (d: OverviewData, scope: string) => result(`${scope.replace(/\bDemo (?=BU-|level |[A-Z]{2}\b)/gi, "")} · ${d.snapshot_date}`, [
   fact(d.headcount, v => `${n(v)} people are recorded in this selection${numeric(d.fte) ? `, representing ${n(d.fte)} FTE` : ''}.`),
-  fact(d.open_positions, v => `${n(v)} positions are open in the selected snapshot; this is not a hiring forecast.`),
-  fact(d.voluntary_turnover_ytd_pct, v => `Voluntary turnover is ${n(v)}% year to date, not a full-year total turnover rate.`),
+  fact(d.open_positions, v => `${n(v)} open positions.`),
+  fact(d.voluntary_turnover_ytd_pct, v => `Voluntary turnover: ${n(v)}% YTD.`),
 ]);
 export const workforceFindings = (d: WorkforceResponse) => {
   const trend = [...(d.trend ?? [])].filter(row => numeric(row.headcount)).sort((a,b)=>a.snapshot_date.localeCompare(b.snapshot_date));
