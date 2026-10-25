@@ -1,6 +1,6 @@
 import type {HeadcountProjection} from './home-solution-projection';
 // @ts-expect-error Native regression tests share TypeScript source.
-import {calculateMonthlyWorkload,type MonthlyWorkloadSpec} from './swp-monthly-workload.ts';
+import {calculateMonthlyWorkload,monthlyWorkloadVersion,type MonthlyWorkloadSpec} from './swp-monthly-workload.ts';
 export type ProjectionDemandInputs={ftePerPerson:string;allocation:string;volume:string;effort:string;hours:string;productivity:string};
 export const emptyProjectionDemand:ProjectionDemandInputs={ftePerPerson:'',allocation:'',volume:'',effort:'',hours:'',productivity:''};
 /** Explicit recurring workload assumptions; projected people never implicitly become FTE. */
@@ -12,4 +12,18 @@ export function projectionDemand(analysis:HeadcountProjection,inputs:ProjectionD
  const flow=(people:number)=>({people:q(people,'people'),fte:{mode:'per-person',quantity:q(ratio,'FTE/person')}});
  const spec={version:'monthly-supply-workload/v1',scope:{id:analysis.id,label:analysis.inputs.scope,kind:'workload-group',workUnit:'user-defined work units'},accounting:{timing:'start-of-month-outflows-from-opening',exits:'all-separations-including-retirement',movements:'disjoint',workload:'before-productivity',productiveHours:'net-of-non-work-time-before-allocation'},opening:{scopeId:analysis.id,asOf:analysis.inputs.asOf,headcount:q(analysis.inputs.opening,'people'),contractedFte:q(ratio===null?null:Number((ratio*analysis.inputs.opening).toFixed(6)),'FTE')},months:analysis.points.map(p=>({month:p.month.slice(0,7),scopeId:analysis.id,hires:flow(p.hires),exits:flow(p.exits),transfersIn:flow(p.transfersIn),transfersOut:flow(p.transfersOut),volume:q(volume,'work-units/month'),hoursPerUnit:q(effort,'hours/work-unit'),productiveHoursPerFte:q(hours,'hours/FTE/month'),allocation:q(allocation===null?null:Math.round(allocation*10000)/1000000,'fraction'),productivityUplift:q(productivity===null?null:Math.round(productivity*10000)/1000000,'fraction')}))};
  return calculateMonthlyWorkload(spec as MonthlyWorkloadSpec);
+}
+
+/** Embedded in one exact headcount revision; these are user assumptions, not source evidence. */
+export type ProjectionDemandSnapshot={version:1;calculatorVersion:typeof monthlyWorkloadVersion;inputs:ProjectionDemandInputs};
+export function readProjectionDemand(raw:unknown,analysis:HeadcountProjection):ProjectionDemandSnapshot {
+ const value=raw as ProjectionDemandSnapshot;
+ if(!value||Object.getPrototypeOf(value)!==Object.prototype||Object.keys(value).sort().join(',')!=='calculatorVersion,inputs,version'||value.version!==1||value.calculatorVersion!==monthlyWorkloadVersion)throw Error('Saved demand assumptions have an unsupported contract.');
+ const inputs=value.inputs;
+ if(!inputs||Object.getPrototypeOf(inputs)!==Object.prototype||Object.keys(inputs).sort().join(',')!==Object.keys(emptyProjectionDemand).sort().join(',')||Object.values(inputs).some(v=>typeof v!=='string'||v.length>80))throw Error('Saved demand inputs could not be read.');
+ projectionDemand(analysis,inputs);
+ return structuredClone(value);
+}
+export function prepareProjectionDemand(analysis:HeadcountProjection,inputs:ProjectionDemandInputs):ProjectionDemandSnapshot {
+ return readProjectionDemand({version:1,calculatorVersion:monthlyWorkloadVersion,inputs},analysis);
 }

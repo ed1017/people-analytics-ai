@@ -1,8 +1,9 @@
+import type {ProjectionDemandInputs} from './projection-demand';
 import type {HeadcountProjection} from './home-solution-projection';
 import type {ProjectionField,ProjectionSpec} from './home-solution-conversation-schema';
 // @ts-expect-error Native offline tests share TypeScript source.
 import {calculateHeadcountProjection,readHeadcountProjections,projectionDigest} from './home-solution-projection.ts';
-export type ProjectionEdit={months:number;values:Partial<Record<ProjectionField,number>>};
+export type ProjectionEdit={demand?:ProjectionDemandInputs|null;months:number;values:Partial<Record<ProjectionField,number>>};
 export function projectionEditFields(analysis:HeadcountProjection):ProjectionField[]{
  return analysis.spec.method==='monthly_flow'?['monthly_hires','monthly_exits',...(Object.values(analysis.inputs.filters).some(v=>v!=='all')?['monthly_transfers_in','monthly_transfers_out'] as ProjectionField[]:[])]:['annual_growth_pct','annual_attrition_pct','fill_rate_pct','productivity_hiring_reduction_pct'];
 }
@@ -12,7 +13,7 @@ export async function previewProjectionEdit(base:HeadcountProjection,edit:Projec
  const fields=projectionEditFields(base);
  if(Object.keys(edit.values).some(k=>!fields.includes(k as ProjectionField)))throw Error('This control does not apply to the projection method or scope.');
  const changes:ProjectionSpec['changes']=Object.entries(edit.values).filter(([k,v])=>v!==base.assumptions[k as ProjectionField]).map(([field,value])=>({field:field as ProjectionField,kind:'literal',value:value!,basis:'user',turnId,interpretation:'Explicit local scenario control; a conditional assumption, not an observed rate.'}));
- const result=await calculateHeadcountProjection({...base.spec,base:{id:base.id,revision:base.revision},months:edit.months,changes},base.inputs,prior,[turnId]);
+ const result=await calculateHeadcountProjection({...base.spec,base:{id:base.id,revision:base.revision},months:edit.months,changes},base.inputs,prior,[turnId],edit.demand);
  // The user operates these controls directly; do not call their entry a model interpretation.
  result.interpretations=[...base.interpretations,...changes.map(c=>`${c.field}: ${c.value}. Explicit local scenario assumption.`),...(edit.months!==base.spec.months?[`Horizon: ${edit.months} months, explicitly entered.`]:[])];
  readHeadcountProjections([result]);return result;

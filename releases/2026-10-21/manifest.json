@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "7751f330600ec5b42eab921334a4c420d689fad7",
+  "sourceCommit": "000a1159837319caa9726ce9a244c84b07b5fed7",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "d54074f317bec9052bf4e1e21b066e5e420a75fe3989959a4b5521b6d97776f2",
-      "bytes": 39532
+      "sha256": "9f7c39276c11aa3acdcef41b54e101b74ed63bc5bee68507767a7d898cc69e00",
+      "bytes": 39858
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "6092753e05eaf57dc0721600c0bf39d63109df69e687bbe68f56b66fe05154ba",
-      "bytes": 43426
+      "sha256": "6b92915373437bfa08b6c5c5d63201a38397e52545715b2a98dbfcbb04475add",
+      "bytes": 44213
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2659,8 +2659,8 @@
     },
     {
       "path": "lib/home-solution-projection.ts",
-      "sha256": "abb870e9a91481e11559e54c7248b3d296f37b48fa63836f70b6125138bdfb7a",
-      "bytes": 13256
+      "sha256": "e90c1d893b4af82d55c018b9c3bbcd651dc879c51a179a1f320cdb37d2582350",
+      "bytes": 13842
     },
     {
       "path": "lib/home-solution-response-failure.ts",
@@ -4149,13 +4149,13 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "1473bb3f01f28d4047250cf344e165f0e7534679cbc6b6b95403993b6f13834d",
-      "bytes": 6414
+      "sha256": "f10e430a941d4a8ecc863b4aaf739aeeed35f35d2fc0900938655f5ec530920b",
+      "bytes": 6863
     },
     {
       "path": "lib/headcount-projection-edit.ts",
-      "sha256": "550a4ac5725f4430154b1e795cb83baedeb20dc138cca8a482e9981a03c198c3",
-      "bytes": 3386
+      "sha256": "ebb1bf1095a5441ecf02d2c7c267d361d287262b9bf23b36db1c1e6c4958e8ee",
+      "bytes": 3499
     },
     {
       "path": "tests/headcount-projection-edit.test.mjs",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "1de24aebc03215843f41b4a5d986a86c4a310df20d7613f88a34dda75adba59c",
-      "bytes": 5826
+      "sha256": "b401f1e43fe444152f713cc5327b1bef779e8f7ebf758fbac6a263b664a1ef64",
+      "bytes": 6605
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4319,8 +4319,8 @@
     },
     {
       "path": "components/projection-demand-panel.tsx",
-      "bytes": 3994,
-      "sha256": "8b2ce07cbfe73393c225feb346661dc5920a76931db44ace8078b9c92f5adc75"
+      "bytes": 4500,
+      "sha256": "143ce99348600c06601da0f655677345a67956301e8ff14a8d0b5cf81e961f10"
     },
     {
       "path": "components/workforce-planning/capacity-projection.module.css",
@@ -4329,13 +4329,23 @@
     },
     {
       "path": "lib/projection-demand.ts",
-      "bytes": 3102,
-      "sha256": "b26d354a4d7cc0dc7fc54625867141d0887b4b2db3fdaacfb252ce6518ab41f3"
+      "bytes": 4364,
+      "sha256": "66883a63c7059503cd579e2d36105e20d687133e6f99d3964d690cdee56b9641"
     },
     {
       "path": "tests/projection-demand.test.mjs",
       "bytes": 2311,
       "sha256": "c70f1c8a27add8603aa9aa3faf05b82ed50bd78c64c940e086b4a1e6bd01e4d0"
+    },
+    {
+      "path": "tests/projection-demand-panel.test.mjs",
+      "bytes": 3574,
+      "sha256": "aa8a5777fe64b5a9600ff2ebb02182190b58262a6c1f41369e0efed52f937f91"
+    },
+    {
+      "path": "tests/projection-demand-persistence.test.mjs",
+      "bytes": 6342,
+      "sha256": "1f6f2c323864d573cceb18c9a177bbea26fc1f74bcd4df2f26480ffce61ace5c"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
