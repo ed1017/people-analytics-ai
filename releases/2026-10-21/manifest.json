@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "e94ea65b907e9ede0adf5f3367e527fc189b6553",
+  "sourceCommit": "83ea8c543904187018276160f1d522811a4b6124",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "bf68c2a9232dfabea6613dfff1f4a5b86f22a9a2c1a4d6a0e252097a229dcdf1",
-      "bytes": 19131
+      "sha256": "122a4567a1ca95d58fa80d397c72ab4dc40be2c561a00afe7e75bb2976c38822",
+      "bytes": 19255
     },
     {
       "path": "components/home-data-status.tsx",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "156ea30e2e2e92a5756b867accd84e33bf6d991b818fadd2d821973ea678431f",
-      "bytes": 8387
+      "sha256": "d9f575058fb360c3a100a722b13a723807cbc49d9fa9c81f96a172d08f7e3a07",
+      "bytes": 8486
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -4236,8 +4236,23 @@
       "path": "tests/capacity-display.test.mjs",
       "sha256": "414f05a07211fb0a88eb6ec601af065f5029ebd5f6b10cbc9c76f74a30e5ebcc",
       "bytes": 2794
+    },
+    {
+      "path": "components/home-risk-summary.tsx",
+      "sha256": "85f6e3a7ed203a52194a3f2d804118585718b273ca27554b61e37515c86e4c04",
+      "bytes": 5476
+    },
+    {
+      "path": "lib/dashboard-risk-summary.ts",
+      "sha256": "cbbf2a9cf0bd67c4237fdf5e134161bebd95f5021ccbf1f319807113a12428e9",
+      "bytes": 1203
+    },
+    {
+      "path": "tests/dashboard-risk-summary.test.mjs",
+      "sha256": "4abb90157a478b04816afe0acbb9e93ab0536bc8c56c43ef25a8e6ec4ac6a1c7",
+      "bytes": 3236
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "10687d9c9cbfb91b697aafd1668384cb63f36e904b541de4d406241017cea7a4"
+  "verifiedDeployedArchiveSha256": "6ed2843f7ffd7a56a3e6b0f16431187fb8562ed15c690d2ea26bafdb5d23cc17"
 }

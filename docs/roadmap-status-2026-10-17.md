@@ -451,3 +451,9 @@ Runtime 3d12d2a5d1b479ea940944b982fca0aaaa5c2e60: signed monthly capacity balanc
 ## Closed AI rail clarity — October 25
 
 PR398 is live after CI and desktop/mobile interaction checks. The apparent second navigation rail is actually collapsed Workforce AI. This candidate retains navigation and the mounted AI state, replaces its closed 64px column with an accessible Open Workforce AI toolbar button, and returns keyboard focus on collapse. Mobile focus scrolls to the opened composer. Repeated capacity-chart explanations move into How to read this chart; synthetic notice, inputs, values and Monthly detail remain. No navigation architecture, model or accounting change. Independent review identified and resolved mobile focus scrolling. Preview/CI pending; no paid provider calls.
+
+## Dashboard workforce risks - October 25 candidate
+
+PR399 is live: runtime e94ea65b907e9ede0adf5f3367e527fc189b6553, public head 7b77f9130752389b78f46efe24863d2dd9c7a6cb, deployment dpl_31Xkwkbdni7xFYdQZgrvQL5AGxWh. Exact-head CI40152415930 and public desktop/mobile focus, draft, reset, navigation/history and methodology checks passed. This supersedes its pending status above.
+
+Dashboard risk candidate uses the same verified business-unit stock histories and three-month continuation as the existing trend planner. Shows actual conditional FTE declines, not demand gaps or probabilities; country/level intersections remain explicitly unavailable. Plan a response carries the selected group and matching evidence into editable controls, comparison and source-bound save/reopen. No provider requests on loading or edits, no new model or financial changes. Calculation/source tests and independent review pass; staged browser/CI and screenshot review pending. Explore/category reordering and contextual headcount ideas remain discussion only.
