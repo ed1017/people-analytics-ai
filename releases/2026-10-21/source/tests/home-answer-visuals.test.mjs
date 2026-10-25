@@ -1,3 +1,4 @@
+import * as catalogDisplay from '../lib/catalog-display.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -7,7 +8,7 @@ import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const require=createRequire(import.meta.url);
-function load(file){const exports={};const js=ts.transpileModule(fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(js,{exports,require:name=>name==='./chat-evidence-chart'?load('chat-evidence-chart.tsx'):name==='@/components/assumptions-disclosure'?load('assumptions-disclosure.tsx'):require(name)});return exports;}
+function load(file){const exports={};const js=ts.transpileModule(fs.readFileSync(new URL('../components/'+file,import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;vm.runInNewContext(js,{exports,require:name=>name==='@/lib/catalog-display'?catalogDisplay:name==='./chat-evidence-chart'?load('chat-evidence-chart.tsx'):name==='@/components/assumptions-disclosure'?load('assumptions-disclosure.tsx'):require(name)});return exports;}
 const {HomeAnswerVisuals,currentHomeVisualAnswer,HomeConversationSplit}=load('home-answer-visuals.tsx');
 const series={metric:'turnover',title:'Monthly turnover',unit:'%',scope:'Company-wide',synthetic:true,points:[{date:'2026-09-01',value:1.42}],asOf:'2026-09-30',sourceId:'A1',limitation:'Recorded rates.'};
 test('only latest current answer can supply the visual panel',()=>{
@@ -30,4 +31,14 @@ test('scalar KPI uses readable value and provenance without inventing a chart',(
  const card={...series,axis:'scalar',metric:'median_time_to_fill_days',title:'Median time to fill',unit:'days',sourceId:'R1',points:[{date:'2026-09-30',value:33}]};
  const html=renderToStaticMarkup(React.createElement(HomeAnswerVisuals,{pending:false,error:false,current:true,series:[card]}));
  assert.match(html,/Median time to fill/);assert.match(html,/33/);assert.match(html,/days/);assert.match(html,/2026-09-30/);assert.doesNotMatch(html,/No chart available|role="region"/);
+});
+
+test('restored completed answer without a verified chart has compact empty state and never exposes stale series',()=>{
+ const html=renderToStaticMarkup(React.createElement(HomeAnswerVisuals,{pending:false,error:false,current:false,answered:true,series:[series]}));
+ assert.match(html,/No chart available/);assert.doesNotMatch(html,/<h3|<figure|Ask a question/);
+ for(const state of [{pending:true,error:false},{pending:false,error:true}]){
+  const gated=renderToStaticMarkup(React.createElement(HomeAnswerVisuals,{...state,current:false,answered:true,series:[series]}));
+  assert.doesNotMatch(gated,/No chart available|<figure/);assert.match(gated,/role="status"/);
+ }
+ const fresh=renderToStaticMarkup(React.createElement(HomeAnswerVisuals,{pending:false,error:false,current:false,answered:false,series:[]}));assert.match(fresh,/Ask a question/);
 });

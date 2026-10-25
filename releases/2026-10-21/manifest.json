@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "e7ce70f3906ef957a9b882142a776ef558236939",
+  "sourceCommit": "2a2f1b5ab614fbca8cad1587da7f8426a19315ae",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -514,8 +514,8 @@
     },
     {
       "path": "components/home-answer-visuals.tsx",
-      "sha256": "952e9852fb4c85ed254a446c604d3a78a6e252804e78f0479555662d64eb0e16",
-      "bytes": 4281
+      "sha256": "b3e8530bfe85f0a08025a9cf091dc586387c1e26789e17fa7e9aab88241718f8",
+      "bytes": 4324
     },
     {
       "path": "components/home-assumptions-fallback.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "a548f581f3fcb0d7281b8cdc96c6c9380f471bc0ad5df1d0ceb5056834385370",
-      "bytes": 103455
+      "sha256": "227d70dd6242fd10ed7e46f0bc30b8be63fce40ce42299ce8f27b2724c46f049",
+      "bytes": 103498
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -3849,8 +3849,8 @@
     },
     {
       "path": "tests/home-answer-visuals.test.mjs",
-      "sha256": "76adf998bcaf240d13fc9a47992a0a16b63a3c3b8164171c0c97cbba4e4cd2fc",
-      "bytes": 4036
+      "sha256": "a6f5e825752cfcf6375448d611e978b45f53278b4a338b3f58746bbf78599f6c",
+      "bytes": 4996
     },
     {
       "path": "tests/home-bu-turnover.test.mjs",
@@ -4229,5 +4229,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "f788064135633b32fad7fb82c89ec988dddf29b703ea7eb7e83d3fb2666c0494"
+  "verifiedDeployedArchiveSha256": "4243e2ab62a8f4efbf896db105cc3601c5ab19ef674645fa7dd7fc65f0ad3fa1"
 }
