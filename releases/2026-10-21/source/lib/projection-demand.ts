@@ -1,0 +1,15 @@
+import type {HeadcountProjection} from './home-solution-projection';
+// @ts-expect-error Native regression tests share TypeScript source.
+import {calculateMonthlyWorkload,type MonthlyWorkloadSpec} from './swp-monthly-workload.ts';
+export type ProjectionDemandInputs={ftePerPerson:string;allocation:string;volume:string;effort:string;hours:string;productivity:string};
+export const emptyProjectionDemand:ProjectionDemandInputs={ftePerPerson:'',allocation:'',volume:'',effort:'',hours:'',productivity:''};
+/** Explicit recurring workload assumptions; projected people never implicitly become FTE. */
+export function projectionDemand(analysis:HeadcountProjection,inputs:ProjectionDemandInputs){
+ const n=(key:keyof ProjectionDemandInputs,max=1e9)=>{const text=inputs[key].trim();if(!text)return null;if(!/^\d+(?:\.\d{1,4})?$/.test(text)||Number(text)>max)throw Error('Check '+key+': use a nonnegative number within its limit.');return Number(text);};
+ const ratio=n('ftePerPerson',1),allocation=n('allocation',100),volume=n('volume'),effort=n('effort'),hours=n('hours'),productivity=n('productivity',100);
+ if(!Number.isSafeInteger(analysis.inputs.opening)||analysis.points.some(p=>[p.hires,p.exits,p.transfersIn,p.transfersOut].some(v=>!Number.isSafeInteger(v))))throw Error('Demand comparison needs whole-person monthly flows. Adjust hires, exits and transfers above; fractional headcount projections stay unchanged.');
+ const q=(value:number|null,unit:string)=>({value,unit,basis:{kind:value===null?'unknown':'user-assumption',note:'Explicit workload overlay; existing headcount scenario retained.'}});
+ const flow=(people:number)=>({people:q(people,'people'),fte:{mode:'per-person',quantity:q(ratio,'FTE/person')}});
+ const spec={version:'monthly-supply-workload/v1',scope:{id:analysis.id,label:analysis.inputs.scope,kind:'workload-group',workUnit:'user-defined work units'},accounting:{timing:'start-of-month-outflows-from-opening',exits:'all-separations-including-retirement',movements:'disjoint',workload:'before-productivity',productiveHours:'net-of-non-work-time-before-allocation'},opening:{scopeId:analysis.id,asOf:analysis.inputs.asOf,headcount:q(analysis.inputs.opening,'people'),contractedFte:q(ratio===null?null:Number((ratio*analysis.inputs.opening).toFixed(6)),'FTE')},months:analysis.points.map(p=>({month:p.month.slice(0,7),scopeId:analysis.id,hires:flow(p.hires),exits:flow(p.exits),transfersIn:flow(p.transfersIn),transfersOut:flow(p.transfersOut),volume:q(volume,'work-units/month'),hoursPerUnit:q(effort,'hours/work-unit'),productiveHoursPerFte:q(hours,'hours/FTE/month'),allocation:q(allocation===null?null:Math.round(allocation*10000)/1000000,'fraction'),productivityUplift:q(productivity===null?null:Math.round(productivity*10000)/1000000,'fraction')}))};
+ return calculateMonthlyWorkload(spec as MonthlyWorkloadSpec);
+}

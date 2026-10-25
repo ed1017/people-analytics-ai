@@ -15,11 +15,12 @@ test('shortfall shading clips crossings and skips unknown or surplus intervals',
 });
 test('rendered capacity chart distinguishes required, available and shortfall with accessible monthly detail',()=>{
  const exports={};const code=ts.transpileModule(fs.readFileSync(new URL('../components/workforce-planning/capacity-projection.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(code,{exports,require:id=>id==='@/lib/capacity-display'?display:require(id)});
+ vm.runInNewContext(code,{exports,require:id=>id==='@/lib/capacity-display'?display:id.endsWith('.module.css')?{default:{}}:require(id)});
  for(const gap of [3,-3,0,null]){
   const result={points:[{month:'2026-10',requiredFte:6,allocatedFte:4,gapFte:2},{month:'2026-11',requiredFte:gap===null?null:5,allocatedFte:gap===null?null:5-gap,gapFte:gap}]},before=structuredClone(result);
   const html=renderToStaticMarkup(React.createElement(exports.CapacityProjection,{result}));
-  assert.ok(html.includes(display.capacityBalanceLabel(gap)));assert.match(html,/Needed \(FTE\)|Available \(FTE\)/);assert.doesNotMatch(html,/tabindex=/);assert.match(html,/Exact values are available in Monthly detail below/);assert.doesNotMatch(html,/Positive gap =|Gap FTE/);assert.deepEqual(result,before);assert.match(html,/<details[^>]*><summary[^>]*>How to read this chart<\/summary>/);assert.match(html,/not a count of people or a hiring target/);
+  assert.ok(html.includes(gap===null?'Shortfall not assessed':display.capacityBalanceLabel(gap)));assert.match(html,/Needed \(FTE\)|Available \(FTE\)/);assert.doesNotMatch(html,/tabindex=/);assert.match(html,/Exact values are available in Monthly detail below/);assert.doesNotMatch(html,/Positive gap =|Gap FTE/);assert.deepEqual(result,before);assert.match(html,/<details[^>]*><summary[^>]*>How to read this chart<\/summary>/);assert.match(html,/not a count of people or a hiring target/);
+  assert.match(html,/Scenario capacity verdict/);assert.match(html,/By Nov 2026/);if(gap>0)assert.match(html,/To close this month/);
   if(gap===null)assert.doesNotMatch(html,/data-capacity-shortfall/);else assert.match(html,/data-capacity-shortfall/);
  }
 });
