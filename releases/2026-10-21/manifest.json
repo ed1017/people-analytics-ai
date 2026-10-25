@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "c16449df646592798580b3eb7461b18fd2ac9d9a",
+  "sourceCommit": "1f4f8ec68b25aa0cc2637e97e7b986205163b714",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -354,8 +354,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "a891e8e31bfbce30672bb4334d6b686ac202fd2109d4808392273b18c6781679",
-      "bytes": 6319
+      "sha256": "1d2a66111a0c0f5f17a94d950c3b66da9ff1e5c414fbf43ab7126de1cfed5571",
+      "bytes": 6219
     },
     {
       "path": "components/compact-chart.tsx",
@@ -499,8 +499,8 @@
     },
     {
       "path": "components/home-action-assumptions.tsx",
-      "sha256": "06437249047998cdff9beca2831d259e71540dfcf5ddfa9cec93968105ff3139",
-      "bytes": 27289
+      "sha256": "38e41ab57ef6eddf6ad3a6b62ac05fbe0f5f5bf365878d9a9279869a7f7c79b6",
+      "bytes": 27132
     },
     {
       "path": "components/home-action-options.tsx",
@@ -554,8 +554,8 @@
     },
     {
       "path": "components/home-capacity-review.tsx",
-      "sha256": "2ff38ca6ae79a0d89b3116bb4d10849ed50702d10d3de4313316fd9e8d46d357",
-      "bytes": 7164
+      "sha256": "c5bbedfeedf56747873338ee79cd655566390b65d954d2b2e504bb63e617e3a1",
+      "bytes": 6965
     },
     {
       "path": "components/home-chat-shell.module.css",
@@ -689,8 +689,8 @@
     },
     {
       "path": "components/home-workforce-flows.tsx",
-      "sha256": "feb2ace29c02a6a3c98918ccf175fe28ac84a62dbb9154308cfbaa2da8186edd",
-      "bytes": 4044
+      "sha256": "180cd12010fef0e6b430b6c0d58004825c0fe6e266a2de6d6ac72176e8b17a1b",
+      "bytes": 4136
     },
     {
       "path": "components/key-findings.tsx",
@@ -1019,8 +1019,8 @@
     },
     {
       "path": "components/training-timing-panel.tsx",
-      "sha256": "f1e8d1bfdc3af915bf37bc810ed08f6e71776b0a69097a21e32099f1cdb7ecf5",
-      "bytes": 10088
+      "sha256": "5e9a294decc22a2c6aad6d513db9f965482a304e1cf42f3abbf42143831ab3d8",
+      "bytes": 9799
     },
     {
       "path": "components/ui/button.tsx",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "d9f575058fb360c3a100a722b13a723807cbc49d9fa9c81f96a172d08f7e3a07",
-      "bytes": 8486
+      "sha256": "36a90929c9a2dec1bad67c90605ae1bab12bbde6a6c7d7bd3ad95a95ddcae0c1",
+      "bytes": 8498
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -4264,8 +4264,8 @@
     },
     {
       "path": "components/decision-style.module.css",
-      "bytes": 1305,
-      "sha256": "ad06ff91f84cf0858bfd86ef9969d568a74be4c67a39f42942aa18a33cf5895b"
+      "bytes": 1800,
+      "sha256": "062ea464a56cc88ab4db7f47bc1c38f65240bcfc47218527cc91f834bc8fdd9c"
     },
     {
       "path": "components/home-plan-jump.module.css",
