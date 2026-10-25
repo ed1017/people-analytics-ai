@@ -1,3 +1,4 @@
+import {plannerFailureReason} from './public-planner-failure.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {solutionResponseReasons,solutionReferenceDetails,SolutionResponseError} from './home-solution-response-failure.ts';
 import {APIError,APIConnectionError,APIConnectionTimeoutError,APIUserAbortError} from 'openai/core/error';
@@ -105,7 +106,7 @@ export function createSolutionDiagnostics(){
     stage==='provider'?'provider_'+(providerKind==='http'?'http_error':providerKind==='other'?'failed':providerKind):
     ({request_validation:'invalid_request',configuration:'configuration_unavailable',grounding:'evidence_verification_failed',model_setup:'model_setup_failed',conversation_preparation:'conversation_preparation_failed',response_validation:'response_validation_failed'} as const)[stage];
    if(!reported)closeStage();
-   const diagnostic={version:2,correlationId,code,stage,reason:(stage==='response_validation'||stage==='conversation_preparation')&&error instanceof SolutionResponseError?member(read(error,'reason'),solutionResponseReasons):null,referenceDetail:error instanceof SolutionResponseError&&error.reason==='calculation_reference'?member(read(error,'detail'),solutionReferenceDetails):null,stageElapsedMs:{...stageElapsedMs},toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
+   const diagnostic={version:2,correlationId,code,stage,plannerFailure:plannerFailureReason(error),reason:(stage==='response_validation'||stage==='conversation_preparation')&&error instanceof SolutionResponseError?member(read(error,'reason'),solutionResponseReasons):null,referenceDetail:error instanceof SolutionResponseError&&error.reason==='calculation_reference'?member(read(error,'detail'),solutionReferenceDetails):null,stageElapsedMs:{...stageElapsedMs},toolSequence:toolSequence.map(tool=>({...tool})),providerRounds:providerRounds.map(round=>({...round})),elapsedMs:bounded(Date.now()-startedAt,600000),modelAttempts,...(groundingReads?{groundingReads}:{}),
     // An SDK attempt is not proof of a wire dispatch, provider receipt, usage or spend.
     providerKind,providerHttpStatus:provider?.status??null,providerErrorClass:provider?.errorClass??null,providerCauseCode:provider?.causeCode??null,
     providerElapsedMs:provider&&attemptStartedAt!==null?bounded(Date.now()-attemptStartedAt,600000):null,grounding:evidence};

@@ -89,7 +89,8 @@
       "feat/risk-comparison-bars": false,
       "fix/discrete-month-sliders": false,
       "feat/action-plan-scenarios": false,
-      "feat/shared-planner-inputs": false
+      "feat/shared-planner-inputs": false,
+      "fix/home-tool-replay-template": false
     }
   }
 }

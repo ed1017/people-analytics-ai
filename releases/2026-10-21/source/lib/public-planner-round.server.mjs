@@ -1,6 +1,7 @@
 /** Disabled public planner boundary. Every provider dispatch consumes an atomic
  * reservation from the existing lifetime ledger, including failed attempts. */
 import {createHash} from 'node:crypto';
+import {PublicPlannerBoundaryError} from './public-planner-failure.mjs';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
@@ -24,7 +25,7 @@ const object=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
 const exact=(v,keys)=>object(v)&&Object.keys(v).length===keys.length&&keys.every(k=>Object.hasOwn(v,k));
 const integer=(v,min,max)=>Number.isSafeInteger(v)&&v>=min&&v<=max;
 const hash=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex');
-const must=(v,code)=>{if(!v)throw Error(code);};
+const must=(v,code)=>{if(!v)throw new PublicPlannerBoundaryError(code);};
 const frozen=v=>{if(v&&typeof v==='object'){Object.values(v).forEach(frozen);Object.freeze(v);}return v;};
 function json(v,depth=0){
  if(depth>64)return false;
@@ -53,7 +54,7 @@ export function readPublicPlannerPolicy(raw){
 const live=(p,now)=>Number.isFinite(now)&&now>=Date.parse(p.verifiedAt)&&now+p.timeoutMs+30000<Date.parse(p.validUntil);
 function textInput(item){
  if(!object(item))return false;
- if(item.type==='function_call')return Object.keys(item).every(k=>['type','id','call_id','name','arguments','status'].includes(k))&&typeof item.call_id==='string'&&typeof item.name==='string'&&typeof item.arguments==='string';
+ if(item.type==='function_call')return Object.keys(item).every(k=>['type','id','call_id','name','arguments','status','async','caller'].includes(k))&&typeof item.call_id==='string'&&typeof item.name==='string'&&typeof item.arguments==='string'&&(item.async===undefined||item.async===false)&&(item.caller===undefined||item.caller===null||exact(item.caller,['type'])&&item.caller.type==='direct');
  if(item.type==='function_call_output')return Object.keys(item).every(k=>['type','id','call_id','output','status'].includes(k))&&typeof item.call_id==='string'&&typeof item.output==='string';
  if(item.type==='reasoning')return Object.keys(item).every(k=>['type','id','encrypted_content','summary','status','content'].includes(k))&&typeof item.encrypted_content==='string'&&Array.isArray(item.summary)&&item.summary.every(x=>exact(x,['type','text'])&&x.type==='summary_text'&&typeof x.text==='string')&&(!Object.hasOwn(item,'content')||item.content===null||Array.isArray(item.content)&&item.content.every(x=>exact(x,['type','text'])&&x.type==='reasoning_text'&&typeof x.text==='string'));
  if(!['user','assistant','system','developer'].includes(item.role)||item.type!==undefined&&item.type!=='message')return false;
@@ -128,7 +129,7 @@ export function createPublicPlannerRoundBoundary({enabled=PUBLIC_PLANNER_ENABLED
    if(!signal.aborted)timer=setTimeout(()=>controller.abort(),p.timeoutMs); // Bound the final context check too.
    await check();
    return response(output,p,spec);
-  })(),signal);}catch(error){closed=true;if(error instanceof PublicPlannerAdmissionError)throw error;throw Error('planner_round_unavailable');}
+  })(),signal);}catch(error){closed=true;if(error instanceof PublicPlannerAdmissionError||error instanceof PublicPlannerBoundaryError)throw error;throw new PublicPlannerBoundaryError('planner_round_unavailable');}
   finally{clearTimeout(timer);controller.abort();busy=false;}
  }});
 }

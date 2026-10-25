@@ -1,5 +1,12 @@
 import test from 'node:test';import a from 'node:assert/strict';
 import {emptyHiringBudget} from '../lib/hiring-budget.ts';import {hiringAnswerContract} from '../lib/home-hiring-plan.ts';import {SolutionResponseError} from '../lib/home-solution-response-failure.ts';import {createSolutionDiagnostics} from '../lib/home-solution-diagnostics.ts';
+import {PublicPlannerBoundaryError} from '../lib/public-planner-failure.mjs';
+test('pre-dispatch boundary failure retains a fixed classification without payload logging',()=>{
+ const logs=[],old=console.error;console.error=(...args)=>logs.push(args);
+ try{const d=createSolutionDiagnostics();d.modelAttempt({});d.failure(new PublicPlannerBoundaryError('planner_input_invalid'),null,false,false);const v=JSON.parse(logs[0][1]);a.equal(v.plannerFailure,'planner_input_invalid');a.equal(v.providerRounds.length,0);
+ const other=createSolutionDiagnostics();other.modelAttempt({});other.failure(Error('SECRET_BODY'),null,false,false);a.equal(JSON.parse(logs[1][1]).plannerFailure,null);a.doesNotMatch(JSON.stringify(logs),/SECRET_BODY/);
+ }finally{console.error=old;}
+});
 const review=values=>({version:1,revision:1,datasetToken:'synthetic',scopeKey:'synthetic',inputs:{...emptyHiringBudget(),...values},origins:Object.fromEntries(Object.keys(values).map(k=>[k,{kind:'user-entry',turnId:null,quote:null,explanation:'Explicit synthetic test input.'}])),basisTurns:[]});
 test('hiring tool answer contract reflects count/budget eligibility, including zero and withdrawal',()=>{
  for(const values of [{hires:0},{hires:null,budget:240000}])a.deepEqual(hiringAnswerContract(review(values)).allowedAnswerKinds,['discussionOnly']);

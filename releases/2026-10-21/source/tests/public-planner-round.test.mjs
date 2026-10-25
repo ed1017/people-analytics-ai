@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {toResponseInputItems} from 'openai/lib/responses/ResponseInputItems';
 import {PUBLIC_9037 as P} from '../lib/public-9037-contract.mjs';
 import {createPublicPlannerRoundBoundary as boundary,createPublicPlannerProvider,publicPlannerReadiness,plannerWorstChargeMicroUsd,readPublicPlannerPolicy,PUBLIC_PLANNER_ROUTE_LIMITS} from '../lib/public-planner-round.server.mjs';
 const NOW=Date.parse('2026-10-20T15:00:00Z'),context='a'.repeat(64);
@@ -21,6 +22,19 @@ function setup({p=policy(),db=ledger(),provider,resultHook,currentContext=()=>co
  const calls=[];const run=boundary({enabled:true,policy:p,admit:db.admit,provider:provider??(async(s,signal)=>{signal.throwIfAborted();calls.push(s);return resultHook?resultHook(s):result(s);}),currentContext,now:()=>NOW,...rest});
  return {run,db,calls};
 }
+
+test('SDK direct-call metadata replays on the second round; unsupported execution remains blocked',async()=>{
+ for(const caller of [undefined,null,{type:'direct'}]){
+  const f=setup(),first=spec();await f.run.complete(first,meta());
+  const item={type:'function_call',id:'fc_synthetic',call_id:'call_synthetic',name:'estimate_policy_base_pay',arguments:'{}',status:'completed',async:false,...(caller===undefined?{}:{caller})};
+  const next={...first,input:[...first.input,...toResponseInputItems([item]),{type:'function_call_output',call_id:item.call_id,output:'{"status":"clarification"}'}]};
+  await f.run.complete(next,meta(2));assert.equal(f.calls.length,2);assert.equal(f.db.count,2);assert.deepEqual(f.calls[1].input[1],item);
+ }
+ for(const extra of [{async:true},{caller:{type:'program',call_id:'not-supported'}},{namespace:'unconfigured'},{prompt_cache_breakpoint:{mode:'explicit'}}]){
+  const f=setup(),s=spec();s.input.push({type:'function_call',call_id:'c',name:'estimate_policy_base_pay',arguments:'{}',...extra});
+  await assert.rejects(f.run.complete(s,meta()),e=>e.reason==='planner_input_invalid');assert.equal(f.db.attempts,0);assert.equal(f.calls.length,0);
+ }
+});
 test('disabled or missing policy never touches ledger or provider',async()=>{
  const db=ledger();let calls=0;
  for(const options of [{},{enabled:true},{enabled:false,policy:policy()}]){
@@ -58,7 +72,7 @@ test('policy supplies absent model and preserves encrypted reasoning replay',asy
 });
 test('provider failure, invalid usage and incomplete output keep reservations and forbid retries',async()=>{
  for(const provider of [()=>{throw Error('secret provider details');},s=>({...result(s),status:'incomplete'}),s=>({...result(s),usage:{input_tokens:1050001,output_tokens:1,total_tokens:1050002}})]){
-  const f=setup({provider});await assert.rejects(f.run.complete(spec(),meta()),/^Error: planner_round_unavailable$/);
+  const f=setup({provider});await assert.rejects(f.run.complete(spec(),meta()),error=>['planner_round_unavailable','planner_provider_invalid','planner_usage_invalid'].includes(error.reason));
   assert.equal(f.db.reserved,2);await assert.rejects(f.run.complete(spec(),meta(2)));assert.equal(f.db.count,1);
  }
 });
