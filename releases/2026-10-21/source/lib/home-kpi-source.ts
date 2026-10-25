@@ -1,4 +1,4 @@
-export type HomeRecruitingKpi = {hires:number; month:string; asOf:string; offers?:number|null; timeToFillDays?:number|null; openReqAgeDays?:number|null};
+export type HomeRecruitingKpi = {hires:number; month:string; asOf:string; offers?:number|null; timeToFillDays?:number|null; openReqAgeDays?:number|null; timeToFillCohort?:'filled-requisitions-opening-to-closure'};
 import {PUBLIC_9037} from './public-9037-contract.mjs';
 const object=(value:unknown):Record<string,unknown>=>value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{};
 const date=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;
@@ -27,5 +27,6 @@ export function homeRecruitingKpi(result:unknown, settled:boolean, datasetToken:
   return {hires:Number(rows[0].hires),month:month.slice(0,7),asOf:snapshotDate,
     offers:Number.isSafeInteger(rows[0].offers)&&Number(rows[0].offers)>=0?Number(rows[0].offers):null,
     timeToFillDays:summary.suppressed===true?null:days(summary.avg_time_to_fill_days),
+    ...(publicRelease ? {timeToFillCohort:'filled-requisitions-opening-to-closure' as const} : {}),
     openReqAgeDays:summary.suppressed===true?null:days(summary.avg_open_req_age_days)};
 }
