@@ -12,7 +12,7 @@ export function CatalogComposer({value,onChange,textareaRef,rows,workforce,datas
  const catalogue=match?composerCatalogOptions(match.kind,source?.status==='loaded'?source.data:null,roleSource?.token===datasetToken?roleSource.data:null,datasetToken):[];
  const roleField=match?.kind==='role'&&/^\s*role\s*:\s*$/i.test(value.slice(value.lastIndexOf('\n',match.start-1)+1,match.start));
  const roleParts=roleField?match!.query.split(',').map(s=>s.trim()):[];
- const isSelected=(option:CatalogOption)=>roleParts.includes(option.code)||roleParts.includes(option.label===option.code?option.code:option.label+' ('+option.code+')');
+ const isSelected=(option:CatalogOption)=>roleParts.includes(option.code)||roleParts.includes(option.label)||roleParts.includes(option.label===option.code?option.code:option.label+' ('+option.code+')');
  const options=match?filterComposerOptions(catalogue,roleField?(roleSearch??(catalogue.some(isSelected)?'':match.query)):match.query):[];
  useEffect(()=>{if(open)document.getElementById(id+'-'+active)?.scrollIntoView({block:'nearest'});},[active,open,id]);
  const chosen=options[active];

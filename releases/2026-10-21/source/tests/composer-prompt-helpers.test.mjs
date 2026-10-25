@@ -28,3 +28,16 @@ test('real catalogue parser cannot consume another template line as role or leve
  const result=exports.toggleComposerRole(value,exports.composerCatalogMatch(value,caret),options[0]);a.doesNotMatch(result.value,/Role 0/);a.match(result.value,/Role 49/);
  a.equal(exports.composerCatalogMatch('Business unit: ',15).kind,'business unit');
  });
+
+test('readable titles, legacy codes and title/code pairs toggle one identity without duplicates',()=>{
+ const exports={};const js=ts.transpileModule(fs.readFileSync(new URL('../lib/composer-catalog.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ vm.runInNewContext(js,{exports,require:name=>name==='./public-9037-contract.mjs'?{PUBLIC_9037:{}}:{catalogDisplayLabel:v=>v}});
+ const option={code:'AI-ENG',label:'AI Engineer'};
+ for(const form of ['AI-ENG','AI Engineer','AI Engineer (AI-ENG)']){
+  const value=`Role: ${form}, BI-ANA\nFTE needed: 12`;const caret=value.indexOf('\n');
+  const removed=exports.toggleComposerRole(value,exports.composerCatalogMatch(value,caret),option);
+  a.equal(removed.value,'Role: BI-ANA\nFTE needed: 12');
+  const restored=exports.toggleComposerRole(removed.value,exports.composerCatalogMatch(removed.value,removed.caret),option);
+  a.equal(restored.value,'Role: BI-ANA, AI Engineer (AI-ENG)\nFTE needed: 12');
+ }
+});

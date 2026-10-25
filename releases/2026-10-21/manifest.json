@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3b42b25954db6209550dae52d73eeb03d84983ea",
+  "sourceCommit": "e7ce70f3906ef957a9b882142a776ef558236939",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "c135efb22fa5b8b4f9b4e171ed16b76fc5fd5d3860e52696ef9802ae4a5f87af",
-      "bytes": 8291
+      "sha256": "59e8250f83e2dc4be0c382e8e620cd8ce841df63fa2abdda1eca857b0c21614d",
+      "bytes": 8325
     },
     {
       "path": "components/chat-content.tsx",
@@ -484,8 +484,8 @@
     },
     {
       "path": "components/hiring-planning-summary.tsx",
-      "sha256": "10e34045af49abb36c1c2dd9a7983ab6ff96161f8c89d693b929431b9ce0d542",
-      "bytes": 2392
+      "sha256": "1e78bbc0f5630e34d46b4f9bdfc03642389f585f5bd0ecbff4a78052aa5d2c32",
+      "bytes": 2493
     },
     {
       "path": "components/hiring-scenario-controls.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "e6371c5fa80f7b799a57986294bd1e7da6a52d113f79b74abc707a9a033b854c",
-      "bytes": 11734
+      "sha256": "063c61b65abb9da1bec815a5e68f96c1b1924fa6cb9e193c7965f5dd07e9799a",
+      "bytes": 11835
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -1094,8 +1094,8 @@
     },
     {
       "path": "components/workforce-alternatives.tsx",
-      "sha256": "cd352a55e08704fe77f319bd0cbcaa527811afffdc3f604a480958b95f18ae7e",
-      "bytes": 16990
+      "sha256": "7f84aba4240947a90de0ab812c64645ebabf87659afac3acb3d94aa73c178abf",
+      "bytes": 17091
     },
     {
       "path": "components/workforce-calculation-breakdown.tsx",
@@ -1449,8 +1449,8 @@
     },
     {
       "path": "lib/catalog-display.ts",
-      "sha256": "6f92c11ef456715fac7179491fd5a281e1522acfb277611641fe832f4d2f1904",
-      "bytes": 2069
+      "sha256": "cdecd03c5f3c024176d8e01d3310605ab74cd053abf57703572dc46e917daa05",
+      "bytes": 4674
     },
     {
       "path": "lib/chat-answer-style.ts",
@@ -1529,8 +1529,8 @@
     },
     {
       "path": "lib/composer-catalog.ts",
-      "sha256": "a1ca729173e0ce68e5b870d837546a6b7e2c6c34e74a4967e0c142cc3ead1454",
-      "bytes": 4307
+      "sha256": "8a7d16545257301fafe976866df8f3bd69d9f131f817e3418781fe7751367052",
+      "bytes": 4325
     },
     {
       "path": "lib/composer-prompt-helpers.ts",
@@ -2034,8 +2034,8 @@
     },
     {
       "path": "lib/hiring-budget-authority.ts",
-      "sha256": "aa1b4ef45fddad3ed4d8d1dd427fc8a17b1f6c462817472128517c4e1aafc446",
-      "bytes": 2944
+      "sha256": "55021720e2d905a3236d42fd21448e19881bbb0014dbed56b459484ea428ac71",
+      "bytes": 2935
     },
     {
       "path": "lib/hiring-budget.ts",
@@ -2679,8 +2679,8 @@
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "cf731575ed66f1924ce264ac9a8875698a9f56368f3b45b9147e4d095474fa27",
-      "bytes": 2240
+      "sha256": "aae40096b0d0944a37ebc0d39794c369237a15f7614a169ec145cc3030d36bbb",
+      "bytes": 2396
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -3799,13 +3799,13 @@
     },
     {
       "path": "tests/catalog-display.test.mjs",
-      "sha256": "5406ece5b454532b5718e4024d6c1cc1946e1a1bf9255737b111c22d4a44933e",
-      "bytes": 6013
+      "sha256": "4841fd394ab857703e095c1b52a8433466a367e231bba64bf43d65d3f2c19aeb",
+      "bytes": 8371
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "70f78b896d2c1039f0a12eb6d06497878cc0041ba9f871b2c62911ad0c7e74e4",
-      "bytes": 6375
+      "sha256": "19b158686b0fc273a5250dba34419522b8fe70ff585003fc9470f084402c7d93",
+      "bytes": 7401
     },
     {
       "path": "tests/context-findings.test.mjs",
@@ -4129,8 +4129,8 @@
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "a27c4b4e916f63ae58ae180494ed622fb459968721e51d1640cda2e74751c525",
-      "bytes": 1213
+      "sha256": "1ddbe4986a47893a3c0b1d7c94ce763e4f3b01630e52ba3d82dbf82b9a11a4a3",
+      "bytes": 1400
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4224,10 +4224,10 @@
     },
     {
       "path": "tests/staffing-template-intake.test.mjs",
-      "sha256": "00bad563f27dabfa00ebb343d3a8dcb7086c37d95f99bcae7c83ded48e19996b",
-      "bytes": 3530
+      "sha256": "824b2c3db816793f7e1fb1ade0ffd21689f91c02e2500e9d718f370727b00bec",
+      "bytes": 3614
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "b9dcf1761d2d1033e8bb7004e37f16862cbc201e936e81dda4b3ba7c06365a36"
+  "verifiedDeployedArchiveSha256": "f788064135633b32fad7fb82c89ec988dddf29b703ea7eb7e83d3fb2666c0494"
 }

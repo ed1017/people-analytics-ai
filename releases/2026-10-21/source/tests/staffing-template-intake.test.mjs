@@ -1,3 +1,4 @@
+import {catalogDisplayLabel} from '../lib/catalog-display.ts';
 import test from 'node:test';import a from 'node:assert/strict';
 import {readStaffingTemplate} from '../lib/staffing-template.ts';
 import {staffingStarterIntake} from '../lib/home-staffing-intake.ts';
@@ -13,7 +14,7 @@ test('role lists request allocation without multiplying total FTE or dropping su
  for(const [fte,roles]of [['12','AI-ENG, BI-ANA, BI-DEV'],['7.5','DATA-ENG, QA-ENG']]){
   const request={state:{},message:{text:template('$2M',fte,roles)}},before=structuredClone(request);
   const response=staffingStarterIntake(request);a.ok(response);a.match(response.answer,new RegExp(`total ${fte} FTE`));
-  for(const role of roles.split(', '))a.ok(response.answer.includes(role));
+  for(const role of roles.split(', '))a.ok(response.answer.includes(catalogDisplayLabel(role)));
   a.equal(response.questions.length,1);a.deepEqual(request,before);a.doesNotMatch(response.answer,/each needs|equal split|ready in|within budget/i);
  }
 });

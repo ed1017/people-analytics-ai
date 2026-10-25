@@ -1,4 +1,5 @@
 "use client";
+import {catalogProseDisplay} from '@/lib/catalog-display';
 import type {JourneyTransient} from '@/lib/workforce-journey-state';
 import {useEffect,useEffectEvent,useRef,useState,type ReactNode} from "react";
 import {decisionStore,useDecisionStorage} from "@/components/decision-store";
@@ -66,7 +67,7 @@ function AlternativeDrafts({renderBundleAdoption,solution,evidenceResultId,input
  }
  return <details className="space-y-3 rounded border p-3"><summary className="cursor-pointer font-semibold">Review local alternatives</summary><section data-journey="review-alternatives" tabIndex={-1} aria-label="Local workforce alternatives" className="space-y-3 text-sm">
   <p>{renderBundleAdoption?'Select up to two mixes, then review one for adoption into this plan.':'Compare up to two alternatives using this calculation’s saved evidence.'} Demand, budget, employee limit, deadline, hire cost and hiring timing stay fixed. Calculations run locally; no AI request or real-world action occurs.</p>
-  <p>{input.roles} additional {input.jobProfile} roles in {input.businessUnit}; {input.planningMonth}, {input.months} months. Cash budget: {input.budget?money(Number(input.budget)):'Unknown'}. Employee cap: {input.maxAddedEmployees||'Unknown'}. Deadline: {input.deadlineMonth||'Unknown'}.</p>
+  <p>{input.roles} additional {catalogProseDisplay(input.jobProfile)} roles in {catalogProseDisplay(input.businessUnit)}; {input.planningMonth}, {input.months} months. Cash budget: {input.budget?money(Number(input.budget)):'Unknown'}. Employee cap: {input.maxAddedEmployees||'Unknown'}. Deadline: {input.deadlineMonth||'Unknown'}.</p>
   <p className="text-xs">Fixed hiring basis: annual cost per hire {input.annualHireCost?money(Number(input.annualHireCost)):'Unknown'}, fee per hire {input.hireFee?money(Number(input.hireFee)):'Unknown'}; recruiting launch {input.recruitingStart||'Unknown'}, arrival mode {input.arrivalMode||'Unknown'}{input.arrivalMode==='explicit'?`, arrival ${input.arrivalDate||'Unknown'}`:''}. Loaded hourly cost: {input.loadedHourlyCost?money(Number(input.loadedHourlyCost)):'Unknown'}.</p>
   {blocked&&<p role="status">Select a current calculation and save any main-plan edits before previewing or saving alternatives. Historical alternative reviews remain below.</p>}
   {unreadable&&!renderBundleAdoption&&<p role="status">Saved alternative history is unreadable. Original records are retained; saving is unavailable.</p>}
