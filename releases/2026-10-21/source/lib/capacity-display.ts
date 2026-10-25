@@ -21,3 +21,10 @@ export function capacityShortfallAreas(points:readonly {requiredFte:number|null;
  }
  return areas;
 }
+
+/** Focused linear scale; domain labels remain explicit, zero is included when data reaches it. */
+export function capacityChartDomain(values:readonly number[]){
+ const known=values.filter(Number.isFinite);if(!known.length)return {min:0,max:1};
+ const low=Math.min(...known),high=Math.max(...known),padding=Math.max((high-low)*.15,high*.005,.01);
+ return {min:Math.max(0,low-padding),max:Math.max(.01,high+padding)};
+}

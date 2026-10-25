@@ -14,3 +14,5 @@
 
 .levers{display:flex;flex-direction:column;gap:12px}.levers>h4{margin-bottom:0}.levers button{margin-top:6px}.metrics dd{word-break:normal;overflow-wrap:normal;font-size:clamp(1.05rem,2.7cqi,1.4rem)}.outcome{font-size:clamp(1.35rem,4.5cqi,1.9rem);line-height:1.2}.visual{padding:12px}.visual figcaption{font-size:1rem}.visual ul{font-size:.75rem;gap:4px 10px}
 @container(min-width:500px){.layout{grid-template-columns:minmax(170px,.68fr) minmax(0,1.32fr)}}
+
+.focusLayout{display:flex;flex-direction:column;gap:12px;min-width:0}.focusLayout>.visual{order:-1;width:100%}.focusLayout>.levers{width:100%}.focusLayout>details.levers{display:block}

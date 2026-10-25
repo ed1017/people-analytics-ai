@@ -24,3 +24,5 @@ test('rendered capacity chart distinguishes required, available and shortfall wi
   if(gap===null)assert.doesNotMatch(html,/data-capacity-shortfall/);else assert.match(html,/data-capacity-shortfall/);
  }
 });
+
+test('focused chart scale contains all values and retains visible small differences',()=>{const d=display.capacityChartDomain([9037,9043,9137]);assert.ok(d.min<9037&&d.min>8900);assert.ok(d.max>9137);assert.ok((9137-9043)/(d.max-d.min)>.3);const zero=display.capacityChartDomain([0,5]);assert.equal(zero.min,0);assert.deepEqual(display.capacityChartDomain([]),{min:0,max:1});for(const values of [[5,5],[0,0],[.001,.002]]){const a=display.capacityChartDomain(values);assert.ok(a.max>a.min);assert.ok(values.every(v=>v>=a.min&&v<=a.max));}});

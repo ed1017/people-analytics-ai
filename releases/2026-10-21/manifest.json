@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0d7e5f3b2e0a8682603a1a7c871e1e9a252ae6ea",
+  "sourceCommit": "03986b863738f0793c5e8800f3dd1fb93a7b6f45",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "12e693e1d24e44f0d88a3f44d80bb1d44d3a4abf4ff888f4dae22da43bbe6c4b",
-      "bytes": 19330
+      "sha256": "744c2fe27789b3d8c7031c68abc0ad80c85f4ebb92ab0cdc4cbd28c99a50868e",
+      "bytes": 19307
     },
     {
       "path": "components/home-data-status.tsx",
@@ -1149,8 +1149,8 @@
     },
     {
       "path": "components/workforce-planning/capacity-projection.tsx",
-      "sha256": "25bd0ce7587d8f33472a9e1d676cbaa13424dc4c990fbe52c402f7eefc9e29cc",
-      "bytes": 6291
+      "sha256": "f3e2b07d6940e26f3934410faf69b25cbfe1e82521d6e48dface54cf24beeaf2",
+      "bytes": 6773
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
@@ -4124,13 +4124,13 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "sha256": "dbf2338ea2d6aaa375f15ea83636618cfc11e0ca7b940b43b3d671a8ac17ce91",
-      "bytes": 2181
+      "sha256": "fd1b5ef9322b575d397c2e89c003f0afb4196d4c62c027d1e98c052e4c33ff2c",
+      "bytes": 2367
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "8f9ed6f4782dac58d71351405e64195693d6ce123af0e133d309d0e8eb69cf97",
-      "bytes": 1546
+      "sha256": "c5a3f58e0fc16c0b9f0a7bc6cac615518a4c0785a7c38414a8acfa52aaa8b5a0",
+      "bytes": 1778
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "42dcec40e4d7228f21b77c103206bc9a6a8d3c82e044374800bc0791dbaad1e6",
-      "bytes": 6397
+      "sha256": "1473bb3f01f28d4047250cf344e165f0e7534679cbc6b6b95403993b6f13834d",
+      "bytes": 6414
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "9b39dec906823875e59d47ed63cd09e6e6e6530d6be0c5a74645ac0af3ebcb76",
-      "bytes": 5840
+      "sha256": "1de24aebc03215843f41b4a5d986a86c4a310df20d7613f88a34dda75adba59c",
+      "bytes": 5826
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4229,13 +4229,13 @@
     },
     {
       "path": "lib/capacity-display.ts",
-      "sha256": "d932a4cecb3dd0b71187711da2d7362c0adfa1caf7def2fe2a8f90becbf42607",
-      "bytes": 1330
+      "sha256": "148c8192ab4da58ec7bf2b5d8e97324a3e6b09a2f743395d94bd9b957b1f1ace",
+      "bytes": 1757
     },
     {
       "path": "tests/capacity-display.test.mjs",
-      "sha256": "4a05547101d24bc59510c92994807feadedec73ce56fba44cb83a028ab29410d",
-      "bytes": 3003
+      "sha256": "48c7af4642ce546f39a2366770a162eb82cb79852a9f1f5b0b47526b5f43894d",
+      "bytes": 3545
     },
     {
       "path": "components/home-risk-summary.tsx",
@@ -4265,7 +4265,7 @@
     {
       "path": "components/decision-style.module.css",
       "bytes": 1305,
-      "sha256": "61bc72e909f9bc32e3f04408453d52212397d4dfe8305bedd5a8bcc638ad4472"
+      "sha256": "ad06ff91f84cf0858bfd86ef9969d568a74be4c67a39f42942aa18a33cf5895b"
     },
     {
       "path": "components/home-plan-jump.module.css",
@@ -4319,13 +4319,13 @@
     },
     {
       "path": "components/projection-demand-panel.tsx",
-      "bytes": 3212,
-      "sha256": "84454f49af83f2e30d09229e580eeee5e1116ae994915bf401d7881e8c0428a9"
+      "bytes": 3994,
+      "sha256": "8b2ce07cbfe73393c225feb346661dc5920a76931db44ace8078b9c92f5adc75"
     },
     {
       "path": "components/workforce-planning/capacity-projection.module.css",
-      "bytes": 294,
-      "sha256": "c7c754ce20b072ec71ac2161c4c74bc7294a680e2485d5a0fbedbc44ae53bf4e"
+      "bytes": 566,
+      "sha256": "65e7eca547937ad16c86519984b99a911d1347f67e09b17091b47f24963880e9"
     },
     {
       "path": "lib/projection-demand.ts",
