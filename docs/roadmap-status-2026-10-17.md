@@ -481,3 +481,11 @@ PR404 is live at runtime 471bae3; budget continuity and controlled recovery/save
 Candidate runtime 5b3df826b47eccf19a08164801603d6eeaf29707 reproduces the same guard with controlled source retrieval failures. Local catalogue facts can leave Send available while no verified public source exists. The guard remains enforced; a specific evidence-loading message and explicit Refresh evidence and keep draft action replace the misleading saved-plan message for this condition. Refresh does not submit. Corrupt recipes and missing saved-plan bindings retain their existing validation.
 
 Five new regressions and 23 related saved-evidence/intake checks pass, with independent review. Staging/browser acceptance and preview review pending; not live yet. No paid AI calls, pricing, accounting or access changes. Original intermittent trigger and fresh model reliability remain unproven. Broader entry-point/copy/mobile composer polish remains outside this fix.
+
+## Focused planning-entry usability — October 25
+
+PR405 evidence recovery is live (runtime5b3df826); public desktop/mobile explicit refresh/resend and reset-during-refresh passed with paid calls blocked. Original intermittent cause remains unknown.
+
+Next bounded candidate f906615064f18b1446af4fda7dce97128e30766e distinguishes worked example vs own-plan templates, shortens multi-role clarification to the actual allocation question and two reply choices, and gives the textarea a full row when its own composer container is narrow. Send sits below rather than consuming input width; desktop split resizing is covered by the same rule. No navigation reorder, allocation inference, submit handler or saved-state change.
+
+25 focused checks, types/lint and independent review pass. Staging/browser keyboard/mobile, draft/repeated-helper/category/back/follow-up checks and screenshots pending. Not yet live. No paid calls or pricing/accounting/access changes.

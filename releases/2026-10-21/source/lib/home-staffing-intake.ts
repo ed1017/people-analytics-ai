@@ -17,8 +17,8 @@ export function staffingStarterIntake(request:SolutionRequest){
  const template=readStaffingTemplate(request.message.text);
  const roles=template?.role.split(',').map(role=>catalogRoleCode(role))??[];
  if(template&&template.description===''&&/^\d+(?:\.\d+)?$/.test(template['fte needed'])&&Number(template['fte needed'])>0&&roles.length>1&&roles.every((role):role is string=>role!==null)&&new Set(roles).size===roles.length){
-  const question=`How should the total ${template['fte needed']} FTE be split across ${roles.map(role=>catalogDisplayLabel(role!)).join(', ')}? You can give a split or ask to compare alternative allocations.`;
-  return {questions:[question],answer:question+' I have kept your other supplied details. I have not assigned the total to each role or assumed costs or readiness.'};
+  const question=`How should the total ${template['fte needed']} FTE be split across ${roles.map(role=>catalogDisplayLabel(role!)).join(', ')}?`;
+  return {questions:[question],answer:question+'\n\nReply with FTE per role, or ask to compare allocations.'};
  }
  const gap=text.match(/^(?:how (?:can|could|would) (?:we|you) )?close (?:the |a )?(\d+(?:\.\d+)?) fte capacity gap$/);
  if((text!=='how can we close a staffing gap'&&(!gap||Number(gap[1])>100000))||request.goal.statement||request.selectedId||request.catalog||request.goalContext||s.turns.length||s.constraints.length||s.working.length||s.analyses.length||s.requiredStaffing||s.staffingDeliveryTarget||s.hiringBudget||s.businessPlanning)return null;

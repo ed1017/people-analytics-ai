@@ -32,3 +32,17 @@ test('retention never adopts a new template ceiling into prior planning context'
   const r=request();change(r);const reply=await converseSolutions(r,runtime,new AbortController().signal);a.equal(reply.state.hiringBudget,undefined);
  }
 });
+
+test('concise allocation choices keep scope and funding, and follow-ups do not repeat intake',async()=>{
+ const {staffingStarterIntake}=await import('../lib/home-staffing-intake.ts');
+ const r=request(),reply=await converseSolutions(r,runtime,new AbortController().signal);
+ a.equal(reply.state.questions.length,1);a.equal(reply.answer.split('\n\n').length,2);
+ a.match(reply.answer,/Reply with FTE per role, or ask to compare allocations/);
+ a.doesNotMatch(reply.answer,/I have kept|I have not assigned|equal split/);
+ for(const text of ['4 AI Engineers, 4 BI Analysts, 4 BI Developers.','Compare alternative allocations across these roles.']){
+  const follow={...r,state:readSolutionState(JSON.parse(JSON.stringify(reply.state))),message:{id:'follow',text}};
+  a.equal(staffingStarterIntake(follow),null);
+  a.equal(follow.state.turns[0].text,r.message.text);
+  a.equal(editHiringBudget(follow,'test:1',[]).inputs.budget,2000000);
+ }
+});

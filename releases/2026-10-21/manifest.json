@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "5b3df826b47eccf19a08164801603d6eeaf29707",
+  "sourceCommit": "f906615064f18b1446af4fda7dce97128e30766e",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "59e8250f83e2dc4be0c382e8e620cd8ce841df63fa2abdda1eca857b0c21614d",
-      "bytes": 8325
+      "sha256": "688ee74b49cda522f5b596933fe6f6ca14d3c7c2b1e96bf36f8dc98b405c3f86",
+      "bytes": 8286
     },
     {
       "path": "components/chat-content.tsx",
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "f7f0e545b75a93af5e3a9f3cb879a9a6080d55f72459ecc572e143270ac29266",
-      "bytes": 22110
+      "sha256": "3a3f93fe8709674f66d8a8bd45323dd2e61ed1e2c0d53ff41a9ec0b806294594",
+      "bytes": 22740
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "12e2495ff93896f5bc24281af58effbf17b3e05b92613c2b4eba6ccd4f67bb82",
-      "bytes": 19354
+      "sha256": "12e693e1d24e44f0d88a3f44d80bb1d44d3a4abf4ff888f4dae22da43bbe6c4b",
+      "bytes": 19330
     },
     {
       "path": "components/home-data-status.tsx",
@@ -2679,8 +2679,8 @@
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "7dcd627fc78ce4a81c6b1a2d2456570f1dadc94af7a3019b25e49153195dbf6a",
-      "bytes": 3804
+      "sha256": "d41aca9aa9ec07e8e28f6a359e255a011a25dd9da99b23130da5f81883f870c4",
+      "bytes": 3684
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -3804,8 +3804,8 @@
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "19b158686b0fc273a5250dba34419522b8fe70ff585003fc9470f084402c7d93",
-      "bytes": 7401
+      "sha256": "7a9ee49b610aa2e441fd6278ae2290088fd3476dda9e7befffc302395f199717",
+      "bytes": 7391
     },
     {
       "path": "tests/context-findings.test.mjs",
@@ -4309,8 +4309,8 @@
     },
     {
       "path": "tests/staffing-intake-continuity.test.mjs",
-      "bytes": 4006,
-      "sha256": "6229e93ee19998b76d7dac39e3b1add0e0b27ec246191218bf136c452968251b"
+      "bytes": 4961,
+      "sha256": "fb6d01e94cfdc440dbefeaf82e79100cf533e45e1ce8b74bacad339e12b6bc73"
     },
     {
       "path": "tests/public-evidence-recovery.test.mjs",

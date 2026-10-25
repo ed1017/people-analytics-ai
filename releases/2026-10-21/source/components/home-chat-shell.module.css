@@ -316,3 +316,11 @@
 .historySummary .historyPoint{fill:#007d7d}
 .historySummary .snapshotCharts{background:white;border-radius:12px;padding:8px}
 @media(max-width:600px){.historyHeading{padding:14px 16px}.historyHeading strong{font-size:32px}.historySummary{padding:10px}}
+
+/* Narrow composers reserve the full row for the draft; Send remains below it.
+   Applies to both the welcome and active conversation, including narrow splits. */
+.shell :global(.home-composer-slot) { container-type:inline-size; container-name:home-composer; }
+@container home-composer (max-width: 560px) {
+ .shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock), .shell :global(.home-workspace:not([data-overview-starting])) :global(.home-composer-dock) { grid-template-columns:minmax(0,1fr); }
+ .shell :global(.home-workspace) :global(.home-compose-actions) { grid-column:1; justify-self:end; }
+}
