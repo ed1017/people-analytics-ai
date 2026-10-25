@@ -1,0 +1,2 @@
+.jump{display:none}
+@container home-intro (max-width:759px){.jump{display:block;width:100%;min-height:44px;margin:10px 0;padding:10px 14px;background:#142b45;color:white;border-radius:9px;text-align:center;font-weight:650}.jump:focus-visible{outline:3px solid #007d7d;outline-offset:3px}}

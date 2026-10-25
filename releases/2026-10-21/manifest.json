@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "d2c66eca8444a0e6dd3f6969cf1752bd35a82e91",
-  "deployment": "pending-protected-verification",
+  "sourceCommit": "ebe23739d9d32c15037ccf228f9b03840d1e9870",
+  "deployment": "dpl_CQbegZyDjWG3QhLJi4wPQB9UeVX2",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -274,8 +274,8 @@
     },
     {
       "path": "app/planning/headcount-demo/page.tsx",
-      "sha256": "b64abf28ba6657579afd72b1b7cc64876df05b360b3108974a8e258669b6b27f",
-      "bytes": 226
+      "sha256": "3275348d1ceb593bce6c81bee6b7db914df2724f6ad1967821c10b0d029c6eff",
+      "bytes": 713
     },
     {
       "path": "app/public-qa/page.tsx",
@@ -539,8 +539,8 @@
     },
     {
       "path": "components/home-business-planning-review.tsx",
-      "sha256": "4fc022a41262341bfa77c6b94733068849332b47c3a282d166a5420a870175bb",
-      "bytes": 9009
+      "sha256": "1b096ce5b2fc749f73a86cf3d1c59c46abaa7bf99d359de2421080abf959e4d5",
+      "bytes": 10510
     },
     {
       "path": "components/home-candidate-options.tsx",
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "dcbb75eddfdf7ffafcfa4a2ec816117e24bb4e37e89724bfec67735dba85e421",
-      "bytes": 21151
+      "sha256": "f7f0e545b75a93af5e3a9f3cb879a9a6080d55f72459ecc572e143270ac29266",
+      "bytes": 22110
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "122a4567a1ca95d58fa80d397c72ab4dc40be2c561a00afe7e75bb2976c38822",
-      "bytes": 19255
+      "sha256": "12e2495ff93896f5bc24281af58effbf17b3e05b92613c2b4eba6ccd4f67bb82",
+      "bytes": 19354
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "227d70dd6242fd10ed7e46f0bc30b8be63fce40ce42299ce8f27b2724c46f049",
-      "bytes": 103498
+      "sha256": "f98cb4ba71c9358e45b0c3db5a51f734ecb6f9a95923f35086448d0f665c87c7",
+      "bytes": 103710
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -934,8 +934,8 @@
     },
     {
       "path": "components/staffing-mix-controls.tsx",
-      "sha256": "248cb22045c083225f27e565ac17fbfd84e988b6259142bd2e1faae665ce2731",
-      "bytes": 2692
+      "sha256": "d283cd796b7bee2097138465721cfb59d4bda76fa904aa283b2ba7ffa6b0d1b7",
+      "bytes": 2514
     },
     {
       "path": "components/staffing-option-cost.tsx",
@@ -974,8 +974,8 @@
     },
     {
       "path": "components/swp-outcome-chart.tsx",
-      "sha256": "29e186496ffc3b23e3b863ae20043e27f4d1b0f02965b6d8f21e18f3ce2bc760",
-      "bytes": 4407
+      "sha256": "20fec30c4ef6800628b9aaab518d4ee3cfa62acb5e4c78c8506044e7117cf48b",
+      "bytes": 4998
     },
     {
       "path": "components/synthetic-career-demo.tsx",
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "6aef4be69d7663940b82cda0078f8565a1a76b4ce0e41243e527a0b43f2ae5f0",
-      "bytes": 38952
+      "sha256": "d54074f317bec9052bf4e1e21b066e5e420a75fe3989959a4b5521b6d97776f2",
+      "bytes": 39532
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -4124,13 +4124,13 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "sha256": "2d0fb85a458384c03866d3d66c2db77ee38eacbb2a3fe3edb40eda9758e5b0ae",
-      "bytes": 1178
+      "sha256": "dbf2338ea2d6aaa375f15ea83636618cfc11e0ca7b940b43b3d671a8ac17ce91",
+      "bytes": 2181
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "1ddbe4986a47893a3c0b1d7c94ce763e4f3b01630e52ba3d82dbf82b9a11a4a3",
-      "bytes": 1400
+      "sha256": "a5adcabe061a51bee589ec403eca1b2dbbe1c80df102e2537d1cd3339b24836f",
+      "bytes": 1498
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4256,6 +4256,56 @@
       "path": "tests/manual/dashboard-risk-release.test.mjs",
       "sha256": "02e2a19e6cd6a957a56c1ce5448d9a7f91113f7060cb7c4309aec5df5778362e",
       "bytes": 1400
+    },
+    {
+      "path": "components/business-assumptions-editor.tsx",
+      "bytes": 2064,
+      "sha256": "56cf73aa1d31543b4623514a77adb9b46aab5d0e563257dd7c9644012ccbc990"
+    },
+    {
+      "path": "components/decision-style.module.css",
+      "bytes": 1305,
+      "sha256": "61bc72e909f9bc32e3f04408453d52212397d4dfe8305bedd5a8bcc638ad4472"
+    },
+    {
+      "path": "components/home-plan-jump.module.css",
+      "bytes": 289,
+      "sha256": "406d85ef514565808b163d026d04a6f8374218b2d63dff9981f249025e564b4d"
+    },
+    {
+      "path": "components/home-plan-jump.tsx",
+      "bytes": 1165,
+      "sha256": "4e4e38d0a96f7913e89c07befe17b6dea12afe08bd9695e6af50df8d6cf69839"
+    },
+    {
+      "path": "components/planner-design-preview.module.css",
+      "bytes": 9661,
+      "sha256": "beda12427f99f88a3b2aa5917dc0e4710131123e81854d415d591c07b86b46f6"
+    },
+    {
+      "path": "components/planner-design-preview.tsx",
+      "bytes": 12413,
+      "sha256": "2fbf5290eca3660ddf0296bee8088ce47d13e84d497cc08af614e04533437c45"
+    },
+    {
+      "path": "lib/planner-display.ts",
+      "bytes": 1165,
+      "sha256": "53f13f6dc6d135a1cad59bd06cbc42559b0f2a5cd56fd23ef0d4b2e0fec9c230"
+    },
+    {
+      "path": "lib/planner-preview-inputs.ts",
+      "bytes": 2727,
+      "sha256": "d50cdffd0fb4099d74b85f7161b4417cd67dc7a31d2ff748d57c8c6b7b10a892"
+    },
+    {
+      "path": "tests/planner-display.test.mjs",
+      "bytes": 1133,
+      "sha256": "7b80df889ffd45a38e6f682c06efdb881d04e1c68da2815eff15f258929ced88"
+    },
+    {
+      "path": "tests/planner-preview-inputs.test.mjs",
+      "bytes": 4847,
+      "sha256": "e3303ee4e23395b752f7bf65ffef15465fee2bec55ef4e61d4d8c3d79a6ba47e"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

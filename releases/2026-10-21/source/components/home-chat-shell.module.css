@@ -302,3 +302,17 @@
 .snapshotCharts figure > h3 { margin:8px 0 4px; font-size:14px; line-height:1.4; }
 .snapshotCharts figure > p,.snapshotCharts figure > div { font-size:12px; line-height:1.4; }
 .kpiScope { display:block; font-size:11px; line-height:1.3; font-style:normal; color:var(--muted-foreground); }
+
+/* Shared decision hierarchy: retain the existing chart/rail and responsive split. */
+.historySummary{border:1px solid #d7e3eb;border-radius:16px;background:#f5f8fb;padding:12px}
+.historyHeading{padding:18px 20px;margin-bottom:10px}
+.historyHeading p,.historyHeading span{color:#dceaf0}
+.historyHeading strong{font-size:38px;font-weight:750;letter-spacing:-.035em;color:white}
+.historySummary .kpiRow{border-color:#d7e3eb;background:white;border-radius:12px}
+.historySummary .kpiRow li{border-color:#e3ebf0}
+.historySummary .kpiRow b{color:#142b45;font-size:20px;font-weight:750;letter-spacing:-.025em}
+.historySummary .kpiRow span{color:#4d6378}
+.historySummary .historyLine{stroke:#007d7d;stroke-width:3}
+.historySummary .historyPoint{fill:#007d7d}
+.historySummary .snapshotCharts{background:white;border-radius:12px;padding:8px}
+@media(max-width:600px){.historyHeading{padding:14px 16px}.historyHeading strong{font-size:32px}.historySummary{padding:10px}}

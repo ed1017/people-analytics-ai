@@ -1,6 +1,7 @@
 'use client';
 import {previewProjectionEdit,verifyProjectionEditSource,type ProjectionEdit} from '@/lib/headcount-projection-edit';
 import {calculateHeadcountProjection,type HeadcountProjection} from '@/lib/home-solution-projection';
+import {editPreviewAssumptions,type PreviewAssumptions} from '@/lib/planner-preview-inputs';
 import {selectBusinessPlanningMix} from '@/lib/home-business-planning';
 import {homeAnswerVisualField,restoreHomeAnswerVisual} from '@/lib/home-answer-visual-save';
 import {annualTurnoverEvidenceQuestion} from '@/lib/home-turnover-chat';
@@ -270,6 +271,11 @@ export function useHomeSolutionConversation(props:Props){
   requireCurrent();const state=currentBusinessState();if(!state)throw Error('The current staffing comparison is unavailable.');
   persist({...memoryRef.current,businessPlanning:selectBusinessPlanningMix(state,mix)});
  }
+ function adjustBusinessAssumptions(draft:PreviewAssumptions,key:string){
+  if(pending||saving)throw Error('Finish the current operation before adjusting this scenario.');
+  requireCurrent();const state=currentBusinessState();if(!state||JSON.stringify(state)!==key)throw Error('The plan changed. Close and reopen the input editor.');
+  persist({...memoryRef.current,businessPlanning:editPreviewAssumptions(state,draft,'planner-edit-'+crypto.randomUUID())});
+ }
  async function reviewBusinessOption(id:string){
   const snapshot=requireCurrent(),state=currentBusinessState();if(!state)throw Error('The business discussion changed.');
   const key=JSON.stringify(state),revision=snapshot.data.revision,context=liveKey.current,initialEpoch=epoch.current;
@@ -288,5 +294,5 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {updateRequiredStaffing,saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ return {adjustBusinessAssumptions,updateRequiredStaffing,saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

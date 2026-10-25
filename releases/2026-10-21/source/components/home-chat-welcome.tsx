@@ -1,4 +1,5 @@
 'use client';
+import decision from './decision-style.module.css';
 import {useChartPointerTooltip} from './chart-pointer-tooltip';
 import {HomeRiskSummary} from './home-risk-summary';
 import {KeyFindings} from './key-findings';
@@ -92,8 +93,8 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const plot = history.map(point => ({...point, x: monthSpan ? 12 + 85 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 54.5, y: chartY(point.headcount)}));
   const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:12+85*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:chartY(point.headcount)})) : [];
   const dateMarks = [...new Set([first?.snapshot_date,history.length>2?history[Math.floor((history.length-1)/2)].snapshot_date:undefined,horizonEnd])].filter((date):date is string=>!!date);
-  return <section aria-label="Workforce snapshot" className={styles.historySummary}>
-      <div className={styles.historyHeading}>
+  return <section aria-label="Workforce snapshot" className={`${decision.surface} ${styles.historySummary}`}>
+      <div className={`${decision.hero} ${styles.historyHeading}`}>
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
       </div>
 

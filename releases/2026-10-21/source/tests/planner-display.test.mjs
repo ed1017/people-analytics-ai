@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {plannerCash,plannerDate,staffingActionHeadline} from '../lib/planner-display.ts';
+test('headline cash rounds only display and distinguishes unknown from zero',()=>{const value=168666.66666666666;assert.equal(plannerCash(value),'$168,667');assert.equal(value,168666.66666666666);assert.equal(plannerCash(null),'Unknown');assert.equal(plannerCash(0),'$0');});
+test('human dates preserve day/month precision and reject invalid dates',()=>{assert.equal(plannerDate('2027-02-15'),'Feb 15, 2027');assert.equal(plannerDate('2027-02'),'Feb 2027');for(const value of [null,'','2027-02-30','2027-13'])assert.equal(plannerDate(value),'Unknown');});
+test('short actions follow the actual allocation without a gap-closure assertion',()=>{assert.equal(staffingActionHeadline({status:'met',mix:{build:2,move:1,buy:2}}),'Develop 2. Redeploy 1. Hire 2.');assert.equal(staffingActionHeadline({status:'unknown',mix:{build:0,move:0,buy:5}}),'Hire 5.');assert.equal(staffingActionHeadline({status:'invalid',mix:{build:2,move:1,buy:2}}),'Review this staffing allocation.');});
