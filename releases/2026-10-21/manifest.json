@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "6527124110cdea3ddb7a9dcab03b6b69fea8cfb8",
+  "sourceCommit": "471bae3c767148969f4d6a5dea60e9528bed5a76",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "531c988f64dc560d8709a2a478743a21f3c2539443d70839c60f784a7dafc4f0",
-      "bytes": 22941
+      "sha256": "62c9125f63ae961fcfc084cf788b3be5bbe23c751179a503a1d95fbd55a4d0bf",
+      "bytes": 23127
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "f98cb4ba71c9358e45b0c3db5a51f734ecb6f9a95923f35086448d0f665c87c7",
-      "bytes": 103710
+      "sha256": "da4fe014083f682c4454eca9bbaaed8402331f5c3ad1518ff0c389781d75e399",
+      "bytes": 103863
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -2324,8 +2324,8 @@
     },
     {
       "path": "lib/home-hiring-budget.ts",
-      "sha256": "48b9c826df7781938438d20bb4d52401c9225585cc4087bc415c1b47719a390f",
-      "bytes": 14216
+      "sha256": "39e83f4ca2e7ff93f195b9f9413dfd2ccd357a9c04f379b23397899329e9fd1a",
+      "bytes": 14383
     },
     {
       "path": "lib/home-hiring-plan-save.ts",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "62b4ef4a7765bf50e34c52c3e45aab09e7ec2dbaa269977a5db7c1ccf7a44436",
-      "bytes": 43003
+      "sha256": "6092753e05eaf57dc0721600c0bf39d63109df69e687bbe68f56b66fe05154ba",
+      "bytes": 43426
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2679,8 +2679,8 @@
     },
     {
       "path": "lib/home-staffing-intake.ts",
-      "sha256": "aae40096b0d0944a37ebc0d39794c369237a15f7614a169ec145cc3030d36bbb",
-      "bytes": 2396
+      "sha256": "7dcd627fc78ce4a81c6b1a2d2456570f1dadc94af7a3019b25e49153195dbf6a",
+      "bytes": 3804
     },
     {
       "path": "lib/home-staffing-scenario.ts",
@@ -4306,6 +4306,11 @@
       "path": "tests/planner-preview-inputs.test.mjs",
       "bytes": 4847,
       "sha256": "e3303ee4e23395b752f7bf65ffef15465fee2bec55ef4e61d4d8c3d79a6ba47e"
+    },
+    {
+      "path": "tests/staffing-intake-continuity.test.mjs",
+      "bytes": 4006,
+      "sha256": "6229e93ee19998b76d7dac39e3b1add0e0b27ec246191218bf136c452968251b"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

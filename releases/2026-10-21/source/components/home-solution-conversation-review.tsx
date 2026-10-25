@@ -1,4 +1,5 @@
 'use client';
+import {hasHiringScenarioInputs} from '@/lib/home-hiring-budget';
 import {HeadcountProjectionPlanner} from './headcount-projection-planner';
 import {ElapsedWaitingTime} from './elapsed-waiting-time';
 import {HistoricalMetricContext} from './historical-metric-context';
@@ -112,7 +113,7 @@ export function HomeSolutionConversationReview({controller,goal,pack,showSaved,p
   {controller.notice&&<p role="status">{controller.notice}</p>}
   {!current.length&&!controller.state.requiredStaffing&&!!controller.state.constraints.length&&<details><summary className="cursor-pointer py-2 text-sm">Current interpreted constraints</summary>{controller.state.constraints.map(item=><p key={item.field} className="text-sm">{item.field.replaceAll('_',' ')}: {item.action==='remove'?'Removed':item.number??item.text} {item.unit}. Correct this in chat if needed.</p>)}</details>}
   {!!controller.state.verifiedMetrics.length&&<section aria-label="Checked quantitative results" className="rounded border p-3 text-sm"><h3 className="font-semibold">Checked quantitative results</h3>{controller.state.verifiedMetrics.map((ref,index)=>{const metric=resolveSolutionMetric(controller.state,ref);return <p key={index}>{metric.label}: {number(metric.value)} {metric.unit}. {metric.basis} · {metric.source}.</p>;})}<p>Effectiveness and savings are not established by these calculations.</p></section>}
-  {controller.state.hiringBudget&&<details open={controller.state.currentCalculationKinds?.includes('hiring')===true}>
+  {controller.state.hiringBudget&&(hasHiringScenarioInputs(controller.state.hiringBudget)||controller.state.currentCalculationKinds?.includes('hiring'))&&<details open={controller.state.currentCalculationKinds?.includes('hiring')===true}>
    <summary hidden={controller.state.currentCalculationKinds?.includes('hiring')===true} className="min-h-11 cursor-pointer py-2">Earlier hiring calculation</summary>
    <HomeHiringBudgetReview review={controller.state.hiringBudget} recommended={controller.state.conditionalHiringPlan===true&&controller.state.currentCalculationKinds?.includes('hiring')===true&&!canReviewCostedHiringPlan(controller.state.hiringBudget)} onDirtyChange={dirty=>controller.setHiringEditorDirty(JSON.stringify(controller.state.hiringBudget),dirty)} onUpdate={controller.updateHiringBudget} onRestore={controller.resetHiringScenario} disabled={controller.pending||controller.saving||!controller.canSend}><HomeHiringPlanReview controller={controller}/></HomeHiringBudgetReview>
   </details>}

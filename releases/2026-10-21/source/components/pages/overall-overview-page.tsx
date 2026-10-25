@@ -1,4 +1,5 @@
 "use client";
+import {hasHiringScenarioInputs} from '@/lib/home-hiring-budget';
 import {HomePlanJump} from '@/components/home-plan-jump';
 import {HeadcountProjectionEntry} from '../headcount-projection-entry';
 import {isHeadcountEntry} from '@/lib/projection-entry';
@@ -646,7 +647,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const visualStarter=legacyVisualsAllowed&&currentVisualAnswer&&(starterForecasts.get(currentVisualAnswer)?.forecast.domain!=='hiring'||visualTaReady)?renderStarterForecast(currentVisualAnswer):null;
   const visualExit=currentVisualAnswer&&!solutionConversationEnabled?renderExitReasonChart(currentVisualAnswer):null;
   const plannerIntent=scenarioPlannerEntry(input)||scenarioPlannerEntry([...messages].reverse().find(m=>m.role==='user')?.content??'');
-  const plannerResult=Boolean(solutions.state.businessPlanning||solutions.state.hiringBudget||solutions.state.requiredStaffing||solutions.state.working.length||solutions.state.analyses.length);
+  const plannerResult=Boolean(solutions.state.businessPlanning||hasHiringScenarioInputs(solutions.state.hiringBudget)||solutions.state.currentCalculationKinds?.includes('hiring')||solutions.state.requiredStaffing||solutions.state.working.length||solutions.state.analyses.length);
   const projectionEntry=plannerIntent&&!plannerResult&&isHeadcountEntry(input)?<HeadcountProjectionEntry key={contextKey+':'+conversation.resetEpoch} question={input} query={workforceQuery} onSave={solutions.saveProjectionEntry} disabled={!solutions.canSend||solutions.pending||solutions.saving}/>:null;
   const planningReviewPanel=solutionConversationEnabled?<HomeSolutionConversationReview onShowProjection={projectionReady&&conversation.activeGoalId&&publicAiReadiness.available('/api/home-solution-conversation') ? (id,revision)=>{void homeProjection.show(id,revision);} : undefined} planningNotes={followUp?[followUp.reference,followUp.planningNotes,followUp.explanation].filter(Boolean).join('\n\n'):undefined} capacityRisk={followUp?.capacityRisk} controller={solutions} goal={conversation.focusedIssue} pack={pack} showSaved={recoveryPlanChoice?.goalId!==conversation.activeGoalId}/>:null;
   const currentVisualSupplement=visualForecast||visualStarter||visualExit?<>{visualForecast}{visualStarter}{visualExit}</>:null;
