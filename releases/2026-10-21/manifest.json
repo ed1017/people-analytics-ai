@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "accdc04305fd773b5bdb9901a58fd032ec713b5e",
+  "sourceCommit": "2e41ecc84774e6a964fca1be29a05c56a1ea67ec",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2084,8 +2084,8 @@
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "75ee80a003078db6bccd477778b6d86afa5d6710f0ba839b84f341dee6c36a0c",
-      "bytes": 15385
+      "sha256": "351a8740d5047f225f1cdcd6a52e51c3eaad0cd55383699d3bbdd82a4628ea83",
+      "bytes": 15980
     },
     {
       "path": "lib/home-aggregate-tool.mjs",
@@ -2444,8 +2444,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "1f5843c27fadc60bd41ab7b346ab99be571b3d3bd1d075a7de80b537d24d41cc",
-      "bytes": 29518
+      "sha256": "41483a7faf72ffe5eb14fec87875d2efb33f08f6c10a6cf00826ca69b91a4e4b",
+      "bytes": 29999
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "080199bd8f038c582e81eeafa23e97cff553249183f9d79cd8fd5e89d9abf37c",
-      "bytes": 13099
+      "sha256": "49f8a106057e26d9ac93005535d2b68b115ce205de7ef5305040fe84e9223532",
+      "bytes": 13614
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -4411,6 +4411,16 @@
       "path": "tests/recruiting-metric-semantics.test.mjs",
       "bytes": 4237,
       "sha256": "75fa1c9333f9171b92a5bd12ab0142d1c958fb82f340526c9cf9ae4d90d790a8"
+    },
+    {
+      "path": "tests/home-recruiting-cohort.test.mjs",
+      "bytes": 2924,
+      "sha256": "2c6086965c8c07ed92ffdbe508321d08816c63c96e7bba6ef40969675b22d4bb"
+    },
+    {
+      "path": "tests/public-recruiting-cohort-recovery.test.mjs",
+      "bytes": 2903,
+      "sha256": "8701c159405c17e3da8c769d46cdd4bfe4e7cd197af9d5dffd62a1ba8933c676"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
