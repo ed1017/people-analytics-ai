@@ -41,7 +41,7 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
    </div> : <div className="flex min-h-60 items-center justify-center py-8 text-center text-sm text-muted-foreground">{result?'More numbers are needed. Fill in the blank work and team inputs.':'Enter your work and team numbers to see the comparison.'}</div>}
    <details className="mt-2 text-sm text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3 focus-visible:ring-2 focus-visible:ring-ring">How to read this chart</summary><p>FTE means full-time equivalent capacity, not a count of people or a hiring target. Shading marks required capacity above available capacity. Unknown values are not plotted or connected. Exact values are in Monthly detail.</p></details>
   </div>
-  <aside aria-label="Scenario capacity verdict" className={`rounded-xl border-l-4 p-4 ${last?.gapFte!=null&&last.gapFte>0?'border-amber-600 bg-amber-50':'border-teal-700 bg-teal-50'}`}>
+  <aside aria-label="Scenario capacity verdict" className={`rounded-xl border-l-4 p-4 ${last?.gapFte==null?'border-slate-400 bg-slate-50':last.gapFte>0?'border-amber-600 bg-amber-50':'border-teal-700 bg-teal-50'}`}>
    <p className="text-sm">{last?'By '+new Date(last.month+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'}):'Set your planning horizon'}</p>
    <p className="mt-1 text-3xl font-bold tracking-tight tabular-nums">{last?.gapFte==null?'Shortfall not assessed':capacityBalanceLabel(last.gapFte)}</p>
    {last&&<p className="mt-2 text-base"><strong>{format(last.allocatedFte)}</strong> of <strong>{format(last.requiredFte)}</strong> FTE needed</p>}

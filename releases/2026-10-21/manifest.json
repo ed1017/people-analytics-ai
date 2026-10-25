@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "aea8a6ca9d9f36b9ab859e9e8582ed460876e532",
+  "sourceCommit": "d9b7e00e258dd4f860a4f0788ba88213f4e79851",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1149,8 +1149,8 @@
     },
     {
       "path": "components/workforce-planning/capacity-projection.tsx",
-      "sha256": "9b26c0211faa01ba1e314a49b83db874eebfb676e6489132919f2bcdb9412ca0",
-      "bytes": 6261
+      "sha256": "25bd0ce7587d8f33472a9e1d676cbaa13424dc4c990fbe52c402f7eefc9e29cc",
+      "bytes": 6291
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
@@ -4129,8 +4129,8 @@
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "a5adcabe061a51bee589ec403eca1b2dbbe1c80df102e2537d1cd3339b24836f",
-      "bytes": 1498
+      "sha256": "8f9ed6f4782dac58d71351405e64195693d6ce123af0e133d309d0e8eb69cf97",
+      "bytes": 1546
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "4632dad97651a35f37f31acf9763b605d27c30a8ded7bbd5334e161bb95a7384",
-      "bytes": 6373
+      "sha256": "d03dfcc06a5f912a98bd7ab31d7ddcacc6496b275398062abeb385bc278c6669",
+      "bytes": 6402
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "91e527bd79d60790578547fefaeeea799c2aaefffdb191b46e987036c9d664f1",
-      "bytes": 5804
+      "sha256": "3480b42a91d755713942a02618953892a0709bd115b532723269bd4f6208c54b",
+      "bytes": 5836
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4329,13 +4329,13 @@
     },
     {
       "path": "lib/projection-demand.ts",
-      "bytes": 2859,
-      "sha256": "6afefb538ee068fcfd026cbc91a1c668bec1b5e30661024fd26fedeec6e5d230"
+      "bytes": 3102,
+      "sha256": "b26d354a4d7cc0dc7fc54625867141d0887b4b2db3fdaacfb252ce6518ab41f3"
     },
     {
       "path": "tests/projection-demand.test.mjs",
-      "bytes": 2128,
-      "sha256": "25f94f118762bfd78357c77889d64c5164560c9de0959e43ab66154e42ed8c21"
+      "bytes": 2311,
+      "sha256": "c70f1c8a27add8603aa9aa3faf05b82ed50bd78c64c940e086b4a1e6bd01e4d0"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
