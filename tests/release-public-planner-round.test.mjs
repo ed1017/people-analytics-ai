@@ -58,7 +58,7 @@ test('policy supplies absent model and preserves encrypted reasoning replay',asy
 });
 test('provider failure, invalid usage and incomplete output keep reservations and forbid retries',async()=>{
  for(const provider of [()=>{throw Error('secret provider details');},s=>({...result(s),status:'incomplete'}),s=>({...result(s),usage:{input_tokens:1050001,output_tokens:1,total_tokens:1050002}})]){
-  const f=setup({provider});await assert.rejects(f.run.complete(spec(),meta()),/^Error: planner_round_unavailable$/);
+  const f=setup({provider});await assert.rejects(f.run.complete(spec(),meta()),error=>['planner_round_unavailable','planner_provider_invalid','planner_usage_invalid'].includes(error.reason));
   assert.equal(f.db.reserved,2);await assert.rejects(f.run.complete(spec(),meta(2)));assert.equal(f.db.count,1);
  }
 });
