@@ -1,4 +1,5 @@
 "use client";
+import {evidenceMonthWindow} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {recruitingFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
@@ -74,7 +75,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
 
           {!extension&&<section aria-label="Source recruiting funnel" className="mt-6 rounded-lg border p-4">
             <h3 className="font-semibold">Recruiting funnel</h3>
-            <p className="mb-4 text-sm text-muted-foreground">{separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Stages available in the current source summary; no screening or acceptance stage is inferred.'}</p>
+            <p className="mb-4 text-sm text-muted-foreground">{separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Recorded recruiting stages.'}</p>
             <div className="evidence-metric-grid grid gap-3">{([
               ['Applications',summary.applications,null],['Interviewed',summary.interviewed_applications,summary.application_to_interview_pct],
               ['Offers',summary.offered_applications,summary.interview_to_offer_pct],['Hires',summary.hires,summary.offer_to_hire_pct],
@@ -85,7 +86,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">Monthly Recruiting Activity</h3>
-                <p className="text-sm text-muted-foreground">Applications and hires from January 2024 through September 2026</p>
+                <p className="text-sm text-muted-foreground">Applications and hires · {evidenceMonthWindow(data.monthly.map(row => row.month))}</p>
               </div>
               <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
@@ -178,7 +179,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
       ) : (
         (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">{loading ? "Loading Talent Acquisition analytics…" : "No Talent Acquisition data returned."}</div>
       )}
-      {data && <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p role="status" className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data does not match the calibration snapshot.'}</p>}</div>}
+      {data && <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <details className="rounded-lg border p-3 text-sm"><summary className="cursor-pointer min-h-6">Additional recruiting views unavailable</summary><p className="mt-2 text-muted-foreground">{separateDataset?'Active-requisition history, projections and screening are not supplied for this dataset. The summary and funnel use its recorded events.':'The source does not match the calibration snapshot required for projections and the expanded funnel.'}</p></details>}</div>}
     </section>
   );
 }

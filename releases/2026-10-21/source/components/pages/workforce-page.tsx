@@ -1,4 +1,5 @@
 "use client";
+import {evidenceAsOfLabel, evidenceMonthWindow} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {workforceFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel, countryDisplayLabel} from "@/lib/catalog-display";
@@ -57,7 +58,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
 
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-          {loading ? "Loading workforce…" : data ? "As of " + data.as_of : "Workforce"}
+          {loading ? "Loading workforce…" : data ? evidenceAsOfLabel(data.as_of) : "Workforce"}
         </span>
       </div>
       {!loading && error && (
@@ -93,14 +94,14 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
 
             <details className="mt-1">
               <summary className="cursor-pointer">How these figures were constructed</summary>
-              <p className="mt-2">People managers are employees with at least one generated direct report, independently of career level. Reporting lines connect employees to the next populated higher level within their business unit. Average span is direct reports per people manager.</p>
-              <p className="mt-2">Countries and initial levels use near-uniform synthetic assignments; later promotions affect the level distribution. Hybrid is a fixed source field, not an observed working pattern. These construction choices explain the displayed mix; they do not establish organizational realism.</p>
+              <p className="mt-2">People managers have at least one generated direct report. The synthetic hierarchy uses varied team sizes and grade-compatible reporting lines. Average span is direct reports per people manager.</p>
+              <p className="mt-2">The fictional country mix varies by entry business unit and stays fixed through each employee’s history. Grades and work arrangements use the revised synthetic baseline, including hybrid, remote and onsite assignments.</p>
             </details>
           </aside>}
           <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Headcount Trend</h3>
-              <p className="mb-4 text-sm text-muted-foreground">Monthly workforce size since 2024</p>
+              <p className="mb-4 text-sm text-muted-foreground">Monthly workforce size · {evidenceMonthWindow(data.trend.map(row => row.snapshot_date))}</p>
               <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={data.trend}>

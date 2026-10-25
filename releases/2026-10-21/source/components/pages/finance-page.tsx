@@ -1,4 +1,5 @@
 "use client";
+import {evidenceAsOfLabel} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {financeFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
@@ -59,7 +60,7 @@ export function FinancePage({
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                 {financeLoading
                   ? "Loading finance…"
-                  : financeData ? "As of September 30, 2026" : "Finance"}
+                  : financeData ? evidenceAsOfLabel(financeData.as_of) : "Finance"}
               </span>
             </div>
 

@@ -1,4 +1,5 @@
 "use client";
+import {evidenceAsOfLabel} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {skillsFindings} from "@/lib/key-findings";
 
@@ -54,7 +55,7 @@ export function SkillsPage({
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                 {skillsLoading
                   ? "Loading skills…"
-                  : skillsData ? "As of September 30, 2026" : "Skills"}
+                  : skillsData ? evidenceAsOfLabel(skillsData.as_of) : "Skills"}
               </span>
             </div>
 
