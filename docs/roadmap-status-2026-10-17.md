@@ -1,6 +1,6 @@
-# Active roadmap - October 25, PR410 live
+# Active roadmap - October 25, PR411 live
 
-Production is [PR410](https://github.com/ed1017/people-analytics-ai/pull/410), runtime `2e41ecc84774e6a964fca1be29a05c56a1ea67ec`, deployment `dpl_E9icRPFg54yuHxUtYnqrwy7PmaTf`, source merge `3a574ca027117a9878caa07b2a85839b41f0ea83`. The canonical public alias is verified READY. Dated records below are historical checkpoints; pending labels there do not override this queue.
+Production is [PR411](https://github.com/ed1017/people-analytics-ai/pull/411), runtime `e6f0f2352dc46933774204cf60689b3c4c40719d`, deployment `dpl_G3qN8x4eKBtqPfyQZVW7zCMfnB46`, source merge `e0f1db1aa6584406d0448742556d3b9a071e9729`. Canonical public alias and active Learning/Listening desktop/mobile checks passed. Dated records below are historical checkpoints.
 
 ## Completed agreed work
 
@@ -25,7 +25,9 @@ Production is [PR410](https://github.com/ed1017/people-analytics-ai/pull/410), r
 
 PR410 closes the historical harness reconciliation: 99 focused checks, repaired imports/current fixtures and retained helper support for more than two eligible options, plus cancellation/dataset-switch/retry coverage. Exact-head CI40243426463 passed; staged desktop/mobile checks and screenshot review passed. Recruiting now distinguishes the recorded successful-hire cohort from a complete applicant funnel, with conversion unavailable in page and grounded summary/aggregate paths. Mean and median remain independent; actual source counts are unchanged. No original intermittent failure was reproduced.
 
-The next separate candidate `e6f0f2352dc46933774204cf60689b3c4c40719d` shortens Learning, Career preferences and Employee Listening findings while retaining definitions, missing-data states and scope limits in accessible details. Thirteen focused findings/render checks and independent review pass. Hosted preview and final CI are pending; this candidate is not live.
+PR411 concise Learning/Listening copy is live; definitions remain accessible and scope/missing states are preserved. Career Interests is a retained legacy component whose URL intentionally redirects to Workforce; its copy has local component coverage only, with no route restoration. Exact-head CI40243821563 and public active-page checks passed.
+
+PR412 candidate `dc9a699c4da1cfb389b69ce16405824322491b42` addresses verified empty Listening panels and repeated generic item labels. The source contains engagement-only waves; no substantive dimension names or pulse/manager/onboarding results are available. The candidate uses concise unavailable states and recorded question IDs, preserves original text in details, and corrects unsupported annual/progression wording and UTC month labels. Seventeen focused checks/types/lint and independent review pass. Hosted preview/screenshot review and final CI are pending; this candidate is not live.
 
 Owner review is useful but does not block these independent tracks. No additional clearly agreed unbuilt feature has been identified. New work must close these existing acceptance gaps rather than create features to remain busy.
 

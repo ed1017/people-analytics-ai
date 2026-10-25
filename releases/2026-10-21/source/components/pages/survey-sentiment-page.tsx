@@ -30,8 +30,8 @@ type SurveySentimentPageProps = {
   error: string | null;
 };
 
-function formatYear(value: string) {
-  return new Date(value + "T00:00:00").getFullYear().toString();
+function formatWave(value: string) {
+  return new Date(value + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "2-digit", timeZone: "UTC" });
 }
 
 function formatLongDate(value: string) {
@@ -56,6 +56,8 @@ function DimensionList({
   rows: SurveyListeningDimension[];
   showExitDetails?: boolean;
 }) {
+  if (!rows.length) return <p className="text-sm text-muted-foreground">Results unavailable.</p>;
+  const repeatedDimensions = new Set(rows.filter(row => rows.filter(other => other.dimension === row.dimension).length > 1).map(row => row.dimension));
   return (
     <div className="space-y-3">
       {rows.map((row) => (
@@ -66,7 +68,7 @@ function DimensionList({
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-sm font-medium">
-                {row.dimension}
+                {repeatedDimensions.has(row.dimension) ? `Survey item ${row.question_code}` : row.dimension}
               </p>
               <p className="text-xs text-muted-foreground">
                 {formatMetric(row.avg_score, 2, " / 5 average")}
@@ -77,6 +79,7 @@ function DimensionList({
               {showExitDetails && <span className="block text-xs font-normal text-muted-foreground">favorable</span>}
             </p>
           </div>
+          {!showExitDetails && repeatedDimensions.has(row.dimension) && <details className="mt-2 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Item details</summary><p>{row.question_text}</p><p>{row.dimension} · {row.survey_code} · {row.question_code}</p></details>}
           {showExitDetails && (
             <div className="mt-2 text-xs text-muted-foreground">
               <p>{row.question_text}</p>
@@ -161,7 +164,7 @@ export function SurveySentimentPage({
                   ? data?.data_meta?.listeningWave ?? "2026 Global Engagement"
                   : (engagementDelta >= 0 ? "+" : "") +
                     engagementDelta.toFixed(1) +
-                    (data?.data_meta?.listeningPeriod === "quarterly" ? " pts vs prior quarterly wave" : " pts vs prior annual survey")}
+                    (data?.data_meta?.listeningPeriod === "quarterly" ? " pts vs prior quarterly wave" : " pts vs prior survey")}
               </p>
             </div>
 
@@ -186,7 +189,7 @@ export function SurveySentimentPage({
                 {formatMetric(summary.manager_favorable_pct, 1, "%")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                2026 Manager Effectiveness Survey
+                Recorded manager survey
               </p>
             </div>
 
@@ -210,7 +213,7 @@ export function SurveySentimentPage({
                   Engagement Trend
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {data.data_meta?.listeningPeriod === "quarterly" ? "Quarterly valid-respondent favorability and participation" : "Annual favorable sentiment and survey participation"}
+                  {data.data_meta?.listeningPeriod === "quarterly" ? "Quarterly valid-respondent favorability and participation" : "Recorded survey favorability and participation"}
                 </p>
               </div>
 
@@ -231,7 +234,7 @@ export function SurveySentimentPage({
                     />
                     <XAxis
                       dataKey="launch_date"
-                      tickFormatter={formatYear}
+                      tickFormatter={formatWave}
                       tick={{ fontSize: 12 }}
                     />
                     <YAxis
@@ -242,7 +245,7 @@ export function SurveySentimentPage({
                     />
                     <Tooltip
                       labelFormatter={(value) =>
-                        formatYear(String(value))
+                        formatWave(String(value))
                       }
                       formatter={(value) =>
                         typeof value === "number" ? formatPercent(value) : "Unavailable"
@@ -282,10 +285,10 @@ export function SurveySentimentPage({
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">
-                  2026 Engagement Dimensions
+                  Engagement Items
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Favorability by core listening dimension
+                  Favorability by recorded survey item
                 </p>
               </div>
               <DimensionList
@@ -301,7 +304,7 @@ export function SurveySentimentPage({
                   Engagement by Business Unit
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  2026 engagement favorability across business units
+                  Recorded engagement favorability across business units
                 </p>
               </div>
 
@@ -350,10 +353,10 @@ export function SurveySentimentPage({
                 </p>
               </div>
 
-              <div className="evidence-panel-grid grid gap-5">
+              {!data.pulse_dimensions.length && !data.manager_dimensions.length ? <p className="text-sm text-muted-foreground">Pulse and manager survey results unavailable.</p> : <div className="evidence-panel-grid grid gap-5">
                 <div>
                   <p className="mb-3 text-sm font-semibold">
-                    Q2 Pulse
+                    Pulse
                   </p>
                   <DimensionList
                     rows={data.pulse_dimensions}
@@ -367,7 +370,7 @@ export function SurveySentimentPage({
                     rows={data.manager_dimensions}
                   />
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
 
@@ -377,11 +380,11 @@ export function SurveySentimentPage({
                 Onboarding Experience
               </h3>
               <p className="text-sm text-muted-foreground">
-                Favorability progression across 30-, 60-, and 90-day surveys
+                Results from separate 30-, 60-, and 90-day surveys
               </p>
             </div>
 
-            <div className="evidence-panel-grid grid gap-6">
+            {!onboarding30.length && !onboarding60.length && !onboarding90.length ? <p className="text-sm text-muted-foreground">30-, 60- and 90-day onboarding results unavailable.</p> : <div className="evidence-panel-grid grid gap-6">
               {[
                 ["ONB-30", onboarding30],
                 ["ONB-60", onboarding60],
@@ -399,7 +402,7 @@ export function SurveySentimentPage({
                   />
                 </div>
               ))}
-            </div>
+            </div>}
           </div>
 
           <div className="mt-6 text-sm text-muted-foreground">

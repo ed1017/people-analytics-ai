@@ -16,7 +16,7 @@ const aliases={
  '@/components/evidence-table-region':componentModule('evidence-table-region.tsx'),
  '@/components/evidence-scope-notice':componentModule('evidence-scope-notice.tsx',{'@/lib/talent-evidence-scope':scope}),
  '@/components/synthetic-domain-demo':{SyntheticDomainDemo:()=>null},
- recharts:new Proxy({},{get:()=>()=>null}),
+ recharts:new Proxy({},{get:(_target,key)=>key==='XAxis'?props=>React.createElement('span',null,props.tickFormatter?.('2026-04-01')):props=>React.createElement('div',null,props.children)}),
 };
 const pages={
  'learning-development':componentModule('pages/learning-development-page.tsx',aliases).LearningDevelopmentPage,
@@ -65,4 +65,36 @@ test('loading/error states still hide stale summaries and methodology',()=>{
  for(const route of Object.keys(pages))for(const extra of [{loading:true},{error:'Controlled unavailable source'}]){
   const html=render(route,extra);assert.doesNotMatch(html,/aria-label="Key findings"|Survey definitions|Learning sources and definitions|Methodology &amp; interpretation/);
  }
+});
+
+
+test('engagement-only source replaces blank survey panels with unavailable states and distinct recorded item codes',()=>{
+ const d=data['survey-sentiment'],before=JSON.stringify(d),html=render('survey-sentiment');
+ assert.equal(d.onboarding_dimensions.length,0);assert.equal(d.manager_dimensions.length,0);assert.equal(d.pulse_dimensions.length,0);
+ assert.match(html,/30-, 60- and 90-day onboarding results unavailable/);
+ assert.match(html,/Pulse and manager survey results unavailable/);
+ for(const row of d.engagement_dimensions){assert.match(html,new RegExp('Survey item '+row.question_code));assert.ok(html.includes(row.question_text));}
+ assert.doesNotMatch(html,/Q2 Pulse|2026 Manager Effectiveness Survey|prior annual survey|Favorability progression|2026 Engagement Dimensions/);
+ assert.equal(JSON.stringify(d),before);
+});
+
+test('partial onboarding keeps real zero scores and explicit missing stages without fabricated progression',()=>{
+ const d=data['survey-sentiment'],row={...d.engagement_dimensions[0],survey_code:'ONB-30',dimension:'Role clarity',avg_score:0,favorable_pct:0};
+ const html=render('survey-sentiment',{data:{...d,onboarding_dimensions:[row]}});
+ assert.match(html,/Role clarity/);assert.match(html,/0\.00 \/ 5 average/);assert.match(html,/0\.0%/);
+ assert.match(html,/Results unavailable/);assert.doesNotMatch(html,/30-, 60- and 90-day onboarding results unavailable/);
+});
+
+test('distinct source dimensions retain their names and loading never exposes stale items',()=>{
+ const d=data['survey-sentiment'],rows=d.engagement_dimensions.slice(0,2).map((row,i)=>({...row,dimension:['Role clarity','Team support'][i]}));
+ const html=render('survey-sentiment',{data:{...d,engagement_dimensions:rows}});
+ assert.match(html,/Role clarity/);assert.match(html,/Team support/);assert.doesNotMatch(html,/Survey item Q/);
+ assert.doesNotMatch(render('survey-sentiment',{loading:true}),/Survey item Q|30-, 60- and 90-day onboarding/);
+});
+
+
+test('survey chart month labels retain the recorded month in positive UTC offsets',()=>{
+ const previous=process.env.TZ;process.env.TZ='Asia/Tokyo';
+ try{assert.match(render('survey-sentiment'),/Apr 26/);assert.doesNotMatch(render('survey-sentiment'),/Mar 26/);}
+ finally{if(previous===undefined)delete process.env.TZ;else process.env.TZ=previous;}
 });
