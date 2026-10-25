@@ -36,7 +36,7 @@ export function toggleComposerRole(value:string,match:CatalogMatch,option:Catalo
  const end=value.indexOf('\n',match.end),fieldEnd=end<0?value.length:end;
  let parts=value.slice(match.start,fieldEnd).split(',').map(s=>s.trim()).filter(Boolean);
  const label=option.label===option.code?option.code:option.label+' ('+option.code+')';
- const same=(s:string)=>s===label||s===option.code;
+ const same=(s:string)=>s===label||s===option.code||s===option.label;
  const selected=parts.some(same);
  const activeIndex=value.slice(match.start,match.end).split(',').length-1;
  const fragment=parts[activeIndex];

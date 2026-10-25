@@ -25,8 +25,8 @@ export function HomeConversationSplit({enabled,visuals,children}:{enabled:boolea
 }
 
 /** Only the current turn's verified series enters this panel; never retain a prior chart while answering. */
-export function HomeAnswerVisuals({pending,error,current,series,supplement}: {pending:boolean;error:boolean;current:boolean;series:ChatEvidenceSeries[];supplement?:ReactNode}) {
-  const empty=current&&!pending&&!error&&!series.length&&!supplement;
+export function HomeAnswerVisuals({pending,error,current,series,supplement,answered=false}: {pending:boolean;error:boolean;current:boolean;answered?:boolean;series:ChatEvidenceSeries[];supplement?:ReactNode}) {
+  const empty=!pending&&!error&&(current?!series.length&&!supplement:answered);
   if(empty)return <aside className="home-answer-empty" aria-label="Current answer visuals"><p role="status">No chart available</p></aside>;
   const status=pending?'Preparing visuals for your question.':error?'No current visual: the answer could not be completed.':!current?'Ask a question to see its supported visuals here.':!series.length&&!supplement?'No chart is available for this answer.':null;
   return <aside className="home-answer-visuals" aria-label="Current answer visuals" aria-busy={pending}>

@@ -1,5 +1,5 @@
 // @ts-expect-error Native tests share source.
-import {demoBusinessUnitNames} from './catalog-display.ts';
+import {demoBusinessUnitNames,catalogRoleCode} from './catalog-display.ts';
 // @ts-expect-error Native tests share source.
 import {readStaffingTemplate} from './staffing-template.ts';
 /** Only an explicit standalone total-ceiling command can adopt funding through chat. */
@@ -15,7 +15,7 @@ export function confirmsBudgetAmount(text:string,value:number){
  // and explicit ceiling confirmation; negation in any field must not be ignored.
  const boundedTemplate=template&&['description','location','needed by','department/team'].every(key=>!template[key])&&
   (!template['fte needed']||/^\d+(?:\.\d+)?$/.test(template['fte needed']))&&
-  (!template.role||/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+(?:,\s*[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)*$/.test(template.role))&&
+  (!template.role||template.role.split(',').every(role=>catalogRoleCode(role)!==null))&&
   (!template.level||/^(?:L\d+|(?:level\s+)?\d+(?:\s+\(L\d+\))?)$/i.test(template.level))&&
   (!template['business unit']||Object.entries(demoBusinessUnitNames).some(([code,name])=>template['business unit']===code||template['business unit']===`${name} (${code})`))&&
   !/\b(?:not|unapproved|hypothetical|assume|assumed|estimate|approve|budget)\b/i.test(Object.entries(template).filter(([key])=>key!=='budget (optional)').map(([,value])=>value).join(' '));

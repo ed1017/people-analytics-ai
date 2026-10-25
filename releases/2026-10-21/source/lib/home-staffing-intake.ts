@@ -1,4 +1,6 @@
 // @ts-expect-error Native fixtures share source.
+import {catalogRoleCode,catalogDisplayLabel} from './catalog-display.ts';
+// @ts-expect-error Native fixtures share source.
 import {readStaffingTemplate} from './staffing-template.ts';
 import type {SolutionRequest} from './home-solution-conversation';
 // @ts-expect-error Native fixtures share source.
@@ -9,9 +11,9 @@ export function staffingStarterIntake(request:SolutionRequest){
  const text=normalizeHomeQuestion(request.message.text);
  const s=request.state;
  const template=readStaffingTemplate(request.message.text);
- const roles=template?.role.split(',').map(role=>role.trim())??[];
- if(template&&template.description===''&&/^\d+(?:\.\d+)?$/.test(template['fte needed'])&&Number(template['fte needed'])>0&&roles.length>1&&roles.every(role=>/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$/.test(role))&&new Set(roles).size===roles.length){
-  const question=`How should the total ${template['fte needed']} FTE be split across ${roles.join(', ')}? You can give a split or ask to compare alternative allocations.`;
+ const roles=template?.role.split(',').map(role=>catalogRoleCode(role))??[];
+ if(template&&template.description===''&&/^\d+(?:\.\d+)?$/.test(template['fte needed'])&&Number(template['fte needed'])>0&&roles.length>1&&roles.every((role):role is string=>role!==null)&&new Set(roles).size===roles.length){
+  const question=`How should the total ${template['fte needed']} FTE be split across ${roles.map(role=>catalogDisplayLabel(role!)).join(', ')}? You can give a split or ask to compare alternative allocations.`;
   return {questions:[question],answer:question+' I have kept your other supplied details. I have not assigned the total to each role or assumed costs or readiness.'};
  }
  const gap=text.match(/^(?:how (?:can|could|would) (?:we|you) )?close (?:the |a )?(\d+(?:\.\d+)?) fte capacity gap$/);
