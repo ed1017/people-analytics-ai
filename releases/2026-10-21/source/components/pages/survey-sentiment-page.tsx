@@ -402,10 +402,14 @@ export function SurveySentimentPage({
             </div>
           </div>
 
-          <div className="mt-6 rounded-md border bg-muted/20 p-4 text-xs text-muted-foreground">
-            {summary.open_text_comments === null
-              ? "Open-text survey comment count is unavailable."
-              : `${formatWholeCount(summary.open_text_comments)} open-text survey comments across all surveys are available in the synthetic listening dataset; this is not an exit-only count.`} This version does not yet run qualitative theme or sentiment analysis on those comments, so no themes are inferred here.
+          <div className="mt-6 text-sm text-muted-foreground">
+            <p>{summary.open_text_comments === null
+              ? "Open-text survey comment count unavailable."
+              : `${formatWholeCount(summary.open_text_comments)} open-text comments across all surveys.`} Theme analysis unavailable.</p>
+            <details className="mt-2">
+              <summary className="cursor-pointer min-h-6">Survey definitions</summary>
+              <p className="mt-2">Favorability measures survey responses, not comment sentiment or causality. Each survey retains its own respondents and period. Comment counts include all surveys; no qualitative themes are supplied.</p>
+            </details>
           </div>
         </>
       ) : (

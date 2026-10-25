@@ -51,7 +51,7 @@ export function CareerMobilityPage({
             Career Interests
           </h2>
           <p className="text-muted-foreground">
-            Describe recorded career interests, desired destinations, and preference coverage without treating preferences as readiness or recommendations.
+            Explore recorded career interests and preferred destinations.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export function CareerMobilityPage({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                No preference row recorded; not evidence of no career interest
+                No preference record
               </p>
             </div>
 
@@ -160,14 +160,7 @@ export function CareerMobilityPage({
             </div>
           </div>
 
-          <div className="mt-4 rounded-md border bg-muted/20 p-4 text-sm text-muted-foreground">
-            <p className="font-medium text-foreground">
-              Denominator & interpretation
-            </p>
-            <p className="mt-1">
-              Preference-record coverage uses the active workforce as its denominator. All other distributions use active employees with a recorded preference and, where relevant, a known value for that field. A recorded destination or relocation preference does not establish readiness, suitability, an available role, or a likely move.
-            </p>
-          </div>
+
 
           <div className="mt-6 grid gap-6 xl:grid-cols-2">
             <div className="rounded-lg border p-4">
@@ -498,8 +491,9 @@ export function CareerMobilityPage({
 
           <details className="mt-6 rounded-lg border p-4">
             <summary className="cursor-pointer font-semibold">
-              Methodology & guardrails
+              Methodology & interpretation
             </summary>
+            <p className="mt-3 text-sm text-muted-foreground">Preference coverage uses the active workforce. Other distributions use preference holders with a known value for that field. Missing records do not mean no career interest. Preferences do not establish readiness, role availability or permission to redeploy.</p>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {data.methodology.map(
                 (item) => (
