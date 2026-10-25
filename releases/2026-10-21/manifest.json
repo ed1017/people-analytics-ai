@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "03986b863738f0793c5e8800f3dd1fb93a7b6f45",
+  "sourceCommit": "16507d93c9c420ece2684afded28757f21b5f129",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1149,8 +1149,8 @@
     },
     {
       "path": "components/workforce-planning/capacity-projection.tsx",
-      "sha256": "f3e2b07d6940e26f3934410faf69b25cbfe1e82521d6e48dface54cf24beeaf2",
-      "bytes": 6773
+      "sha256": "89e497fa155df6bc440b1583f038bcadc3fec5cf2756e87af9a6a934483ac912",
+      "bytes": 6836
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",

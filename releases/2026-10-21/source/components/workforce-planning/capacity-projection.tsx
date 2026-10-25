@@ -33,7 +33,7 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
     {series.map(item=>{let previousKnown=false;const path=points.map((point,index)=>{const value=point[item.key];if(value===null){previousKnown=false;return '';}const command=previousKnown?'L':'M';previousKnown=true;return `${command}${x(index)},${y(value)}`;}).join(' ');return <g key={item.key}><path d={path} fill="none" stroke={item.color} strokeWidth="2.5" strokeDasharray={item.dash}/>{points.map((point,index)=>point[item.key]===null?null:<circle key={point.month} cx={x(index)} cy={y(point[item.key]!)} r="4" fill={item.color}><title>{`${point.month}: ${item.label}, ${format(point[item.key])}`}</title></circle>)}</g>;})}
    </svg>
    <div aria-hidden="true" data-capacity-axis="y" className="pointer-events-none absolute inset-0 text-sm leading-4 tabular-nums">
-    {[0,.25,.5,.75,1].map(fraction=><span key={fraction} className="absolute left-0 whitespace-nowrap text-right" style={{width:'14.5%',top:`${y(tick(fraction))/260*100}%`,transform:'translateY(-50%)'}}>{format(tick(fraction))}</span>)}
+    {[0,.25,.5,.75,1].map(fraction=><span key={fraction} className="absolute left-0 whitespace-nowrap text-right" style={{width:'14.5%',top:`${y(tick(fraction))/260*100}%`,transform:'translateY(-50%)'}}>{tick(fraction).toLocaleString('en-US',{maximumFractionDigits:maximum-minimum>=4?0:2})}</span>)}
    </div>
    </div>
    <div aria-hidden="true" data-capacity-axis="x" className="relative h-8 text-center text-sm leading-4 tabular-nums">
