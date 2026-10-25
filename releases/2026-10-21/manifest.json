@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "d9b7e00e258dd4f860a4f0788ba88213f4e79851",
+  "sourceCommit": "0d7e5f3b2e0a8682603a1a7c871e1e9a252ae6ea",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "d03dfcc06a5f912a98bd7ab31d7ddcacc6496b275398062abeb385bc278c6669",
-      "bytes": 6402
+      "sha256": "42dcec40e4d7228f21b77c103206bc9a6a8d3c82e044374800bc0791dbaad1e6",
+      "bytes": 6397
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "3480b42a91d755713942a02618953892a0709bd115b532723269bd4f6208c54b",
-      "bytes": 5836
+      "sha256": "9b39dec906823875e59d47ed63cd09e6e6e6530d6be0c5a74645ac0af3ebcb76",
+      "bytes": 5840
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4319,13 +4319,13 @@
     },
     {
       "path": "components/projection-demand-panel.tsx",
-      "bytes": 3079,
-      "sha256": "ac16b812d07c245d314d2c1c553be90079f9da14382eb81b248aface0f06dadb"
+      "bytes": 3212,
+      "sha256": "84454f49af83f2e30d09229e580eeee5e1116ae994915bf401d7881e8c0428a9"
     },
     {
       "path": "components/workforce-planning/capacity-projection.module.css",
       "bytes": 294,
-      "sha256": "2da84288456b4dac9079ee080c61b847a08795bdb53a0d6995e6dff612caacd2"
+      "sha256": "c7c754ce20b072ec71ac2161c4c74bc7294a680e2485d5a0fbedbc44ae53bf4e"
     },
     {
       "path": "lib/projection-demand.ts",
