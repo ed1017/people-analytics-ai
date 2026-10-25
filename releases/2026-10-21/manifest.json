@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "2a2f1b5ab614fbca8cad1587da7f8426a19315ae",
+  "sourceCommit": "3d12d2a5d1b479ea940944b982fca0aaaa5c2e60",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -1149,18 +1149,18 @@
     },
     {
       "path": "components/workforce-planning/capacity-projection.tsx",
-      "sha256": "8d1b92dcf02bb86342a38ebdb70fceb20041fb646eb4a70d76d3bc0a6f8a9d1f",
-      "bytes": 5154
+      "sha256": "cc04cb19af5f1d45825b565810a584d17aa47fdce0344a043d67edbd989ae1e5",
+      "bytes": 5554
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
-      "sha256": "35578f4b513ed84ecde28f88a918c232b075eb68452afc7e61c880008b5ebe47",
-      "bytes": 13473
+      "sha256": "211a3f00c18277976621bfcb19001b1f56ca329b6946137e92b0f6b01494448e",
+      "bytes": 13409
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "2ba1cfceca6449b19c3aaec2de61330e2895aad54e6e3aec4237839e3564865c",
-      "bytes": 12969
+      "sha256": "9e649d22acbfbf35223f85bea16f18c5c7738682da0a6778341f851a4f721c3f",
+      "bytes": 13059
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -1209,8 +1209,8 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
-      "sha256": "efd7cecf5bd3d7fec071d716dd961f8a4c19400aec8a284a5fb6d763248df089",
-      "bytes": 6502
+      "sha256": "f25a569037a05a3d2d0827935b456cdd0690474edcd9b6faee2ca4993f983b0d",
+      "bytes": 6610
     },
     {
       "path": "components/workforce-planning/planning-overview.tsx",
@@ -4124,8 +4124,8 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "sha256": "c044d33ed1c58f668797723c0d0880ce0e7f6f59d579c148d50fc70dd163f0d5",
-      "bytes": 1144
+      "sha256": "2d0fb85a458384c03866d3d66c2db77ee38eacbb2a3fe3edb40eda9758e5b0ae",
+      "bytes": 1178
     },
     {
       "path": "components/interactive-planner.tsx",
@@ -4226,8 +4226,18 @@
       "path": "tests/staffing-template-intake.test.mjs",
       "sha256": "824b2c3db816793f7e1fb1ade0ffd21689f91c02e2500e9d718f370727b00bec",
       "bytes": 3614
+    },
+    {
+      "path": "lib/capacity-display.ts",
+      "sha256": "d932a4cecb3dd0b71187711da2d7362c0adfa1caf7def2fe2a8f90becbf42607",
+      "bytes": 1330
+    },
+    {
+      "path": "tests/capacity-display.test.mjs",
+      "sha256": "8011e36c509a6db54362fb8047cc0ae7d7349f04b64eb37eb880d9fcf9abaf7b",
+      "bytes": 2649
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "4243e2ab62a8f4efbf896db105cc3601c5ab19ef674645fa7dd7fc65f0ad3fa1"
+  "verifiedDeployedArchiveSha256": "104fd507d527bcb9ce82579152399c5a0fbf2ac0ff8de4fdbb6a196d032db6c0"
 }

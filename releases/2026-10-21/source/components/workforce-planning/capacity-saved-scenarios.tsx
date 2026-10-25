@@ -1,4 +1,5 @@
 'use client';
+import {capacityBalanceLabel} from '@/lib/capacity-display';
 import {useState} from 'react';
 import {CarriedPlanningGoal} from './carried-planning-goal';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
@@ -10,7 +11,7 @@ import {usePlanningSession} from './planning-session-context';
 import type {CapacityDraft} from '@/lib/swp-capacity-draft';
 
 const control='min-h-11 min-w-0 rounded-md border bg-background px-3 py-2 text-sm text-foreground';
-const gap=(n:number|null)=>n===null?'Unknown':`${n>0?'+':''}${n.toLocaleString(undefined,{maximumFractionDigits:2})}`;
+const gap=capacityBalanceLabel;
 const assumptionFields = [
  ['people','People at the start','people'],
  ['fte','Contracted time at start','FTE'],
@@ -111,7 +112,7 @@ export function CapacitySavedScenarios(){
     {comparison?.compatible&&left&&right&&<div role="region" aria-label="Saved capacity comparison" tabIndex={0} className="overflow-x-auto">
      <p className="mb-2 break-words text-sm">{scope?.label} · Opening {left.record.inputs.opening.asOf} · {left.record.inputs.months.length} planning months. Comparing saved snapshots; current draft edits are excluded.</p>
      <CapacityAssumptionChanges left={{name:left.record.name,draft:left.draft}} right={{name:right.record.name,draft:right.draft}}/>
-     <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Signed gap in FTE · positive is shortfall, negative is surplus</caption><thead><tr><th scope="col" className="p-2">Month</th><th scope="col" className="p-2">{left.record.name}</th><th scope="col" className="p-2">{right.record.name}</th></tr></thead><tbody>{left.record.result.points.map((p,i)=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{gap(p.gapFte)}</td><td className="p-2">{gap(right.record.result.points[i].gapFte)}</td></tr>)}</tbody></table>
+     <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Capacity balance by month</caption><thead><tr><th scope="col" className="p-2">Month</th><th scope="col" className="p-2">{left.record.name}</th><th scope="col" className="p-2">{right.record.name}</th></tr></thead><tbody>{left.record.result.points.map((p,i)=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{gap(p.gapFte)}</td><td className="p-2">{gap(right.record.result.points[i].gapFte)}</td></tr>)}</tbody></table>
      {costComparison&&<details className="mt-3 border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Contracted supply cost comparison</summary>
       <p className="mb-2 text-xs text-muted-foreground">User-assumed USD per contracted FTE per month: {left.record.name} {formatCapacityCost(costComparison.leftRateCents)}; {right.record.name} {formatCapacityCost(costComparison.rightRateCents)}. Blank and older scenarios have unknown cost.</p>
       <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Monthly supply run-rate (USD/month) · right minus left, not savings</caption><thead><tr>{['Month',left.record.name,right.record.name,'Difference (USD/month)'].map((label,i)=><th key={i} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{costComparison.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{formatCapacityCost(p.leftCents)}</td><td className="p-2">{formatCapacityCost(p.rightCents)}</td><td className="p-2">{p.deltaCents!==null&&p.deltaCents>0?'+':''}{formatCapacityCost(p.deltaCents)}</td></tr>)}</tbody></table>

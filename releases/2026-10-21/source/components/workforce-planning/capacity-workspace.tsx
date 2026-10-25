@@ -1,4 +1,5 @@
 'use client';
+import {capacityBalanceLabel} from '@/lib/capacity-display';
 import {KeyFindings} from "@/components/key-findings";
 import {capacityFindings} from "@/lib/context-findings";
 import {useRef} from 'react';
@@ -92,11 +93,11 @@ export function CapacityWorkspace(){
     <div className="overflow-x-auto" role="region" aria-label="Monthly capacity comparison" tabIndex={0}>
      <div className="space-y-3 sm:hidden">{result.points.map(p=><div key={p.month} className="rounded-md border p-3">
       <p className="mb-2 font-medium">{p.month}</p>
-      <dl className="grid grid-cols-3 gap-2 text-sm">{[['Available FTE',p.allocatedFte],['Required FTE',p.requiredFte],['Gap FTE',p.gapFte]].map(([label,value])=><div key={label as string}><dt className="text-xs">{label}</dt><dd className="mt-1 font-semibold tabular-nums">{label==='Gap FTE'&&typeof value==='number'&&value>0?'+':''}{format(value as number|null)}</dd></div>)}</dl>
+      <dl className="grid grid-cols-3 gap-2 text-sm">{[['Available FTE',p.allocatedFte],['Required FTE',p.requiredFte],['Capacity balance',p.gapFte]].map(([label,value])=><div key={label as string}><dt className="text-xs">{label}</dt><dd className="mt-1 font-semibold tabular-nums">{label==='Capacity balance'?capacityBalanceLabel(value as number|null):format(value as number|null)}</dd></div>)}</dl>
       <p className="mt-2 text-xs">{format(p.headcount)} people · {format(p.contractedFte)} contracted FTE</p>
       <p className="mt-2 text-xs">Estimated workforce cost: {formatCapacityCost(cost?.points.find(c=>c.month===p.month)?.runRateCents)} USD/month</p>
      </div>)}</div>
-     <table className="hidden w-full text-left text-sm sm:table"><caption className="sr-only">Monthly available and required capacity, with people shown separately</caption><thead><tr>{['Month','People','Contracted FTE','Available FTE','Required FTE','Gap FTE','Estimated workforce cost (USD/month)'].map(label=><th key={label} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{result.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th>{[p.headcount,p.contractedFte,p.allocatedFte,p.requiredFte,p.gapFte].map((n,i)=><td key={i} className="p-2 tabular-nums">{i===4&&n!==null&&n>0?'+':''}{format(n)}</td>)}<td className="p-2 tabular-nums">{formatCapacityCost(cost?.points.find(c=>c.month===p.month)?.runRateCents)}</td></tr>)}</tbody></table>
+     <table className="hidden w-full text-left text-sm sm:table"><caption className="sr-only">Monthly available and required capacity, with people shown separately</caption><thead><tr>{['Month','People','Contracted FTE','Available FTE','Required FTE','Capacity balance','Estimated workforce cost (USD/month)'].map(label=><th key={label} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{result.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th>{[p.headcount,p.contractedFte,p.allocatedFte,p.requiredFte,p.gapFte].map((n,i)=><td key={i} className="p-2 tabular-nums">{i===4?capacityBalanceLabel(n):format(n)}</td>)}<td className="p-2 tabular-nums">{formatCapacityCost(cost?.points.find(c=>c.month===p.month)?.runRateCents)}</td></tr>)}</tbody></table>
     </div>
     </details>
     <p className="text-xs text-muted-foreground">Available FTE is contracted FTE assigned to this work. Productivity changes required FTE; an FTE gap is not a number of people to hire.</p>

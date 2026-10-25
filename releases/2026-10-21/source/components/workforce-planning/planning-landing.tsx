@@ -1,4 +1,5 @@
 'use client';
+import {capacityBalanceLabel} from '@/lib/capacity-display';
 
 import {useState} from 'react';
 import {ChartNoAxesCombined, SlidersHorizontal, Lightbulb, RotateCcw} from 'lucide-react';
@@ -47,7 +48,7 @@ export function PlanningLanding(){
     <div className={styles.projectionHeading}><span><ChartNoAxesCombined size={19} aria-hidden="true"/> Workforce projection</span><span className={styles.badge}>{error?'Check inputs':'Demo calculation'}</span></div>
     <CapacityProjection result={result}/>
     <p className={styles.footnote}>Calculated from the displayed demo assumptions. An FTE gap is capacity, not a hiring target.</p>
-    {result&&<details className={styles.assumptions}><summary>Monthly detail</summary><div className="overflow-x-auto" role="region" aria-label="Demo monthly capacity" tabIndex={0}><table className="w-full text-left text-xs"><caption className="sr-only">Demo monthly available, required and gap FTE</caption><thead><tr>{['Month','Available FTE','Required FTE','Gap FTE'].map(label=><th className="p-2" key={label} scope="col">{label}</th>)}</tr></thead><tbody>{result.points.map(point=><tr key={point.month}><th className="p-2" scope="row">{point.month}</th>{[point.allocatedFte,point.requiredFte,point.gapFte].map((value,index)=><td className="p-2" key={index}>{number(value)}</td>)}</tr>)}</tbody></table></div></details>}
+    {result&&<details className={styles.assumptions}><summary>Monthly detail</summary><div className="overflow-x-auto" role="region" aria-label="Demo monthly capacity" tabIndex={0}><table className="w-full text-left text-xs"><caption className="sr-only">Demo monthly available, required and gap FTE</caption><thead><tr>{['Month','Available FTE','Required FTE','Capacity balance'].map(label=><th className="p-2" key={label} scope="col">{label}</th>)}</tr></thead><tbody>{result.points.map(point=><tr key={point.month}><th className="p-2" scope="row">{point.month}</th>{[point.allocatedFte,point.requiredFte,point.gapFte].map((value,index)=><td className="p-2" key={index}>{index===2?capacityBalanceLabel(value):number(value)}</td>)}</tr>)}</tbody></table></div></details>}
    </div>
    <aside className={styles.guidance} aria-label="Planning guidance">
     <div className={styles.cardTitle}><span className={styles.icon}><Lightbulb size={20} aria-hidden="true"/></span><h4>Planning guidance</h4></div>
