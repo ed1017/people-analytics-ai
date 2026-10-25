@@ -457,3 +457,9 @@ PR398 is live after CI and desktop/mobile interaction checks. The apparent secon
 PR399 is live: runtime e94ea65b907e9ede0adf5f3367e527fc189b6553, public head 7b77f9130752389b78f46efe24863d2dd9c7a6cb, deployment dpl_31Xkwkbdni7xFYdQZgrvQL5AGxWh. Exact-head CI40152415930 and public desktop/mobile focus, draft, reset, navigation/history and methodology checks passed. This supersedes its pending status above.
 
 Dashboard risk candidate uses the same verified business-unit stock histories and three-month continuation as the existing trend planner. Shows actual conditional FTE declines, not demand gaps or probabilities; country/level intersections remain explicitly unavailable. Plan a response carries the selected group and matching evidence into editable controls, comparison and source-bound save/reopen. No provider requests on loading or edits, no new model or financial changes. Calculation/source tests and independent review pass; staged browser/CI and screenshot review pending. Explore/category reordering and contextual headcount ideas remain discussion only.
+
+## Dashboard risk meaning - October25
+
+PR400 is live: runtimefa065deaf32fa711b6addeeba3195df9f71ec51b, deploymentdpl_6gSRZRcCfKmd3MQ1TM7VVfKmkFzr, merge8747d41662ea8151ebdf950ab515f8d471cceaab. CI and public desktop/mobile risk-to-planner, filters, reset/save/reopen and error-recovery checks passed. Live readiness and screenshot show AI configured; no paid calls.
+
+This copy-only follow-up supports quick recruiter review: short conditional FTE result, recorded/projected figures, visible unknown workload coverage and accurate Model staffing changes action. Same calculation, scope eligibility, layout, saved basis and trend editor. Independent review and18focusedchecks passed. Preview screenshot and exact-head CI pending. Mockup themes/mitigation numbers/global reordering remain discussion, not implemented.
