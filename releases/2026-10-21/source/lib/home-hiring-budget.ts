@@ -43,6 +43,9 @@ export function hiringPlanningSummary(result:ReturnType<typeof calculateHiringBu
   :{kind:'unknown' as const,amount:null};
  return {cost:{...cost,currency:input.currency},months:input.months,startMonth:input.startMonth,arrivalDate:input.arrivalDate,hires:input.hires,ftePerHire:input.ftePerHire};
 }
+export function hasHiringScenarioInputs(s:HiringBudgetReview|null|undefined){
+ return !!s&&hiringBudgetFields.some(field=>field!=='budget'&&s.inputs[field]!==null);
+}
 export function hiringBudgetView(s:HiringBudgetReview|null){
  if(!s)return null;
  const result=calculateHiringBudget(s.inputs,s.datasetToken);

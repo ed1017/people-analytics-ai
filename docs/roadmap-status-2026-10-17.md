@@ -463,3 +463,13 @@ Dashboard risk candidate uses the same verified business-unit stock histories an
 PR400 is live: runtimefa065deaf32fa711b6addeeba3195df9f71ec51b, deploymentdpl_6gSRZRcCfKmd3MQ1TM7VVfKmkFzr, merge8747d41662ea8151ebdf950ab515f8d471cceaab. CI and public desktop/mobile risk-to-planner, filters, reset/save/reopen and error-recovery checks passed. Live readiness and screenshot show AI configured; no paid calls.
 
 This copy-only follow-up supports quick recruiter review: short conditional FTE result, recorded/projected figures, visible unknown workload coverage and accurate Model staffing changes action. Same calculation, scope eligibility, layout, saved basis and trend editor. Independent review and18focusedchecks passed. Preview screenshot and exact-head CI pending. Mockup themes/mitigation numbers/global reordering remain discussion, not implemented.
+
+## Planning journey recovery — October 25 candidate
+
+PR402's shared dashboard/planner styling and connected save/reopen flow are live; PR403's date-only renewal is live at runtime 6527124110cdea3ddb7a9dcab03b6b69fea8cfb8. Pricing expires October 26 at 15:05 UTC (earliest configuration cutoff 15:03 UTC).
+
+The focused usability check found one deterministic clarification gap: a new multi-role template's explicit budget was kept only in prose, while subsequent calculator updates require current-turn funding authority. Candidate runtime 471bae3c767148969f4d6a5dea60e9528bed5a76 captures that strictly validated initial budget through the existing provenance validator. It does not infer currency, costs, allocation or a hiring plan, repurpose an existing scenario, or weaken later budget-change authorization. A retained budget alone does not display a calculated-plan panel.
+
+Unpaid production-browser checks passed for failure/draft retention/explicit retry/repeated submit (mobile), cancel/late-response rejection/retry (desktop), real input validation, apply/cancel/reset, chart recalculation, two saved revisions/reload and original receipt preservation. Controlled answers were used; this is not fresh model interpretation. Local tests cover template allocation follow-up, unknown versus zero, unsupported budgets, older context and state reload. Candidate preview, exact-commit CI and public verification remain pending. No paid calls, accounting, access or pricing changes in this candidate.
+
+Remaining evidence limits: the original intermittent model rejection is not proven fixed; arbitrary fresh-model multi-role interpretation remains unverified. No promise of failure-free behavior. Main planning entry already exists as Try a planning scenario and current-plan jump; avoid duplicating it or reordering modules without a demonstrated issue.

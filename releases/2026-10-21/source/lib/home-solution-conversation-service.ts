@@ -29,7 +29,7 @@ import {turnoverChatReply,clearTurnoverChat,retainTurnoverChat} from './home-tur
 // @ts-expect-error Native fixtures share source.
 import {headcountChatReply} from './home-headcount-chat.ts';
 // @ts-expect-error Native fixtures share source.
-import {staffingStarterIntake} from './home-staffing-intake.ts';
+import {staffingStarterIntake,initialStaffingTemplateBudget} from './home-staffing-intake.ts';
 // @ts-expect-error Native Node tests share application source.
 import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
@@ -131,6 +131,8 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  }
  const intake=!runtime.staffingScenarioOnly&&!runtime.demand?staffingStarterIntake(request):null;
  if(intake){
+  const budget=runtime.natural?initialStaffingTemplateBudget(request):null;
+  if(budget!==null)state.hiringBudget=editHiringBudget(request,runtime.natural!.datasetToken,[{field:'budget',value:budget,basis:{kind:'user-supplied',turnId:request.message.id,quote:request.message.text,explanation:'Explicit budget from the initial staffing template; role allocation and costs remain unknown.'}}]);
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:intake.answer}].slice(-32);
   state.questions=intake.questions;
   return {requestId:request.requestId,answer:intake.answer,candidateIds:[],analysisIds:[],charts:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
