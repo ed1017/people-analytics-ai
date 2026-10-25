@@ -1,5 +1,6 @@
 'use client';
 import {useChartPointerTooltip} from './chart-pointer-tooltip';
+import {HomeRiskSummary} from './home-risk-summary';
 import {KeyFindings} from './key-findings';
 import {snapshotFindings} from '@/lib/key-findings';
 
@@ -94,7 +95,6 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   return <section aria-label="Workforce snapshot" className={styles.historySummary}>
       <div className={styles.historyHeading}>
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
-        <p className={styles.watch}>Watch: Not assessed</p>
       </div>
 
       <p className={styles.scope}>{scopeLabel} · Recorded workforce history</p>
@@ -122,6 +122,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average open requisition age scope and definition">ⓘ</summary><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></details></li>
         <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting offers scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></details></li>
       </ul></div>
+      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
       <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         <p>{axisLabel} Recorded charts share the snapshot year; conditional projections are separately labeled.</p>

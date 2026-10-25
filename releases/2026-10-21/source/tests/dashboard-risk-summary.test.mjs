@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {dashboardRiskSummary as summary} from '../lib/dashboard-risk-summary.ts';
+import {groupWorkforceTrend} from '../lib/group-workforce-trend.ts';
+const all={country:'all',org:'all',level:'all'},asOf='2026-09-30';
+function groups(){return Array.from({length:8},(_,i)=>{const change=i-4;return {code:'BU-'+i,label:'Group '+i,asOf,headcount:200,fte:180,exits:4,historyMonths:9,history:['2026-06-30','2026-07-31','2026-08-31',asOf].map((snapshot_date,j)=>({snapshot_date,headcount:200+(j-3)*change,fte:180+(j-3)*change}))};});}
+test('matched observed stock changes rank declines and preserve exact planner handoff',()=>{const input=groups(),before=structuredClone(input),r=summary(input,all,asOf);assert.equal(r.declines.length,4);assert.equal(r.from,'2026-06-30');assert.equal(r.end,'2026-12-31');assert.equal(r.rows[0].trend.deltaFte,-12);for(const row of r.rows)assert.deepEqual(row.trend,groupWorkforceTrend(row.group,3,3));assert.deepEqual(input,before);});
+test('BU scope stays isolated and unsupported intersections do not use global risk',()=>{assert.equal(summary(groups(),{...all,org:'BU-7'},asOf).rows.length,1);assert.equal(summary(groups(),{...all,org:'BU-7'},asOf).declines.length,0);for(const f of [{...all,org:'missing'},{...all,country:'US'},{...all,level:'L2'}])assert.throws(()=>summary(groups(),f,asOf));});
+test('missing months, stale dates, duplicate/incomplete partitions cannot claim assessed risk',()=>{for(const change of [g=>g.pop(),g=>g[0].history.splice(1,1),g=>g[0].asOf='2026-08-31',g=>g[0].code=g[1].code,g=>g[0].history[0].fte=NaN]){const g=groups();change(g);assert.throws(()=>summary(g,all,asOf));}});
+test('zero and positive trends are not declines; ties deterministic without altering precision',()=>{const g=groups().map(x=>({...x,history:x.history.map(p=>({...p,headcount:200,fte:180}))}));const r=summary(g,all,asOf);assert.equal(r.declines.length,0);assert.deepEqual(r.rows.map(x=>x.group.code),g.map(x=>x.code));g[0].history[0].fte=180.123456;assert.ok(Math.abs(summary(g,all,asOf).declines[0].trend.deltaFte+.123456)<1e-10);});
