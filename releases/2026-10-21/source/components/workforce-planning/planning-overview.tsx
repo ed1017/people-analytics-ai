@@ -144,7 +144,7 @@ export function PlanningOverview({
       <section className="rounded-lg border p-4" aria-label="Current planning scenario">
         <h3 className="font-semibold">{cards[0].value}</h3>
         <p className="mt-2 text-sm">{cards[0].detail} {cards[1].detail}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Stored plan / modeled outcomes, not observed actuals.</p>
+        <p className="mt-1 text-xs text-muted-foreground">Projected outcomes from the selected plan.</p>
         <button type="button" onClick={()=>onNavigate("plan")} className="mt-3 min-h-11 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background focus-visible:ring-2 focus-visible:ring-ring">Create or compare a scenario</button>
       </section>
       <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
@@ -210,7 +210,7 @@ export function PlanningOverview({
         <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Synthetic planning examples</summary>
       <div className="rounded-lg border p-4">
         <p className="font-semibold">Try Planning Calculator</p>
-        <p className="mt-1 text-sm text-muted-foreground">Explore a fictional managed-services workload and review how planning inputs affect its estimated capacity gap. Fictional defaults and unverified entries remain labeled.</p>
+        <p className="mt-1 text-sm text-muted-foreground">Try a fictional managed-services workload to see how your inputs change the estimated capacity gap.</p>
         <PlanningAssumptionIllustration launcherOnly/>
       </div>
       </details>
