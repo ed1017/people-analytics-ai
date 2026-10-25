@@ -30,7 +30,7 @@ export const attritionFindings = (d: AttritionResponse) => result(`Company workf
   numeric(d.summary.total_exits) && d.summary.total_exits > 0 && numeric(d.summary.voluntary_exits) && d.summary.voluntary_exits <= d.summary.total_exits ? `${n(100*d.summary.voluntary_exits/d.summary.total_exits)}% of recorded exits were voluntary; this does not establish why people left.` : null,
 ]);
 export const recruitingFindings = (d: TalentAcquisitionResponse) => result(`Recruiting snapshot · ${d.as_of}`, [
-  fact(d.summary.median_time_to_fill_days, v => `Recorded median time to fill is ${n(v)} days; it is not a promise for a future hire.`),
+  fact(d.summary.median_time_to_fill_days, v => `Recorded median time to fill: ${n(v)} days.`),
   fact(d.summary.open_requisitions, v => `${n(v)} requisitions currently have open status.`),
   fact(d.summary.open_reqs_over_60_days, v => numeric(d.summary.open_requisitions) && d.summary.open_requisitions > 0 && v <= d.summary.open_requisitions ? `${n(100*v/d.summary.open_requisitions)}% of open requisitions (${n(v)} of ${n(d.summary.open_requisitions)}) are older than 60 days.` : `${n(v)} open requisitions are older than 60 days.`),
 ]);
@@ -40,14 +40,14 @@ export const surveyFindings = (d: SurveySentimentResponse) => result(`Company em
   'Favorability summarizes survey responses; it is not comment sentiment or evidence of a causal relationship.',
 ]);
 export const financeFindings = (d: FinanceResponse) => result(`Company finance snapshot · ${d.as_of}`, [
-  fact(d.current.labor_cost_usd, v => `Recorded labor cost is USD ${n(v)}. The snapshot does not establish an annual or fully loaded cost basis.`),
+  fact(d.current.labor_cost_usd, v => `Recorded labor cost: USD ${n(v)}; cost period unconfirmed.`),
   fact(d.current.vacant_positions, v => `${n(v)} positions are vacant in the finance snapshot.`),
-  fact(d.current.fte, v => `${n(v)} FTE are represented; forecast scenarios remain separate from recorded costs.`),
+  fact(d.current.fte, v => `Recorded workforce: ${n(v)} FTE.`),
 ]);
-export const skillsFindings = (d: SkillsResponse) => result(`Company skill evidence · ${d.as_of}; workforce filters do not narrow this evidence`, [
+export const skillsFindings = (d: SkillsResponse) => result(`Company-wide skill evidence · ${d.as_of}`, [
   fact(d.summary.skills_with_demand, v => `${n(v)} skills have recorded role demand.`),
-  fact(d.summary.weighted_requirement_met_pct, v => `${n(v)}% is the weighted requirement-met rate; it is not the share of employees ready to move.`),
-  fact(d.summary.average_profile_coverage_pct, v => `Average profile coverage is ${n(v)}%; missing proficiency evidence is not proof of low proficiency.`),
+  fact(d.summary.weighted_requirement_met_pct, v => `Role requirements met (weighted): ${n(v)}%.`),
+  fact(d.summary.average_profile_coverage_pct, v => `Average recorded profile coverage: ${n(v)}%; missing proficiency remains unassessed.`),
 ]);
 export const learningFindings = (d: LearningDevelopmentResponse) => result(`Company learning catalogue · ${d.as_of}; workforce filters do not narrow this evidence`, [
   fact(d.summary.gap_skills_with_active_pathway, v => `${n(v)} gap skills have an active learning pathway${numeric(d.summary.current_gap_skills) ? ` out of ${n(d.summary.current_gap_skills)} recorded gap skills` : ''}.`),

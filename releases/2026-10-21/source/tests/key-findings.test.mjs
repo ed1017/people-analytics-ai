@@ -15,7 +15,7 @@ test('null/nonfinite recruiting metrics do not turn into zero or a forecast',()=
  const a=findings.recruitingFindings({as_of:'2026-09-30',summary:{median_time_to_fill_days:null,open_requisitions:NaN,open_reqs_over_60_days:Infinity}});
  assert.match(a.items[0],/No verified values/);
  const b=findings.recruitingFindings({as_of:'2026-09-30',summary:{median_time_to_fill_days:33,open_requisitions:0,open_reqs_over_60_days:0}});
- assert.match(b.items[0],/median.*33 days.*not a promise/);assert.match(b.items[1],/^0 requisitions/);
+ assert.equal(b.items[0],'Recorded median time to fill: 33 days.');assert.match(b.items[1],/^0 requisitions/);
 });
 test('succession suppression wins even if a populated value is accidentally supplied',()=>{
  const r=findings.successionFindings({as_of_date:null,plan_coverage_suppressed:true,recorded_plan_coverage_pct:17,ready_now_suppressed:true,positions_with_ready_now:3,data_meta:{successionSemantics:'illustrative-plan-flags'}});
@@ -25,7 +25,7 @@ test('survey and finance preserve distinct metric and cost-period meanings',()=>
  const survey=findings.surveyFindings({as_of:'2026-09-30',summary:{engagement_favorable_pct:40,engagement_respondents:100,engagement_participation_pct:null}});
  assert.match(survey.items[0],/40% among 100 respondents/);assert.match(survey.items.at(-1),/not comment sentiment/);
  const finance=findings.financeFindings({as_of:'2026-09-30',current:{labor_cost_usd:1000,vacant_positions:null,fte:5}});
- assert.match(finance.items[0],/does not establish an annual/);assert.doesNotMatch(finance.items.join(' '),/0 positions/);
+ assert.equal(finance.items[0],'Recorded labor cost: USD 1,000; cost period unconfirmed.');assert.equal(finance.items[1],'Recorded workforce: 5 FTE.');assert.doesNotMatch(finance.items.join(' '),/0 positions/);
 });
 test('all page integrations gate stale results while loading/error',()=>{
  for(const name of ['workforce','attrition','talent-acquisition','survey-sentiment','learning-development','career-mobility']) {
@@ -46,4 +46,17 @@ test('public recruiting context tolerates intentionally omitted recruiter record
  const source=fs.readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  assert.match(source,/talentAcquisitionData\.recruiters\?\.slice/);
  assert.doesNotMatch(source,/talentAcquisitionData\.recruiters\.slice/);
+});
+
+
+test('concise skills findings preserve company scope and unknown evidence without readiness claims',()=>{
+ const d={as_of:'2027-01-31',summary:{skills_with_demand:12,weighted_requirement_met_pct:72.5,average_profile_coverage_pct:88}};
+ const a=findings.skillsFindings(d);
+ assert.equal(a.scope,'Company-wide skill evidence · 2027-01-31');
+ assert.deepEqual(a.items,['12 skills have recorded role demand.','Role requirements met (weighted): 72.5%.','Average recorded profile coverage: 88%; missing proficiency remains unassessed.']);
+ const zero=findings.skillsFindings({...d,summary:{skills_with_demand:0,weighted_requirement_met_pct:0,average_profile_coverage_pct:0}});
+ assert.match(zero.items.join(' '),/0 skills.*weighted.*0%.*coverage: 0%/);
+ const missing=findings.skillsFindings({...d,summary:{skills_with_demand:null,weighted_requirement_met_pct:NaN,average_profile_coverage_pct:undefined}});
+ assert.deepEqual(missing.items,['No verified values are available for this summary. Missing values are not zero.']);
+ assert.doesNotMatch(a.items.join(' '),/ready to move|employees ready/);
 });

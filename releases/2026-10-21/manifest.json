@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "b0b42e052046e87c1622c07deef8c4581178c2e9",
+  "sourceCommit": "af63daaadf28fa109083968cc9b54d50f8f2c1cc",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -759,8 +759,8 @@
     },
     {
       "path": "components/pages/finance-page.tsx",
-      "sha256": "98d51179774c871f3fa5e4fe50f14735f3b4bd57e4b3703fbd7a8e3e7e073431",
-      "bytes": 17231
+      "sha256": "148bdb5eb85fc17c1cd6b235e82abe5c4830d9185593ef65e1c77db5a6d6874c",
+      "bytes": 17444
     },
     {
       "path": "components/pages/intelligence-page.tsx",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "b9fb90032565069d717d65c03030b70e4a0df0acaab75436a008dd274db020d0",
-      "bytes": 8726
+      "sha256": "2a94f0f952a29e0997aa3a5db1cc6f2abf9e20279ba8867d86f6125a0a451537",
+      "bytes": 8478
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3799,8 +3799,8 @@
     },
     {
       "path": "tests/catalog-display.test.mjs",
-      "sha256": "4841fd394ab857703e095c1b52a8433466a367e231bba64bf43d65d3f2c19aeb",
-      "bytes": 8371
+      "sha256": "ac70128ebf69d43b429f882fe999d307ad4cbe0a9c9f193e3683720afe211dbe",
+      "bytes": 8467
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "324face40e0bd0f544213dd8c0ac2389d085c0bff45fbabcf37f3f5db65109b3",
-      "bytes": 4170
+      "sha256": "5ff7f30b7d71806852ec8a06f170459ef6cf2ca4d856d54f3ad797918cbbb6c7",
+      "bytes": 5365
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",

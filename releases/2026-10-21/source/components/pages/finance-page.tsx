@@ -83,9 +83,10 @@ export function FinancePage({
                         financeData.current.labor_cost_usd
                       )}
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Reported USD cost · period unknown
-                    </p>
+                    <details className="mt-1 text-xs text-muted-foreground">
+                      <summary className="cursor-pointer min-h-6">Reported USD cost · period unknown</summary>
+                      <p className="mt-1">The source does not specify a cost period or whether benefits and other employer costs are included.</p>
+                    </details>
                   </div>
 
                   <div className="min-w-0 break-words rounded-lg border p-4">
