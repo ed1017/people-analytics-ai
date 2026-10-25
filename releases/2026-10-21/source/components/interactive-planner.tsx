@@ -6,11 +6,12 @@ import decision from './decision-style.module.css';
 const display=(value:ReactNode)=>typeof value==='string'?catalogProseDisplay(value):value;
 
 /** Presentation only. Each adapter supplies outputs and controls from its existing calculator. */
-export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,assumptions,children,compact=false}:{scope:ReactNode;outcome:ReactNode;metrics:{label:string;value:ReactNode}[];levers:ReactNode;visual:ReactNode;actions?:ReactNode;assumptions?:ReactNode;children?:ReactNode;compact?:boolean}){
+export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,assumptions,children,supplement,focusVisual=false,compact=false}:{scope:ReactNode;outcome:ReactNode;metrics:{label:string;value:ReactNode}[];levers:ReactNode;visual:ReactNode;actions?:ReactNode;assumptions?:ReactNode;children?:ReactNode;supplement?:ReactNode;focusVisual?:boolean;compact?:boolean}){
  return <section className={`${decision.surface} ${styles.planner} ${compact?styles.compact:''}`} aria-label="Interactive scenario planner">
   <header className={decision.hero}><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
   <dl className={styles.metrics}>{metrics.map(metric=><div key={metric.label}><dt>{metric.label}</dt><dd>{display(metric.value)}</dd></div>)}</dl>
-  <div className={styles.layout}><section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section><div className={styles.visual}>{visual}</div></div>
+  <div className={focusVisual?styles.focusLayout:styles.layout}>{focusVisual?<details open className={styles.levers}><summary className="min-h-11 cursor-pointer py-2 font-semibold">Adjust scenario</summary>{levers}</details>:<section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section>}<div className={styles.visual}>{visual}</div></div>
+  {supplement}
   {actions&&<div className={styles.actions}>{actions}</div>}
   {assumptions&&<p className={styles.assumptions}>{display(assumptions)}</p>}
   {children}
