@@ -145,9 +145,9 @@ export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loadi
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <h2>Plan the workforce your business needs</h2>
-    <p className={styles.subtitle}>Start with a decision. Explore the evidence, compare assumptions, and build your plan.</p>
+    <p className={styles.subtitle}>Try the worked example, or use a template below for your own staffing plan.</p>
     <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>
-    <p className={styles.demoNote}>Edit assumptions, compare staffing options and save a proposal in this browser. No live AI call.</p>
+    <p className={styles.demoNote}>Worked example: adjust staffing, compare options, then review and save. No AI call.</p>
     <h3>What decision are you facing?</h3>
     <HomePromptCategories onQuestion={onQuestion} disabled={disabled}/>
     {templates}
