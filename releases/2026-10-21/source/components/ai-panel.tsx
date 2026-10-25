@@ -189,7 +189,7 @@ export function AiPanel({
         </div>
       )}
 
-      <aside
+      <aside id="workforce-ai-panel"
         className={
           aiCollapsed
             ? "app-ai-panel sticky top-[var(--app-header-height)] flex h-[calc(100vh-var(--app-header-height))] min-w-0 flex-col overflow-hidden border-l bg-card p-4 max-md:h-16"

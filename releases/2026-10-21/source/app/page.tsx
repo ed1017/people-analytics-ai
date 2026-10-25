@@ -1952,7 +1952,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-left${evidenceDrawer ? " app-evidence-first" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${aiCollapsed && !evidenceDrawer ? " app-ai-closed" : ""}${evidenceDrawer ? " app-evidence-first" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -1961,7 +1961,7 @@ export default function Home() {
             "--divider-width": `${
               aiCollapsed ? 0 : 6
             }px`,
-            "--ai-width": aiCollapsed ? "64px" : `min(${aiWidth}px, max(280px, calc(100vw - var(--nav-width) - 486px)))`,
+            "--ai-width": aiCollapsed ? "0px" : `min(${aiWidth}px, max(280px, calc(100vw - var(--nav-width) - 486px)))`,
           } as CSSProperties
         }
       >
@@ -1977,6 +1977,7 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+        {!evidenceDrawer && aiCollapsed && !["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) && <div className="evidence-ai-toolbar"><button id="collapsed-ai-entry" type="button" aria-controls="workforce-ai-panel" aria-expanded={false} onClick={()=>{setAiCollapsed(false);requestAnimationFrame(()=>document.querySelector<HTMLTextAreaElement>(".app-ai-panel textarea")?.focus({preventScroll:window.matchMedia("(min-width: 768px)").matches}));}}>Open Workforce AI</button></div>}
         {evidenceDrawer && <div className={`evidence-ai-toolbar${activePage === "workforce" ? " baseline-ai-entry" : ""}`}><span className="sr-only">Ask about this evidence</span><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>{activePage === "workforce" && <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 10h8M8 14h5"/></svg>}Open Workforce AI</button></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
@@ -2190,7 +2191,7 @@ export default function Home() {
           onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
-            setAiCollapsed(!aiCollapsed)
+            {setAiCollapsed(!aiCollapsed);if(!aiCollapsed)requestAnimationFrame(()=>document.getElementById("collapsed-ai-entry")?.focus({preventScroll:window.matchMedia("(min-width: 768px)").matches}));}
           }
           onChatInputChange={setChatInput}
           onSendSuggested={sendSuggestedPrompt}
