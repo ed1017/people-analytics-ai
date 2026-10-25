@@ -9,7 +9,7 @@ import {swpDemoPrompt} from '@/lib/swp-demo';
 import {PublicAiConfigurationStatus} from '@/components/public-ai-configuration-status';
 import {publicAiFetch} from '@/lib/public-ai-readiness-client.mjs';
 import {publicAiReadiness,usePublicAiReadiness} from '@/components/use-public-ai-readiness';
-import {publicHomeSourceVersion} from '@/lib/public-ai-evidence-client.mjs';
+import {publicHomeSourceVersion,canRefreshPublicEvidence} from '@/lib/public-ai-evidence-client.mjs';
 import {PUBLIC_AI_ENABLED} from '@/lib/public-ai-capabilities.mjs';
 import {homeWorkforceFlows,type WorkforceFlow} from '@/lib/home-workforce-flows';
 import {CatalogComposer,PromptTemplates} from '@/components/catalog-composer';
@@ -218,6 +218,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const [loading, setLoading] = useState(false);
   const [evidenceError, setEvidenceError] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
+  const [evidenceRetryContext,setEvidenceRetryContext]=useState<string|null>(null);
   const { messages, setMessages, input, setInput, loading: chatLoading, setLoading: setChatLoading, error: chatError, setError: setChatError, problem: journey, questionUnanswered, setQuestionUnanswered, history: modelHistoryRef } = conversation;
   const optionSnapshot=useSyncExternalStore(optionActions?.subscribe??noActionSubscription,optionActions?.getSnapshot??noActionSnapshot,noActionSnapshot);
   const [scenarioChat,setScenarioChat]=useState(false);
@@ -366,7 +367,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       setInput(current=>current.trim()?current:message);
       responseReveal.current?.cancel();const reveal=guidedExampleActive?null:queueHomeResponseReveal(()=>conversationViewport.current,()=>requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key);responseReveal.current=reveal;
       try{const answer=await solutions.send(message);if(answer&&sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key){const assistantMessage:ChatMessage={role:'assistant',content:answer};const series=solutions.answerSeries.current;setAnswerCharts(current=>{const next=new Map(current).set(assistantMessage,{context:key,series});while(next.size>16)next.delete(next.keys().next().value!);return next;});setMessages(current=>[...current,assistantMessage]);if(!keepComposer||emptyComposer)setInput(current=>current.trim()===message?'':current);setQuestionUnanswered(false);}}
-      catch(error){if(sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key)setChatError(error instanceof Error?error.message:'The conversation is unavailable. Your draft is kept.');}
+      catch(error){if(sending.current===ticket&&requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key){setEvidenceRetryContext(canRefreshPublicEvidence(error)?key:null);setChatError(error instanceof Error?error.message:'The conversation is unavailable. Your draft is kept.');}}
       finally{if(sending.current===ticket)sending.current=null;if(requestEpoch===promptEpoch.current&&liveActive.current&&currentEvidenceKey.current===key)reveal?.complete();else reveal?.cancel();}return;
     }
     const forecastQuestion = !actionPlan && Boolean(homeForecastIntent(message));
@@ -661,6 +662,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       </div>}
       {chatLoading && <DataLoadingStatus startedAt={conversation.pendingStartedAt} name="AI answer status" label="Preparing your answer…" detail="Using the available evidence and your question."/>}
       {chatError && <p role="alert" className="text-destructive">{chatError}</p>}
+      {chatError&&evidenceRetryContext===contextKey&&<button type="button" disabled={loading||chatLoading||solutions.pending} onClick={()=>{setEvidenceRetryContext(null);setChatError(null);refreshHomeData();}} className="min-h-11 rounded border px-3 py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50">Refresh evidence and keep draft</button>}
     </section>
   );
   const templates=<PromptTemplates value={input} onChange={changeQuestion} textareaRef={composer}/>;

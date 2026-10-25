@@ -15,6 +15,10 @@ export function selectedPublicObjectiveState(state,objective){
 }
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const bytes=v=>new TextEncoder().encode(JSON.stringify(v)).length;
+export class PublicEvidenceUnavailableError extends Error {
+ constructor(){super('Current workforce evidence could not be verified. Refresh evidence, then send your question again. Your draft is kept.');this.name='PublicEvidenceUnavailableError';}
+}
+export const canRefreshPublicEvidence=error=>error instanceof PublicEvidenceUnavailableError;
 const must=v=>{if(!v)throw Error('Exact public evidence for this saved plan is unavailable. Earlier plans are kept.');};
 export function publicHomeSourceVersion(results){
  const metadata=Object.values(results??{}).filter(v=>v?.status==='loaded').map(v=>v.data?.data_meta).filter(Boolean);
@@ -40,6 +44,9 @@ export function retainPublicAiRecipes(previous,added){
 }
 export async function recipeBinding(recipe){return actionBinding(recipe.goal.id,recipe.goal.statement,recipe.evidence,recipe.planningInputs);}
 export async function publicSolutionEnvelope(request,source,stored){
+ // A settled fetch can lack a verified source after failed retrieval or mixed receipts.
+ // Never send or silently substitute evidence.
+ if(!isPublicProjectionVersion(source))throw new PublicEvidenceUnavailableError();
  const goal=request.goal;
  const required=[...(request.catalog?.plans??[]).map(p=>p.draft.binding),...(request.state.working??[]).map(p=>p.binding)];
  const current=publicAiRecipe({source,goal,filters:request.filters,scope:request.scope,evidence:request.evidence,planningInputs:{scope:request.scope,constraints:request.state.constraints}});

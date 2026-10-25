@@ -473,3 +473,11 @@ The focused usability check found one deterministic clarification gap: a new mul
 Unpaid production-browser checks passed for failure/draft retention/explicit retry/repeated submit (mobile), cancel/late-response rejection/retry (desktop), real input validation, apply/cancel/reset, chart recalculation, two saved revisions/reload and original receipt preservation. Controlled answers were used; this is not fresh model interpretation. Local tests cover template allocation follow-up, unknown versus zero, unsupported budgets, older context and state reload. Candidate preview, exact-commit CI and public verification remain pending. No paid calls, accounting, access or pricing changes in this candidate.
 
 Remaining evidence limits: the original intermittent model rejection is not proven fixed; arbitrary fresh-model multi-role interpretation remains unverified. No promise of failure-free behavior. Main planning entry already exists as Try a planning scenario and current-plan jump; avoid duplicating it or reordering modules without a demonstrated issue.
+
+## Evidence recovery follow-up — October 25
+
+PR404 is live at runtime 471bae3; budget continuity and controlled recovery/save checks passed. One desktop evidence guard failure before POST remains causally unclassified; its original log is preserved, not presented as a model rejection.
+
+Candidate runtime 5b3df826b47eccf19a08164801603d6eeaf29707 reproduces the same guard with controlled source retrieval failures. Local catalogue facts can leave Send available while no verified public source exists. The guard remains enforced; a specific evidence-loading message and explicit Refresh evidence and keep draft action replace the misleading saved-plan message for this condition. Refresh does not submit. Corrupt recipes and missing saved-plan bindings retain their existing validation.
+
+Five new regressions and 23 related saved-evidence/intake checks pass, with independent review. Staging/browser acceptance and preview review pending; not live yet. No paid AI calls, pricing, accounting or access changes. Original intermittent trigger and fresh model reliability remain unproven. Broader entry-point/copy/mobile composer polish remains outside this fix.
