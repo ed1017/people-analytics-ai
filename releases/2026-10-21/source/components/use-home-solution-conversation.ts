@@ -1,4 +1,5 @@
 'use client';
+import type {ProjectionDemandInputs} from '@/lib/projection-demand';
 import {previewProjectionEdit,verifyProjectionEditSource,type ProjectionEdit} from '@/lib/headcount-projection-edit';
 import {calculateHeadcountProjection,type HeadcountProjection} from '@/lib/home-solution-projection';
 import {editPreviewAssumptions,type PreviewAssumptions} from '@/lib/planner-preview-inputs';
@@ -194,7 +195,7 @@ export function useHomeSolutionConversation(props:Props){
    currentProps.current.conversation.selectProposalGoal(goal,revision,{...fields,[solutionConversationField]:state} as unknown as Record<string,Json>);memoryRef.current=state;setMemory(state);setNotice('Action Plan pinned. Staffing assumptions remain unconfirmed.');
   }catch(error){setNotice(error instanceof Error?error.message:'The staffing plan could not be saved.');}finally{setSaving(false);}
  }
- async function saveProjectionEntry(base:HeadcountProjection,turnId:string){
+ async function saveProjectionEntry(base:HeadcountProjection,turnId:string,demand:ProjectionDemandInputs|null=null){
   if(controller.current||pending||saving)throw Error('Finish the current operation before saving this projection.');
   const snapshot=requireCurrent(),state=memoryRef.current,context=liveKey.current,initialEpoch=epoch.current,token=datasetSession.snapshot();
   if(state.analyses.length>=6||state.turns.length>=32)throw Error('This conversation has reached its revision limit. Existing projections are retained; start a new conversation for further revisions.');
@@ -207,10 +208,10 @@ export function useHomeSolutionConversation(props:Props){
    const response=await datasetFetch('/api/home-solution-conversation?'+new URLSearchParams(active),{method:'GET',cache:'no-store',signal:abort.signal});
    if(!response.ok)throw Error('Current projection inputs could not be checked. Your saved revision is unchanged.');
    await verifyProjectionEditSource(base,await response.json(),token);
-   const projection=await calculateHeadcountProjection(base.spec,base.inputs,[],[turnId]);
+   const projection=await calculateHeadcountProjection(base.spec,base.inputs,[],[turnId],demand);
    if(!current())throw Error('The conversation or source changed during verification. No projection was saved.');
    requireCurrent();
-   const text=`Saved local projection assumptions: ${base.spec.months} months; ${Object.entries(base.assumptions).map(([k,v])=>`${k.replaceAll('_',' ')} ${v}`).join('; ')}. These are conditional scenario inputs, not observed outcomes.`;
+   const text=`Saved local projection assumptions: ${base.spec.months} months; ${Object.entries(base.assumptions).map(([k,v])=>`${k.replaceAll('_',' ')} ${v}`).join('; ')}. ${projection.demand?' Workload assumptions saved with this revision; unknown values remain unknown.':''} These are conditional scenario inputs, not observed outcomes.`;
    persist(readSolutionState({...state,analyses:[...state.analyses,projection],turns:[...state.turns,{id:turnId,role:'user',text}],verifiedMetrics:state.verifiedMetrics.filter(ref=>ref.kind!=='projection'||ref.id!==base.id)}));
    setNotice(`Saved projection revision 1; earlier conversation remains unchanged.`);
   }finally{clearTimeout(timer);if(controller.current===abort)controller.current=null;setSaving(false);}
@@ -231,7 +232,7 @@ export function useHomeSolutionConversation(props:Props){
    const projection=await previewProjectionEdit(base,edit,turnId,state.analyses);
    if(!current())throw Error('The conversation or source changed during verification. No projection was saved.');
    requireCurrent();
-   const text=`Saved local projection assumptions: ${edit.months} months; ${Object.entries(edit.values).map(([k,v])=>`${k.replaceAll('_',' ')} ${v}`).join('; ')}. These are conditional scenario inputs, not observed outcomes.`;
+   const text=`Saved local projection assumptions: ${edit.months} months; ${Object.entries(edit.values).map(([k,v])=>`${k.replaceAll('_',' ')} ${v}`).join('; ')}. ${projection.demand?' Workload assumptions saved with this revision; unknown values remain unknown.':''} These are conditional scenario inputs, not observed outcomes.`;
    persist(readSolutionState({...state,analyses:[...state.analyses,projection],turns:[...state.turns,{id:turnId,role:'user',text}],verifiedMetrics:state.verifiedMetrics.filter(ref=>ref.kind!=='projection'||ref.id!==base.id)}));
    setNotice(`Saved projection revision ${projection.revision}; the original revision and earlier conversation remain unchanged.`);
   }finally{clearTimeout(timer);if(controller.current===abort)controller.current=null;setSaving(false);}
