@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "0b15c2a0110c4a9f60b8d2cb8c4aa73eef4d6e91",
+  "sourceCommit": "d2c66eca8444a0e6dd3f6969cf1752bd35a82e91",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -4239,18 +4239,18 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "aa0318dba950b9eadba3f21b61b3d6e26b355fd9d06b0d904be1c9e46b25e590",
-      "bytes": 5457
+      "sha256": "44e0d58d06e3e02d59bced81f344522001c7d0aa55f261fb71749e868e2c7530",
+      "bytes": 5465
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
-      "sha256": "39840b0cdd6dc263ee320803917b4ec796313c4809343ce5a22fe895ad020e31",
-      "bytes": 2217
+      "sha256": "66cbf6cbf9abdcc46c867cc2a8bd044326dc3d7db0676554a0adab23700d40f0",
+      "bytes": 2350
     },
     {
       "path": "tests/dashboard-risk-summary.test.mjs",
-      "sha256": "a45308889831f6ba7d59827fc19dd871df309a8feef5b8052a50370ff0f0dae3",
-      "bytes": 3746
+      "sha256": "502324fd4921e78d1cfe65c863f59f6b22dd235b20b2308528af936ea6d83d47",
+      "bytes": 4415
     },
     {
       "path": "tests/manual/dashboard-risk-release.test.mjs",
@@ -4259,5 +4259,5 @@
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "0c79d1dce1ab97750892493769c4da719d854444d5bcba8bac958eb809969755"
+  "verifiedDeployedArchiveSha256": "6001526a13a4f58ddf27396937e691abd26894d0d4cb95b638fa1e058a0e30b7"
 }

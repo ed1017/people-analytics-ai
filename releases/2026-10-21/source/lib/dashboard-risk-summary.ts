@@ -15,10 +15,11 @@ export function dashboardRiskSummary(groups:RiskGroup[],filters:DashboardFilters
 /** Plain-language presentation only; calculated stocks and the saved basis stay unchanged. */
 export function workforceTrendMessage(group:RiskGroup,trend:ReturnType<typeof groupWorkforceTrend>){
  const magnitude=Math.abs(trend.deltaFte),rounded=Math.round(magnitude);
- const amount=magnitude<1?(magnitude===0?'0':magnitude<.1?'less than 0.1':magnitude.toLocaleString('en-US',{maximumFractionDigits:1})):((Math.abs(magnitude-rounded)>.000001?'about ':'')+rounded.toLocaleString('en-US'));
+ const amount=magnitude<1?(magnitude===0?'0':magnitude<.1?'less than 0.1':magnitude>=.95?'less than 1':magnitude.toLocaleString('en-US',{maximumFractionDigits:1})):rounded.toLocaleString('en-US');
  const direction=trend.deltaFte<0?'fewer':'more';
- const statement=magnitude===0?`${group.label}: no projected FTE change`:`${group.label}: ${amount} ${direction} FTE`;
- const condition=`If recent net staffing trends continue for ${trend.months} months.`;
+ const endMonth=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(trend.points.at(-1)!.month+'T00:00:00Z'));
+ const statement=magnitude===0?`${group.label}: no projected FTE change by ${endMonth}`:`${group.label}: ${amount} ${direction} FTE by ${endMonth}`;
+ const condition='If the recent staffing trend continues.';
  const format=(v:number)=>v.toLocaleString('en-US',{maximumSignificantDigits:12});
  return {statement,condition,detail:`${format(group.fte)} recorded → ${format(trend.points.at(-1)!.fte)} projected FTE (${trend.deltaFte>0?'+':''}${format(trend.deltaFte)} FTE).`};
 }
