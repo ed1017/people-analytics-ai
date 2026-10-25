@@ -18,7 +18,7 @@ export async function decisionLandingExample() {
     if(cash.total===null||cash.lines.some(line=>line.total===null)||cash.lines.reduce((sum,line)=>sum+(line.total??0),0)!==cash.total||option.draft.inputs.scope.currency!=='USD'||cash.months!==draft.inputs.scope.months.value||cash.start!==draft.inputs.scope.startMonth.value)throw Error('Comparable cash evidence unavailable');
     return {id:option.id,label:staffingOptionLabel(option.candidate.mix),mix:option.candidate.mix,cash,uncoveredHours:effort?.shortfallHours??null};
   });
-  if(options.length!==2||options[0].cash.end!==options[1].cash.end)throw Error('Comparable options unavailable');
+  if(options.length<2||options.some(option=>option.cash.end!==options[0].cash.end))throw Error('Comparable options unavailable');
   return {requiredFte:workload.workloadHours/workload.productiveHoursInHorizon,qualifiedFte:workload.qualifiedAllocatedFte,gapFte:workload.additionalFte,existingPeople:draft.inputs.guidedWorkload!.existingPeople.value,budget:draft.inputs.budget!.amount.value,currency:'USD' as const,options};
 }
 export type DecisionLandingExample=Awaited<ReturnType<typeof decisionLandingExample>>;

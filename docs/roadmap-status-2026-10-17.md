@@ -1,4 +1,50 @@
-# Active roadmap - October 24, PR382 live
+# Active roadmap - October 25, PR409 live
+
+Production is [PR409](https://github.com/ed1017/people-analytics-ai/pull/409), runtime `000a1159837319caa9726ce9a244c84b07b5fed7`, deployment `dpl_35VsT2VvBHBXL4TFjRMeiF7hL3Qe`, source merge `453c981f62b9e5d9c5466e054d3c3943b6f2f283`. The canonical public alias was checked again on October 25 and is READY. Dated records below are historical checkpoints; their pending labels do not override this queue.
+
+## Completed agreed work
+
+| Work | Current outcome and evidence boundary |
+| --- | --- |
+| Grounding and evidence | Historical/filter/multipart grounding, 70-metric catalogue coverage, scalar and categorical visuals, complete rankings and honest unsupported intersections are delivered. This is not unrestricted natural-language acceptance. |
+| Planning and editing | Optional-budget estimates, templates, role multiselect/readable labels, allocation clarification, service targets, shared recommendation/controls/charts and contextual revisions are delivered. Supported engines retain distinct units and unknown inputs. |
+| Risk and workload | Trend-grounded group exposure, dashboard summary, editable projections and actual demand/capacity shortfall verdict are delivered. Declining staffing is not automatically a demand gap or risk probability. |
+| Saving | PR409 saves optional workload assumptions with existing headcount revisions. Public desktop/mobile save/reopen, demand-only edits, removal, reset and original preservation passed with controlled currentness receipts and real deployed calculations/storage. Workload edits remain local controls; no new chat workload-edit contract. Existing six-analysis/32-turn bounds remain. |
+| Usability and shared styling | PR402/406/408 delivered sharp shared dashboard/planner styling, concise clarification, full-width narrow composer, accessible teal/amber tokens and reduced repeated copy. This does not claim every surface has received the same recent visual review. |
+| Recovery | Budget continuity, explicit source refresh/draft preservation and cancellation/retry paths are delivered and regression-tested. Original intermittent model and evidence-loading causes remain unproven. |
+| Data and portability | Fictional BU/role labels, coherent hierarchy/skills/geography, 83-table/58-view reconstruction and 62-query replay are complete. No new data regeneration is in this continuation. |
+| Pricing maintenance | PR403 last verified expiry is October 26 at 15:05 UTC; earliest configuration cutoff 15:03 UTC. This is a recorded maintenance state, not authorization for another renewal. Accounting and access remain unchanged. |
+
+## Active independent work
+
+| Track | Next concrete outcome / boundary |
+| --- | --- |
+| Existing-journey reliability | Reconcile the historical broad-suite failures against current code; run targeted unpaid recovery/follow-up checks, distinguish obsolete assertions from actual defects, and fix demonstrated failures. Do not rerun unrelated completed catalogue/data audits. |
+| Consistent existing-page polish | Inspect remaining shared-style and repetitive-copy inconsistencies outside the recently accepted core; fix confirmed issues within current layouts, preserving missing-input/error/unsaved warnings. Actual preview screenshots precede promotion. |
+| Verification record | Keep this active queue and release evidence current. PR407's initial public-check failure was the harness rejecting bare ed-ai.app; canonical www.ed-ai.app reruns passed. This does not explain the historical model failure. |
+
+Current candidate `af63daaadf28fa109083968cc9b54d50f8f2c1cc` corrects outdated Workforce construction notes, derives Skills/Finance dates and Workforce/recruiting periods from source records, and condenses the optional recruiting-view explanation. The historical failure log contained 18 failures; rerunning the affected current files found 13 failures in 47 checks. Stale test aliases/fixtures and a retained helper's exact-two-options assumption are repaired. The focused current aggregate passes 99 checks, including shared-request cancellation, dataset-switch late responses and demand-driven retry timing. Independent review, TypeScript and lint pass. No original intermittent failure was reproduced. Initial hosted eight-page/viewport checks passed. Final copy follow-up shortens recruiting/finance/skills findings and retains unknown cost basis in accessible details. Initial CI passed 3,086/3,087 checks; one test-loader alias omitted the new date helper and is now repaired (13 focused checks). Final findings checks (19), types and review pass. Revised hosted preview, screenshot review and final release CI remain pending; production remains PR409.
+
+Owner review is useful but does not block these independent tracks. No additional clearly agreed unbuilt feature has been identified. New work must close these existing acceptance gaps rather than create features to remain busy.
+
+## Remaining evidence limits and exact dependencies
+
+- Historical intermittent final-answer rejection: original rejected output was not retained. Later SDK/intake defects were fixed, but they do not prove its cause. Replay a diagnostic-bearing failure if available. Fresh provider acceptance remains paused; do not substitute replay for fresh-model evidence or relax validation.
+- Historical intermittent source-loading trigger: recovery is tested, but the original trigger is not proven. Preserve failure records and distinguish harness queue/transport failures from application defects.
+- Current journey checks use controlled responses where necessary. No paid AI calls, pricing/cap changes, ledger/hold changes or access changes are authorized in this continuation.
+- Observed owner failures remain useful regression inputs, not a requirement to stop independent work.
+
+## Explicit deferrals and scope limits
+
+Onboarding popup/video/credits, pinning/action integration, tornado charts/new scenario engines, wholesale navigation/theme redesign and real-company ingestion/tenancy remain separate. The approved shared palette is delivered; it does not authorize a blanket dark-mode conversion. Synthetic payroll, geographic composition and recorded skills are illustrative, not externally calibrated business predictions. Preserve current datasets, saved bases and accounting safeguards.
+
+---
+
+## Historical checkpoints (superseded by the active queue above)
+
+### Archived active queue through PR382
+
+#### Historical active roadmap - October 24, PR382 live
 
 Owner direction now authorizes clearly fictional business-unit labels and editable service targets. Candidate runtime `c48c342d3c191db9c16d9424e2a316cd12f07e9d` implements all eight display names without changing codes, query vocabulary, data or saved identities. The existing coverage deadline and new optional acceptable-uncovered-hours target share the ordinary/guided calculator. Unknown remains distinct from zero; meeting a modeled target does not establish operational sufficiency. Clearing a saved deadline withdraws its active measurement through an append-only history event rather than erasing history or retaining a stale target.
 
@@ -41,7 +87,7 @@ Coding pacing target remains Monday afternoon October26 New York with a buffer, 
 
 ---
 
-## Historical checkpoints (superseded by the active queue above)
+
 
 ## October 23 owner-feedback credibility repair (publication checks pending)
 

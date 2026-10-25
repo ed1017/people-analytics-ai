@@ -74,6 +74,8 @@ function finish(def, input, scope) {
  const src={...object(input)}, raw=object(src.facts);
  const context=readConstructedDisplayContext(src.sourceContext),demoLabels=context?DOMAIN_DEMO_LABELS[id]:null;
  const facts={...pick(raw,numeric,text,bool)};
+ const successfulRecruitingCohort=id==='R1'&&context?.datasetToken===PUBLIC_9037.token;
+ if(successfulRecruitingCohort)for(const metric of ['application_to_interview_pct','interview_to_offer_pct','offer_to_hire_pct','application_to_hire_pct','offer_acceptance_pct'])facts[metric]=null;
  if(id==="S1"&&raw.businessUnitComparison!==undefined)facts.businessUnitComparison=readHomeSurveyGroups(raw.businessUnitComparison);
  if(id==="F1")Object.assign(facts,{source:"finance_current_summary",currency:"USD",cost_period:null,source_refreshed_at:null});
  if(id==='R1'&&context){facts.modeled_ta_version=null;facts.modeled_ta_status='not-released';facts.modeled_ta_metric='Constructed recruiting events; no candidate stock forecast or screening stage is released. October–December 2026 is unmodeled. Planning source separate.';}
@@ -111,7 +113,7 @@ function finish(def, input, scope) {
  while(bytes(facts)>sourceBudget && facts.monthly?.length)facts.monthly.pop();
  if(bytes(facts)>sourceBudget) status="budget-excluded";
  const available=num(src.rowsAvailable ?? object(src.coverage).rowsAvailable);
- return {id,label:demoLabels?.label??label,page,scope:id==="W1"?`Selected workforce snapshot: ${(str(scope)??"").replace(/^(?:Selected workforce snapshot:\s*)+/i, "")||"scope unavailable"}`:canonicalScope,date:["P1","I1","I3","D1"].includes(id)?null:date(src.date),population:demoLabels?.population??population,limitation:demoLabels?.limitation??limitation,status,...(context&&demoLabels?{sourceContext:context}:{}),
+ return {id,label:demoLabels?.label??label,page,scope:id==="W1"?`Selected workforce snapshot: ${(str(scope)??"").replace(/^(?:Selected workforce snapshot:\s*)+/i, "")||"scope unavailable"}`:canonicalScope,date:["P1","I1","I3","D1"].includes(id)?null:date(src.date),population:demoLabels?.population??population,limitation:(demoLabels?.limitation??limitation)+(successfulRecruitingCohort?' Successful-hire journeys only; unsuccessful applications are absent. Funnel conversion performance is unavailable; do not derive it by dividing these counts.':''),status,...(context&&demoLabels?{sourceContext:context}:{}),
  coverage:{summary:"Allowlisted summary only; not all source rows",rowsAvailable:available,rowsIncluded:kept,selection:str(src.selection ?? object(src.coverage).selection)||"No detail rows",detailTruncated:available!==null&&available>kept,...(id==="A1"&&facts.monthly?{monthly:{rowsIncluded:status==="loaded"?facts.monthly.length:0,selection:"Monthly YTD: recorded months in the requested year through the source cutoff, at most 36 recorded observations. Explicit date ranges are inclusive. Otherwise up to three selected/comparison or latest months. Omitted months are not proof of source absence.",denominator:"Unavailable; snapshot headcount is not a monthly rate denominator."}}:{})},facts:status==="loaded"?facts:null};
 }
 export function normalizeHomePack(input) {

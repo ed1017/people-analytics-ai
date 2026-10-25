@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {publicPlannerPriceCandidate,PUBLIC_PLANNER_PRICE_GROUP} from '../lib/public-planner-price-candidate.mjs';
-import {plannerWorstChargeMicroUsd,publicPlannerReadiness} from '../lib/public-planner-round.server.mjs';
+import {plannerWorstChargeMicroUsd,publicPlannerReadiness,PUBLIC_PLANNER_CAP_MICRO_USD} from '../lib/public-planner-round.server.mjs';
 test('official-source full-context candidate amounts conservatively cover every route output bound',()=>{
  const amounts={};
  for(const route of ['home-solution','chat','plan','intake','capability']){
@@ -11,14 +11,15 @@ test('official-source full-context candidate amounts conservatively cover every 
   amounts[route]=worst;
  }
  assert.deepEqual(amounts,{'home-solution':4686000,chat:481800,plan:465168,intake:467940,capability:464376});
- // Existing reservations mean even four max-Sol rounds leave less than one dollar.
+ // Historical $20 proposal arithmetic, not the current live ledger or cap.
  assert.equal(20000000-34-4*4800000,799966);
 });
 test('multi-price readiness requires the reviewed global version and maximum, not a caller discount',async()=>{
  const p=publicPlannerPriceCandidate('plan'),now=()=>Date.parse(p.verifiedAt)+60*60*1000;
- const row={id:'public-9037-ai-initial-v1',enabled:true,cap_micro_usd:30000000,reserved_micro_usd:34,policy_id:PUBLIC_PLANNER_PRICE_GROUP,per_call_micro_usd:4800000,pricing_valid_until:p.validUntil};
+ const row={id:'public-9037-ai-initial-v1',enabled:true,cap_micro_usd:PUBLIC_PLANNER_CAP_MICRO_USD,reserved_micro_usd:34,policy_id:PUBLIC_PLANNER_PRICE_GROUP,per_call_micro_usd:4800000,pricing_valid_until:p.validUntil};
  const options={enabled:true,policy:p,now,readLedgerStatus:async()=>row,ledgerPolicyId:PUBLIC_PLANNER_PRICE_GROUP,ledgerPerCallMicroUsd:4800000};
  assert.equal(await publicPlannerReadiness(options),true);
+ for(const cap of [30000000,PUBLIC_PLANNER_CAP_MICRO_USD+1])assert.equal(await publicPlannerReadiness({...options,readLedgerStatus:async()=>({...row,cap_micro_usd:cap})}),false);
  assert.equal(await publicPlannerReadiness({...options,ledgerPerCallMicroUsd:500000}),false);
  assert.equal(await publicPlannerReadiness({...options,ledgerPolicyId:'other'}),false);
 });

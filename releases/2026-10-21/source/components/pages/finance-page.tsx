@@ -1,4 +1,5 @@
 "use client";
+import {evidenceAsOfLabel} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {financeFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
@@ -59,7 +60,7 @@ export function FinancePage({
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
                 {financeLoading
                   ? "Loading finance…"
-                  : financeData ? "As of September 30, 2026" : "Finance"}
+                  : financeData ? evidenceAsOfLabel(financeData.as_of) : "Finance"}
               </span>
             </div>
 
@@ -82,9 +83,10 @@ export function FinancePage({
                         financeData.current.labor_cost_usd
                       )}
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Reported USD cost · period unknown
-                    </p>
+                    <details className="mt-1 text-xs text-muted-foreground">
+                      <summary className="cursor-pointer min-h-6">Reported USD cost · period unknown</summary>
+                      <p className="mt-1">The source does not specify a cost period or whether benefits and other employer costs are included.</p>
+                    </details>
                   </div>
 
                   <div className="min-w-0 break-words rounded-lg border p-4">

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "000a1159837319caa9726ce9a244c84b07b5fed7",
+  "sourceCommit": "2e41ecc84774e6a964fca1be29a05c56a1ea67ec",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "744c2fe27789b3d8c7031c68abc0ad80c85f4ebb92ab0cdc4cbd28c99a50868e",
-      "bytes": 19307
+      "sha256": "f5d42c1670170167b6e867f3b1e6cfcb902e86ace97d20c4369ebdccf6cad698",
+      "bytes": 19514
     },
     {
       "path": "components/home-data-status.tsx",
@@ -759,8 +759,8 @@
     },
     {
       "path": "components/pages/finance-page.tsx",
-      "sha256": "077e177f78badf03b9ca3181609d32f52934077b3e7918e700ac2feecde3635f",
-      "bytes": 17158
+      "sha256": "148bdb5eb85fc17c1cd6b235e82abe5c4830d9185593ef65e1c77db5a6d6874c",
+      "bytes": 17444
     },
     {
       "path": "components/pages/intelligence-page.tsx",
@@ -784,8 +784,8 @@
     },
     {
       "path": "components/pages/skills-page.tsx",
-      "sha256": "7cd7037b9199515a103e5cee2861bbe9bf57766603cc9860de6d78942ca719cd",
-      "bytes": 14922
+      "sha256": "623fe9f43121309df0fe6e1c4b3be3374a778061c6a05f4d17d40fa9a6e29ea3",
+      "bytes": 14994
     },
     {
       "path": "components/pages/succession-planning-page.tsx",
@@ -799,13 +799,13 @@
     },
     {
       "path": "components/pages/talent-acquisition-page.tsx",
-      "sha256": "9cf1339d4373115f49c9ef81888a4939cd1882b544883c6d8eee22bd3cd7f0b2",
-      "bytes": 13301
+      "sha256": "3bdb50999599918495e55800de329f41538447699ab0300c7e6ef7ecc359e973",
+      "bytes": 15101
     },
     {
       "path": "components/pages/workforce-page.tsx",
-      "sha256": "d057a4fa0ef9d955592a36ceec8addb9d4a50b75d5f054a9accc2b66580f863a",
-      "bytes": 11883
+      "sha256": "a862f72111b5a3ca87096642edf179d32145669434530512efe5e8fd96cf229d",
+      "bytes": 11913
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
@@ -1884,8 +1884,8 @@
     },
     {
       "path": "lib/decision-landing.ts",
-      "sha256": "75d666d2ac95d57492dd8f7250a1e5724ade55afe1ff6e5e7e8b9af62d868e22",
-      "bytes": 2171
+      "sha256": "c452e2475b5c642c442917f44b4935d4ac8f43b7a609e574ab58c34a11e12eec",
+      "bytes": 2187
     },
     {
       "path": "lib/decision-recovery.ts",
@@ -2084,8 +2084,8 @@
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "75ee80a003078db6bccd477778b6d86afa5d6710f0ba839b84f341dee6c36a0c",
-      "bytes": 15385
+      "sha256": "351a8740d5047f225f1cdcd6a52e51c3eaad0cd55383699d3bbdd82a4628ea83",
+      "bytes": 15980
     },
     {
       "path": "lib/home-aggregate-tool.mjs",
@@ -2354,8 +2354,8 @@
     },
     {
       "path": "lib/home-kpi-source.ts",
-      "sha256": "484efb5a52eb4b92c360fb17291bfff9b0a2f346457292fc0d5cae2beaaa5d6d",
-      "bytes": 2987
+      "sha256": "4770ffbcc802e2630f8a03c8cc408772a4fde487062c7c400ba81a154b19d1f0",
+      "bytes": 3147
     },
     {
       "path": "lib/home-linked-attachment.ts",
@@ -2444,8 +2444,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "1f5843c27fadc60bd41ab7b346ab99be571b3d3bd1d075a7de80b537d24d41cc",
-      "bytes": 29518
+      "sha256": "41483a7faf72ffe5eb14fec87875d2efb33f08f6c10a6cf00826ca69b91a4e4b",
+      "bytes": 29999
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "b9fb90032565069d717d65c03030b70e4a0df0acaab75436a008dd274db020d0",
-      "bytes": 8726
+      "sha256": "2a94f0f952a29e0997aa3a5db1cc6f2abf9e20279ba8867d86f6125a0a451537",
+      "bytes": 8478
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "080199bd8f038c582e81eeafa23e97cff553249183f9d79cd8fd5e89d9abf37c",
-      "bytes": 13099
+      "sha256": "49f8a106057e26d9ac93005535d2b68b115ce205de7ef5305040fe84e9223532",
+      "bytes": 13614
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -3799,8 +3799,8 @@
     },
     {
       "path": "tests/catalog-display.test.mjs",
-      "sha256": "4841fd394ab857703e095c1b52a8433466a367e231bba64bf43d65d3f2c19aeb",
-      "bytes": 8371
+      "sha256": "ac70128ebf69d43b429f882fe999d307ad4cbe0a9c9f193e3683720afe211dbe",
+      "bytes": 8467
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "324face40e0bd0f544213dd8c0ac2389d085c0bff45fbabcf37f3f5db65109b3",
-      "bytes": 4170
+      "sha256": "5ff7f30b7d71806852ec8a06f170459ef6cf2ca4d856d54f3ad797918cbbb6c7",
+      "bytes": 5365
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
@@ -3984,8 +3984,8 @@
     },
     {
       "path": "tests/public-planner-price-proposal.test.mjs",
-      "bytes": 4095,
-      "sha256": "e727b0c2aa5eebb749c3e871b77257a3b41853949043d312b15d6d768a71d46d"
+      "bytes": 4315,
+      "sha256": "a6b1231790b405fa107cc958e2afa2fbc8c142e80c3dcf8f2f912a19ed117d86"
     },
     {
       "path": "tests/public-planner-round.test.mjs",
@@ -4314,8 +4314,8 @@
     },
     {
       "path": "tests/public-evidence-recovery.test.mjs",
-      "bytes": 3456,
-      "sha256": "6a88927d993f2274f5258509a8ede9824871f7ba655755d5357d4259977f942c"
+      "bytes": 5577,
+      "sha256": "6b6eadd87cacfce685b20b3867b145cfd3a865981ccc48548e816c35b7046efc"
     },
     {
       "path": "components/projection-demand-panel.tsx",
@@ -4346,6 +4346,81 @@
       "path": "tests/projection-demand-persistence.test.mjs",
       "bytes": 6342,
       "sha256": "1f6f2c323864d573cceb18c9a177bbea26fc1f74bcd4df2f26480ffce61ace5c"
+    },
+    {
+      "path": "lib/evidence-period-label.ts",
+      "bytes": 1013,
+      "sha256": "eff27349039a1810935f5f8a15b6faea657851a45752bb3579a61b1ea5dbc7fc"
+    },
+    {
+      "path": "tests/analysis-leaf-display-states.test.mjs",
+      "bytes": 9193,
+      "sha256": "1a102fcc8fd1fe3891f07fa22ad010b68d2a10883d15ead4feb1533e5fe3b98e"
+    },
+    {
+      "path": "tests/compensation-ranges.test.mjs",
+      "bytes": 7782,
+      "sha256": "275505045e55c22d16936625b9156058b02ced64ef6cf0747838bcef42a11057"
+    },
+    {
+      "path": "tests/compensation-release.test.mjs",
+      "bytes": 8450,
+      "sha256": "0f42576d6b2a543586c72616c87c6997064982be998682eacc0ab56d85c34f9d"
+    },
+    {
+      "path": "tests/compensation.test.mjs",
+      "bytes": 6189,
+      "sha256": "914d737c524118ae42b9c533ebfb30941444bd238dc239790e6f7acbbb6e1c5e"
+    },
+    {
+      "path": "tests/decision-landing.test.mjs",
+      "bytes": 1888,
+      "sha256": "5cbced16ba5bae5a394af8ffe4f99ec8691b39a54de9023d67798fab1fb763c2"
+    },
+    {
+      "path": "tests/evidence-period-label.test.mjs",
+      "bytes": 1405,
+      "sha256": "a949889113586cd494ec15b86ba7de14782f847886743cafbbaaaf2fe93c2b1b"
+    },
+    {
+      "path": "tests/fixtures/component-module.mjs",
+      "bytes": 671,
+      "sha256": "195ec26cf2dbe1cfc60c9a931e560230ef4cdc1b488669b03901daaee09e33a7"
+    },
+    {
+      "path": "tests/fixtures/dataset-runtime.mjs",
+      "bytes": 1041,
+      "sha256": "d93967972184c1a29d7c6a98b08f3c58e7cd1548a14c915d0386265e8e9cc7cf"
+    },
+    {
+      "path": "tests/popup-tradeoff-presentation.test.mjs",
+      "bytes": 7186,
+      "sha256": "051fae4dd8781bdb8305bcf2c1a6764bbb52606f6db683501017c22a9ac91c49"
+    },
+    {
+      "path": "tests/public-composition-context.test.mjs",
+      "bytes": 4230,
+      "sha256": "9b6ec3f0ca99bdf302bf1233a71cf39ae48113faa9b3af9f1f74f2343bb92f11"
+    },
+    {
+      "path": "tests/urgent-missing-display.test.mjs",
+      "bytes": 3133,
+      "sha256": "fb7e4c3ed4331ef894e0450cb0f18c5863e94a98e4519b877a59578c244be992"
+    },
+    {
+      "path": "tests/recruiting-metric-semantics.test.mjs",
+      "bytes": 4237,
+      "sha256": "75fa1c9333f9171b92a5bd12ab0142d1c958fb82f340526c9cf9ae4d90d790a8"
+    },
+    {
+      "path": "tests/home-recruiting-cohort.test.mjs",
+      "bytes": 2924,
+      "sha256": "2c6086965c8c07ed92ffdbe508321d08816c63c96e7bba6ef40969675b22d4bb"
+    },
+    {
+      "path": "tests/public-recruiting-cohort-recovery.test.mjs",
+      "bytes": 2903,
+      "sha256": "8701c159405c17e3da8c769d46cdd4bfe4e7cd197af9d5dffd62a1ba8933c676"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

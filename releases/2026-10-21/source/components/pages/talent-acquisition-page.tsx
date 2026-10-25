@@ -1,4 +1,6 @@
 "use client";
+import {PUBLIC_9037} from '@/lib/public-9037-contract.mjs';
+import {evidenceMonthWindow} from '@/lib/evidence-period-label';
 import {KeyFindings} from "@/components/key-findings";
 import {recruitingFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel} from "@/lib/catalog-display";
@@ -29,6 +31,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
   const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const separateDataset = isSeparateTaDataset(data);
+  const generatedHireCohort = data?.data_meta?.datasetToken === PUBLIC_9037.token;
   const extension = !loading&&!error ? resolveTaResponseExtension(data) : null;
 
   return (
@@ -36,7 +39,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
       <KeyFindings findings={data ? recruitingFindings(data) : null} />
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="text-muted-foreground">Monitor recruiting demand, funnel conversion, hiring velocity, and source effectiveness.</p>
+          <p className="text-muted-foreground">Review recruiting demand, recorded hiring activity and time to fill.</p>
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
           {loading ? "Loading recruiting data…" : data ? "As of " + formatLongDate(data.as_of) : "Talent Acquisition"}
@@ -56,14 +59,17 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
               <p className="mt-1 text-xs text-muted-foreground">{formatWholeCount(summary.open_positions)} open positions</p>
             </div>
             <div className="rounded-lg border p-4">
-              <p className="text-sm text-muted-foreground">Applications</p>
+              <p className="text-sm text-muted-foreground">{generatedHireCohort ? "Recorded hired cohort" : "Applications"}</p>
               <p className="mt-2 text-3xl font-semibold">{formatWholeCount(summary.applications)}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{formatMetric(summary.application_to_hire_pct, 1, "%")} application → hire</p>
+              <p className="mt-1 text-xs text-muted-foreground">{generatedHireCohort ? "Funnel conversion unavailable" : <>Recorded conversion: {formatMetric(summary.application_to_hire_pct, 1, "%")}</>}</p>
+
+              <details className="mt-1 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Conversion details</summary><p className="mt-1">{formatWholeCount(summary.hires)} {generatedHireCohort ? "accepted offers" : "hires"} / {formatWholeCount(summary.applications)} recorded applications.</p>{generatedHireCohort && <p className="mt-1">The recorded cohort contains one successful application, interview and accepted offer per hire. The complete applicant population is unavailable, so these records cannot measure funnel conversion.</p>}</details>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Median Time to Fill</p>
               <p className="mt-2 text-3xl font-semibold">{formatMetric(summary.median_time_to_fill_days, 0, " days")}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{formatMetric(summary.avg_time_to_fill_days, 1, " day average")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Average (mean): {formatMetric(summary.avg_time_to_fill_days, 1, " days")}</p>
+              <details className="mt-1 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Time-to-fill definition</summary><p className="mt-1">{generatedHireCohort && <>Opening to closure for filled requisitions with both dates, closed by {data.as_of}, including internal and external fills. </>}Mean is the arithmetic average; median is the middle duration.</p></details>
             </div>
             <div className="rounded-lg border p-4">
               <p className="text-sm text-muted-foreground">Aging Open Reqs</p>
@@ -73,19 +79,19 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
           </div>
 
           {!extension&&<section aria-label="Source recruiting funnel" className="mt-6 rounded-lg border p-4">
-            <h3 className="font-semibold">Recruiting funnel</h3>
-            <p className="mb-4 text-sm text-muted-foreground">{separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Stages available in the current source summary; no screening or acceptance stage is inferred.'}</p>
+            <h3 className="font-semibold">{generatedHireCohort ? "Recorded hired-cohort stages" : "Recruiting funnel"}</h3>
+            <p className="mb-4 text-sm text-muted-foreground">{generatedHireCohort?'Successful-hire records only.':separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Recorded recruiting stages.'}</p>
             <div className="evidence-metric-grid grid gap-3">{([
               ['Applications',summary.applications,null],['Interviewed',summary.interviewed_applications,summary.application_to_interview_pct],
               ['Offers',summary.offered_applications,summary.interview_to_offer_pct],['Hires',summary.hires,summary.offer_to_hire_pct],
-            ] as const).map(([label,value,conversion])=><div key={label} className="rounded-lg border bg-muted/10 p-4"><p className="text-xs font-medium">{label}</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p><p className="mt-2 text-xs text-muted-foreground">{label==='Applications'?'Top of funnel':formatMetric(conversion,1,'% from prior stage')}</p></div>)}</div>
+            ] as const).map(([label,value,conversion])=><div key={label} className="rounded-lg border bg-muted/10 p-4"><p className="text-xs font-medium">{label}</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(value)}</p><p className="mt-2 text-xs text-muted-foreground">{generatedHireCohort?'Recorded cohort':label==='Applications'?'Top of funnel':formatMetric(conversion,1,'% from prior stage')}</p></div>)}</div>
           </section>}
 
           <div className="mt-6 evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <div className="mb-4">
                 <h3 className="font-semibold">Monthly Recruiting Activity</h3>
-                <p className="text-sm text-muted-foreground">Applications and hires from January 2024 through September 2026</p>
+                <p className="text-sm text-muted-foreground">{generatedHireCohort ? "Recorded hired cohort" : "Applications and hires"} · {evidenceMonthWindow(data.monthly.map(row => row.month))}</p>
               </div>
               <div className="evidence-chart">
                 <ResponsiveContainer width="100%" height="100%">
@@ -94,7 +100,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
                     <XAxis dataKey="month" tickFormatter={formatMonth} minTickGap={28} tick={{ fontSize: 12 }} />
                     <YAxis tickFormatter={(value) => formatWholeCount(value)} width={64} tick={{ fontSize: 12 }} />
                     <Tooltip labelFormatter={(value) => formatMonth(String(value))} formatter={(value) => typeof value === "number" ? formatWholeCount(value) : "Unavailable"} contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)", borderRadius: "0.5rem" }} />
-                    <Line type="monotone" dataKey="applications" name="Applications" stroke="currentColor" strokeWidth={2.5} dot={false} />
+                    <Line type="monotone" dataKey="applications" name={generatedHireCohort ? "Successful application records" : "Applications"} stroke="currentColor" strokeWidth={2.5} dot={false} />
                     <Line type="monotone" dataKey="hires" name="Hires" stroke="currentColor" strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
@@ -103,11 +109,11 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
 
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Hiring Mix</h3>
-              <p className="mb-4 text-sm text-muted-foreground">Internal versus external hiring and offer acceptance</p>
+              <p className="mb-4 text-sm text-muted-foreground">Internal versus external hiring</p>
               <div className="space-y-3">
                 <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">External hires</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(summary.external_hires)}</p></div>
                 <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Internal hires</p><p className="mt-2 text-2xl font-semibold">{formatWholeCount(summary.internal_hires)}</p></div>
-                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Offer acceptance</p><p className="mt-2 text-2xl font-semibold">{formatMetric(summary.offer_acceptance_pct, 1, "%")}</p></div>
+                <div className="rounded-lg border p-4"><p className="text-xs text-muted-foreground">Offer acceptance</p><p className="mt-2 text-2xl font-semibold">{generatedHireCohort ? "Unavailable" : formatMetric(summary.offer_acceptance_pct, 1, "%")}</p></div>
               </div>
             </div>
           </div>
@@ -117,7 +123,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
               <div className="mb-4"><h3 className="font-semibold">Hiring Demand by Business Unit</h3><p className="text-sm text-muted-foreground">Current open positions and historical hiring velocity</p></div>
               <EvidenceTableRegion label="Hiring demand by business unit">
                 <table className="w-full min-w-[620px] text-sm">
-                  <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Business Unit</th><th className="pb-3 pr-4 text-right">Open</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Avg TTF</th></tr></thead>
+                  <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Business Unit</th><th className="pb-3 pr-4 text-right">Open</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Mean time to fill</th></tr></thead>
                   <tbody>
                     {data.business_units.map((row) => (
                       <tr key={row.org_code} className="border-b last:border-0">
@@ -133,17 +139,17 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
             </div>
 
             <div className="min-w-0 rounded-lg border p-4">
-              <div className="mb-4"><h3 className="font-semibold">Source Effectiveness</h3><p className="text-sm text-muted-foreground">Applications, hires, and application-to-hire conversion</p></div>
-              <EvidenceTableRegion label="Recruiting source effectiveness">
+              <div className="mb-4"><h3 className="font-semibold">Recruiting Sources</h3><p className="text-sm text-muted-foreground">{generatedHireCohort ? "Recorded successful-hire journeys by source" : "Recorded applications, hires and conversion"}</p></div>
+              <EvidenceTableRegion label="Recruiting source records">
                 <table className="w-full min-w-[560px] text-sm">
-                  <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Source</th><th className="pb-3 pr-4 text-right">Apps</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Conv.</th></tr></thead>
+                  <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Source</th><th className="pb-3 pr-4 text-right">{generatedHireCohort ? "Cohort records" : "Apps"}</th><th className="pb-3 pr-4 text-right">Hires</th><th className="pb-3 text-right">Recorded conversion</th></tr></thead>
                   <tbody>
                     {data.sources.map((row) => (
                       <tr key={row.source_code} className="border-b last:border-0">
                         <td className="py-3 pr-4 font-medium">{row.source_name}</td>
                         <td className="py-3 pr-4 text-right">{formatWholeCount(row.applications)}</td>
                         <td className="py-3 pr-4 text-right">{formatWholeCount(row.hires)}</td>
-                        <td className="py-3 text-right font-semibold">{formatMetric(row.application_to_hire_pct, 1, "%")}</td>
+                        <td className="py-3 text-right font-semibold">{generatedHireCohort ? "Unavailable" : formatMetric(row.application_to_hire_pct, 1, "%")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -159,7 +165,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
             </div>
             <EvidenceTableRegion label="Recruiter workload">
               <table className="w-full min-w-[760px] text-sm">
-                <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Recruiter</th><th className="pb-3 pr-4">Region</th><th className="pb-3 pr-4">Specialty</th><th className="pb-3 pr-4 text-right">Open Reqs</th><th className="pb-3 text-right">Avg TTF</th></tr></thead>
+                <thead><tr className="border-b text-left text-xs text-muted-foreground"><th className="pb-3 pr-4">Recruiter</th><th className="pb-3 pr-4">Region</th><th className="pb-3 pr-4">Specialty</th><th className="pb-3 pr-4 text-right">Open Reqs</th><th className="pb-3 text-right">Mean time to fill</th></tr></thead>
                 <tbody>
                   {(data.recruiters ?? []).slice(0, 10).map((row) => (
                     <tr key={row.recruiter_name} className="border-b last:border-0">
@@ -178,7 +184,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
       ) : (
         (loading || !error) && <div role="status" className="rounded-lg border p-8 text-center text-sm text-muted-foreground">{loading ? "Loading Talent Acquisition analytics…" : "No Talent Acquisition data returned."}</div>
       )}
-      {data && <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <p role="status" className="rounded-lg border p-3 text-sm">{separateDataset?'Active-requisition history, projections and a screening stage are not released for this dataset. The recruiting summary and funnel use its own events.':'Calibrated projections and expanded funnel unavailable: source data does not match the calibration snapshot.'}</p>}</div>}
+      {data && <div className="mb-4">{extension ? <CalibratedTaPanels data={extension} /> : <details className="rounded-lg border p-3 text-sm"><summary className="cursor-pointer min-h-6">Additional recruiting views unavailable</summary><p className="mt-2 text-muted-foreground">{separateDataset?'Active-requisition history, projections and screening are not supplied for this dataset. The summary and funnel use its recorded events.':'The source does not match the calibration snapshot required for projections and the expanded funnel.'}</p></details>}</div>}
     </section>
   );
 }

@@ -37,3 +37,35 @@ test('refresh classification never hides corrupt saved recipes or missing plan b
  await assert.rejects(publicSolutionEnvelope(bound,source,undefined),error=>!canRefreshPublicEvidence(error));
  assert.equal(canRefreshPublicEvidence(new Error('network failure')),false);
 });
+
+test('leaving one consumer does not cancel a shared source or poison its verified cache',async()=>{
+ const pending=Promise.withResolvers();let reads=0;
+ const source=new SourceRequests(()=>{reads++;return pending.promise;},()=>0);
+ const leaving=new AbortController(),first=source.read(leaving.signal),remaining=source.read();
+ await Promise.resolve();assert.equal(reads,1);leaving.abort();
+ assert.deepEqual(await first,{status:'unavailable',data:null});
+ const value=loaded();pending.resolve(value);assert.equal(await remaining,value);
+ assert.equal(await source.read(),value);assert.equal(reads,1);
+});
+
+test('a dataset switch retires pending evidence even when the old response arrives last',async()=>{
+ let token='old:1';const old=Promise.withResolvers(),fresh=Promise.withResolvers();let reads=0;
+ const load=()=>{reads++;return token==='old:1'?old.promise:fresh.promise;};
+ const sources=new HomeSourceRequests(load,new SourceRequests(load,()=>0),()=>0,()=>token);
+ const previous=sources.read('');await Promise.resolve();const firstReads=reads;
+ token='new:2';const current=sources.read('');await Promise.resolve();assert.ok(reads>firstReads);
+ const value=loaded();fresh.resolve(value);const published=await current;
+ assert.ok(Object.values(published).every(result=>result===value));
+ old.resolve({...loaded(),data:{stale:true}});
+ assert.ok(Object.values(await previous).every(result=>result.status==='unavailable'&&result.data===null));
+ assert.deepEqual(sources.peek(''),published);
+});
+
+test('a transient source failure permits a demand-driven retry after its backoff, never an automatic retry',async()=>{
+ let now=0,reads=0;const value=loaded();
+ const source=new SourceRequests(async()=>{reads++;return reads===1?{status:'timeout',data:{stale:true}}:value;},()=>now);
+ assert.deepEqual(await source.read(),{status:'timeout',data:null});assert.equal(reads,1);
+ now=29999;assert.equal((await source.read()).status,'timeout');assert.equal(reads,1);
+ now=30000;assert.equal(source.peek(),null);await Promise.resolve();assert.equal(reads,1);
+ assert.equal(await source.read(),value);assert.equal(reads,2);
+});
