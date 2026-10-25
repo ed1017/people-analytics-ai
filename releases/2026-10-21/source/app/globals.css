@@ -956,3 +956,6 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .scenario-decision-options dt { font-size:.75rem;color:#c2d2df; }
 .scenario-decision-options dd { font-size:.95rem;font-weight:650; }
 .scenario-essential-inputs { padding:.7rem 0; border-block:1px solid var(--border); }
+
+/* A closed AI conversation keeps its state without consuming a second icon rail. */
+.app-shell.app-ai-closed > .app-ai-panel { display: none; }

@@ -20,7 +20,6 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
  return <div className="min-w-0 space-y-4">
   <div className="min-w-0 rounded-xl bg-background p-3 sm:p-4">
    <h3 className="font-semibold">Work needed and time available</h3>
-   <p className="mt-1 text-sm text-muted-foreground">Compared in FTE (full-time equivalents), not a count of people.</p>
    <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm" aria-label="Chart legend">{series.map(item=><li key={item.key} className="flex items-center gap-2"><span aria-hidden="true" className="inline-block w-5 border-t-2" style={{borderColor:item.color,borderStyle:item.dash?'dashed':'solid'}}/>{item.label}</li>)}<li className="flex items-center gap-2"><span aria-hidden="true" className="inline-block h-3 w-5 bg-amber-700/15"/>Shaded: shortfall</li></ul>
    {values.length>0 ? <div className="mt-3">
    <div className="relative">
@@ -39,7 +38,7 @@ export function CapacityProjection({result}:{result:CapacityResult|null}) {
     {points.map((point,index)=><span key={point.month} className="absolute top-0" style={{left:`${x(index)/640*100}%`,transform:'translateX(-50%)'}}><span className="block">{new Date(`${point.month}-01T00:00:00Z`).toLocaleDateString(undefined,{month:'short',timeZone:'UTC'})}</span><span className="block">{point.month.slice(0,4)}</span></span>)}
    </div>
    </div> : <div className="flex min-h-60 items-center justify-center py-8 text-center text-sm text-muted-foreground">{result?'More numbers are needed. Fill in the blank work and team inputs.':'Enter your work and team numbers to see the comparison.'}</div>}
-   {result&&<p className="mt-2 text-sm text-muted-foreground">Shading marks required capacity above available capacity. Unknown values are not plotted.</p>}
+   <details className="mt-2 text-sm text-muted-foreground"><summary className="min-h-11 cursor-pointer py-3 focus-visible:ring-2 focus-visible:ring-ring">How to read this chart</summary><p>FTE means full-time equivalent capacity, not a count of people or a hiring target. Shading marks required capacity above available capacity. Unknown values are not plotted or connected. Exact values are in Monthly detail.</p></details>
   </div>
   {last&&<div><p className="mb-2 text-sm text-muted-foreground">Final planning month · {last.month}</p><dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2 sm:gap-3">{[{label:'Available FTE',value:last.allocatedFte},{label:'Required FTE',value:last.requiredFte},{label:'Capacity balance',value:last.gapFte}].map(item=>{const text=item.label==='Capacity balance'?capacityBalanceLabel(item.value):format(item.value),longValue=text.length>9;return <div key={item.label} className={`min-w-0 rounded-lg bg-muted p-3 ${longValue?'col-span-full':''}`}><dt className="text-sm text-muted-foreground">{item.label}</dt><dd className={`mt-2 whitespace-nowrap font-semibold tabular-nums ${longValue?'text-base sm:text-lg':'text-lg sm:text-2xl'}`}>{text}</dd></div>;})}</dl></div>}
  </div>;

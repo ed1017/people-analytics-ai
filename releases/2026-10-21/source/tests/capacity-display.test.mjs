@@ -19,7 +19,7 @@ test('rendered capacity chart distinguishes required, available and shortfall wi
  for(const gap of [3,-3,0,null]){
   const result={points:[{month:'2026-10',requiredFte:6,allocatedFte:4,gapFte:2},{month:'2026-11',requiredFte:gap===null?null:5,allocatedFte:gap===null?null:5-gap,gapFte:gap}]},before=structuredClone(result);
   const html=renderToStaticMarkup(React.createElement(exports.CapacityProjection,{result}));
-  assert.ok(html.includes(display.capacityBalanceLabel(gap)));assert.match(html,/Needed \(FTE\)|Available \(FTE\)/);assert.doesNotMatch(html,/tabindex=/);assert.match(html,/Exact values are available in Monthly detail below/);assert.doesNotMatch(html,/Positive gap =|Gap FTE/);assert.deepEqual(result,before);
+  assert.ok(html.includes(display.capacityBalanceLabel(gap)));assert.match(html,/Needed \(FTE\)|Available \(FTE\)/);assert.doesNotMatch(html,/tabindex=/);assert.match(html,/Exact values are available in Monthly detail below/);assert.doesNotMatch(html,/Positive gap =|Gap FTE/);assert.deepEqual(result,before);assert.match(html,/<details[^>]*><summary[^>]*>How to read this chart<\/summary>/);assert.match(html,/not a count of people or a hiring target/);
   if(gap===null)assert.doesNotMatch(html,/data-capacity-shortfall/);else assert.match(html,/data-capacity-shortfall/);
  }
 });

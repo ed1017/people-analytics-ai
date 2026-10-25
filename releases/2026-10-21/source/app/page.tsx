@@ -1688,7 +1688,7 @@ export default function Home() {
       const roster = /\b(names?|roster|employees? list|list of employees)\b/i.test(message);
       const csv = !roster && chatEvidenceReady ? buildAggregateExport({page:activePage,filters:JSON.stringify(selectedBusinessContext),snapshot:overviewData,trend:headcountTrend,workforce:workforceData,skills:skillsData}) : null;
       if (csv) downloadAggregateCsv(csv, activePage);
-      setChatMessages(current => [...current, {role:"user",content:message},{role:"assistant",content:roster ? "Employee-name and roster exports are not available from the current public aggregate views. I have not downloaded a roster. This needs a separate source and access review." : csv ? "Downloaded the available Workforce or Skills aggregate tables as CSV, with source, scope, filters, dates and units. This contains aggregate metrics, not employee names or raw records." : "A CSV export is currently available on Workforce and Skills Intelligence after their data has loaded. This page’s data is not yet supported for export; no file was downloaded."}]);
+      setChatMessages(current => [...current, {role:"user",content:message},{role:"assistant",content:roster ? "Employee-name and roster exports are not available from the current public aggregate views. I have not downloaded a roster. This needs a separate source and access review." : csv ? "Downloaded the available Workforce or Skills aggregate tables as CSV, with source, scope, filters, dates and units. This contains aggregate metrics, not employee names or raw records." : "A CSV export is currently available on Workforce and Skills Intelligence after their data has loaded. This pageâ€™s data is not yet supported for export; no file was downloaded."}]);
       if(suggestedMessage===undefined)setChatInput("");
       return;
     }
@@ -1944,7 +1944,7 @@ export default function Home() {
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
       <title>{`${getAppPageMetadata(activePage).label} | Workforce Intelligence`}</title>
       {/* Top header */}
-      <AppHeader contextLabel={`${conversation.focusedIssue||"General exploration"} · ${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} onNavigate={setActivePage}
+      <AppHeader contextLabel={`${conversation.focusedIssue||"General exploration"} Â· ${selectedCountryLabel} Â· ${selectedOrgLabel} Â· ${selectedLevelLabel}`} onNavigate={setActivePage}
         activePage={activePage}
         selectedPersona={selectedPersona}
         onPersonaChange={setSelectedPersona}
@@ -1952,7 +1952,7 @@ export default function Home() {
 
       {/* Main application */}
       <div
-        className={`app-shell app-ai-left${evidenceDrawer ? " app-evidence-first" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
+        className={`app-shell app-ai-left${aiCollapsed && !evidenceDrawer ? " app-ai-closed" : ""}${evidenceDrawer ? " app-evidence-first" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-home" : ""}`}
         style={
           {
             "--nav-width": `${
@@ -1961,7 +1961,7 @@ export default function Home() {
             "--divider-width": `${
               aiCollapsed ? 0 : 6
             }px`,
-            "--ai-width": aiCollapsed ? "64px" : `min(${aiWidth}px, max(280px, calc(100vw - var(--nav-width) - 486px)))`,
+            "--ai-width": aiCollapsed ? "0px" : `min(${aiWidth}px, max(280px, calc(100vw - var(--nav-width) - 486px)))`,
           } as CSSProperties
         }
       >
@@ -1977,6 +1977,7 @@ export default function Home() {
 
         {/* Dashboard area */}
         <div className="app-dashboard min-w-0 overflow-x-hidden bg-background">
+        {!evidenceDrawer && aiCollapsed && !["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) && <div className="evidence-ai-toolbar"><button id="collapsed-ai-entry" type="button" aria-controls="workforce-ai-panel" aria-expanded={false} onClick={()=>{setAiCollapsed(false);requestAnimationFrame(()=>document.querySelector<HTMLTextAreaElement>(".app-ai-panel textarea")?.focus({preventScroll:window.matchMedia("(min-width: 768px)").matches}));}}>Open Workforce AI</button></div>}
         {evidenceDrawer && <div className={`evidence-ai-toolbar${activePage === "workforce" ? " baseline-ai-entry" : ""}`}><span className="sr-only">Ask about this evidence</span><button type="button" aria-haspopup="dialog" aria-expanded={drawerOpen} onClick={() => setDrawerPage(activePage)}>{activePage === "workforce" && <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 10h8M8 14h5"/></svg>}Open Workforce AI</button></div>}
         {!["home","future-of-work","action-plans","plan-track"].includes(activePage)&&<SelectedGoalProgress/>}
         {(planningWorkspaceActive||["workforce","future-of-work","action-plans","plan-track"].includes(activePage))&&<PlanningJourney activePage={activePage} onNavigate={setActivePage}/>}
@@ -1986,8 +1987,8 @@ export default function Home() {
         {!["home","decision-brief","assess-evaluate","compensation","future-of-work","action-plans","plan-track"].includes(activePage)&&<details className="px-6 pt-3 text-xs text-muted-foreground"><summary className="cursor-pointer">Source details</summary><p className="mt-1" aria-label="Evidence type">{evidenceTrustLabel(activePage)}</p></details>}
         <div hidden={activePage !== "home"}>
           <HomeChatShell>
-          <OverallOverviewPage overviewEntry projectionOverview={{overview:overviewData,receipt:overviewScope,requested:{country:selectedCountry,org:selectedOrg,level:selectedLevel},scopeLabel:`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`,loading:dashboardLoading,error:dashboardError,trend:headcountTrend}} renderWelcome={controls=><HomeChatWelcome {...controls} trend={headcountTrend} overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError}/>} renderPlanPane={savedWork=><HomePlanPane onNavigate={setActivePage} onExample={()=>setDemoActive(true)}>{savedWork}</HomePlanPane>} onCloseDemo={()=>{setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus({preventScroll:true}));}} guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></HomeChatShell></div>
-        {activePage==="planning-overview"&&<details className="mx-5 my-3 rounded border"><summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-medium">Current scenario summary</summary><HomePlanningOverview overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError} onNavigate={setActivePage}/></details>}
+          <OverallOverviewPage overviewEntry projectionOverview={{overview:overviewData,receipt:overviewScope,requested:{country:selectedCountry,org:selectedOrg,level:selectedLevel},scopeLabel:`${selectedCountryLabel} Â· ${selectedOrgLabel} Â· ${selectedLevelLabel}`,loading:dashboardLoading,error:dashboardError,trend:headcountTrend}} renderWelcome={controls=><HomeChatWelcome {...controls} trend={headcountTrend} overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} Â· ${selectedOrgLabel} Â· ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError}/>} renderPlanPane={savedWork=><HomePlanPane onNavigate={setActivePage} onExample={()=>setDemoActive(true)}>{savedWork}</HomePlanPane>} onCloseDemo={()=>{setDemoActive(false);requestAnimationFrame(()=>document.getElementById("overview-question")?.focus({preventScroll:true}));}} guidedExampleActive={demoActive} optionActions={optionActions} marketReference={marketCarry} onEvidencePack={setHomeEvidencePacket} countryOptions={filterOptions.countries} onCountry={setSelectedCountry} developmentSession={developmentSession} conversation={conversation} onStartDemo={() => setDemoActive(true)} active={activePage === "home"} persona={selectedPersona} onNavigate={setActivePage} workforceQuery={"?" + new URLSearchParams({ country: selectedCountry, org: selectedOrg, level: selectedLevel }).toString()} workforceScope={`Selected workforce snapshot: ${selectedCountryLabel}; ${selectedOrgLabel}; ${selectedLevelLabel}`} /></HomeChatShell></div>
+        {activePage==="planning-overview"&&<details className="mx-5 my-3 rounded border"><summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-medium">Current scenario summary</summary><HomePlanningOverview overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} Â· ${selectedOrgLabel} Â· ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError} onNavigate={setActivePage}/></details>}
         {planningWorkspaceActive && marketCarry && <CarriedMarketReference carry={marketCarry} onClear={()=>setMarketCarry(null)}/>}
         {activePage === "future-of-work" ? <FutureOfWorkPage onNavigate={setActivePage}/> : activePage === "action-plans" || activePage === "plan-track" ? <PlanningSupportPage page={activePage} onNavigate={setActivePage}/> : activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "assess-evaluate" ? <section className="p-6"><h2 className="text-lg font-semibold">Coming soon</h2><p className="mt-3 text-muted-foreground">A future space to compare agreed targets with observed outcomes. No scorecard, predicted impact or ROI is calculated here.</p></section> : activePage === "home" ? null : intelligencePage ? <IntelligencePage page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={carry=>{recordDecisionEvidence(conversation.activeGoalId,"labor-market",marketCarryEvidence(carry));setMarketCarry(carry);setActivePage("planning-overview");}} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <CompensationPage scope={{country: selectedCountry, org: selectedOrg, level: selectedLevel}} />
@@ -2190,7 +2191,7 @@ export default function Home() {
           onResizeKeyDown={resizeAiWithKeyboard}
           onToggleExpanded={toggleAiExpanded}
           onToggleCollapsed={() =>
-            setAiCollapsed(!aiCollapsed)
+            {setAiCollapsed(!aiCollapsed);if(!aiCollapsed)requestAnimationFrame(()=>document.getElementById("collapsed-ai-entry")?.focus({preventScroll:window.matchMedia("(min-width: 768px)").matches}));}
           }
           onChatInputChange={setChatInput}
           onSendSuggested={sendSuggestedPrompt}

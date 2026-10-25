@@ -447,3 +447,7 @@ All 50 stable role codes receive unique fictional descriptive display titles bas
 ## Capacity clarity candidate — October 25
 
 Runtime 3d12d2a5d1b479ea940944b982fca0aaaa5c2e60: signed monthly capacity balances now say Short/Surplus/Capacity matched; missing values remain Unknown. Required-versus-available charts shade only existing modeled shortfall segments, with exact values in Monthly detail. Shared planner labels are more readable and chart/KPI framing is lighter. Calculations, saved inputs, accounting and access are unchanged. Independent review resolved noninteractive-chart accessibility; targeted tests, TypeScript and lint pass. Preview/browser acceptance and exact-commit CI pending; PR397 remains live. No paid provider calls. No current exposed P1 heading found; loading/About were not changed without a reproduced defect.
+
+## Closed AI rail clarity — October 25
+
+PR398 is live after CI and desktop/mobile interaction checks. The apparent second navigation rail is actually collapsed Workforce AI. This candidate retains navigation and the mounted AI state, replaces its closed 64px column with an accessible Open Workforce AI toolbar button, and returns keyboard focus on collapse. Mobile focus scrolls to the opened composer. Repeated capacity-chart explanations move into How to read this chart; synthetic notice, inputs, values and Monthly detail remain. No navigation architecture, model or accounting change. Independent review identified and resolved mobile focus scrolling. Preview/CI pending; no paid provider calls.
