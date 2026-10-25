@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "e6f0f2352dc46933774204cf60689b3c4c40719d",
+  "sourceCommit": "dc9a699c4da1cfb389b69ce16405824322491b42",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -794,8 +794,8 @@
     },
     {
       "path": "components/pages/survey-sentiment-page.tsx",
-      "sha256": "92015bf203092c89df76d0a907e909e7dbaf8c63aa31f52bf89d2397ccf09b48",
-      "bytes": 15831
+      "sha256": "bdb84e3ee9a6d10f9aab98d331f69b79f483d3c2e99331228ef53c86df113a91",
+      "bytes": 16811
     },
     {
       "path": "components/pages/talent-acquisition-page.tsx",
@@ -4424,8 +4424,8 @@
     },
     {
       "path": "tests/concise-talent-findings.test.mjs",
-      "bytes": 5209,
-      "sha256": "f567531656b802efdcc540c07eeecb895049632cd2596f54179b3863b7780f30"
+      "bytes": 7668,
+      "sha256": "b044cf4cd706eb06eaa04ad4af78072ccc37bb0768254c1daa6e017180783a80"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
