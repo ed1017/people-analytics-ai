@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "1f4f8ec68b25aa0cc2637e97e7b986205163b714",
+  "sourceCommit": "7751f330600ec5b42eab921334a4c420d689fad7",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "708c5191bbe629b0af8f027eaa11852a1a8e96a28fec018789c6674cc995b61d",
-      "bytes": 8834
+      "sha256": "b9fb90032565069d717d65c03030b70e4a0df0acaab75436a008dd274db020d0",
+      "bytes": 8726
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "efcc027376246e3eac26b876026f1f13b8af8bd0322d18c001e7b9cb1c454dbb",
-      "bytes": 4179
+      "sha256": "324face40e0bd0f544213dd8c0ac2389d085c0bff45fbabcf37f3f5db65109b3",
+      "bytes": 4170
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
