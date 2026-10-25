@@ -50,7 +50,7 @@ export function CapacityWorkspace(){
  return <section aria-label="Workload capacity planning" className="capacity-workspace @container/capacity space-y-4">
   <KeyFindings findings={!error ? capacityFindings(result, isPreview) : null} />
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
-  {draft.sourceNote&&<aside aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><strong>Illustrative handoff origin</strong><p>{draft.sourceNote}</p><p>Origin values are retained for review. Later edits below are independent; the reduction is not applied again. No observed savings or staffing release is established.</p></aside>}
+  {draft.sourceNote&&<aside aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><strong>Illustrative handoff origin</strong><p>{draft.sourceNote}</p><p>Edit the transferred assumptions below. The original reduction is already included.</p></aside>}
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 grid-cols-1 @min-[48rem]/capacity:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">
@@ -60,7 +60,7 @@ export function CapacityWorkspace(){
    <h3 className="border-t pt-3 font-semibold">2. How many people do you have?</h3>
    <p className="text-sm text-muted-foreground">Count people separately from working time. FTE means full-time equivalent: two half-time people = 1 FTE.</p>
    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('people')}{field('fte')}</div>
-   <p className="text-sm text-muted-foreground">Add the dates and how much time is spent on this work below. Skill records do not fill in these numbers.</p>
+   <p className="text-sm text-muted-foreground">Enter your dates and time assigned to this work below.</p>
    <details className="border-t pt-1">
     <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Timing &amp; capacity assumptions (required)</summary>
     <p className="mb-3 text-xs text-muted-foreground">Starting people and FTE are measured just before the first planning month. FTE is contracted working time, before assigning time to this work. Leave blanks when unknown; enter 0 only when none.</p>
@@ -81,7 +81,7 @@ export function CapacityWorkspace(){
   {result&&!isPreview&&<div className="rounded-xl border bg-background p-4" aria-label="Contracted supply cost estimate">
    <p className="text-sm">Estimated monthly workforce cost - final month · {result.points.at(-1)?.month}</p>
    <p className="mt-2 break-words text-xl font-semibold tabular-nums">{formatCapacityCost(cost?.points.at(-1)?.runRateCents)} <span className="text-sm font-normal">USD/month</span></p>
-   <p className="mt-2 text-xs text-muted-foreground">User-assumed {formatCapacityCost(cost?.assumptions.rateCents)} USD per contracted FTE per month × contracted FTE supply, rounded to cents. Assignment and productivity do not change this estimate. It is not actual pay, cumulative spend or savings.</p>
+   <p className="mt-2 text-xs text-muted-foreground">Your rate of {formatCapacityCost(cost?.assumptions.rateCents)} USD per contracted FTE per month × contracted FTE supply.</p>
   </div>}
   <div ref={feedback} tabIndex={-1} aria-label="Capacity calculation feedback" className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring">
    <p role="alert" aria-atomic="true" className={error?'text-sm text-destructive':'sr-only'}>{error}</p>
@@ -90,6 +90,7 @@ export function CapacityWorkspace(){
     {result.status==='needs-inputs'&&<p className="text-sm">Fill in the missing numbers, including Timing &amp; capacity assumptions, then confirm and calculate. Known work needs can still be shown while available time is unknown.</p>}
     <p className="text-sm">{result.assumptions.scope.label} · Opening {result.assumptions.opening.asOf}.</p>
     <details className="border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Monthly detail · people and FTE</summary>
+    <p className="mb-3 text-xs text-muted-foreground">Available FTE is contracted time assigned to this work; productivity changes required FTE. An FTE gap is not a hiring count. Cost is a monthly estimate from your rate and contracted FTE, rounded to cents; assignment and productivity do not change it. It does not measure actual pay, cumulative spend or savings.</p>
     <div className="overflow-x-auto" role="region" aria-label="Monthly capacity comparison" tabIndex={0}>
      <div className="space-y-3 sm:hidden">{result.points.map(p=><div key={p.month} className="rounded-md border p-3">
       <p className="mb-2 font-medium">{p.month}</p>
@@ -100,12 +101,11 @@ export function CapacityWorkspace(){
      <table className="hidden w-full text-left text-sm sm:table"><caption className="sr-only">Monthly available and required capacity, with people shown separately</caption><thead><tr>{['Month','People','Contracted FTE','Available FTE','Required FTE','Capacity balance','Estimated workforce cost (USD/month)'].map(label=><th key={label} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{result.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th>{[p.headcount,p.contractedFte,p.allocatedFte,p.requiredFte,p.gapFte].map((n,i)=><td key={i} className="p-2 tabular-nums">{i===4?capacityBalanceLabel(n):format(n)}</td>)}<td className="p-2 tabular-nums">{formatCapacityCost(cost?.points.find(c=>c.month===p.month)?.runRateCents)}</td></tr>)}</tbody></table>
     </div>
     </details>
-    <p className="text-xs text-muted-foreground">Available FTE is contracted FTE assigned to this work. Productivity changes required FTE; an FTE gap is not a number of people to hire.</p>
    </div>}
   </div>
   </div>
   </div>
   <CapacitySavedScenarios key={goalKey}/>
-  <p className="text-xs text-muted-foreground">Saved scenarios stay in this browser under the selected goal. Without a goal, calculations are session-only. Unsaved drafts survive navigation but clear on reload or dataset change. No automatic saving. Optional cost estimates use only your manual rate and contracted FTE supply.</p>
+  <p className="text-xs text-muted-foreground">Save scenarios in this browser under a selected goal. Without a goal, calculations are session-only. Drafts are not saved automatically: they survive navigation but clear on reload or dataset change.</p>
  </section>;
 }

@@ -1,4 +1,4 @@
-.companion { color: #172b49; background: #f3f6fb; border: 1px solid #dce5ef; border-radius: 14px; }
+.companion { color: var(--brand-structure); background: #F3F4F6; border: 1px solid #dce5ef; border-radius: 14px; }
 .launcher { width: 100%; text-align: left; cursor: pointer; padding: 18px 22px; min-height: 48px; font-weight: 600; }
 .launcher span { font-size: 12px; color: #5c6d83; margin-left: 12px; font-weight: 400; }
 .body { padding: 4px 24px 24px; }
@@ -6,7 +6,7 @@
 .body header p,.body > p { font-size: 13px; color: #5c6d83; margin-top: 6px; }
 .fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin: 24px 0; }
 .fields label { font-size: 13px; font-weight: 600; }
-.fields :is(select,input) { display: block; width: 100%; min-height: 44px; border: 1px solid #b5c5da; border-radius: 7px; padding: 10px; margin-top: 8px; background: white; color: #172b49; }
+.fields :is(select,input) { display: block; width: 100%; min-height: 44px; border: 1px solid #b5c5da; border-radius: 7px; padding: 10px; margin-top: 8px; background: white; color: var(--brand-structure); }
 .fields :disabled { opacity: .6; }
 .fields small { display: block; margin-top: 6px; color: #5c6d83; font-size: 11px; font-weight: 400; }
 .result { background: white; border: 1px solid #dce5ef; border-radius: 12px; padding: 24px; }
@@ -14,8 +14,8 @@
 .bars { display: grid; gap: 12px; margin: 20px 0; }
 .bars > div { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: center; font-size: 12px; color: #5c6d83; }
 .bars > div > div { height: 22px; border-radius: 4px; background: #f0f4f9; overflow: hidden; }
-.bars i { display: block; height: 100%; border-radius: 4px; background: #245cdb; }
-.bars .target { background: #18837c; }
+.bars i { display: block; height: 100%; border-radius: 4px; background: var(--brand-action); }
+.bars .target { background: var(--brand-structure); }
 .result dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .result dl > div { border: 1px solid #dce5ef; border-radius: 8px; padding: 14px; }
 .result dt { font-size: 12px; color: #5c6d83; }
@@ -25,6 +25,6 @@
 .sources { font-size: 12px; color: #5c6d83; margin-top: 14px; }
 .sources summary { cursor: pointer; min-height: 44px; padding: 12px 0; }
 .sources p { margin-top: 8px; line-height: 1.6; }
-.refresh { min-height: 44px; font-size: 12px; color: #245cdb; text-decoration: underline; }
-.companion :is(input,select,summary,button):focus-visible { outline: 3px solid #245cdb; outline-offset: 3px; }
+.refresh { min-height: 44px; font-size: 12px; color: var(--brand-action); text-decoration: underline; }
+.companion :is(input,select,summary,button):focus-visible { outline: 3px solid var(--brand-action); outline-offset: 3px; }
 @media(max-width:600px) { .body { padding: 4px 16px 16px; } .fields { grid-template-columns: 1fr; gap: 12px; margin: 18px 0; } .result { padding: 16px; } .result dd { font-size: 20px; } .launcher span { display: block; margin: 6px 0 0; } }

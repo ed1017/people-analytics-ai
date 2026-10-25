@@ -56,7 +56,7 @@ export function HomeCapacityReview({request,context,conversation,onClose,onConfi
  }
  return <section ref={root} tabIndex={-1} aria-label="Review workforce planning scope" className="space-y-3 rounded-lg border border-primary/40 p-4 text-sm">
   <h2 className="text-lg font-semibold">Review the goal and planning scope</h2>
-  <p>Compare development, internal moves and external hiring for <strong>additional role capacity in one business unit</strong>. Costs and timing depend on assumptions you review next. This does not estimate retention improvements or replacement-only hiring.</p>
+  <p>Compare development, internal moves and external hiring for <strong>additional role capacity in one business unit</strong>. Review your cost and timing assumptions next.</p>
   <label className="block">Goal to carry into the plan<textarea aria-label="Goal to carry into the plan" readOnly={Boolean(request.goalId)} value={goal} onChange={event=>{setGoal(event.target.value);setScope('')}} className="mt-1 min-h-24 w-full rounded border bg-background p-2"/></label>
   {goal.trim().length>240&&<p role="status">Please review a goal of up to 240 characters. Your original text and chat draft are retained; nothing is shortened automatically.</p>}
   <fieldset disabled={blocked} className="space-y-2"><legend className="mb-2 font-medium">Does this goal require additional role capacity?</legend>
@@ -67,13 +67,13 @@ export function HomeCapacityReview({request,context,conversation,onClose,onConfi
     ['unknown','Not sure yet'],
    ].map(([value,label])=><label key={value} className="flex min-h-11 items-center gap-2"><input type="radio" name="home-capacity-scope" value={value} checked={scope===value} onChange={()=>setScope(value)}/><span>{label}</span></label>)}
   </fieldset>
-  {scope==='additional'&&<p>Confirm only the additional-capacity part of your goal. Retention effects remain unknown. Next: choose a role and business unit, fill missing demand, timing and cost assumptions, <strong>Save reviewed inputs</strong>, then <strong>Calculate options</strong>.</p>}
+  {scope==='additional'&&<p>Confirm the additional-capacity part of your goal. Choose a role and business unit, enter demand, timing and cost assumptions, <strong>Save reviewed inputs</strong>, then <strong>Calculate options</strong>. Retention effects remain unknown.</p>}
   {((scope==='retention'&&!onRetention)||scope==='replacement')&&<p role="status">This scope is not supported by the additional-capacity calculator. Continue the conversation to investigate evidence and next steps. No workforce plan or calculation has been created.</p>}
-  {scope==='retention'&&onRetention&&<p role="status">Retention what-if explores one program using your own expected-exit baseline, effect range, timing and costs. It is conditional arithmetic, not a forecast. Page filters do not supply its population or assumptions.</p>}
+  {scope==='retention'&&onRetention&&<p role="status">Explore a retention program using your assumed population, expected exits, effect range, timing and costs. Enter these separately from page filters.</p>}
   {scope==='unknown'&&<p role="status">Clarify whether you need additional roles before using this calculator. You can continue the conversation; your draft is kept.</p>}
   {stale&&<p role="status">Your goal or context changed. Close and reopen the scope review to review the current context. Your review text is retained here for reference.</p>}
   {notice&&<p role="alert">{notice}</p>}
   <div className="flex flex-wrap gap-2">{scope==='retention'&&onRetention&&<button type="button" className={button} disabled={blocked||!goal.trim()||goal.trim().length>240} onClick={confirmRetention}>Confirm goal and open Retention what-if</button>}{!(scope==='retention'&&onRetention)&&<button type="button" className={button} disabled={blocked||scope!=='additional'||!goal.trim()||goal.trim().length>240} onClick={confirm}>Confirm goal and review inputs</button>}<button type="button" className={button} onClick={onClose}>Return to conversation</button></div>
-  <p className="text-xs text-muted-foreground">Confirmation saves this goal and opens local inputs. It does not send to AI or calculate. Your conversation draft is kept.</p>
+  <p className="text-xs text-muted-foreground">Confirmation saves this goal and opens inputs for review. Your conversation draft is kept.</p>
  </section>;
 }

@@ -49,13 +49,21 @@
 }
 
 :root {
+  /* Brand roles are stable; theme tokens below control readable surface contrast. */
+  --brand-structure: #04342C;
+  --brand-accent: #1D9E75;
+  --brand-action: #087F5B;
+  --brand-action-hover: #066649;
+  --brand-warning: #BA7517;
+  --brand-soft: #EAF7F1;
+  --brand-line: #B8D8CC;
   --background: #111827;
   --foreground: #F2F5FA;
   --card: #1F2937;
   --card-foreground: #F2F5FA;
   --popover: #1F2937;
   --popover-foreground: #F2F5FA;
-  --primary: #A5C5EE;
+  --primary: #82D9C7;
   --primary-foreground: #111827;
   --secondary: #303D4D;
   --secondary-foreground: #F2F5FA;
@@ -66,21 +74,21 @@
   --destructive: #FF9FAF;
   --border: #536982;
   --input: #536982;
-  --ring: #A5C5EE;
-  --chart-1: #A5C5EE;
-  --chart-2: #45D6B0;
-  --chart-3: #C4AFF2;
+  --ring: #82D9C7;
+  --chart-1: #82D9C7;
+  --chart-2: #C4AFF2;
+  --chart-3: #45D6B0;
   --chart-4: #F4C77D;
   --chart-5: #F096AF;
   --radius: 0.625rem;
-  --sidebar: #18212F;
+  --sidebar: var(--brand-structure);
   --sidebar-foreground: #F2F5FA;
-  --sidebar-primary: #A5C5EE;
+  --sidebar-primary: #82D9C7;
   --sidebar-primary-foreground: #111827;
   --sidebar-accent: #3A485C;
   --sidebar-accent-foreground: #F2F5FA;
   --sidebar-border: #536982;
-  --sidebar-ring: #A5C5EE;
+  --sidebar-ring: #82D9C7;
 }
 
 .dark {
@@ -90,7 +98,7 @@
   --card-foreground: #F2F5FA;
   --popover: #1F2937;
   --popover-foreground: #F2F5FA;
-  --primary: #A5C5EE;
+  --primary: #82D9C7;
   --primary-foreground: #111827;
   --secondary: #303D4D;
   --secondary-foreground: #F2F5FA;
@@ -101,20 +109,20 @@
   --destructive: #FF9FAF;
   --border: #536982;
   --input: #536982;
-  --ring: #A5C5EE;
-  --chart-1: #A5C5EE;
-  --chart-2: #45D6B0;
-  --chart-3: #C4AFF2;
+  --ring: #82D9C7;
+  --chart-1: #82D9C7;
+  --chart-2: #C4AFF2;
+  --chart-3: #45D6B0;
   --chart-4: #F4C77D;
   --chart-5: #F096AF;
-  --sidebar: #18212F;
+  --sidebar: var(--brand-structure);
   --sidebar-foreground: #F2F5FA;
-  --sidebar-primary: #A5C5EE;
+  --sidebar-primary: #82D9C7;
   --sidebar-primary-foreground: #111827;
   --sidebar-accent: #3A485C;
   --sidebar-accent-foreground: #F2F5FA;
   --sidebar-border: #536982;
-  --sidebar-ring: #A5C5EE;
+  --sidebar-ring: #82D9C7;
 }
 
 @layer base {
@@ -307,7 +315,7 @@
 .home-workspace :is(button, summary, textarea, a):focus-visible,
 .development-catalog :is(button, summary, input, select):focus-visible,
 .development-planning :is(button, input):focus-visible {
-  outline: 3px solid #b7d4fb;
+  outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
 .home-workspace :is(aside, form) {
@@ -411,7 +419,7 @@
 .evidence-workspace :is(button, input, select, textarea, summary, a):focus-visible,
 .app-sidebar button:focus-visible,
 .app-ai-panel :is(button, textarea):focus-visible {
-  outline: 3px solid #b7d4fb;
+  outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
 .evidence-workspace nav[aria-label="Planning destination cards"] {
@@ -513,10 +521,10 @@
 }
 html[data-workspace-preference="slate-blue"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) {
   --workspace-panel: #1F2937;
-  --workspace-send: #3979D5;
-  --workspace-home-send: #3979D5;
-  --workspace-send-text: #000000;
-  --workspace-action-edge: #A5C5EE;
+  --workspace-send: var(--brand-action);
+  --workspace-home-send: var(--brand-action);
+  --workspace-send-text: #FFFFFF;
+  --workspace-action-edge: #82D9C7;
 }
 [data-workspace-palette] :is(.global-workforce-filters, .home-composer-dock, .app-ai-panel) {
   background-color: var(--workspace-panel);
@@ -532,7 +540,7 @@ html[data-workspace-preference="slate-blue"] [data-workspace-palette]:not([data-
   box-shadow: inset 0 0 0 1px var(--workspace-action-edge);
 }
 html[data-workspace-preference="slate-blue"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) :is(.global-workforce-filters, .app-ai-panel) :is(button, select, textarea):focus-visible {
-  outline: 3px solid #B7D4FB;
+  outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
 
@@ -585,13 +593,13 @@ html[data-workspace-preference="slate-blue"] [data-workspace-palette]:not([data-
   .app-ai-panel { position: static; width: 100%; min-width: 0; }
 }
 
-/* Neutral Light surfaces; primary actions and selection retain blue emphasis. */
+/* Neutral Light surfaces; accessible teal identifies primary actions and selection. */
 html[data-workspace-preference="light"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) {
   --workspace-panel: #FFFFFF;
-  --workspace-send: #205CAC;
-  --workspace-home-send: #205CAC;
+  --workspace-send: var(--brand-action);
+  --workspace-home-send: var(--brand-action);
   --workspace-send-text: #FFFFFF;
-  --workspace-action-edge: #205CAC;
+  --workspace-action-edge: var(--brand-action);
   --background: #F3F4F6;
   --foreground: #182230;
   --card: #FFFFFF;
@@ -600,27 +608,27 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   --popover-foreground: #182230;
   --muted: #E9EDF2;
   --muted-foreground: #4B5563;
-  --primary: #205CAC;
+  --primary: var(--brand-action);
   --primary-foreground: #FFFFFF;
   --secondary: #E9EDF2;
   --secondary-foreground: #182230;
   --border: #9AA4B2;
   --input: #9AA4B2;
-  --ring: #174D90;
-  --accent: #E8EFFA;
+  --ring: var(--brand-action);
+  --accent: var(--brand-soft);
   --accent-foreground: #182230;
   --destructive: #A51D3C;
-  --chart-1: #205CAC;
-  --chart-2: #08765C;
-  --chart-3: #7750AC;
-  --chart-4: #92600B;
+  --chart-1: var(--brand-action);
+  --chart-2: #7750AC;
+  --chart-3: var(--brand-structure);
+  --chart-4: var(--brand-warning);
   --chart-5: #AB375C;
   color-scheme: light;
 }
 html[data-workspace-preference="light"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) .global-workforce-filters { background-color: #F9FAFB; color: var(--foreground); }
 html[data-workspace-preference="light"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) .home-composer-dock textarea { background-color: #FFFFFF; color: #182230; border-color: #9AA4B2; }
 html[data-workspace-preference="light"] [data-workspace-palette]:not([data-workspace-palette="original-navy-teal"]) :is(.app-dashboard, .global-workforce-filters, .home-composer-dock, .app-ai-panel, .phone-navigation-trigger) :is(button, input, select, textarea, summary):focus-visible {
-  outline: 3px solid #174D90;
+  outline: 3px solid var(--brand-action);
   outline-offset: 3px;
 }
 
@@ -643,7 +651,7 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   :is(.development-quote > span:nth-child(2), .development-option > p, .development-remove) { color: var(--muted-foreground); }
   :is(.development-quote[aria-pressed="true"], .development-option > p:has(strong), .development-option dl > div:last-child, .evidence-workspace .evidence-scope-notice) { background: var(--secondary); color: var(--foreground); }
   .development-primary { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
-  .development-primary:hover:not(:disabled) { background: #174D90; }
+  .development-primary:hover:not(:disabled) { background: var(--brand-action); }
   .evidence-workspace th { background: var(--muted); color: var(--foreground); }
   .evidence-workspace tbody tr:hover { background: var(--accent); }
   .recharts-legend-item-text { color: var(--foreground) !important; }
@@ -793,7 +801,7 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .swp-demo-assumptions label { display:grid; gap:5px; font-size:14px; }
 .swp-demo-assumptions input { width:100%; min-height:44px; padding:8px; border:1px solid var(--input); border-radius:6px; background:var(--card); color:var(--foreground); }
 .swp-demo-assumptions input[type="range"] { padding:0; accent-color:var(--primary); }
-.swp-demo-warning { border-left:3px solid #B77916; padding:8px 12px; background:var(--muted); font-size:13px; }
+.swp-demo-warning { border-left:3px solid var(--brand-warning); padding:8px 12px; background:var(--muted); font-size:13px; }
 @media (max-width:767px) {
   main > header .calm-header-row { display:flex; padding:8px 12px; gap:4px 8px; }
   main > header .calm-brand { display:flex; flex-basis:100%; }
@@ -848,7 +856,7 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 .simple-demo .swp-demo-assumptions input[type="range"] { min-height:24px; border:0; }
 .simple-demo-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .capacity-gap-track { display:flex; height:12px; margin-top:6px; background:var(--muted); border-radius:6px; overflow:hidden; }
-.capacity-gap-track span { background:#26776f; }.capacity-gap-track i { background:#b8893f; }
+.capacity-gap-track span { background:var(--brand-action); }.capacity-gap-track i { background:var(--brand-warning); }
 .home-workspace[data-simple-demo]:not([data-demo-chat]) .home-chat-form { display:none; }
 @media(max-width:767px){.simple-demo-options,.simple-demo-controls,.simple-demo-details { grid-template-columns:1fr; }}
 
@@ -959,3 +967,28 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
 
 /* A closed AI conversation keeps its state without consuming a second icon rail. */
 .app-shell.app-ai-closed > .app-ai-panel { display: none; }
+
+/* Teal-navy anchors navigation while workspace surfaces retain their chosen theme. */
+.app-top-header { background-color: var(--brand-structure); }
+.app-top-header > .workspace-context > summary { color: #B9D5CB; }
+.app-top-header > .calm-header-row, .app-sidebar {
+  --background: var(--brand-structure);
+  --card: var(--brand-structure);
+  --foreground: #F2F5FA;
+  --card-foreground: #F2F5FA;
+  --popover: var(--brand-structure);
+  --popover-foreground: #F2F5FA;
+  --secondary-foreground: #F2F5FA;
+  --accent-foreground: #F2F5FA;
+  --input: #528879;
+  --muted-foreground: #B9D5CB;
+  --primary: #82D9C7;
+  --primary-foreground: #04342C;
+  --secondary: #125344;
+  --accent: #125344;
+  --border: #528879;
+  --ring: #82D9C7;
+  background-color: var(--brand-structure);
+  color: var(--foreground);
+}
+.app-sidebar [data-nav-destination][aria-current="page"] > .absolute { background: var(--primary); }
