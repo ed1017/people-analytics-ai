@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "2e41ecc84774e6a964fca1be29a05c56a1ea67ec",
+  "sourceCommit": "e6f0f2352dc46933774204cf60689b3c4c40719d",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -749,8 +749,8 @@
     },
     {
       "path": "components/pages/career-mobility-page.tsx",
-      "sha256": "da23bbe69bbf86e3c8c2febea23f013d344709e1273d4a758c68f042eb78d9a1",
-      "bytes": 20378
+      "sha256": "a3285bec87d8cd0e98836c1e466d013a75a29e1cfaf69a10b516f7039fdca503",
+      "bytes": 19965
     },
     {
       "path": "components/pages/compensation-page.tsx",
@@ -769,8 +769,8 @@
     },
     {
       "path": "components/pages/learning-development-page.tsx",
-      "sha256": "a478b9636a4192984ccd96ec03697f3248233c3f0306b811dae2ed060310815f",
-      "bytes": 16476
+      "sha256": "915d705ccfbce59983a9985ccb0ed62f427b41e587779e767b67301f42e9410c",
+      "bytes": 16217
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
@@ -794,8 +794,8 @@
     },
     {
       "path": "components/pages/survey-sentiment-page.tsx",
-      "sha256": "131cebfa6aad34b93cb376150273bb4c947b7d0488e25842f246ee11fb07347f",
-      "bytes": 15655
+      "sha256": "92015bf203092c89df76d0a907e909e7dbaf8c63aa31f52bf89d2397ccf09b48",
+      "bytes": 15831
     },
     {
       "path": "components/pages/talent-acquisition-page.tsx",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "2a94f0f952a29e0997aa3a5db1cc6f2abf9e20279ba8867d86f6125a0a451537",
-      "bytes": 8478
+      "sha256": "44f3593a539a6abb8842c983df32ecd22098f314a48b21a590dee0d68a2f5a7a",
+      "bytes": 8060
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "5ff7f30b7d71806852ec8a06f170459ef6cf2ca4d856d54f3ad797918cbbb6c7",
-      "bytes": 5365
+      "sha256": "ddbf70006aea45860a275a442527e510c78c767c61e7d654fe2a785afde436b0",
+      "bytes": 5338
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
@@ -4421,6 +4421,11 @@
       "path": "tests/public-recruiting-cohort-recovery.test.mjs",
       "bytes": 2903,
       "sha256": "8701c159405c17e3da8c769d46cdd4bfe4e7cd197af9d5dffd62a1ba8933c676"
+    },
+    {
+      "path": "tests/concise-talent-findings.test.mjs",
+      "bytes": 5209,
+      "sha256": "f567531656b802efdcc540c07eeecb895049632cd2596f54179b3863b7780f30"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

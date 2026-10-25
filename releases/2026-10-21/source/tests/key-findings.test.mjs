@@ -23,7 +23,7 @@ test('succession suppression wins even if a populated value is accidentally supp
 });
 test('survey and finance preserve distinct metric and cost-period meanings',()=>{
  const survey=findings.surveyFindings({as_of:'2026-09-30',summary:{engagement_favorable_pct:40,engagement_respondents:100,engagement_participation_pct:null}});
- assert.match(survey.items[0],/40% among 100 respondents/);assert.match(survey.items.at(-1),/not comment sentiment/);
+ assert.deepEqual(survey.items,['Engagement favorability is 40% among 100 respondents.']);
  const finance=findings.financeFindings({as_of:'2026-09-30',current:{labor_cost_usd:1000,vacant_positions:null,fte:5}});
  assert.equal(finance.items[0],'Recorded labor cost: USD 1,000; cost period unconfirmed.');assert.equal(finance.items[1],'Recorded workforce: 5 FTE.');assert.doesNotMatch(finance.items.join(' '),/0 positions/);
 });

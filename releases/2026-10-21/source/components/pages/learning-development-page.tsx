@@ -55,7 +55,7 @@ export function LearningDevelopmentPage({
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Connect skill gaps to active courses. Course coverage does not measure readiness.
+            Find active courses for recorded skill gaps.
           </p>
         </div>
 
@@ -375,9 +375,7 @@ export function LearningDevelopmentPage({
               </div>
             )}
 
-            <p className="mt-3 text-xs text-muted-foreground">
-              Job-profile coverage is course coverage across required skills. It does not measure whether any employee is ready for that role.
-            </p>
+
           </div>
 
           <details className="mt-6 rounded-lg border p-4">

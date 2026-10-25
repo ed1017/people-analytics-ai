@@ -1,6 +1,6 @@
-# Active roadmap - October 25, PR409 live
+# Active roadmap - October 25, PR410 live
 
-Production is [PR409](https://github.com/ed1017/people-analytics-ai/pull/409), runtime `000a1159837319caa9726ce9a244c84b07b5fed7`, deployment `dpl_35VsT2VvBHBXL4TFjRMeiF7hL3Qe`, source merge `453c981f62b9e5d9c5466e054d3c3943b6f2f283`. The canonical public alias was checked again on October 25 and is READY. Dated records below are historical checkpoints; their pending labels do not override this queue.
+Production is [PR410](https://github.com/ed1017/people-analytics-ai/pull/410), runtime `2e41ecc84774e6a964fca1be29a05c56a1ea67ec`, deployment `dpl_E9icRPFg54yuHxUtYnqrwy7PmaTf`, source merge `3a574ca027117a9878caa07b2a85839b41f0ea83`. The canonical public alias is verified READY. Dated records below are historical checkpoints; pending labels there do not override this queue.
 
 ## Completed agreed work
 
@@ -23,7 +23,9 @@ Production is [PR409](https://github.com/ed1017/people-analytics-ai/pull/409), r
 | Consistent existing-page polish | Inspect remaining shared-style and repetitive-copy inconsistencies outside the recently accepted core; fix confirmed issues within current layouts, preserving missing-input/error/unsaved warnings. Actual preview screenshots precede promotion. |
 | Verification record | Keep this active queue and release evidence current. PR407's initial public-check failure was the harness rejecting bare ed-ai.app; canonical www.ed-ai.app reruns passed. This does not explain the historical model failure. |
 
-Current candidate `af63daaadf28fa109083968cc9b54d50f8f2c1cc` corrects outdated Workforce construction notes, derives Skills/Finance dates and Workforce/recruiting periods from source records, and condenses the optional recruiting-view explanation. The historical failure log contained 18 failures; rerunning the affected current files found 13 failures in 47 checks. Stale test aliases/fixtures and a retained helper's exact-two-options assumption are repaired. The focused current aggregate passes 99 checks, including shared-request cancellation, dataset-switch late responses and demand-driven retry timing. Independent review, TypeScript and lint pass. No original intermittent failure was reproduced. Initial hosted eight-page/viewport checks passed. Final copy follow-up shortens recruiting/finance/skills findings and retains unknown cost basis in accessible details. Initial CI passed 3,086/3,087 checks; one test-loader alias omitted the new date helper and is now repaired (13 focused checks). Final findings checks (19), types and review pass. Revised hosted preview, screenshot review and final release CI remain pending; production remains PR409.
+PR410 closes the historical harness reconciliation: 99 focused checks, repaired imports/current fixtures and retained helper support for more than two eligible options, plus cancellation/dataset-switch/retry coverage. Exact-head CI40243426463 passed; staged desktop/mobile checks and screenshot review passed. Recruiting now distinguishes the recorded successful-hire cohort from a complete applicant funnel, with conversion unavailable in page and grounded summary/aggregate paths. Mean and median remain independent; actual source counts are unchanged. No original intermittent failure was reproduced.
+
+The next separate candidate `e6f0f2352dc46933774204cf60689b3c4c40719d` shortens Learning, Career preferences and Employee Listening findings while retaining definitions, missing-data states and scope limits in accessible details. Thirteen focused findings/render checks and independent review pass. Hosted preview and final CI are pending; this candidate is not live.
 
 Owner review is useful but does not block these independent tracks. No additional clearly agreed unbuilt feature has been identified. New work must close these existing acceptance gaps rather than create features to remain busy.
 

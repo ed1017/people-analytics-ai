@@ -37,7 +37,6 @@ export const recruitingFindings = (d: TalentAcquisitionResponse) => result(`Recr
 export const surveyFindings = (d: SurveySentimentResponse) => result(`Company employee listening · ${d.data_meta?.listeningPeriod ?? d.as_of}`, [
   fact(d.summary.engagement_favorable_pct, v => `Engagement favorability is ${n(v)}%${numeric(d.summary.engagement_respondents) ? ` among ${n(d.summary.engagement_respondents)} respondents` : ''}.`),
   fact(d.summary.engagement_participation_pct, v => `Recorded participation is ${n(v)}% of the eligible population.`),
-  'Favorability summarizes survey responses; it is not comment sentiment or evidence of a causal relationship.',
 ]);
 export const financeFindings = (d: FinanceResponse) => result(`Company finance snapshot · ${d.as_of}`, [
   fact(d.current.labor_cost_usd, v => `Recorded labor cost: USD ${n(v)}; cost period unconfirmed.`),
@@ -49,15 +48,13 @@ export const skillsFindings = (d: SkillsResponse) => result(`Company-wide skill 
   fact(d.summary.weighted_requirement_met_pct, v => `Role requirements met (weighted): ${n(v)}%.`),
   fact(d.summary.average_profile_coverage_pct, v => `Average recorded profile coverage: ${n(v)}%; missing proficiency remains unassessed.`),
 ]);
-export const learningFindings = (d: LearningDevelopmentResponse) => result(`Company learning catalogue · ${d.as_of}; workforce filters do not narrow this evidence`, [
+export const learningFindings = (d: LearningDevelopmentResponse) => result(`Company-wide learning catalogue · ${d.as_of}`, [
   fact(d.summary.gap_skills_with_active_pathway, v => `${n(v)} gap skills have an active learning pathway${numeric(d.summary.current_gap_skills) ? ` out of ${n(d.summary.current_gap_skills)} recorded gap skills` : ''}.`),
   fact(d.summary.fully_covered_job_profiles, v => `${n(v)} job profiles have pathways covering all required skills.`),
-  'Catalogue availability does not establish participation, completion or readiness.',
 ]);
-export const mobilityFindings = (d: CareerMobilityResponse) => result(`Company career preferences · ${d.as_of ?? 'update date unavailable'}; workforce filters do not narrow this evidence`, [
+export const mobilityFindings = (d: CareerMobilityResponse) => result(`Company-wide career preferences · ${d.as_of ?? 'update date unavailable'}`, [
   fact(d.summary.preference_record_coverage_pct, v => `Preference records cover ${n(v)}% of active employees.`),
-  fact(d.summary.employees_without_preference, v => `${n(v)} active employees have no recorded preference; this does not mean they lack career interests.`),
-  'Preferences describe interests, not assessed readiness or permission to redeploy.',
+  fact(d.summary.employees_without_preference, v => `${n(v)} active employees have no recorded preference.`),
 ]);
 export const successionFindings = (d: SuccessionCoverageResponse) => result(`Company succession evidence · ${d.as_of_date ?? 'assessment date unavailable'}; workforce filters do not narrow this evidence`, [
   d.plan_coverage_suppressed ? 'Plan coverage is suppressed; no small-group count is disclosed.' : fact(d.recorded_plan_coverage_pct, v => `${n(v)}% of filled critical positions have a recorded plan.`),
