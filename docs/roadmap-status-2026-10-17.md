@@ -1,6 +1,6 @@
-# Active roadmap - October 25, PR411 live
+# Active roadmap - October 25, PR412 live
 
-Production is [PR411](https://github.com/ed1017/people-analytics-ai/pull/411), runtime `e6f0f2352dc46933774204cf60689b3c4c40719d`, deployment `dpl_G3qN8x4eKBtqPfyQZVW7zCMfnB46`, source merge `e0f1db1aa6584406d0448742556d3b9a071e9729`. Canonical public alias and active Learning/Listening desktop/mobile checks passed. Dated records below are historical checkpoints.
+Production is [PR412](https://github.com/ed1017/people-analytics-ai/pull/412), runtime `dc9a699c4da1cfb389b69ce16405824322491b42`, deployment `dpl_B9aebBVNBnoyMi26AFZx11pUYFeY`, source merge `65438d4d52f2c9be9e40e38c6317d7d97c281f46`. Canonical public alias and Listening desktop/mobile checks passed. PR411 runtime `e6f0f2352dc46933774204cf60689b3c4c40719d`, deployment `dpl_G3qN8x4eKBtqPfyQZVW7zCMfnB46` remains the preceding Learning/Listening copy release. Dated records below are historical checkpoints.
 
 ## Completed agreed work
 
@@ -27,7 +27,9 @@ PR410 closes the historical harness reconciliation: 99 focused checks, repaired 
 
 PR411 concise Learning/Listening copy is live; definitions remain accessible and scope/missing states are preserved. Career Interests is a retained legacy component whose URL intentionally redirects to Workforce; its copy has local component coverage only, with no route restoration. Exact-head CI40243821563 and public active-page checks passed.
 
-PR412 candidate `dc9a699c4da1cfb389b69ce16405824322491b42` addresses verified empty Listening panels and repeated generic item labels. The source contains engagement-only waves; no substantive dimension names or pulse/manager/onboarding results are available. The candidate uses concise unavailable states and recorded question IDs, preserves original text in details, and corrects unsupported annual/progression wording and UTC month labels. Seventeen focused checks/types/lint and independent review pass. Hosted preview/screenshot review and final CI are pending; this candidate is not live.
+PR412 live runtime `dc9a699c4da1cfb389b69ce16405824322491b42` addresses verified empty Listening panels and repeated generic item labels. The source contains engagement-only waves; no substantive dimension names or pulse/manager/onboarding results are available. The candidate uses concise unavailable states and recorded question IDs, preserves original text in details, and corrects unsupported annual/progression wording and UTC month labels. Seventeen focused checks/types/lint and independent review pass. Exact-head CI40244618052, parent screenshot review and public desktop/mobile actual-GET checks passed. No paid calls.
+
+Final core-journey reconciliation found one targeted gap: demand-only revision save failure/recovery. Source review and component reproduction identified that a prior save error disabled valid unchanged inputs even after storage readiness recovered. The focused candidate separates prior operation errors from current validation errors, retains explicit retry and original revisions, and keeps pending/invalid/storage gates. Seventeen focused checks and independent review pass; hosted recovery and preview remain gates. No new feature engine or persistence store.
 
 Owner review is useful but does not block these independent tracks. No additional clearly agreed unbuilt feature has been identified. New work must close these existing acceptance gaps rather than create features to remain busy.
 
