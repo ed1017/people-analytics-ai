@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3c5a7aa9fd348d743f6d013105fbf9004c4ce284",
+  "sourceCommit": "a4ef6524aa3fdc347b743dc4f15afe75e2ab4fee",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -499,8 +499,8 @@
     },
     {
       "path": "components/home-action-assumptions.tsx",
-      "sha256": "6d1a42ca73148ecdc408a9f797e49ec18f79c2ed2bb295d47eed191975ed9052",
-      "bytes": 25507
+      "sha256": "06437249047998cdff9beca2831d259e71540dfcf5ddfa9cec93968105ff3139",
+      "bytes": 27289
     },
     {
       "path": "components/home-action-options.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "861060fb28bc5b456bffcc8933066a15eae3d7908380c11805bae8c990d8c180",
-      "bytes": 7830
+      "sha256": "e6371c5fa80f7b799a57986294bd1e7da6a52d113f79b74abc707a9a033b854c",
+      "bytes": 11734
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "dd77c9f4edb414fe08917fb990dc5364775ffbd9c2504c6133bb04ec7b032442",
-      "bytes": 22841
+      "sha256": "531c988f64dc560d8709a2a478743a21f3c2539443d70839c60f784a7dafc4f0",
+      "bytes": 22941
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "a9a3eea2998f8e559091f4cb837042b5cee64b7688469b91847b068568153ec9",
-      "bytes": 103462
+      "sha256": "a548f581f3fcb0d7281b8cdc96c6c9380f471bc0ad5df1d0ceb5056834385370",
+      "bytes": 103455
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "3206e36d7bba551f6ad2fa04bd9456a291b193daf16f5551d1e5d72d9cbb89d3",
-      "bytes": 38376
+      "sha256": "6aef4be69d7663940b82cda0078f8565a1a76b4ce0e41243e527a0b43f2ae5f0",
+      "bytes": 38952
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -2079,8 +2079,8 @@
     },
     {
       "path": "lib/home-action-scenarios.ts",
-      "sha256": "6ed6751a0863cb95f7e613b4441debcb32c1a208455189c7d0a0f72e16c02b57",
-      "bytes": 12221
+      "sha256": "e93878c8a8cac80f66b2f4b1d7ba59e8a0769febe5b2be2491d756ee9dc0c151",
+      "bytes": 13017
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
@@ -2584,8 +2584,8 @@
     },
     {
       "path": "lib/home-required-staffing.ts",
-      "sha256": "34fa4d0ab9a0c27d56b7bd8f6f096f1da8973cb7ad0c6dc43233318caa827ac8",
-      "bytes": 19551
+      "sha256": "d4884127351ba1bb8847d895cf1ec3b1384dc1795fe43ff5858ca826dcc936e2",
+      "bytes": 20754
     },
     {
       "path": "lib/home-role-recruiting.mjs",
@@ -4201,8 +4201,18 @@
       "path": "tests/action-planner-edit.test.mjs",
       "sha256": "92ca98cd797375790ec714739160f54c1f1b48ad21cdb809ca49bfe43251e390",
       "bytes": 5223
+    },
+    {
+      "path": "components/legacy-action-planner.tsx",
+      "sha256": "3fbef992359d1cf5f2b6316b3ca2e2a3477ac0fb4963eb8fadbc9d7a6e5792c6",
+      "bytes": 6338
+    },
+    {
+      "path": "tests/planner-format-gaps.test.mjs",
+      "sha256": "c7a9fe763f20bae8db07513a23412482bd5b8b8291f677556a5fbfbebab04b3d",
+      "bytes": 5632
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "69ba4f3ff823f81854f3372c4532b35694143d6f401ba2410af0d5eb91df683a"
+  "verifiedDeployedArchiveSha256": "215089e4c821b14faa1651cd3afc72010244cd241aa2d214f1bd6d0aeb5229c4"
 }
