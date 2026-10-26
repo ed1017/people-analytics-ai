@@ -38,6 +38,7 @@ test('launch is explicit and single-shot, disabled state cannot start, storage f
  const h=harness({demoReady:false,storageFails:true});h.flush();h.button('Start guided demo').props.onClick();assert.equal(h.starts,0);assert.equal(h.native.open,true);
  h.flush({demoReady:true});const start=h.button('Start guided demo');start.props.onClick();start.props.onClick();h.flush();assert.equal(h.starts,1);assert.equal(h.native.open,false);
  h.button('About Workforce Intelligence').props.onClick();h.flush();h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
+ h.button('About Workforce Intelligence').props.onClick();h.flush();const resume=h.button('Start guided demo');resume.props.onClick();resume.props.onClick();h.flush();assert.equal(h.starts,2,'an explicit immediate reopen permits one new launch, not two');
 });
 test('context interruption closes without opening a demo or stealing focus',()=>{
  const h=harness();h.flush();h.flush({active:false,dismissKey:'two'});assert.equal(h.native.open,false);assert.equal(h.starts,0);assert.equal(h.writes.length,0);
@@ -45,7 +46,7 @@ test('context interruption closes without opening a demo or stealing focus',()=>
 });
 test('orientation is compact and about link preserves current tab; demo entry cannot fall through to provider',()=>{
  const h=harness();const tree=h.flush(),all=nodes(tree);const about=all.find(n=>n.type==='a');assert.equal(about.props.href,'/about');assert.equal(about.props.target,'_blank');assert.match(about.props.rel,/noopener/);
- const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.ok(source.includes('onStartDemo={()=>submitStarterQuestion(swpDemoPrompt)}'));
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.ok(source.includes('onStartDemo={startIntroDemo}'));
  assert.ok(source.includes("if(message===swpDemoPrompt){setChatError('The planning scenario is not ready."));
 });
 import * as localDecisions from '../lib/local-decisions.ts';
@@ -65,4 +66,15 @@ test('actual dataset initialization preserves fresh first-visit observation, con
  const returning=hydratedStore([...fresh.local]);returning.api.switchDecisionDataset(token);assert.equal(returning.api.consumeFirstHomeVisit(),false);
  const dismissed=hydratedStore();dismissed.api.switchDecisionDataset(token);dismissed.local.set(onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1');assert.equal(dismissed.api.consumeFirstHomeVisit(),false);
  const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),false);
+});
+
+test('explicit intro resume releases only local demo debounce and retains shared duplicate guards',()=>{
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
+ const body=source.match(/function startIntroDemo\(\)\{([\s\S]*?)\n  \}/)[1];
+ const recentSuggestions={current:new Set(['starter:demo','question:other'])};let launches=0;
+ const run=new Function('recentSuggestions','swpDemoPrompt','submitStarterQuestion',body);
+ run(recentSuggestions,'demo',prompt=>{assert.equal(prompt,'demo');assert.equal(recentSuggestions.current.has('starter:demo'),false);launches++;});
+ assert.equal(launches,1);assert.equal(recentSuggestions.current.has('question:other'),true);
+ assert.match(source,/queuedSuggestion.current\|\|chatLoading\|\|sending.current/);
+ assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
 });

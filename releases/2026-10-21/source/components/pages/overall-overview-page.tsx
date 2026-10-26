@@ -332,6 +332,12 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
 
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
+  function startIntroDemo(){
+    // A newly confirmed intro launch may resume a demo closed within the click debounce window.
+    recentSuggestions.current.delete('starter:'+swpDemoPrompt);
+    submitStarterQuestion(swpDemoPrompt);
+  }
+
   function submitStarterQuestion(prompt:string,purpose?:'swp-business'){
     if(conversation.issueEditor)return;
     if(prompt!==swpDemoPrompt&&scenarioPlannerEntry(prompt)){
@@ -695,7 +701,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
         <button type="button" data-orientation-return aria-haspopup="dialog" disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onClick={()=>submitStarterQuestion(swpDemoPrompt)} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Planning Scenario</button>
         <details className="relative ml-auto"><summary className="min-h-11 cursor-pointer rounded-lg px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">More</summary><div className="absolute right-0 z-30 flex max-h-[70dvh] w-[min(24rem,calc(100vw-3rem))] flex-col gap-3 overflow-y-auto rounded-lg border bg-background p-3 shadow-lg">
         {renderPlanPane&&<details className="home-saved-plan-disclosure"><summary>Saved plans</summary>{renderPlanPane(savedWork)}</details>}
-        <HomeGettingStarted liveChatAvailable={liveChatAvailable} conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor&&!conversation.activeGoalId&&messages.length===0&&!swpDemoVisible} busy={chatLoading||guidedExampleActive||swpDemoVisible} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} demoReady={ready&&!suggestionPending&&!conversation.issueEditor&&conversation.saved} onStartDemo={()=>submitStarterQuestion(swpDemoPrompt)} status={
+        <HomeGettingStarted liveChatAvailable={liveChatAvailable} conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor&&!conversation.activeGoalId&&messages.length===0&&!swpDemoVisible} busy={chatLoading||guidedExampleActive||swpDemoVisible} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} demoReady={ready&&!suggestionPending&&!conversation.issueEditor&&conversation.saved} onStartDemo={startIntroDemo} status={
         <div className="ml-auto flex items-center gap-3 text-xs">
           <span className="text-muted-foreground">In development</span>
           <button type="button" popoverTarget="home-data-details" aria-label="Open data details" title="Data, scope and conversation history" className="flex min-h-11 items-center gap-1 rounded px-2 text-primary hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"><Info size={16}/><span>Data details</span>{!sourcesSettled&&<span role="status" aria-label="Evidence refresh status">Refreshing…</span>}</button>
