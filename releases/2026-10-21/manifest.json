@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "13db9ad6ff6822639952bf2b014f7a53a4d7f49e",
+  "sourceCommit": "d42993cf33448fade057969f1ada113751bab79a",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -559,8 +559,8 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "f8b5eed3362b36f9f735757474754c616faf525f6c05b8aca6950c594fbe0082",
-      "bytes": 23457
+      "sha256": "9ebed55bd2e7fd2266bf50b2d89cb6a69d3999821819578c23f29afc6389f20a",
+      "bytes": 23891
     },
     {
       "path": "components/home-chat-welcome.tsx",

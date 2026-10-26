@@ -332,3 +332,9 @@
 .findingsBanner li { overflow-wrap: anywhere; }
 .chartHeadcount { margin: 0 0 4px; font-size: 14px; line-height: 1.5; }
 .chartHeadcount strong { font-size: 20px; font-weight: 700; }
+
+/* Keep the risk banner compact without shrinking its disclosure hit target. */
+.welcome :global([aria-label="Workforce risks"]) { padding-block: 6px; }
+.welcome :global([aria-label="Workforce risks"]) > h3 { margin: 0; }
+.welcome :global([aria-label="Workforce risks"]) > details { margin-block: 0; }
+.welcome :global([aria-label="Workforce risks"]) > details > summary { min-height: 44px; padding-block: 14px; line-height: 16px; }
