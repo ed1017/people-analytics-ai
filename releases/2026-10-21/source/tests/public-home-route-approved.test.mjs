@@ -252,6 +252,18 @@ test('multi-role template preserves all supplied details and returns an allocati
   const response=await route.handle(http(r));assert.equal(response.status,200);const body=await response.json();
   assert.deepEqual(body.usage,{modelRounds:0,toolCalls:0});assert.equal(body.state.questions.length,1);assert.match(body.answer,/split across/);
   assert.equal(body.state.turns.at(-2).text,text);assert.deepEqual(r,original);assert.deepEqual(body.candidateIds,[]);assert.deepEqual(body.charts,[]);
-  assert.equal(body.state.requiredStaffing,undefined);assert.equal(body.state.hiringBudget,undefined);
+  assert.equal(body.state.requiredStaffing,undefined);
+  if(budget){
+   const savedBudget=body.state.hiringBudget;
+   assert.equal(savedBudget.inputs.budget,2000000);
+   assert.equal(savedBudget.datasetToken,P.token);
+   assert.equal(savedBudget.scopeKey,JSON.stringify([scope,filters]));
+   assert.deepEqual(savedBudget.basisTurns,[{id:r.message.id,text}]);
+   assert.equal(savedBudget.origins.budget.kind,'user-supplied');
+   assert.equal(savedBudget.origins.budget.turnId,r.message.id);
+   assert.equal(savedBudget.origins.budget.quote,text);
+   assert.deepEqual(Object.keys(savedBudget.origins),['budget']);
+   for(const [field,value]of Object.entries(savedBudget.inputs))if(field!=='budget')assert.equal(value,null,`${field} must remain unknown until supplied`);
+  }else assert.equal(body.state.hiringBudget,undefined);
  }
 });

@@ -2,10 +2,12 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useState,
   useSyncExternalStore,
   type ReactNode,
+  type SetStateAction,
 } from "react";
 
 import {datasetSession} from '@/lib/dataset-client.mjs';
@@ -38,7 +40,14 @@ export type PlanningWorkspaceView =
   | "execute";
 
 export type CarriedPlanningGoalActions={businessGoal:string;goals:{id:string;statement:string}[];disabled:boolean;onCreate:(statement:string)=>void;onSelect:(id:string)=>void};
+export type PositionEditorDraft={baselineRows:import("@/lib/position-design-scenario").PositionRecord[];scope:string;asOf:string;scenario:import("@/lib/position-design-scenario").PositionScenario|null;rows:import("@/lib/position-design-scenario").PositionRecord[];editing:import("@/lib/position-design-scenario").PositionRecord|null};
+export type PositionGoalActions={businessGoal?:string;goals:{id:string;statement:string}[];disabled:boolean;onCreate:(statement:string)=>string;onSelect:(id:string)=>string};
 type PlanningSessionContextValue = {
+  positionGoalActions?:PositionGoalActions;
+  positionDesignDraft?:PositionEditorDraft;
+  setPositionDesignDraft:(draft:SetStateAction<PositionEditorDraft|undefined>)=>void;
+  canCarryPositionDesignDraft:(goalId:string)=>boolean;
+  carryPositionDesignDraft:(goalId:string,draft:PositionEditorDraft)=>void;
   carriedGoalActions?:CarriedPlanningGoalActions;
   goalKey: string;
   capacitySession:CapacitySession;
@@ -56,22 +65,42 @@ export function PlanningSessionProvider({
   onTalentEvidenceContextChange,
   capacityState,
   carriedGoalActions,
+  positionGoalActions,
 }: {
   children: ReactNode;
   goalKey: string;
   onTalentEvidenceContextChange: (snapshot: string | null) => void;
   capacityState?:ReturnType<typeof useCapacitySessionState>;
   carriedGoalActions?:CarriedPlanningGoalActions;
+  positionGoalActions?:PositionGoalActions;
 }) {
   const [activeView, setActiveView] =
     useState<PlanningWorkspaceView>("overview");
 
   const localCapacityState=useCapacitySessionState(goalKey);
   const currentCapacityState=capacityState??localCapacityState;
+  const [positionDrafts,setPositionDrafts]=useState<Record<string,PositionEditorDraft|undefined>>({});
+  const positionKey=JSON.stringify([currentCapacityState.datasetToken,goalKey]);
+  const setPositionDesignDraft=useCallback((draft:SetStateAction<PositionEditorDraft|undefined>)=>setPositionDrafts(current=>({...current,[positionKey]:typeof draft==="function"?draft(current[positionKey]):draft})),[positionKey]);
+  const canCarryPositionDesignDraft=useCallback((id:string)=>{
+    const target=goalKey.slice(0,goalKey.indexOf(':')+1)+id;
+    const targetKey=JSON.stringify([currentCapacityState.datasetToken,target]);
+    return Boolean(id)&&positionDrafts[targetKey]===undefined;
+  },[currentCapacityState.datasetToken,goalKey,positionDrafts]);
+  const carryPositionDesignDraft=useCallback((id:string,draft:PositionEditorDraft)=>{
+    if(!id)return;
+    const target=goalKey.slice(0,goalKey.indexOf(':')+1)+id;
+    const targetKey=JSON.stringify([currentCapacityState.datasetToken,target]);
+    if(!canCarryPositionDesignDraft(id))throw Error("That goal already has a position draft. Choose another goal; both drafts remain unchanged.");
+    setPositionDrafts(current=>current[targetKey]===undefined?({...current,[targetKey]:structuredClone(draft)}):current);
+  },[currentCapacityState.datasetToken,goalKey,canCarryPositionDesignDraft]);
   return (
     <PlanningSessionContext.Provider
       value={{
         carriedGoalActions,
+        positionGoalActions,
+        positionDesignDraft:positionDrafts[positionKey],
+        setPositionDesignDraft,carryPositionDesignDraft,canCarryPositionDesignDraft,
         goalKey,
         capacitySession:currentCapacityState.capacitySession,
         setCapacitySession:currentCapacityState.setCapacitySession,

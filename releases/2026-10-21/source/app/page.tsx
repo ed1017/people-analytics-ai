@@ -1149,6 +1149,20 @@ export default function Home() {
     if(existing)conversation.selectGoal(existing.id);
   };
 
+  const attachPositionPlanningGoal = (choice:{id:string}|{statement:string}) => {
+    const before=decisionStore.getSnapshot();
+    if(conversation.activeGoalId||before.data.goals.activeId||!before.ready||!before.saved||conversation.loading||conversation.issueEditor)throw Error('The goal or storage changed. Your position draft is kept; review again.');
+    if(capacityState.datasetToken!==datasetSession.snapshot())throw Error('The dataset changed. Review the position baseline again.');
+    const existing='id' in choice?before.data.goals.goals.find(goal=>goal.id===choice.id):null;
+    if('id' in choice&&!existing)throw Error('Choose an existing saved goal.');
+    const id=existing?existing.id:conversation.confirmWorkforceGoal('statement' in choice?choice.statement:'');
+    if(!decisionStore.getSnapshot().saved)throw Error('The goal could not be saved. Your position draft is kept.');
+    if(existing)conversation.selectGoal(existing.id);
+    const attached=decisionStore.getSnapshot();
+    if(!attached.saved||attached.data.goals.activeId!==id)throw Error('The selected goal could not be saved. Your position draft is kept with its original workspace.');
+    return id;
+  };
+
   const clearPlanningEvidenceHandoff = () => {
     setPlanningEvidenceHandoff(null);
     focusAfterRender(
@@ -1940,7 +1954,7 @@ export default function Home() {
   };
 
   return (
-    <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} carriedGoalActions={planningEvidenceHandoff&&!conversation.activeGoalId?{businessGoal:planningEvidenceHandoff.businessGoal,goals:conversation.goals,disabled:!conversation.storageReady||!conversation.saved||conversation.loading||!!conversation.issueEditor,onCreate:statement=>attachCarriedPlanningGoal({statement}),onSelect:id=>attachCarriedPlanningGoal({id})}:undefined} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
+    <PlanningSessionProvider goalKey={conversation.workspaceKey} capacityState={capacityState} positionGoalActions={!conversation.activeGoalId?{businessGoal:'',goals:conversation.goals,disabled:!conversation.storageReady||!conversation.saved||conversation.loading||!!conversation.issueEditor,onCreate:statement=>attachPositionPlanningGoal({statement}),onSelect:id=>attachPositionPlanningGoal({id})}:undefined} carriedGoalActions={planningEvidenceHandoff&&!conversation.activeGoalId?{businessGoal:planningEvidenceHandoff.businessGoal,goals:conversation.goals,disabled:!conversation.storageReady||!conversation.saved||conversation.loading||!!conversation.issueEditor,onCreate:statement=>attachCarriedPlanningGoal({statement}),onSelect:id=>attachCarriedPlanningGoal({id})}:undefined} onTalentEvidenceContextChange={setTalentResponseEvidenceContext}>
     <main data-workspace-palette={workspacePalette} className={`min-h-screen bg-background text-foreground${activePage === "home" ? " app-home-composer" : ""}${["home","decision-brief","assess-evaluate","future-of-work","action-plans","plan-track"].includes(activePage) ? " app-overview-mode" : ""}`}>
       <title>{`${getAppPageMetadata(activePage).label} | Workforce Intelligence`}</title>
       {/* Top header */}

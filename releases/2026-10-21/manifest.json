@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "2922eb96944d61aa58f4fada4ea95c651a11b2ad",
-  "deployment": "https://people-analytics-l1z5p7wjx-ed-56dc.vercel.app",
+  "sourceCommit": "7d0496874f5b995f427783488105a58f96fdab6a",
+  "deployment": "https://people-analytics-gks199ze0-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "a79b1265d0e4a702dd9dc2bc7e80d082b20b6fab9261a9d0d492968ee4615146",
-      "bytes": 89018
+      "sha256": "79fe4f7d9263e41f52d1d19968456911b9659e126142730aef3e1bca34bfb915",
+      "bytes": 90519
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "f86fef12cc956b43616875ca038a91446728ae5fd5a8524e0d0b728d30bd425b",
-      "bytes": 72834
+      "sha256": "bd6fa8e82478dbe287789c7f5e832ded3c05b26c24dbb60ab3542c78ffb9f66a",
+      "bytes": 72809
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -1219,8 +1219,8 @@
     },
     {
       "path": "components/workforce-planning/planning-session-context.tsx",
-      "sha256": "1438a33277fd78deff68151190ee264ebc354ce6285429036097b182c11b4692",
-      "bytes": 3767
+      "sha256": "63d361332389c04e645df187c3e2cc38f04102f0984fa31c6b62b02ab6164f0f",
+      "bytes": 6199
     },
     {
       "path": "components/workforce-planning/position-action-simulator.tsx",
@@ -1234,8 +1234,8 @@
     },
     {
       "path": "components/workforce-planning/position-workforce-design-destination.tsx",
-      "sha256": "bb1e87e12f5b9998545f83138de20d12bf3d61b08d8b0c755d2a2b3420484747",
-      "bytes": 3216
+      "sha256": "ea41945e5cdc4611586f9ba8e4ba0ae42abd52dc29aaafd14086f5ced5d120f7",
+      "bytes": 3778
     },
     {
       "path": "components/workforce-planning/response-portfolio-allocation-section.tsx",
@@ -3974,8 +3974,8 @@
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
-      "sha256": "1915faa4256d06def35d2681bc0e16c382f9858e37eeba8fdc7e35d11a1a693d",
-      "bytes": 31586
+      "sha256": "38c7209d47c19d7bd8b99dcca8637ee5b3802be2bee09b457e1a2972fedfed3c",
+      "bytes": 32321
     },
     {
       "path": "tests/public-planner-ledger.test.mjs",
@@ -4394,8 +4394,8 @@
     },
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
-      "bytes": 7186,
-      "sha256": "051fae4dd8781bdb8305bcf2c1a6764bbb52606f6db683501017c22a9ac91c49"
+      "bytes": 7425,
+      "sha256": "5184c279f87829e47cca706a50f8428eddeb1116a0e292b4c55408ce104c70dd"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
@@ -4476,6 +4476,46 @@
       "path": "tests/staffing-priority-presentation.test.mjs",
       "bytes": 6058,
       "sha256": "81de38cb614e32537b1eb41982956e0af8057b6c7cd711a1cc839e49354c56ae"
+    },
+    {
+      "path": "components/external-workforce-evidence-panel.tsx",
+      "bytes": 4163,
+      "sha256": "0f7599c6ebdd4a5a9a8842a8db07601340d0e39331bea67dc406353262f2ddcb"
+    },
+    {
+      "path": "components/workforce-planning/position-scenario-editor.tsx",
+      "bytes": 16075,
+      "sha256": "4212f03cf25e6297c45c6e24b582bbf7a3503791464a5a58ad284e06d169afcf"
+    },
+    {
+      "path": "lib/external-workforce-evidence.ts",
+      "bytes": 3337,
+      "sha256": "a067842c63917e5f883a84e55ede2f9cfe7ae490bdf255ccd86ef3c2b389e79c"
+    },
+    {
+      "path": "lib/position-design-scenario.ts",
+      "bytes": 7125,
+      "sha256": "5a57dab4ecb01858c1dd52c6b80f38d8e8ad10986fd7493b17de44810228baf9"
+    },
+    {
+      "path": "tests/compensation-9037-render.test.mjs",
+      "bytes": 4108,
+      "sha256": "ea25215e042d970a8ca424a01c13e490fa2aac3c8fa1a543bca8217d7b1ca3b3"
+    },
+    {
+      "path": "tests/external-workforce-evidence.test.mjs",
+      "bytes": 6391,
+      "sha256": "d408f0ad5ef51da7bd03b1b3df6e40601a575f95cbb8f7bad23c4eacfe9a9d65"
+    },
+    {
+      "path": "tests/position-design-scenario.test.mjs",
+      "bytes": 6587,
+      "sha256": "a0ab7f75f120317beb1ab8099aa767ce3846a5dca175dace78733ce34e9eff22"
+    },
+    {
+      "path": "tests/position-goal-isolation.test.mjs",
+      "bytes": 5028,
+      "sha256": "21e312b136385ee3d18397611699fc0fbb8c138cc620e04d1849e82ea893971d"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

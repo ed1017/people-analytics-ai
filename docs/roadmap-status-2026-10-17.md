@@ -1,5 +1,10 @@
 # Active roadmap - October 26
 
+## Current candidate: position modeling and source references
+
+The owner approved these two tracks on October 26. [Implementation and verification boundaries](position-modeling-and-external-evidence.md) distinguish the working position editor from source-only external references. Candidate is not yet live; PR425 remains the verified production checkpoint. Durable AI policy is proposed only, pending explicit cumulative-cap and scoped-permission approval. No renewal or paid testing is included.
+
+
 The PR424 verified production checkpoint is [PR424](https://github.com/ed1017/people-analytics-ai/pull/424), runtime `8518d4491daf1d88f3367db88bb1ec6efa1a3c18`, deployment `dpl_2GtEnuzWxSadpyRyqvL9juXdGWeJ`, source merge `b3dfb68be44e87f7f7c0305addf0dba7e32a1a31`. Direct Scenarios aliases, prominent isolated worked example, immediate demo reopen, concise presentation copy and visible About case study/public links are live. The accepted compact layout, Company profile, long creator introduction and saved-demand restoration remain intact.
 
 Independent review, focused regressions, lint/build and exact-head CI40387897720 passed. Public direct desktop1440/mobile390 each passed eight checks: all three aliases preserving filters/hash, populated worked example, edit/reset, repeated entry, About links, Back/Forward, cancellation/draft preservation and explicit adoption. Zero paid attempts or page errors. [PR424 verification](release-verification-pr424.md) records the staged transport boundaries and exact identities. This does not establish fresh-model acceptance or the cause of historical intermittent failures.

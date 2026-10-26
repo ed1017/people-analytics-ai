@@ -1,3 +1,5 @@
+import {ExternalWorkforceEvidencePanel} from "@/components/external-workforce-evidence-panel";
+import {PositionScenarioEditor} from "./position-scenario-editor";
 import {KeyFindings} from "@/components/key-findings";
 import {designFindings} from "@/lib/context-findings";
 import type { ComponentProps } from "react";
@@ -51,17 +53,24 @@ export function PositionWorkforceDesignDestination({
             Position & Workforce Design
           </h3>
           <p className="text-sm text-muted-foreground">
-            Turn the workforce scenario into concrete position changes and see the recruiting and skill impact.
+            Compare current and proposed positions.
           </p>
         </div>
 
+
+      </div>
+
+      <PositionScenarioEditor />
+      <ExternalWorkforceEvidencePanel />
+
+      <details className="rounded-lg border p-4">
+        <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Grouped inventory tools</summary>
+        <p className="mb-3 text-sm text-muted-foreground">Grouped calculations use the business-unit selector or structural actions, independently of dashboard filters.</p>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
           {positionModelingLoading
             ? "Loading positions…"
             : selectedPlanningScenario}
         </span>
-      </div>
-
       {!positionModelingLoading && !structuralActionProps.loading && !structuralActionProps.error && <KeyFindings findings={designFindings(structuralPositionResult, selectedPlanningScenario)} />}
       <PositionActionSimulator
         {...positionActionProps}
@@ -88,6 +97,7 @@ export function PositionWorkforceDesignDestination({
       <details className="rounded-lg border p-4">
         <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Position inventory &amp; source details</summary>
         <PositionModelingSummary {...positionSummaryProps} />
+      </details>
       </details>
     </div>
   );
