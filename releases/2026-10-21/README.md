@@ -1,6 +1,6 @@
 # Versioned application source
 
-Current status: [active roadmap](../../docs/roadmap-status-2026-10-17.md) and [PR413 verification](../../docs/release-verification-pr413.md). Dated release identities and acceptance below are historical; the current source file set is pinned by `manifest.json`.
+Current status: [active roadmap](../../docs/roadmap-status-2026-10-17.md) and [PR424 verification](../../docs/release-verification-pr424.md). Dated release identities and acceptance below are historical; the current source file set is pinned by `manifest.json`.
 
 The following historical checkpoint records the October 23 date-only pricing renewal and coherent fictional geography revision.
 
@@ -33,7 +33,7 @@ Protected provider checks cover intake, comparison, revisions, combinations, cap
 
 At this historical checkpoint, pricing verification expired October 22, 2026 at 09:59 UTC (admission cutoff 09:57:30 UTC). Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
-The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
+The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. At this historical checkpoint, saved/versioned headcount what-if was a separate proposal. It was subsequently delivered; current saving and restoration acceptance is recorded in the active roadmap. No predictive accuracy, realized savings or enterprise persistence is claimed.
 
 ## Home question and split-view update
 

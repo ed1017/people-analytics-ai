@@ -1,22 +1,39 @@
-# Workforce-planning portfolio prototype
+# Workforce Intelligence
 
-Live app: https://www.ed-ai.app
+[Open the app](https://www.ed-ai.app) · [About the project](https://www.ed-ai.app/about)
 
-A synthetic-data People Analytics and Strategic Workforce Planning prototype. The public app offers workforce evidence, deterministic staffing scenarios, a guided planning scenario, and an explicit-input headcount what-if. Provider-backed planning conversations were restored in the October 21 release, subject to verified pricing windows and cumulative budget admission. See the release evidence boundaries below.
+Workforce Intelligence helps a planning conversation move from “What is happening in our workforce?” to “How could we cover the work?” It brings workforce evidence, adjustable staffing assumptions and calculated comparisons into one workspace for recruiters, hiring managers and workforce planners.
 
-Ed defined the workforce-planning problem, product requirements and acceptance criteria; AI assisted with implementation, design and testing.
+The portfolio prototype uses a fictional company with 9,037 people as of September 30, 2026. Visitors can explore its workforce, test a workload or headcount scenario, and compare developing people, moving people internally and hiring.
 
-## Try the public app
+## Try a planning decision
 
-Start with Planning Scenario on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
+1. **Open the example.** On Overview, choose **Planning Scenario**, then **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
+2. **Test a different approach.** Review the role, timing and budget; adjust the available inputs and compare cost, readiness and uncovered work alongside the charts.
+3. **Keep a proposal.** Save the reviewed plan in your browser, reopen it, and compare a revision while retaining the original assumptions.
 
-The public workforce snapshot contains 9,037 synthetic people as of September 30, 2026. The company headcount what-if takes explicit monthly hires and exits for October 2026 through March 2027. It illustrates conditional arithmetic, not a validated prediction or a payroll forecast.
+Prefer to start with workload? Open [Scenarios](https://www.ed-ai.app/scenarios) and choose **Open worked example**, or enter your own work and team inputs.
 
-This is a portfolio prototype. No measured adoption, savings, business impact or predictive performance is claimed.
+**Live AI status, October 26, 2026:** provider-backed conversation is unavailable while its verification window is expired; renewal remains blocked and has not been applied. The worked example and local scenario calculations remain available.
+
+## Product decisions and tradeoffs
+
+Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing. The work emphasizes four product decisions:
+
+- **Evidence beside decisions.** Keep group, period and source context accessible while moving from a workforce question into planning.
+- **An adjustable recommendation.** Use shared calculations for controls, results and charts, so changing an input changes the corresponding result.
+- **Distinct planning measures.** Keep people, FTE, workload, incremental cash and employee time separate; leave missing inputs unknown instead of assigning zero.
+- **Reversible exploration.** Preserve drafts and original saved assumptions while visitors edit, compare, cancel or reopen a plan. Browser-local saving keeps the prototype simple; it is not a shared enterprise workflow.
+
+The application demonstrates the planning workflow and its software behavior. Adoption, savings and business impact have not been measured.
+
+## Next steps
+
+The current focus is usability and reliability across existing journeys: clear entry points, concise results, and recovery when data or local saving is unavailable. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Live-AI availability and any fresh provider-backed acceptance remain a separate operational decision.
 
 ## Repository and deployment status
 
-The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. Production is PR421, runtime `3fa65fa0f4ea2f46c01ab2d49d4407e794c66687`, deployment `dpl_UT1RaRfwaLQX6xnd1fkv8f6NHqEk`. The product introduction and Company profile are live. Direct public desktop/mobile lifecycle, draft, guided-demo and dataset checks passed with paid calls blocked. See the [active roadmap](docs/roadmap-status-2026-10-17.md) and [PR421 release record](https://github.com/ed1017/people-analytics-ai/pull/421) for current acceptance and remaining limits. Older dated release sections are historical.
+The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. Production is [PR424](https://github.com/ed1017/people-analytics-ai/pull/424), runtime `8518d4491daf1d88f3367db88bb1ec6efa1a3c18`, deployment `dpl_2GtEnuzWxSadpyRyqvL9juXdGWeJ`, source merge `b3dfb68be44e87f7f7c0305addf0dba7e32a1a31`. This release fixes direct Scenarios links, makes the worked example prominent, reduces repeated explanatory copy and expands About. See the [active roadmap](docs/roadmap-status-2026-10-17.md) and [PR424 release record](https://github.com/ed1017/people-analytics-ai/pull/424) for verified acceptance and remaining limits. Older dated release sections are historical.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
@@ -45,5 +62,7 @@ Open http://localhost:3000. To build this source:
 ```powershell
 npm.cmd run build
 ```
+
+## Historical maintenance record
 
 Historical pricing renewal PR379 (superseded; current recorded maintenance window is in the active roadmap): app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.
