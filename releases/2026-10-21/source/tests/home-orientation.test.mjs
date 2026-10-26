@@ -1,0 +1,50 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+import ts from 'typescript';
+import React from 'react';
+import * as onboarding from '../lib/home-onboarding.ts';
+const require=createRequire(import.meta.url);
+const empty={getItem:()=>null},token='workforce-demo-9037-public-aggregates-v4:5';
+test('first visit honors old dismissal and exact dataset decisions/recovery without changing storage',()=>{
+ assert.equal(onboarding.isFirstHomeVisit(empty,empty,token),true);
+ for(const key of [onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'insights-to-action.decisions.v1','insights-to-action.decisions.v1.dataset.'+token])assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===key?'{}':null},empty,token),false);
+ assert.equal(onboarding.isFirstHomeVisit(empty,{getItem:k=>k==='insights-to-action.decisions.recovery.v1.dataset.'+token?'{}':null},token),false);
+ assert.equal(onboarding.isFirstHomeVisit({getItem:()=>{throw Error('blocked');}},empty,token),false);
+});
+function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')return;out.push(n);React.Children.forEach(n.props?.children,walk);}walk(tree);return out;}
+function harness(initial={}){
+ let cursor=0,props={busy:false,active:true,ready:true,autoOpen:true,dismissKey:'one',onNavigate:()=>{},onStartDemo:()=>{starts++;},...initial},starts=0,focus='',writes=[],listeners={},current;
+ const states=[],refs=[],deps=[],effects=[];
+ const fallback={focus:()=>{focus='fallback';}},title={focus:()=>{focus='title';}},trigger={getClientRects:()=>[],focus:()=>{focus='trigger';}};
+ const native={open:false,shown:0,showModal(){this.open=true;this.shown++;},close(){if(this.open){this.open=false;nodes(current).find(n=>n.type==='dialog').props.onClose();}}};
+ const source=ts.transpileModule(fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,exports={};
+ const document={body:{},activeElement:null,querySelector:()=>fallback};
+ vm.runInNewContext(source,{exports,document,localStorage:{setItem:(...args)=>{if(props.storageFails)throw Error('blocked');writes.push(args);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(effect);}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:require(name)});
+ const render=()=>{cursor=0;current=exports.HomeGettingStarted(props);for(const n of nodes(current)){if(n.type==='dialog')n.props.ref.current=native;if(n.type==='h2')n.props.ref.current=title;if(n.type==='button'&&n.props.ref)n.props.ref.current=trigger;}return current;};
+ const flush=(next={})=>{props={...props,...next};render();for(const e of effects.splice(0))e();return render();};
+ const button=text=>nodes(current).find(n=>n.type==='button'&&n.props.children===text);
+ return {flush,button,native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
+}
+test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
+ const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
+ h.flush({busy:false});assert.equal(h.native.shown,1);assert.equal(h.focus,'title');h.flush();assert.equal(h.native.shown,1);
+ h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);assert.equal(h.focus,'fallback');assert.deepEqual(h.writes,[[onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1']]);assert.equal(h.starts,0);
+ h.button('About Workforce Intelligence').props.onClick();h.flush();assert.equal(h.native.shown,2);h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.native.open,false);
+});
+test('launch is explicit and single-shot, disabled state cannot start, storage failure cannot trap dismissal',()=>{
+ const h=harness({demoReady:false,storageFails:true});h.flush();h.button('Start guided demo').props.onClick();assert.equal(h.starts,0);assert.equal(h.native.open,true);
+ h.flush({demoReady:true});const start=h.button('Start guided demo');start.props.onClick();start.props.onClick();h.flush();assert.equal(h.starts,1);assert.equal(h.native.open,false);
+ h.button('About Workforce Intelligence').props.onClick();h.flush();h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
+});
+test('context interruption closes without opening a demo or stealing focus',()=>{
+ const h=harness();h.flush();h.flush({active:false,dismissKey:'two'});assert.equal(h.native.open,false);assert.equal(h.starts,0);assert.equal(h.writes.length,0);
+ h.flush({active:true});assert.equal(h.native.shown,1);
+});
+test('orientation is compact and about link preserves current tab; demo entry cannot fall through to provider',()=>{
+ const h=harness();const tree=h.flush(),all=nodes(tree);const about=all.find(n=>n.type==='a');assert.equal(about.props.href,'/about');assert.equal(about.props.target,'_blank');assert.match(about.props.rel,/noopener/);
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.ok(source.includes('onStartDemo={()=>submitStarterQuestion(swpDemoPrompt)}'));
+ assert.ok(source.includes("if(message===swpDemoPrompt){setChatError('The planning scenario is not ready."));
+});

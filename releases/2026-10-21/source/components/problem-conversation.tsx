@@ -74,7 +74,7 @@ export function useProblemConversation(scope = "home") {
   useEffect(() => {
     // Capture before initialization creates demo records; existing empty or
     // unreadable records are still existing use. Preserve this across StrictMode.
-    if(firstVisitSnapshot.current===null)firstVisitSnapshot.current=isFirstHomeVisit({getItem:key=>localStorage.getItem(key)},{getItem:key=>sessionStorage.getItem(key)});
+    if(firstVisitSnapshot.current===null)firstVisitSnapshot.current=isFirstHomeVisit({getItem:key=>localStorage.getItem(key)},{getItem:key=>sessionStorage.getItem(key)},decisionStore.getDatasetToken());
     setFirstHomeVisit(firstVisitSnapshot.current);
     // Restore browser-owned state after hydration; never write defaults over unread storage.
     let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals,{getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}).goals;

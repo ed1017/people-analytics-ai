@@ -2,6 +2,7 @@
 import decision from './decision-style.module.css';
 import {useChartPointerTooltip} from './chart-pointer-tooltip';
 import {HomeRiskSummary} from './home-risk-summary';
+import {HomeCompanyIntro} from './home-company-intro';
 import {snapshotFindings} from '@/lib/key-findings';
 
 import {HomeWorkforceFlows} from './home-workforce-flows';
@@ -145,6 +146,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
 export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
+    <HomeCompanyIntro datasetToken={receipt?.version === 3 && isVerifiedDashboardScope(receipt) ? receipt.datasetToken : undefined} asOf={overview?.snapshot_date}/>
     <h3>What decision are you facing?</h3>
     <HomePromptCategories onQuestion={onQuestion} disabled={disabled} templates={templates}/>
     {composer && <div className={styles.composer}>{composer}</div>}
