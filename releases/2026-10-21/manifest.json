@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "d42993cf33448fade057969f1ada113751bab79a",
+  "sourceCommit": "448612c1c980c9676ff3a8b44405d508a278f033",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "8d8978ca8664b31c8f25d6df9118fee2233cbaec9ea2444bff1af3b0fa012905",
-      "bytes": 6906
+      "sha256": "e9d679a860b6fd41f8a1423f278e7dd22e5e031ae39de7f3020cfb2d5c70ff90",
+      "bytes": 7075
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4319,8 +4319,8 @@
     },
     {
       "path": "components/projection-demand-panel.tsx",
-      "bytes": 4500,
-      "sha256": "143ce99348600c06601da0f655677345a67956301e8ff14a8d0b5cf81e961f10"
+      "bytes": 4737,
+      "sha256": "34b9112982da5756e63014b9e69612fe314007136c27ed3fc8f790055b173ff5"
     },
     {
       "path": "components/workforce-planning/capacity-projection.module.css",
@@ -4339,8 +4339,8 @@
     },
     {
       "path": "tests/projection-demand-panel.test.mjs",
-      "bytes": 3574,
-      "sha256": "aa8a5777fe64b5a9600ff2ebb02182190b58262a6c1f41369e0efed52f937f91"
+      "bytes": 4388,
+      "sha256": "52b3f328fc1b843c59db327accc4291ed238512f789f90fade316bc8f3eeca70"
     },
     {
       "path": "tests/projection-demand-persistence.test.mjs",
@@ -4429,8 +4429,8 @@
     },
     {
       "path": "tests/projection-save-retry.test.mjs",
-      "bytes": 3619,
-      "sha256": "f3c62032e35757c344bafa0e55f5798bf6d8906f467923866335bbb66df44864"
+      "bytes": 5546,
+      "sha256": "4e4aea102d67463470b73424a4426df26fd326da6cb3ea59bec9dbe8df47bd63"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

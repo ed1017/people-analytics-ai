@@ -34,3 +34,14 @@ test('invalid hidden demand can reopen for explicit removal and save locks its c
  assert.equal(button(invalid,'Show demand').props.disabled,false);button(invalid,'Show demand').props.onClick();
  const locked=h.render({demandDisabled:true});assert.equal(nodes(locked).find(n=>n.type==='fieldset').props.disabled,true);assert.equal(button(locked,'Hide demand').props.disabled,true);
 });
+
+test('controlled visibility restores the saved comparison without changing assumptions',()=>{
+ const h=harness(inputs);let open=true;
+ const render=()=>h.render({demandOpen:open,onDemandOpenChange:value=>{open=value;}});
+ button(render(),'Hide demand').props.onClick();assert.equal(open,false);assert.equal(nodes(render()).filter(n=>n.type==='input').length,0);
+ h.reset({...inputs,volume:'9000'});assert.ok(button(render(),'Show demand'),'edits do not force reopening');
+ h.reset(inputs);open=true;const restored=render();
+ assert.equal(nodes(restored).filter(n=>n.type==='input').length,6);assert.ok(button(restored,'Hide demand'));
+ assert.equal(restored.props.focusVisual,true);assert.equal(h.changes,0);
+ assert.equal(nodes(restored).find(n=>n.type==='chart').props.result.points.at(-1).requiredFte,50);
+});

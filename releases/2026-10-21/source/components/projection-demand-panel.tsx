@@ -6,8 +6,9 @@ import {InteractivePlanner} from './interactive-planner';
 import {CapacityProjection} from './workforce-planning/capacity-projection';
 const fields:[keyof ProjectionDemandInputs,string][]=[['ftePerPerson','Contracted FTE per person'],['allocation','Time assigned to this work (%)'],['volume','Work units per month'],['effort','Hours per work unit'],['hours','Productive hours per FTE / month'],['productivity','Productivity improvement (%)']];
 const format=(v:number|null|undefined)=>v==null?'Unknown':v.toLocaleString('en-US',{maximumFractionDigits:2});
-export function ProjectionDemandPanel({analysis,demand,onDemandChange,demandDisabled=false,pending=false,calculationError='',...planner}:ComponentProps<typeof InteractivePlanner>&{analysis:HeadcountProjection|null;demand:ProjectionDemandInputs|null;onDemandChange:(value:ProjectionDemandInputs|null)=>void;demandDisabled?:boolean;pending?:boolean;calculationError?:string}){
- const [open,setOpen]=useState(demand!==null),values=demand??emptyProjectionDemand;
+export function ProjectionDemandPanel({analysis,demand,onDemandChange,demandDisabled=false,pending=false,calculationError='',demandOpen,onDemandOpenChange,...planner}:ComponentProps<typeof InteractivePlanner>&{analysis:HeadcountProjection|null;demand:ProjectionDemandInputs|null;onDemandChange:(value:ProjectionDemandInputs|null)=>void;demandDisabled?:boolean;pending?:boolean;calculationError?:string;demandOpen?:boolean;onDemandOpenChange?:(open:boolean)=>void}){
+ const [localOpen,setLocalOpen]=useState(demand!==null),open=demandOpen??localOpen,values=demand??emptyProjectionDemand;
+ const setOpen=(value:boolean)=>{if(onDemandOpenChange)onDemandOpenChange(value);else setLocalOpen(value);};
  let result:ReturnType<typeof projectionDemand>|null=null,error=calculationError;if(open&&analysis&&!error)try{result=projectionDemand(analysis,values);}catch(e){error=(e as Error).message;}
  const last=result?.points.at(-1),active=open&&demand!==null;
  const toggle=<button type="button" aria-expanded={active} className="min-h-11 rounded border px-3 font-medium focus-visible:ring-2 focus-visible:ring-ring" disabled={demandDisabled||(!analysis&&!demand&&!open)} onClick={()=>{if(!active&&!demand)onDemandChange({...emptyProjectionDemand});setOpen(!active);}}>{active?'Hide demand':demand?'Show demand':'Add demand'}</button>;
