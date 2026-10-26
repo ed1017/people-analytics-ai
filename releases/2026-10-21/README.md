@@ -1,6 +1,8 @@
 # Versioned application source
 
-This directory contains the reviewed production source through the October 23 date-only pricing renewal; the coherent fictional geography revision is retained.
+Current status: [active roadmap](../../docs/roadmap-status-2026-10-17.md) and [PR413 verification](../../docs/release-verification-pr413.md). Dated release identities and acceptance below are historical; the current source file set is pinned by `manifest.json`.
+
+The following historical checkpoint records the October 23 date-only pricing renewal and coherent fictional geography revision.
 
 - Runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`.
 - Deployment: `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`; public alias verified.
@@ -29,7 +31,7 @@ This release restores provider-backed planning routes, preserves the current wor
 
 Protected provider checks cover intake, comparison, revisions, combinations, capability review and grounded chat. Captured two-round Home output passed corrected offline contract grading; the original failed hosted grading receipt was not rewritten. Seven local React continuity checks cover selected-goal follow-up, save/reload, cancellation and stale-response isolation using fake provider/admission ports. Public desktop/mobile smoke confirms enabled UI and configuration without paid requests. This is not evidence of a fresh paid production browser journey through all these steps or of arbitrary recommendation correctness.
 
-Current pricing verification expires October 22, 2026 at 09:59 UTC (admission cutoff 09:57:30 UTC). Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
+At this historical checkpoint, pricing verification expired October 22, 2026 at 09:59 UTC (admission cutoff 09:57:30 UTC). Continuing operation requires aligned app pricing, rollout pricing, admission SQL ceiling, and settlement dispatch windows/rates. The cumulative budget is not reset by a release. This snapshot records a point in time; it is not a claim of perpetual availability.
 
 The [local replay recipe](reproduction/README.md) implements bounded public fixture/receipt integration with a separate generated app. Full private calculator reconstruction and live AI are not reproduced. Saved/versioned headcount what-if remains a separate design proposal, not an implemented feature. No predictive accuracy, realized savings or enterprise persistence is claimed.
 
@@ -75,10 +77,10 @@ The browser request was checked at desktop 1440px and phone 390px. Retained-answ
 
 ## Catalog and skills retrieval
 
-The [coverage contract](../../../docs/catalog-skills-grounding.md) adds published job compa comparisons, complete listed policy bands and three explicitly bounded skills lists. Eight targeted regressions, five actual application route cases with simulated provider/accounting, existing registry/server checks and independent review cover the increment. No additional paid model call was made for this mechanical registry extension.
+The [coverage contract](../../docs/catalog-skills-grounding.md) adds published job compa comparisons, complete listed policy bands and three explicitly bounded skills lists. Eight targeted regressions, five actual application route cases with simulated provider/accounting, existing registry/server checks and independent review cover the increment. No additional paid model call was made for this mechanical registry extension.
 
 ### Explicit scenario parity
 
-The guided popup and explicit chat continuation now share the same complete fictional inputs, staffing-option calculator and reviewed save flow. The prominent question updates with accepted assumptions. Bare questions do not import hidden scenario assumptions. See [acceptance and boundaries](../../../docs/scenario-workflow-parity.md).
+The guided popup and explicit chat continuation now share the same complete fictional inputs, staffing-option calculator and reviewed save flow. The prominent question updates with accepted assumptions. Bare questions do not import hidden scenario assumptions. See [acceptance and boundaries](../../docs/scenario-workflow-parity.md).
 
 Pricing renewal PR379: app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.

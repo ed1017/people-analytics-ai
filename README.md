@@ -16,7 +16,7 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-The versioned application source subset, updated through the October 23 date-only pricing renewal, is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. That snapshot maps to deployment `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL` and local source identity `044f26e854d8cad6407b4c683f1c762858f7ebb8`.
+The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. Production is PR413, runtime `df84a97a65d202104a3073f2ba809168b772aae1`, deployment `dpl_EkWHP14PvoKYLo7Po3v8eMstkxcQ`. See the [active roadmap](docs/roadmap-status-2026-10-17.md) and [PR413 verification record](docs/release-verification-pr413.md) for current acceptance and remaining limits. Older dated release sections are historical.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
@@ -46,4 +46,4 @@ Open http://localhost:3000. To build this source:
 npm.cmd run build
 ```
 
-Pricing renewal PR379: app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.
+Historical pricing renewal PR379 (superseded; current recorded maintenance window is in the active roadmap): app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.
