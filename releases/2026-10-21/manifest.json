@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "1e69f6bbbdb03626c881258b5b06fcc89a773e00",
+  "sourceCommit": "8ecbcbfaeb71d29b48b05a41f4b973304b7203f6",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -559,12 +559,12 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "011344dc2015d617c6ed89cfef9f9dd39880164d46ff4fe8cb7647716683a44c",
-      "bytes": 22908
+      "sha256": "a59d35c507057fddbaf0d38460d11e379e12f82d00b9af34e78088e7be59d5c7",
+      "bytes": 22915
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "86d356955e0ccce1ee51056605c96812bfb2d6872a5662df7c3815e4509c4625",
+      "sha256": "175e16b4252c0c8a3adf851dc295b419c7057b41b3373556341ac6fbe34e6bbe",
       "bytes": 18979
     },
     {
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "7c53f5e2452108ddcaaf2582f0d55b8d93261f2c9d2c666b4b9ef063e1982246",
-      "bytes": 5523
+      "sha256": "96be1795f8be9bff41d345d43d9df486eb54b8c18ee95425f95d9d17b3d0c7cf",
+      "bytes": 5375
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
