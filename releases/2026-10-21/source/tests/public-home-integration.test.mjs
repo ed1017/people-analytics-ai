@@ -156,3 +156,16 @@ test('Home hiring metrics use actual released source and reject stale/suppressed
  const suppressed=homeRecruitingKpi({...result,data:{...data,summary:{...data.summary,suppressed:true}}},true,PUBLIC_9037.token,date);assert.equal(suppressed.timeToFillDays,null);assert.equal(suppressed.openReqAgeDays,null);
  const zero=homeRecruitingKpi({...result,data:{...data,summary:{...data.summary,avg_time_to_fill_days:0,avg_open_req_age_days:0}}},true,PUBLIC_9037.token,date);assert.equal(zero.timeToFillDays,0);assert.equal(zero.openReqAgeDays,0);
 });
+
+test('Overview has one scoped findings banner before risk and retains chart headcount',async()=>{
+ const f={country:'all',org:'all',level:'all'},d=await read(f),html=render(d,f);
+ assert.equal((html.match(/aria-label="Key findings"/g)||[]).length,1);
+ assert.ok(html.indexOf('aria-label="Key findings"')<html.indexOf('aria-label="Workforce risks"'));
+ assert.match(html,/As of 2026-09-30/);assert.match(render({...d,trend:[]},f),/As of 2026-09-30/);assert.match(html,/197 open positions/);assert.match(html,/Voluntary turnover: 8.8% YTD/);
+ assert.match(html,/Current headcount <strong>9,037<\/strong> people/);
+ for(const h of [render(d,f,true),render(d,f,false,'failed'),render(d,{...f,org:'BU-SALES'})]){
+  assert.doesNotMatch(h,/197 open positions|Voluntary turnover: 8.8% YTD|9,037/);
+ }
+ const scoped={country:'US',org:'all',level:'L1'},filtered=await read(scoped),filteredHtml=render(filtered,scoped);
+ assert.match(filteredHtml,new RegExp(filtered.overview.headcount.toLocaleString()+' people'));
+});
