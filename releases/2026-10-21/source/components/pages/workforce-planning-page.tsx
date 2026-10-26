@@ -2056,17 +2056,17 @@ export function WorkforcePlanningPage({
           )}
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4 space-y-4">
-            <p className="text-sm text-muted-foreground">Start with the work your business needs to deliver. Enter your demand, adjust capacity assumptions, then save and compare scenarios.</p>
+            <details className="rounded-xl border border-primary/30 bg-primary/5 p-4" data-worked-example-entry>
+              <summary className="min-h-11 cursor-pointer rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Open worked example</summary>
+              <PlanningLanding />
+            </details>
+            <p className="text-sm text-muted-foreground">Try the populated example above, or enter your own work and team below to save and compare scenarios.</p>
             <details open className="rounded-xl border bg-background p-4">
               <summary className="min-h-11 cursor-pointer py-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring">Your demand &amp; capacity scenarios</summary>
               <CapacityWorkspace />
             </details>
             <StaffingTargetCompanion />
             {(workflowView==='overview'||workflowView==='plan')&&<CompanyHeadcountWhatIf key={goalKey}/>}
-            <details className="rounded-xl border bg-background p-4">
-              <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Try an illustrative demo</summary>
-              <PlanningLanding />
-            </details>
           </div>
           <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="border-t pt-2">
           <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Stored plans and earlier scenario tools</summary>

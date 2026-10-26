@@ -24,7 +24,7 @@ export function subscribeToAppPage(onChange: () => void): () => void {
 /** Only catalog destinations are navigable; legacy links keep their current meaning. */
 export function resolveAppPage(value: string | null): AppPage {
   if (value === "overview" || value === "career-mobility") return "workforce";
-  if (value === "workforce-planning") return "planning-overview";
+  if (value === "workforce-planning" || value === "scenarios") return "planning-overview";
   return value !== null && Object.hasOwn(appPageMetadata, value)
     ? value as AppPage
     : "home";

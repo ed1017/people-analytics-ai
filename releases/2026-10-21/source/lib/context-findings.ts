@@ -9,9 +9,9 @@ export function capacityFindings(r: ReturnType<typeof import('./swp-monthly-work
   const p=r?.points.at(-1);
   return {scope:r ? `${r.assumptions.scope.label} · ${p?.month ?? 'unknown period'} · ${preview ? 'unconfirmed preview' : 'entered planning assumptions'}` : 'Workload capacity worksheet',items:p ? [
     valid(p.requiredFte) ? `${n(p.requiredFte)} FTE are required for the entered workload in the final month.` : 'Workload requirements remain unknown.',
-    typeof p.gapFte==='number' && Number.isFinite(p.gapFte) ? `${n(Math.abs(p.gapFte))} FTE ${p.gapFte>0 ? 'shortfall' : p.gapFte<0 ? 'surplus' : 'gap'} in that month; review earlier months separately.` : 'Available capacity or the gap is still unknown; no staffing sufficiency is inferred.',
-    'FTE measures working capacity, not a count of people or a hiring commitment.',
-  ] : ['Enter the work, team and timing you know to compare required and available capacity.', 'Blank inputs remain unknown; no staffing recommendation is inferred.']};
+    typeof p.gapFte==='number' && Number.isFinite(p.gapFte) ? `${n(Math.abs(p.gapFte))} FTE ${p.gapFte>0 ? 'shortfall' : p.gapFte<0 ? 'surplus' : 'gap'} in that month; review earlier months separately.` : 'Available capacity or the gap is still unknown.',
+    'FTE measures working capacity.',
+  ] : ['Enter the work, team and timing you know to compare required and available capacity.', 'Blank inputs remain unknown.']};
 }
 export function occupationFindings(e: OccupationalReferenceEvidence): Findings {
   return {scope: `Selected occupational reference: ${e.selectedOccupationCode ?? 'none'}; not company performance`, items: [

@@ -85,13 +85,12 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,onStartDemo,demoR
             <li><strong>Review the starting point.</strong> The guided example begins with a fictional 5-FTE capacity gap.</li>
             <li><strong>Adjust the assumptions.</strong> Change the available workload, timing, staffing and budget inputs to test your approach.</li>
             <li><strong>Compare the options.</strong> Explore developing people, moving people internally and hiring. Review cost, readiness and uncovered work together.</li>
-            <li><strong>Keep a proposal.</strong> Review and save in this browser, then reopen it to continue. Saving records a plan; it does not approve or execute staffing actions.</li>
+            <li><strong>Keep a proposal.</strong> Review and save in this browser, then reopen it to continue.</li>
           </ol>
         </section>
         <section aria-labelledby={id+'-read'} className="mt-4">
           <h3 id={id+'-read'} className="text-base font-bold">How to read the results</h3>
-          <p className="mt-1">The workforce data is synthetic and dated. The worked example has its own illustrative assumptions, while external references retain their sources and dates. Check the scope and period before comparing results.</p>
-          <p className="mt-2">Scenario results show what follows from the inputs you choose. Missing inputs remain unknown, and a projected staffing decline is not automatically a workload shortfall. These are conditional planning results, not measured business outcomes.</p>
+          <p className="mt-1">Compare scenarios using their stated inputs, scope and dates. Open calculation details to review the method and sources.</p>
         </section>
         <section aria-labelledby={id+'-role'} className="mt-4">
           <h3 id={id+'-role'} className="text-base font-bold">Project development</h3>

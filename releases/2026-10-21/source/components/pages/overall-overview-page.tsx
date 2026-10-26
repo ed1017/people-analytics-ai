@@ -333,7 +333,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   function submitQuestion(prompt:string){if(ready)queueSuggestion("question:"+prompt,()=>void send(prompt))}
 
   function startIntroDemo(){
-    // A newly confirmed intro launch may resume a demo closed within the click debounce window.
+    // An explicit demo launch may resume a demo closed within the click debounce window.
     recentSuggestions.current.delete('starter:'+swpDemoPrompt);
     submitStarterQuestion(swpDemoPrompt);
   }
@@ -698,7 +698,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
       <header id="guided-workspace-controls" data-compact-actions className="flex flex-wrap items-center gap-2">
         <h2 id="overall-overview-heading" className="sr-only">Workforce AI</h2>
         <button type="button" onClick={resetHomeConversation} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Reset Conversation</button>
-        <button type="button" data-orientation-return aria-haspopup="dialog" disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onClick={()=>submitStarterQuestion(swpDemoPrompt)} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Planning Scenario</button>
+        <button type="button" data-orientation-return aria-haspopup="dialog" disabled={suggestionPending||chatLoading||!ready||!active||Boolean(conversation.issueEditor)} onClick={startIntroDemo} className="min-h-11 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Planning Scenario</button>
         <details className="relative ml-auto"><summary className="min-h-11 cursor-pointer rounded-lg px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">More</summary><div className="absolute right-0 z-30 flex max-h-[70dvh] w-[min(24rem,calc(100vw-3rem))] flex-col gap-3 overflow-y-auto rounded-lg border bg-background p-3 shadow-lg">
         {renderPlanPane&&<details className="home-saved-plan-disclosure"><summary>Saved plans</summary>{renderPlanPane(savedWork)}</details>}
         <HomeGettingStarted liveChatAvailable={liveChatAvailable} conversational={solutionConversationEnabled} active={active} ready={conversation.storageReady} autoOpen={conversation.firstHomeVisit&&!conversation.input.trim()&&!conversation.issueEditor&&!conversation.activeGoalId&&messages.length===0&&!swpDemoVisible} busy={chatLoading||guidedExampleActive||swpDemoVisible} dismissKey={JSON.stringify([instructionsDismissed,conversation.workspaceKey,guidedExampleActive])} onNavigate={onNavigate} demoReady={ready&&!suggestionPending&&!conversation.issueEditor&&conversation.saved} onStartDemo={startIntroDemo} status={
@@ -722,15 +722,12 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
         <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{conversation.historyMessages.length?<ConversationMessages assistantBasis={solutionConversationEnabled?'Discussion · interpretations and hypotheses. Checked quantities appear in the result cards.':undefined} compactAssistant messages={conversation.historyMessages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
       {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
-        <p className="mt-3 text-xs">AI can be wrong; plans are not approvals. Real-world actions happen outside this app.</p>
-        <p className="mt-3 text-xs">Only the workforce snapshot follows shared filters; other company sources remain company-wide. BLS is US national. Quotes are fictional or unverified; comparisons use your assumptions.</p>
-        <p className="mt-3 text-xs">Source creation/import history, survey provenance and scoring thresholds are not fully verified. Comment counts are not sentiment analysis; movement history has gaps. Course coverage is not proven skill improvement, and assessments are not individual predictions. Missing costs and impacts stay unknown.</p>
         <p className="mt-3 text-xs">{pack.coverage.selection}</p><p className="mt-2 text-xs">{pack.coverage.unavailable.join(". ")}</p><div className="mt-4 grid gap-4 md:grid-cols-3">
           {sources?.map(source => <article key={source.id} id={`overview-source-${source.id}`} className="min-w-0 text-sm">
             <h4 className="font-semibold">[{source.id}] {source.label}</h4>
-            <p className="mt-2">{source.facts ? source.population : "Source unavailable; not zero."}</p>
+            <p className="mt-2">{source.facts ? source.population : "Source unavailable."}</p>
             <p className="mt-1 text-muted-foreground">As of: {source.date || "not supplied"}. {source.scope}.</p>
-            <p className="mt-2 text-muted-foreground">{source.limitation}</p><p className="mt-2 text-xs">{source.status}; {source.coverage.rowsIncluded} of {source.coverage.rowsAvailable ?? "unknown"} detail rows. {source.coverage.selection}</p>
+            <p className="mt-2 text-muted-foreground">{source.id==='T5'?'Recorded succession plans; suppressed values remain unavailable.':source.limitation}</p><p className="mt-2 text-xs">{source.status}; {source.coverage.rowsIncluded} of {source.coverage.rowsAvailable ?? "unknown"} detail rows. {source.coverage.selection}</p>
             {source.id === "T3" ? <p className="mt-3 text-xs">Aggregate evidence retained; standalone page retired.</p> : <button type="button" onClick={() => onNavigate(source.page as AppPage)} className="mt-3 rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Open {source.label}</button>}
           </article>)}
         </div>
