@@ -77,6 +77,7 @@ test('explicit intro resume releases only local demo debounce and retains shared
  assert.equal(launches,1);assert.equal(recentSuggestions.current.has('question:other'),true);
  assert.match(source,/queuedSuggestion.current\|\|chatLoading\|\|sending.current/);
  assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
+ assert.match(source,/data-orientation-return[\s\S]*?onClick=\{startIntroDemo\}/);
 });
 test('expanded creator introduction keeps keyboard-scrollable content separate from persistent actions',()=>{
  const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');

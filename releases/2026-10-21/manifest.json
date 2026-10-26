@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "3fa65fa0f4ea2f46c01ab2d49d4407e794c66687",
-  "deployment": "https://people-analytics-56t32whez-ed-56dc.vercel.app",
+  "sourceCommit": "8518d4491daf1d88f3367db88bb1ec6efa1a3c18",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -19,8 +19,8 @@
     },
     {
       "path": "app/about/page.tsx",
-      "sha256": "5a0c89ef746323f6123bea98a50fba376d59c82355b2245937ebc7fb87d5664d",
-      "bytes": 775
+      "sha256": "1bd29b410e5a990cc4774e27ed1532f0d575afa601169f1132dcef3d31e54f22",
+      "bytes": 1947
     },
     {
       "path": "app/api/attrition/route.ts",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "72d39f6001d0f1f6e20be75d22e1f870f4c09d7f8521326e27d4e2b6ec70d73b",
-      "bytes": 9814
+      "sha256": "d847a9ad5c9c804d655bd53fa745aae3b296d917d57854557177187073715e54",
+      "bytes": 9376
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "abb9ad685733a539b3b79db9f8b99bff5194aeb200925c3870389b195975ad8c",
-      "bytes": 105429
+      "sha256": "408c4dfbc10d8e4e79f33bb9b1a82d4d05f869f6dcce5f229dbc730052437abe",
+      "bytes": 104769
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "258dd45cc0f0d7e8a24a4fd51c028ffac59b9b22ece2c47661470c14b023dda7",
-      "bytes": 72746
+      "sha256": "f86fef12cc956b43616875ca038a91446728ae5fd5a8524e0d0b728d30bd425b",
+      "bytes": 72834
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -884,8 +884,8 @@
     },
     {
       "path": "components/project-case-study.tsx",
-      "sha256": "feb880cc569b4496340c4f5a014bb591e35a71d15b006c40665b02d980e70f62",
-      "bytes": 2117
+      "sha256": "d8740a57883f4c5f1dbaf2100d868278e21fa7dfd11156908d6cfbcd617c4a8c",
+      "bytes": 3238
     },
     {
       "path": "components/projection-backtest-details.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "db731a496272abeb1dba343c1926fefa8b3615317123fc6a4df34ef8d7ba8004",
-      "bytes": 40050
+      "sha256": "b3f7e7713051fdb781ac6f286a774708478f4a480208a2edb20cf56e5fa61d72",
+      "bytes": 39814
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -1109,8 +1109,8 @@
     },
     {
       "path": "components/workforce-demo-dialog.tsx",
-      "sha256": "ced9b1d102ebf3bf465d12c2bb9b92c9a865808f46d2409f5b1d76fcce1785da",
-      "bytes": 1731
+      "sha256": "a8520fa8fbc92b5a0a03c8fa75ed0c4dbbc0b66e64cb8460845409e666d880ae",
+      "bytes": 1678
     },
     {
       "path": "components/workforce-goal-statement-copy.tsx",
@@ -1209,7 +1209,7 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
-      "sha256": "50add6b963639ca64df6d8012f945abd730a5ec795c7bbb08b54d4b7645e93f5",
+      "sha256": "ddf868c746dffe09149747696b358a20826575a438e789c1d240b2a051a7a477",
       "bytes": 6447
     },
     {
@@ -1349,8 +1349,8 @@
     },
     {
       "path": "components/workforce-solution-cards.tsx",
-      "sha256": "70ccf914ffdf31ae4fbc186879e5ecbfde24d52b9ac21341318fcf1533d7cc95",
-      "bytes": 28402
+      "sha256": "ae70c668c4defb9d5115fb1c9428ce23907958eb0092053bb92a664049f215fa",
+      "bytes": 28256
     },
     {
       "path": "components/workforce-solution-evidence.tsx",
@@ -1359,8 +1359,8 @@
     },
     {
       "path": "components/workforce-solution-panel.tsx",
-      "sha256": "23f3c254ca0c9976c8dcf451cca56828b8da43765aae9094e693b63088c92394",
-      "bytes": 42555
+      "sha256": "595c8b8d424c99263f2f6611e41cf7c9dfc2687198a5bd8898f7e744b727f6f3",
+      "bytes": 42576
     },
     {
       "path": "components/workspace-palette-control.tsx",
@@ -1409,8 +1409,8 @@
     },
     {
       "path": "lib/app-page-url.ts",
-      "sha256": "9eefee291313a1cc1348c7b51f371ecc089d006ab2ca9aaa245cfaf33043bef1",
-      "bytes": 1810
+      "sha256": "ecc18571013edfe4f0ed3d1d17be22667428142ca997643626dfc8ebc6a46aa5",
+      "bytes": 1835
     },
     {
       "path": "lib/business-unit-response-allocation.ts",
@@ -1544,8 +1544,8 @@
     },
     {
       "path": "lib/context-findings.ts",
-      "sha256": "b5acc8f687129d24087a348e833be78f7691192b6b353dfde18ba7d2d32faa65",
-      "bytes": 6755
+      "sha256": "a88f4be7e6e509a029aacfe9550cee82b293b9450be1e6eb405e1f096b923f68",
+      "bytes": 6632
     },
     {
       "path": "lib/contextual-prompts.ts",
@@ -3764,8 +3764,8 @@
     },
     {
       "path": "proxy.ts",
-      "sha256": "733dc51fc820d9ca2e75dd2a0f7e4afa329d10cc9549928965e28a9cc247903b",
-      "bytes": 1889
+      "sha256": "2d7884c914f216fdeccdb8bb97bb06d52d7be94dd6cbde3e9cccc445abe764ad",
+      "bytes": 2580
     },
     {
       "path": "public/file.svg",
@@ -4454,8 +4454,18 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 11523,
-      "sha256": "74666bcb3fc1e6296e9d072be5c01c68a5cbbe472cd130e9adee9550fc8399e8"
+      "bytes": 11606,
+      "sha256": "a05a4639566060c20258f8621a87a39ed73ee4f70836c3a907c7c79e327c3713"
+    },
+    {
+      "path": "tests/about-project-profile.test.mjs",
+      "bytes": 2878,
+      "sha256": "4c3bf114b038b6b4267f66835d2275c782c55974ceb8f36fc36d3a9290fb94c8"
+    },
+    {
+      "path": "tests/scenario-route-aliases.test.mjs",
+      "bytes": 3996,
+      "sha256": "08fea8c432397cdb34870b9e37bbc93e3cd7fa95c4fef14083731b6c37f47456"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
