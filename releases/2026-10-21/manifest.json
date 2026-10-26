@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "448612c1c980c9676ff3a8b44405d508a278f033",
-  "deployment": "pending-protected-verification",
+  "sourceCommit": "3fa65fa0f4ea2f46c01ab2d49d4407e794c66687",
+  "deployment": "https://people-analytics-56t32whez-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -399,8 +399,8 @@
     },
     {
       "path": "components/decision-store.ts",
-      "sha256": "d6598fb4e2ff112babc04b3d97033c4a2a8898c2b0f0ddd4abcecf7b32808415",
-      "bytes": 2200
+      "sha256": "e412c96e9a38d964b824c3d939e53ff722f01763af377229ad3c1a2aef62d9f3",
+      "bytes": 2994
     },
     {
       "path": "components/development-workspace.tsx",
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "9ebed55bd2e7fd2266bf50b2d89cb6a69d3999821819578c23f29afc6389f20a",
-      "bytes": 23891
+      "sha256": "10455bb66b45d538a196fb25f85ae42bf9d9914c7a9bef2b2cea62a982963f7f",
+      "bytes": 23895
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "97d79e3e7e49e8cf0cd4dddb63cb36fb7bb4646cee1189d58402d57563fa4e80",
-      "bytes": 19205
+      "sha256": "9914ecf9909e191fa704d0b5ceae99b4cc551b770659eff13827318d9bdc9087",
+      "bytes": 19425
     },
     {
       "path": "components/home-data-status.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "fc9637bc5496818d027517f9c166785dae2795cd3f5a74f9b3b1ab24ba21e93d",
-      "bytes": 8280
+      "sha256": "72d39f6001d0f1f6e20be75d22e1f870f4c09d7f8521326e27d4e2b6ec70d73b",
+      "bytes": 9814
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "0f56869df25425f99cd88c1b46219d10f8f79c06d78cc8fc0d6eb7748f6238b9",
-      "bytes": 104800
+      "sha256": "abb9ad685733a539b3b79db9f8b99bff5194aeb200925c3870389b195975ad8c",
+      "bytes": 105429
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -879,8 +879,8 @@
     },
     {
       "path": "components/problem-conversation.tsx",
-      "sha256": "133ca36905853c10c4503b4d0deb47ac453c6a6ca039016b1006f5810875e8ab",
-      "bytes": 29489
+      "sha256": "277c6ea5f3f10f6342b65d757f6b3fbbf2a55bc4fa87d05d31ec214291802641",
+      "bytes": 29377
     },
     {
       "path": "components/project-case-study.tsx",
@@ -1534,8 +1534,8 @@
     },
     {
       "path": "lib/composer-prompt-helpers.ts",
-      "sha256": "3dadc7a44b0fa2a17cf346755419e29f0b04d6900f2d1a6ab74a798173f11f27",
-      "bytes": 983
+      "sha256": "8219825fb03024f68947266087f8cfe75d38f0da4a4f870cca3d2578f291225e",
+      "bytes": 1060
     },
     {
       "path": "lib/constraint-aware-workforce-scheduler.ts",
@@ -2439,8 +2439,8 @@
     },
     {
       "path": "lib/home-onboarding.ts",
-      "sha256": "8820a24e82aa4437cd4160fbb9bcb2ded45da1998bb73640608139129de6ec2a",
-      "bytes": 677
+      "sha256": "59fde3b38829fa74b09c7ba9519ee51dbadf039a8b5e9f2af558a96095b6ce86",
+      "bytes": 993
     },
     {
       "path": "lib/home-pack.mjs",
@@ -3804,8 +3804,8 @@
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "dc511391d20ac77f08a75fbd0f6e2265aa4664337a97dc081e6f35c447a3f2a9",
-      "bytes": 7407
+      "sha256": "9e0919a417f82b0b2cf426ff928d347088f310a1b4254026eb5cf79c6bc78cfe",
+      "bytes": 8417
     },
     {
       "path": "tests/context-findings.test.mjs",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "48d77c6501f7d091f1eed53358ea2c301c570efe0394ca90ef856a0dd5afe9f9",
-      "bytes": 15193
+      "sha256": "55dd45128fb62bffa060bdb1a41e9b8a478a56cf2368ac145c37d5860fa782d6",
+      "bytes": 16757
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "1ab1ede7230aae7e7ae1736f1ab4e7ce048bc188da7e613483fc1908812963e6",
-      "bytes": 5409
+      "sha256": "daa0f90855c9afdee895bd8a502e3d221788ec9af3bfe63e2dccecdfd172c6a2",
+      "bytes": 5454
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4431,6 +4431,31 @@
       "path": "tests/projection-save-retry.test.mjs",
       "bytes": 5546,
       "sha256": "4e4aea102d67463470b73424a4426df26fd326da6cb3ea59bec9dbe8df47bd63"
+    },
+    {
+      "path": "components/home-company-intro.tsx",
+      "bytes": 1628,
+      "sha256": "ac52527a9f05776f4bf5f010e9e91861937464048fa0972fb82e43425eedcc5a"
+    },
+    {
+      "path": "lib/demo-company-profile.ts",
+      "bytes": 891,
+      "sha256": "79b7904784f347ed7cf10a855e17c12d7d1735acf68c0421d524a18da8ee64c0"
+    },
+    {
+      "path": "tests/dashboard-risk-presentation.test.mjs",
+      "bytes": 2596,
+      "sha256": "75da138d53a7dd5270d24dfaff4cab7ed2f94720e216a77acfe1accec0d8f94f"
+    },
+    {
+      "path": "tests/demo-company-profile.test.mjs",
+      "bytes": 3115,
+      "sha256": "0b098d864d840de6f9f057d17a3cdfaa27f788cd65c95cd78e9060c194264d88"
+    },
+    {
+      "path": "tests/home-orientation.test.mjs",
+      "bytes": 11523,
+      "sha256": "74666bcb3fc1e6296e9d072be5c01c68a5cbbe472cd130e9adee9550fc8399e8"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

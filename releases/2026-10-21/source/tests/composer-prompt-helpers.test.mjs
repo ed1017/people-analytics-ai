@@ -41,3 +41,20 @@ test('readable titles, legacy codes and title/code pairs toggle one identity wit
   a.equal(restored.value,'Role: BI-ANA, AI Engineer (AI-ENG)\nFTE needed: 12');
  }
 });
+
+
+test('planning helper cards show complete prompts while preserving editable template behavior',()=>{
+ a.deepEqual(composerPromptHelpers.map(h=>h.label),[
+  'Help me estimate the FTE needed to close a capacity gap.',
+  'Compare staffing options for a role.',
+  'What if we change staffing for a role?'
+ ]);
+ for(const helper of composerPromptHelpers){
+  const {PromptTemplates,frames}=component();let value,selection,focused=0;
+  const tree=PromptTemplates({value:'Keep this draft',onChange:v=>value=v,textareaRef:{current:{focus:()=>focused++,setSelectionRange:(...v)=>selection=v}},rows:4,workforce:null,datasetToken:'fixture'});
+  const button=walk(tree).find(n=>n.type==='button'&&walk(n).some(child=>child.props?.children===helper.label));
+  a.ok(button,helper.label);a.equal(button.props.type,'button');button.props.onClick();
+  a.equal(value,'Keep this draft\n'+helper.text);a.equal(focused,0);frames[0]();a.equal(focused,1);
+  a.equal(value.slice(...selection),helper.id==='need'?'':'[role]');
+ }
+});

@@ -169,3 +169,17 @@ test('Overview has one scoped findings banner before risk and retains chart head
  const scoped={country:'US',org:'all',level:'L1'},filtered=await read(scoped),filteredHtml=render(filtered,scoped);
  assert.match(filteredHtml,new RegExp(filtered.overview.headcount.toLocaleString()+' people'));
 });
+
+
+test('company introduction stays in left welcome slot and uses the full company profile under filters',async()=>{
+ for(const requested of [{country:'all',org:'all',level:'all'},{country:'US',org:'BU-TECH',level:'L1'}]){
+  const d=await read(requested),props={overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested,scopeLabel:'Selected scope',loading:false,error:null,trend:d.trend,onQuestion:()=>{}};
+  const tree=exports.HomeChatWelcome(props),split=tree.props.children;
+  const children=React.Children.toArray(split.props.children);assert.equal(children[0].type.name,'HomeCompanyIntro');assert.equal(children[1].props.children,'What decision are you facing?');assert.equal(split.props.visuals.type.name,'HomeHeadcountSummary');
+  const html=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,props));
+  const intro=html.match(/<section aria-label="Company introduction"[^>]*>([\s\S]*?)<\/section>/)[1];
+  assert.match(intro,/>Company<\/h2>/);assert.match(intro,/fictional global business/);assert.match(intro,/9,037 people in 10 countries and 8 business units/);assert.match(intro,/September 30, 2026/);assert.doesNotMatch(intro,/fewer FTE|Workforce risks|capacity gap/);
+  const missing=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,{...props,receipt:null}));
+  const fallback=missing.match(/<section aria-label="Company introduction"[^>]*>([\s\S]*?)<\/section>/)[1];assert.match(fallback,/Explore workforce evidence/);assert.doesNotMatch(fallback,/9,037|10 countries|Ed Inc/);
+ }
+});

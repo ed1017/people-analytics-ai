@@ -1,6 +1,10 @@
-# Active roadmap - October 26, PR419 live
+# Active roadmap - October 26, PR420 live; introduction preview in PR421
 
-Production is [PR419](https://github.com/ed1017/people-analytics-ai/pull/419), runtime `d42993cf33448fade057969f1ada113751bab79a`, deployment `dpl_C75pvjgcz3C61mtX78FU2Ap5T1Ng`, source merge `f8879e511f4bccaddc50d1765fe67ae55785ac54`. The approved compact Overview header, prompt helpers, full-width risk banner/disclosure, grounded findings banner and spacing refinements are live. [Current release evidence](release-verification-pr419.md) records direct public desktop/mobile data, configured-state and UI checks with paid requests blocked. [PR413 recovery evidence](release-verification-pr413.md) remains a historical record of storage recovery and the subsequent harness-only readiness diagnosis. Dated records below remain historical checkpoints.
+Production is [PR420](https://github.com/ed1017/people-analytics-ai/pull/420), runtime `448612c1c980c9676ff3a8b44405d508a278f033`, deployment `dpl_4cdTdGdUbWUrjE8mtF5mHGeEAuka`, source merge `c26c7d858af7ff40418e2020cd75f577ce183357`. PR420 restores saved demand comparison visibility on explicit reset; staged and public desktop/mobile save, hide, reset and reopen checks passed using real calculations/persistence with controlled read-only currentness receipts and paid requests blocked. The accepted PR415-419 compact layout remains live. Dated records below are historical checkpoints.
+
+[PR421](https://github.com/ed1017/people-analytics-ai/pull/421) is the approved product/creator introduction, fictional Ed Inc. company profile, complete helper prompts and compact numbered risk Details preview. Browser acceptance exposed and corrected pre-Home dataset initialization suppressing first-visit detection. The latest owner revisions add a wider formal introduction with top actions/public contacts and a condensed italic Company profile. Runtime `3fa65fa0f4ea2f46c01ab2d49d4407e794c66687` is staged at https://people-analytics-56t32whez-ed-56dc.vercel.app (`dpl_UT1RaRfwaLQX6xnd1fkv8f6NHqEk`). Local desktop/mobile lifecycle, draft and short-viewport checks passed; final hosted checks and promotion remain pending. Direct owner approval resolved the UI upload block; it does not cover PR422. It is not live.
+
+[PR422](https://github.com/ed1017/people-analytics-ai/pull/422) prepares the explicitly approved 24-hour date-only pricing renewal. Production still has the expired October 26 15:05 UTC window. Staging upload was rejected by automatic approval review; no SQL or deployment occurred. The new proposed expiry is not active. Permanent renewal is a separate design investigation, not permission to remove safeguards.
 
 ## Completed agreed work
 
@@ -19,7 +23,7 @@ Production is [PR419](https://github.com/ed1017/people-analytics-ai/pull/419), r
 
 | Track | Next concrete outcome / boundary |
 | --- | --- |
-| Existing-journey reliability | PR410 closed historical harness debt; PR413 closed the demonstrated demand-only save-retry gap. A new focused code review identified a reset-visibility defect: after hiding saved workload demand, explicit Reset restores saved inputs but can leave their risk comparison hidden. A minimal reset signal and regression are in progress, not deployed. Preserve saved revisions and unknown inputs. |
+| Existing-journey reliability | PR410 closed historical harness debt; PR413 closed the demonstrated demand-only save-retry gap. PR420 closed the reset-visibility defect: explicit Reset restores the saved demand comparison after hiding it. Saved revisions and unknown inputs remain preserved. |
 | Consistent existing-page polish | PR410–412 completed inspected Recruiting, Workforce, Learning and Listening corrections. Career Interests has legacy-component coverage only. No further concrete visual defect was identified in this bounded pass; broader redesign stays deferred. |
 | Verification record | Current release pointers now reconcile PR419 and the approved PR415–419 refinements. PR407's initial public-check failure was the harness rejecting bare ed-ai.app; canonical www.ed-ai.app reruns passed. PR418 initially rendered its predecessor immediately after promotion; fresh direct-browser checks then passed, without proving that initial cause. Neither explains the historical model failure. |
 
@@ -44,7 +48,7 @@ Owner review is useful but does not block these independent tracks. The saved-de
 
 ## Explicit deferrals and scope limits
 
-Onboarding popup/video/credits, pinning/action integration, tornado charts/new scenario engines, wholesale navigation/theme redesign and real-company ingestion/tenancy remain separate. The approved shared palette is delivered; it does not authorize a blanket dark-mode conversion. Synthetic payroll, geographic composition and recorded skills are illustrative, not externally calibrated business predictions. Preserve current datasets, saved bases and accounting safeguards.
+The compact product/creator popup and existing guided-demo entry are now approved in PR421. Video, pinning/action integration, tornado charts/new scenario engines, wholesale navigation/theme redesign and real-company ingestion/tenancy remain separate. The approved shared palette is delivered; it does not authorize a blanket dark-mode conversion. Synthetic payroll, geographic composition and recorded skills are illustrative, not externally calibrated business predictions. Preserve current datasets, saved bases and accounting safeguards.
 
 ---
 

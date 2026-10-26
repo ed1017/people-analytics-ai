@@ -2,7 +2,6 @@
 import {usePendingRequest} from "./use-pending-request";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {guidedReturnKey,readGuidedReturn,type GuidedReturn} from '@/lib/home-guided-return';
-import {isFirstHomeVisit} from '@/lib/home-onboarding';
 import {conversationBoundary,resetConversationMarks} from "@/lib/conversation-reset";
 import {createHomeDemoGoals,hasSavedUserGoal} from "@/lib/home-demo-goals";
 import { rememberProblemQuestion, ProblemRequestGate } from "@/lib/problem-session";
@@ -16,7 +15,7 @@ import { MAX_GOALS, emptyLocalGoals, type LocalGoals } from "@/lib/local-goals";
 
 import {solutionConversationEnabled} from '@/lib/home-solution-conversation';
 import {datasetDecisionKey,type Json} from '@/lib/local-decisions';
-import {decisionStore,useDecisionStorage} from "@/components/decision-store";
+import {decisionStore,useDecisionStorage,consumeFirstHomeVisit} from "@/components/decision-store";
 import {ExplorationDraftStore} from '@/lib/exploration-draft';
 
 type GoalChat = { messages: ChatMessage[]; input: string; problem: HomeDecisionContext | null; questionUnanswered: boolean; resetMarks?:Record<string,number>; recoveredPlanSelectionRequired?:boolean };
@@ -74,7 +73,7 @@ export function useProblemConversation(scope = "home") {
   useEffect(() => {
     // Capture before initialization creates demo records; existing empty or
     // unreadable records are still existing use. Preserve this across StrictMode.
-    if(firstVisitSnapshot.current===null)firstVisitSnapshot.current=isFirstHomeVisit({getItem:key=>localStorage.getItem(key)},{getItem:key=>sessionStorage.getItem(key)});
+    if(firstVisitSnapshot.current===null)firstVisitSnapshot.current=consumeFirstHomeVisit();
     setFirstHomeVisit(firstVisitSnapshot.current);
     // Restore browser-owned state after hydration; never write defaults over unread storage.
     let saved=decisionStore.initialize({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value),removeItem:key=>localStorage.removeItem(key)},createHomeDemoGoals,{getItem:key=>sessionStorage.getItem(key),setItem:(key,value)=>sessionStorage.setItem(key,value),removeItem:key=>sessionStorage.removeItem(key)}).goals;

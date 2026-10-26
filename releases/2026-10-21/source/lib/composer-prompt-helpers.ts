@@ -1,7 +1,7 @@
 export const composerPromptHelpers = [
- {id:'need',label:'I need FTE to fill a capacity gap',text:'Help me estimate the FTE needed and compare options. I can leave unknown details blank.\nDescription: \nFTE needed: \nBudget (optional): \nRole: \nBusiness unit: \nLevel: \nLocation: \nNeeded by: '},
- {id:'compare',label:'Compare…',text:'Compare staffing options for [role].'},
- {id:'what-if',label:'What if…',text:'What if we change staffing for [role]?'}
+ {id:'need',label:'Help me estimate the FTE needed to close a capacity gap.',text:'Help me estimate the FTE needed and compare options. I can leave unknown details blank.\nDescription: \nFTE needed: \nBudget (optional): \nRole: \nBusiness unit: \nLevel: \nLocation: \nNeeded by: '},
+ {id:'compare',label:'Compare staffing options for a role.',text:'Compare staffing options for [role].'},
+ {id:'what-if',label:'What if we change staffing for a role?',text:'What if we change staffing for [role]?'}
 ] as const;
 
 /** Append without replacing any draft bytes or implicitly sending a question. */
