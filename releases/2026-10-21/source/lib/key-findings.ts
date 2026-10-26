@@ -9,8 +9,8 @@ function result(scope: string, items: (string | null)[]): Findings {
   const valid = items.filter((v): v is string => v !== null);
   return {scope, items: valid.length ? valid.slice(0, 3) : ['No verified values are available for this summary. Missing values are not zero.']};
 }
-export const snapshotFindings = (d: OverviewData, scope: string) => result(`${scope.replace(/\bDemo (?=BU-|level |[A-Z]{2}\b)/gi, "")} · ${d.snapshot_date}`, [
-  fact(d.headcount, v => `${n(v)} people are recorded in this selection${numeric(d.fte) ? `, representing ${n(d.fte)} FTE` : ''}.`),
+export const snapshotFindings = (d: OverviewData, scope: string, compact = false) => result(`${scope.replace(/\bDemo (?=BU-|level |[A-Z]{2}\b)/gi, "")} · ${d.snapshot_date}`, [
+  fact(d.headcount, v => compact ? `${n(v)} people${numeric(d.fte) ? ` · ${n(d.fte)} FTE` : ''}` : `${n(v)} people are recorded in this selection${numeric(d.fte) ? `, representing ${n(d.fte)} FTE` : ''}.`),
   fact(d.open_positions, v => `${n(v)} open positions.`),
   fact(d.voluntary_turnover_ytd_pct, v => `Voluntary turnover: ${n(v)}% YTD.`),
 ]);

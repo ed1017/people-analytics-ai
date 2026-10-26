@@ -2,12 +2,11 @@
 import decision from './decision-style.module.css';
 import {useChartPointerTooltip} from './chart-pointer-tooltip';
 import {HomeRiskSummary} from './home-risk-summary';
-import {KeyFindings} from './key-findings';
 import {snapshotFindings} from '@/lib/key-findings';
 
 import {HomeWorkforceFlows} from './home-workforce-flows';
 import type {WorkforceFlow} from '@/lib/home-workforce-flows';
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import type { HomeOverviewSummaryProps } from './home-overview-summary';
 import type {HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import type { AppPage, HeadcountTrendPoint } from '@/lib/types';
@@ -66,6 +65,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
 
 export type HomeSnapshotProps = Pick<HomeChatWelcomeProps, 'overview'|'receipt'|'requested'|'scopeLabel'|'loading'|'error'|'trend'>;
 export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string}) {
+  const scopeId = useId();
   const {point:tooltipPoint,tooltip}=useChartPointerTooltip(JSON.stringify([requested,receipt,loading,error,overview?.snapshot_date,overview?.headcount,trend,projection,projectionStatus]));
   const verified = isVerifiedDashboardScope(receipt) && (['country', 'org', 'level'] as const).every(key => receipt?.effective?.[key] === requested[key]);
   const snapshotDate = overview?.snapshot_date ?? '';
@@ -93,13 +93,15 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:12+85*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:chartY(point.headcount)})) : [];
   const dateMarks = [...new Set([first?.snapshot_date,history.length>2?history[Math.floor((history.length-1)/2)].snapshot_date:undefined,horizonEnd])].filter((date):date is string=>!!date);
   return <section aria-label="Workforce snapshot" className={`${decision.surface} ${styles.historySummary}`}>
-      <div className={`${decision.hero} ${styles.historyHeading}`}>
-        <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
-      </div>
+      <section aria-label="Key findings" aria-describedby={scopeId} className={`${decision.hero} ${styles.findingsBanner}`}>
+        <h3>Key findings</h3>
+        {current ? <ul>{snapshotFindings(current, scopeLabel, true).items.map(item=><li key={item}>{item}</li>)}</ul> : <p role="status">{loading ? 'Updating findings…' : 'Verified findings unavailable.'}</p>}
+      </section>
 
       {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
-      <p className={styles.scope}>{scopeLabel} · Recorded workforce history</p>
+      <p id={scopeId} className={styles.scope}>{scopeLabel}{current ? ` · As of ${snapshotDate}` : ''} · Recorded workforce history</p>
       <div className={styles.snapshotGrid}><div className={styles.snapshotCharts}>
+        <p className={styles.chartHeadcount}>Current headcount <strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong>{known(headcount) ? ' people' : ''}</p>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
         <svg role="group" aria-label={'Recorded synthetic headcount history in people. ' + axisLabel + ' ' + periodContext + ' ' + scopeLabel + '. ' + history.map(point => point.snapshot_date + ': ' + point.headcount).join('; ') + '. Missing months are not connected. ' + (checked ? 'Conditional projection: '+projected.map(point=>point.month+': '+format(point.headcount)).join('; ') : 'No projection.')}>
           <line x1="12%" y1="96" x2="97%" y2="96" className={styles.chartAxis}/>
@@ -124,7 +126,6 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average open requisition age scope and definition">ⓘ</summary><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></details></li>
         <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting offers scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></details></li>
       </ul></div>
-      <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         <p>{axisLabel} Recorded charts share the snapshot year; conditional projections are separately labeled.</p>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}

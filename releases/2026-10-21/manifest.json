@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "de3e6cf227f891d7cce598cb8ce093aabae47927",
+  "sourceCommit": "13db9ad6ff6822639952bf2b014f7a53a4d7f49e",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "a59d35c507057fddbaf0d38460d11e379e12f82d00b9af34e78088e7be59d5c7",
-      "bytes": 22915
+      "sha256": "f8b5eed3362b36f9f735757474754c616faf525f6c05b8aca6950c594fbe0082",
+      "bytes": 23457
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "175e16b4252c0c8a3adf851dc295b419c7057b41b3373556341ac6fbe34e6bbe",
-      "bytes": 18979
+      "sha256": "97d79e3e7e49e8cf0cd4dddb63cb36fb7bb4646cee1189d58402d57563fa4e80",
+      "bytes": 19205
     },
     {
       "path": "components/home-data-status.tsx",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "44f3593a539a6abb8842c983df32ecd22098f314a48b21a590dee0d68a2f5a7a",
-      "bytes": 8060
+      "sha256": "102cf05cb8d5b4b318b8bf4e8a93dc5bb1903de9ae0532cfe427145368f219e8",
+      "bytes": 8152
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "ddbf70006aea45860a275a442527e510c78c767c61e7d654fe2a785afde436b0",
-      "bytes": 5338
+      "sha256": "b3e8d3ed0b199ad0819e09a6c23af8065e5aadc2a44f985280236500e627bd81",
+      "bytes": 5904
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "234f40091931d88172cf0f8c9d7614b0f874eae4c81bee0a9280ca0cad29e615",
-      "bytes": 14183
+      "sha256": "48d77c6501f7d091f1eed53358ea2c301c570efe0394ca90ef856a0dd5afe9f9",
+      "bytes": 15193
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",

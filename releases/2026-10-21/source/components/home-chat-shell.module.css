@@ -324,3 +324,11 @@
  .shell :global(.home-workspace[data-overview-starting]) :global(.home-composer-dock), .shell :global(.home-workspace:not([data-overview-starting])) :global(.home-composer-dock) { grid-template-columns:minmax(0,1fr); }
  .shell :global(.home-workspace) :global(.home-compose-actions) { grid-column:1; justify-self:end; }
 }
+
+/* Overview findings reuse the scoped summary; headcount remains attached to its chart. */
+.findingsBanner { padding: 14px 18px; }
+.welcome .findingsBanner h3, .findingsBanner h3 { margin: 0 0 6px; font-size: 16px; font-weight: 700; }
+.findingsBanner ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 15px; line-height: 1.4; }
+.findingsBanner li { overflow-wrap: anywhere; }
+.chartHeadcount { margin: 0 0 4px; font-size: 14px; line-height: 1.5; }
+.chartHeadcount strong { font-size: 20px; font-weight: 700; }

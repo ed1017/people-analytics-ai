@@ -60,3 +60,10 @@ test('concise skills findings preserve company scope and unknown evidence withou
  assert.deepEqual(missing.items,['No verified values are available for this summary. Missing values are not zero.']);
  assert.doesNotMatch(a.items.join(' '),/ready to move|employees ready/);
 });
+
+test('compact snapshot findings preserve actual values, zero, missing data and YTD',()=>{
+ const d={snapshot_date:'2026-09-30',headcount:12,fte:10.5,open_positions:0,voluntary_turnover_ytd_pct:0};
+ assert.deepEqual(findings.snapshotFindings(d,'Selected scope',true).items,['12 people · 10.5 FTE','0 open positions.','Voluntary turnover: 0% YTD.']);
+ const r=findings.snapshotFindings({...d,headcount:null,fte:null,open_positions:null,voluntary_turnover_ytd_pct:null},'Scope',true);
+ assert.doesNotMatch(r.items.join(' '),/0 people|0 FTE|0 open positions|0%/);
+});
