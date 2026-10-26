@@ -112,6 +112,13 @@ async function ask(sources: ReturnType<typeof buildHomePack>, persona: Persona, 
   return { clarification:readHomeClarification(data.clarification??proposal?.question), findingFollowups:readHomeFindingFollowups(data.findingFollowups,data.answer,sources), answer: data.answer, chooseGoal: !proposal&&data.nextStep === "choose_goal", proposal, diagnostic, diagnosticStage:useServer?'server' as const:'client' as const };
 }
 
+/** Visitor-facing wording only; the evidence pack retains its full source instructions. */
+export function homeEvidenceDisplayLimitation(source:{id:string;limitation:string}) {
+ if(source.id==='T5')return 'Recorded succession plans; suppressed values remain unavailable.';
+ if(source.id==='R1'&&source.limitation.includes('unsuccessful applications are absent'))return 'Conversion unavailable: unsuccessful applications are missing.';
+ return source.limitation;
+}
+
 type WelcomeControls = {onNavigate:(page:AppPage)=>void; onQuestion: (question: string) => void; disabled: boolean; recruitingKpi:HomeRecruitingKpi|null;recruitingPending:boolean;flows:WorkforceFlow[]|null;composer?:ReactNode;templates?:ReactNode;plannerVisual?:ReactNode};
 function WelcomeSlot({render, ...controls}: WelcomeControls & {render: (controls: WelcomeControls) => ReactNode}) { return render(controls); }
 
@@ -722,12 +729,12 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
         <section aria-label="Conversation history" className="my-4"><h3 className="font-semibold">Conversation history</h3><p className="mt-1 text-xs text-muted-foreground">Reference only. Current findings use current evidence and saved goal context.</p>{conversation.historyMessages.length?<ConversationMessages assistantBasis={solutionConversationEnabled?'Discussion · interpretations and hypotheses. Checked quantities appear in the result cards.':undefined} compactAssistant messages={conversation.historyMessages} onNavigate={page=>{document.getElementById("home-data-details")?.hidePopover();onNavigate(page);}}/>:<p className="mt-2 text-sm">No conversation yet.</p>}</section>
       {Boolean(marketReference)&&<p className="mt-2 text-xs">An explicitly carried market reference [M1] is also available for this goal. Its selected geography and source period remain separate from workforce filters.</p>}
       <p role="status" className="text-xs text-muted-foreground" aria-label="Home evidence coverage">{pack.coverage.available} of {pack.coverage.total} source summaries available · detail rows are sampled. Open evidence sources for scope and unavailable data.</p>
-        <p className="mt-3 text-xs">{pack.coverage.selection}</p><p className="mt-2 text-xs">{pack.coverage.unavailable.join(". ")}</p><div className="mt-4 grid gap-4 md:grid-cols-3">
+        <p className="mt-2 text-xs">{pack.coverage.unavailable.join(". ")}</p><div className="mt-4 grid gap-4 md:grid-cols-3">
           {sources?.map(source => <article key={source.id} id={`overview-source-${source.id}`} className="min-w-0 text-sm">
             <h4 className="font-semibold">[{source.id}] {source.label}</h4>
             <p className="mt-2">{source.facts ? source.population : "Source unavailable."}</p>
             <p className="mt-1 text-muted-foreground">As of: {source.date || "not supplied"}. {source.scope}.</p>
-            <p className="mt-2 text-muted-foreground">{source.id==='T5'?'Recorded succession plans; suppressed values remain unavailable.':source.limitation}</p><p className="mt-2 text-xs">{source.status}; {source.coverage.rowsIncluded} of {source.coverage.rowsAvailable ?? "unknown"} detail rows. {source.coverage.selection}</p>
+            <p className="mt-2 text-muted-foreground">{homeEvidenceDisplayLimitation(source)}</p><p className="mt-2 text-xs">{source.status}; {source.coverage.rowsIncluded} of {source.coverage.rowsAvailable ?? "unknown"} detail rows.</p>
             {source.id === "T3" ? <p className="mt-3 text-xs">Aggregate evidence retained; standalone page retired.</p> : <button type="button" onClick={() => onNavigate(source.page as AppPage)} className="mt-3 rounded-sm font-semibold text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Open {source.label}</button>}
           </article>)}
         </div>

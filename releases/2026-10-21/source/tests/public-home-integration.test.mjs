@@ -183,3 +183,29 @@ test('company introduction stays in left welcome slot and uses the full company 
   const fallback=missing.match(/<section aria-label="Company introduction"[^>]*>([\s\S]*?)<\/section>/)[1];assert.match(fallback,/Explore workforce evidence/);assert.doesNotMatch(fallback,/9,037|10 countries|Ed Inc/);
  }
 });
+
+test('projection presentation distinguishes unselected, checking, unavailable and checked values',async()=>{
+ const filters={country:'all',org:'all',level:'all'},d=await read(filters);
+ const view=(extra={})=>renderToStaticMarkup(React.createElement(exports.HomeHeadcountSummary,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested:filters,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,...extra}));
+ const idle=view();assert.match(idle,/No projection selected/);assert.match(idle,/Set monthly hiring and departure assumptions in Scenarios/);assert.doesNotMatch(idle,/Projection not configured|AI configuration/);
+ assert.match(view({projectionStatus:'checking'}),/Checking projection/);
+ assert.match(view({projectionStatus:'unavailable'}),/Selected projection unavailable\. Review it and choose Show on Home again/);
+ const projection={checkedAt:'2026-10-26T00:00:00Z',provenance:'approved-public-projection-read',analysis:{id:'test',revision:1,inputs:{asOf:d.overview.snapshot_date,opening:d.overview.headcount,filters},assumptions:{monthly_hires:5,monthly_exits:3},points:[{month:'2026-10-31',headcount:d.overview.headcount+2,hires:5,exits:3,transfersIn:0,transfersOut:0}],interpretations:[],limitations:[]}};
+ const ready=view({projection,projectionStatus:'ready'});assert.match(ready,/Conditional projection/);assert.doesNotMatch(ready,/No projection selected|Projection unavailable/);assert.match(ready,/monthly hires/);
+ assert.doesNotMatch(view({projection:{...projection,analysis:{...projection.analysis,inputs:{...projection.analysis.inputs,opening:0}}},projectionStatus:'unavailable'}),/Dashed: conditional projection/);
+});
+
+test('Data details remove selection-algorithm prose while keeping source counts and source semantics',()=>{
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8'),ast=ts.createSourceFile('overview.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const fn=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='homeEvidenceDisplayLimitation');assert.ok(fn);
+ const js=ts.transpileModule(fn.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,isolated={};vm.runInNewContext(js,{exports:isolated});
+ const display=isolated.homeEvidenceDisplayLimitation;
+ const cohort={id:'R1',limitation:'Successful-hire records only; unsuccessful applications are absent; do not derive funnel conversion.'},before=JSON.stringify(cohort);
+ assert.equal(display(cohort),'Conversion unavailable: unsuccessful applications are missing.');assert.equal(JSON.stringify(cohort),before);
+ assert.equal(display({id:'R1',limitation:'Full recruiting funnel for this period.'}),'Full recruiting funnel for this period.');
+ assert.equal(display({id:'T5',limitation:'Never derive suppressed complements.'}),'Recorded succession plans; suppressed values remain unavailable.');
+ assert.equal(display({id:'A1',limitation:'Voluntary exits; not all exits.'}),'Voluntary exits; not all exits.');
+ const details=source.slice(source.indexOf('<div id="home-data-details"'),source.indexOf('\n      </div>',source.indexOf('<div id="home-data-details"')));
+ assert.doesNotMatch(details,/pack\.coverage\.selection|source\.coverage\.selection/);assert.match(details,/pack\.coverage\.available/);assert.match(details,/source\.coverage\.rowsIncluded/);assert.match(details,/source\.coverage\.rowsAvailable/);assert.match(details,/Source unavailable\./);
+ const internal=fs.readFileSync(new URL('../lib/home-pack.mjs',import.meta.url),'utf8');assert.match(internal,/Explicit goal-word matches first/);assert.match(internal,/Never derive suppressed complements/);
+});

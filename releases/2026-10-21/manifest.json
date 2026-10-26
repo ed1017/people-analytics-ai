@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "8518d4491daf1d88f3367db88bb1ec6efa1a3c18",
-  "deployment": "https://people-analytics-mmos4pvuf-ed-56dc.vercel.app",
+  "sourceCommit": "2922eb96944d61aa58f4fada4ea95c651a11b2ad",
+  "deployment": "https://people-analytics-l1z5p7wjx-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "9914ecf9909e191fa704d0b5ceae99b4cc551b770659eff13827318d9bdc9087",
-      "bytes": 19425
+      "sha256": "291c7480f7dd005576c137782b674f6e1ba2fbe538d6a08beef6fd795168c706",
+      "bytes": 19419
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "408c4dfbc10d8e4e79f33bb9b1a82d4d05f869f6dcce5f229dbc730052437abe",
-      "bytes": 104769
+      "sha256": "e6d67732afd078982301e45e4fd3bcde5062ee4739941055dfcacc70d2d3da95",
+      "bytes": 105085
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "7091571fa63462f82bc69064a0a0e3c3c97ffaeb68b1ec5ef35662782c9e10b1",
-      "bytes": 10406
+      "sha256": "1d35959ab68607d65223672812c91e3353d89e6dbf4915cb5a122a963f17a440",
+      "bytes": 10537
     },
     {
       "path": "components/site-footer.tsx",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "55dd45128fb62bffa060bdb1a41e9b8a478a56cf2368ac145c37d5860fa782d6",
-      "bytes": 16757
+      "sha256": "878cb84abd18ad0246df2a464cd58575aeba4a4ebdfc8a619b479b5ddfee64c2",
+      "bytes": 20513
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4466,6 +4466,16 @@
       "path": "tests/scenario-route-aliases.test.mjs",
       "bytes": 3996,
       "sha256": "08fea8c432397cdb34870b9e37bbc93e3cd7fa95c4fef14083731b6c37f47456"
+    },
+    {
+      "path": "components/staffing-priority-summary.tsx",
+      "bytes": 2164,
+      "sha256": "06ce274b5b74f4e46e579e7d42c574fcfd05ed089d8aac7b6fbd1000a2bbb7c0"
+    },
+    {
+      "path": "tests/staffing-priority-presentation.test.mjs",
+      "bytes": 6058,
+      "sha256": "81de38cb614e32537b1eb41982956e0af8057b6c7cd711a1cc839e49354c56ae"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
