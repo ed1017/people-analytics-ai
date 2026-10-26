@@ -14,23 +14,23 @@ The delivered scope is a synthetic People Analytics and Workforce Planning portf
 | Honest presentation | Synthetic-data and assumption boundaries are explicit. Ed defined the problem, requirements and acceptance criteria; AI assisted implementation, design and testing. No realized savings, adoption or predictive-performance claim is made. |
 | Reproducible public source | The versioned source has a dependency-free hash verifier. A clean-checkout public fixture replay builds and serves the UI without private inputs or credentials, with bounded recorded GET receipts. It does not reproduce live AI, narrowed filters or private calculations. |
 
-Detailed validation and release identities are in the [versioned release notes](../releases/2026-10-21/README.md) and [reproduction instructions](../releases/2026-10-21/reproduction/README.md). The [October 17 roadmap](roadmap-status-2026-10-17.md) is historical; later release evidence supersedes its availability statements.
+Detailed validation and release identities are in the [versioned release notes](../releases/2026-10-21/README.md) and [reproduction instructions](../releases/2026-10-21/reproduction/README.md). The [active roadmap](roadmap-status-2026-10-17.md) and [PR413 verification record](release-verification-pr413.md) supersede current-state claims in this dated checklist; original acceptance context is retained.
 
 ## Production versus source-only handoff tooling
 
-The latest verified production mapping is local release source `100943ea83ccc8394586cc5c41acc97197569c56`, deployment `dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN`. Root repository code and the versioned deployed snapshot are distinct.
+The historical October 21 production mapping was local release source `100943ea83ccc8394586cc5c41acc97197569c56`, deployment `dpl_7AUakS8L8wvBo66H6uqNe4fKUrkN`. Root repository code and the versioned deployed snapshot are distinct.
 
 PRs #321–324 added accounting-only fresh-database bootstrap, invented-company mapping/provider binding, partial Home contracts and local company/snapshot workspace recovery. These are tested synthetic handoff capabilities, not a production rollout of company switching or authentication. They do not need deployment to satisfy the public synthetic MVP. See [bootstrap boundaries](fresh-company-bootstrap.md), [company Home integration](company-home-integration.md) and [workspace transitions](company-workspace-transitions.md).
 
 ## Operational dependency
 
-Live AI remains subject to the cumulative $20 cap and coordinated app pricing, rollout, database admission and settlement windows. The recorded expiry is October 22, 2026 at 09:59 UTC; admission stops at 09:57:30 UTC. Renewal must preserve spend, reservations, uncertain holds and permissions. A point-in-time release receipt does not guarantee perpetual availability.
+At this historical checkpoint the cap was $20 and expiry October 22 at 09:59 UTC, with admission stopping at 09:57:30 UTC. These settings are superseded: the last recorded configured cap is $50 and PR403 expiry October 26 at 15:05 UTC, earliest configuration cutoff 15:03 UTC. This records maintenance history; it is not a fresh readiness check, renewal or paid-test authorization. Renewal must preserve spend, reservations, uncertain holds and permissions. A point-in-time release receipt does not guarantee perpetual availability.
 
 ## Optional extensions, not public MVP blockers
 
 - Actual company ingestion requires an authorized source, inclusion/date rules and independent controls. No private-company readiness is established by synthetic fixtures.
 - Hosted tenants, access isolation, company-specific domain contracts and enterprise persistence need separate implementation and authorization.
-- Saved/versioned six-month headcount what-if persistence remains a design proposal, not an implemented feature or an approved implementation requirement.
+- Historical persistence proposal: subsequently implemented for supported headcount revisions, including workload assumptions and explicit recovery/save/reopen coverage through PR409/413. This remains browser-local storage.
 - Predictive evaluation, defensible payroll forecasts and broader causal or operational recommendations require additional evidence and scoped acceptance criteria.
 
 Do not treat these extensions as missing original portfolio acceptance, or start them merely because a source-only milestone has merged. Remaining work should address a reproduced defect, an existing operational dependency or a separately agreed extension.

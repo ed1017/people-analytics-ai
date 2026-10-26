@@ -1,6 +1,8 @@
 # Versioned application source
 
-This directory contains the reviewed production source through the October 23 date-only pricing renewal; the coherent fictional geography revision is retained.
+Current status: [active roadmap](../../docs/roadmap-status-2026-10-17.md) and [PR413 verification](../../docs/release-verification-pr413.md). Dated release identities and acceptance below are historical; the current source file set is pinned by `manifest.json`.
+
+The following historical checkpoint records the October 23 date-only pricing renewal and coherent fictional geography revision.
 
 - Runtime: `044f26e854d8cad6407b4c683f1c762858f7ebb8`.
 - Deployment: `dpl_A3AqcMu2rdJ9KXBJH53vCzCCxNRL`; public alias verified.
