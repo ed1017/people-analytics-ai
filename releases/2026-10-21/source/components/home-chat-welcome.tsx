@@ -14,7 +14,6 @@ import type { AppPage, HeadcountTrendPoint } from '@/lib/types';
 import { isVerifiedDashboardScope } from '@/lib/dashboard-scope';
 import type {CheckedHomeProjection} from '@/lib/home-projection-selection';
 import styles from './home-chat-shell.module.css';
-import {swpDemoPrompt} from '@/lib/swp-demo';
 import {HomeConversationSplit,HomeSplitProvider} from './home-answer-visuals';
 import {HomePromptCategories} from './home-prompt-categories';
 
@@ -113,7 +112,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         </svg>
         <figcaption><span>{periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
-      {tooltip}{current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>
+      {tooltip}
+      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
+      {current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting hires scope and definition">ⓘ</summary><small>Company-wide · monthly</small></details></li>
         <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="Voluntary turnover YTD scope and definition">ⓘ</summary><small>Source-reported · not annualized</small></details></li>
@@ -123,7 +124,6 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average open requisition age scope and definition">ⓘ</summary><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></details></li>
         <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting offers scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></details></li>
       </ul></div>
-      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
       <KeyFindings findings={current ? snapshotFindings(current, scopeLabel) : null} />
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"Projection not configured"}</summary>
         <p>{axisLabel} Recorded charts share the snapshot year; conditional projections are separately labeled.</p>
@@ -144,13 +144,8 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
 export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
-    <h2>Plan the workforce your business needs</h2>
-    <p className={styles.subtitle}>Try the worked example, or use a template below for your own staffing plan.</p>
-    <div className={styles.entryActions}><button type="button" aria-haspopup="dialog" disabled={disabled} onClick={()=>onQuestion(swpDemoPrompt)}>Try a planning scenario</button><a href="?page=workforce">Explore the full app</a></div>
-    <p className={styles.demoNote}>Worked example: adjust staffing, compare options, then save.</p>
     <h3>What decision are you facing?</h3>
-    <HomePromptCategories onQuestion={onQuestion} disabled={disabled}/>
-    {templates}
+    <HomePromptCategories onQuestion={onQuestion} disabled={disabled} templates={templates}/>
     {composer && <div className={styles.composer}>{composer}</div>}
     </HomeConversationSplit>
   </section>;

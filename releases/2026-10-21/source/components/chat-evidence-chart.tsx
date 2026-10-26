@@ -24,7 +24,7 @@ export function ChatEvidenceChart({series}:{series:ChatEvidenceSeries}){
   <figcaption className="font-semibold">{series.title}</figcaption>
   <p>{scope} · as of {series.asOf}</p>
   <div role="region" aria-label="Complete business-unit comparison table" tabIndex={0} className="overflow-x-auto focus-visible:ring-2 focus-visible:ring-ring"><table className="w-full min-w-[28rem] whitespace-nowrap text-sm"><thead><tr><th scope="col" className="text-left">Business unit</th><th scope="col">Favorable</th><th scope="col">Average score (1–5)</th><th scope="col">Respondents</th></tr></thead><tbody>{series.comparison.map(row=><tr key={row.org_code}><th scope="row" className="p-2 text-left font-medium">{catalogDisplayLabel(row.org_name)}</th><td className="min-w-28 p-2"><span>{row.favorable_pct.toFixed(1)}%</span><div aria-hidden="true" className="h-2 w-full bg-muted"><div className="h-2 bg-primary" style={{width:row.favorable_pct+'%'}}/></div></td><td className="p-2 text-center">{row.avg_score.toFixed(2)}</td><td className="p-2 text-center">{row.respondents.toLocaleString('en-US')}</td></tr>)}</tbody></table></div>
-  <p>{series.comparison.length} business units · {series.respondents?.toLocaleString('en-US')} respondents · {series.synthetic?'synthetic ':''}recorded results</p>
+  <p>{series.comparison.length} business units · {series.respondents?.toLocaleString('en-US')} respondents · recorded results</p>
   <AssumptionsDisclosure><p>[{series.sourceId}] {series.limitation}</p><p>Bars use a common 0–100% scale. Favorability and average score are different measures.</p></AssumptionsDisclosure>
  </figure>;
  const max=Math.max(1,...series.points.map(point=>point.value));

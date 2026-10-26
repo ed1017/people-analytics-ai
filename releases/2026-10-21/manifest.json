@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "df84a97a65d202104a3073f2ba809168b772aae1",
+  "sourceCommit": "1e69f6bbbdb03626c881258b5b06fcc89a773e00",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -249,8 +249,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "dac1750521b3ae4b0e8a6d71eb25a7fbca2ad4b63953eb161ee29a02bd80eec0",
-      "bytes": 53924
+      "sha256": "c5a1302570992420933e18ee119e1a16598a8915ce7ea3495931531854641a28",
+      "bytes": 53952
     },
     {
       "path": "app/layout.tsx",
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "688ee74b49cda522f5b596933fe6f6ca14d3c7c2b1e96bf36f8dc98b405c3f86",
-      "bytes": 8286
+      "sha256": "35dc046d6676b757a717ea7a8fe538bc3a3a5ebfe04596a0bf8578d37f4e7f61",
+      "bytes": 8220
     },
     {
       "path": "components/chat-content.tsx",
@@ -354,8 +354,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "1d2a66111a0c0f5f17a94d950c3b66da9ff1e5c414fbf43ab7126de1cfed5571",
-      "bytes": 6219
+      "sha256": "09a5530dd70bf537589a95eee788a7b3aa2fa07564cad3507f23567b67f0a2da",
+      "bytes": 6185
     },
     {
       "path": "components/compact-chart.tsx",
@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "3a3f93fe8709674f66d8a8bd45323dd2e61ed1e2c0d53ff41a9ec0b806294594",
-      "bytes": 22740
+      "sha256": "011344dc2015d617c6ed89cfef9f9dd39880164d46ff4fe8cb7647716683a44c",
+      "bytes": 22908
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "f5d42c1670170167b6e867f3b1e6cfcb902e86ace97d20c4369ebdccf6cad698",
-      "bytes": 19514
+      "sha256": "86d356955e0ccce1ee51056605c96812bfb2d6872a5662df7c3815e4509c4625",
+      "bytes": 18979
     },
     {
       "path": "components/home-data-status.tsx",
@@ -689,8 +689,8 @@
     },
     {
       "path": "components/home-workforce-flows.tsx",
-      "sha256": "180cd12010fef0e6b430b6c0d58004825c0fe6e266a2de6d6ac72176e8b17a1b",
-      "bytes": 4136
+      "sha256": "8bdf9676e69eccfb04fd5d63c6fb5dbdd114dd2d2daefb80b225cddc6f92e53a",
+      "bytes": 4116
     },
     {
       "path": "components/key-findings.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "b6e5ada5d3e78e10e104f200e6d6ec8d6af0a1da330611624e4558f3536428a4",
-      "bytes": 104417
+      "sha256": "0f56869df25425f99cd88c1b46219d10f8f79c06d78cc8fc0d6eb7748f6238b9",
+      "bytes": 104800
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -1169,8 +1169,8 @@
     },
     {
       "path": "components/workforce-planning/company-headcount-what-if.tsx",
-      "sha256": "e865b0764bf9e3bc3f8bd907d01d748ba916feeaf61fe8ab01d45581ca68d335",
-      "bytes": 4661
+      "sha256": "0731ccfb6a83cfd93dfe1ac70f5cb7d433674bb73a83341ab2e8ae7acdb2ca8a",
+      "bytes": 4651
     },
     {
       "path": "components/workforce-planning/constraint-aware-schedule-summary.tsx",
@@ -3804,8 +3804,8 @@
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "7a9ee49b610aa2e441fd6278ae2290088fd3476dda9e7befffc302395f199717",
-      "bytes": 7391
+      "sha256": "dc511391d20ac77f08a75fbd0f6e2265aa4664337a97dc081e6f35c447a3f2a9",
+      "bytes": 7407
     },
     {
       "path": "tests/context-findings.test.mjs",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "8334cef20145eadec525852115758fb5dad9c612c9de6b3f88fc5aff928cba4b",
-      "bytes": 14197
+      "sha256": "234f40091931d88172cf0f8c9d7614b0f874eae4c81bee0a9280ca0cad29e615",
+      "bytes": 14183
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4099,8 +4099,8 @@
     },
     {
       "path": "components/home-prompt-categories.tsx",
-      "sha256": "0e6a5bdfc0c5093db94ece644e0af00448c33ffb1b6afa403c2d27d9ce129a7b",
-      "bytes": 1608
+      "sha256": "0c75a9ae8abfbb6019b358411051376ee0a36cce7c07a06cae61586375a97e37",
+      "bytes": 1693
     },
     {
       "path": "lib/home-prompt-categories.ts",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "44e0d58d06e3e02d59bced81f344522001c7d0aa55f261fb71749e868e2c7530",
-      "bytes": 5465
+      "sha256": "7c53f5e2452108ddcaaf2582f0d55b8d93261f2c9d2c666b4b9ef063e1982246",
+      "bytes": 5523
     },
     {
       "path": "lib/dashboard-risk-summary.ts",

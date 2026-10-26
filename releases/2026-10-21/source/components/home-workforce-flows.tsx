@@ -13,7 +13,7 @@ export function HomeWorkforceFlows({rows:sourceRows,asOf}:{rows:WorkforceFlow[]|
  const label=(m:string)=>new Date(m+'-01T00:00:00Z').toLocaleDateString('en-US',{month:'short',year:'numeric',timeZone:'UTC'});
  return <figure aria-label="Monthly hires and separations" className="mt-4 min-w-0 space-y-2 border-t pt-3 text-sm">
   <h3 className="font-semibold">Monthly hires and separations</h3>
-  <p className="text-xs text-muted-foreground">Company-wide synthetic workforce · {label(rows[0].month)}–{label(rows.at(-1)!.month)} · people per month</p>
+  <p className="text-xs text-muted-foreground">Company-wide · {label(rows[0].month)}–{label(rows.at(-1)!.month)} · people per month</p>
   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs"><span><span aria-hidden="true" style={{color:'var(--chart-1)'}}>━━</span> Hires: external starts (derived)</span><span><span aria-hidden="true" style={{color:'var(--chart-4)'}}>┄┄</span> Separations: all exits</span></div>
   <svg role="group" aria-label="Monthly external starts and total separations, counts. Focus points or use the exact values table; missing months are not connected." width="100%" height="174">
    {[0,top/2,top].map(t=><g key={t}><line x1="12%" x2="97%" y1={y(t)} y2={y(t)} stroke="currentColor" opacity=".15"/><text x="10%" y={y(t)+4} textAnchor="end" fill="currentColor" fontSize="11">{t}</text></g>)}

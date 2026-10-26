@@ -32,11 +32,11 @@ test('public Home consumes 9037 snapshot and nine current-year history points af
  assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);assert.equal((html.match(/<circle/g)??[]).length,18);assert.doesNotMatch(html,/Verified headcount history unavailable|Verified snapshot needed/);
  assert.doesNotMatch(render(d,filters,true),/9,037/);assert.equal(Object.hasOwn(d.workforce_filter_scope,'artifactDigest'),false);
 });
-test('restored landing shows workforce evidence and one demo opener, never the five-FTE example inline',async()=>{
+test('compact landing shows workforce evidence without a duplicate scenario opener or inline example',async()=>{
  const requested={country:'all',org:'all',level:'all'},d=await read(requested);
  const html=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,onQuestion:()=>{}}));
- assert.match(html,/Plan the workforce your business needs/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);
- assert.equal((html.match(/Try a planning scenario/g)??[]).length,1);assert.match(html,/aria-haspopup="dialog"/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE capacity gap|\$325,000|Choose a staffing option|Develop and move your team/);
+ assert.doesNotMatch(html,/Plan the workforce your business needs|Try the worked example|Explore the full app|Worked example: adjust staffing/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);
+ assert.doesNotMatch(html,/Try a planning scenario/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE capacity gap|\$325,000|Choose a staffing option|Develop and move your team/);
 });
 test('public filtered Home keeps exact requested/effective scope; malformed and stale receipts stay unavailable',async()=>{
  const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/9 recorded monthly snapshots/);
@@ -49,15 +49,15 @@ test('public filtered Home keeps exact requested/effective scope; malformed and 
  const privateReceipt={...d.workforce_filter_scope,version:2,status:'verified_aggregate',artifactDigest:'a'.repeat(64)};for(const key of ['datasetToken','contract','cutoff'])delete privateReceipt[key];assert.ok(scope.readDashboardScopeReceipt(privateReceipt));delete privateReceipt.artifactDigest;assert.equal(scope.readDashboardScopeReceipt(privateReceipt),null);
 });
 
-test('Home questions submit their visible wording and the separate scenario CTA keeps its popup prompt',()=>{
+test('Home questions retain their normal handler after the scenario action moves to the header',()=>{
  const navigation=[],questions=[];
  const tree=exports.HomeChatWelcome({requested:{country:'all',org:'all',level:'all'},scopeLabel:'Global workforce',loading:true,onNavigate:page=>navigation.push(page),onQuestion:question=>questions.push(question)});
  const buttons=[],categories=[];
  function visit(node){if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(visit);return;}if(node.type==='button')buttons.push(node);if(node.type?.name==='HomePromptCategories')categories.push(node);visit(node.props?.children);}
  visit(tree);
- assert.equal(buttons.length,1);assert.equal(categories.length,1);categories[0].props.onQuestion('A normal category question');
+ assert.equal(buttons.length,0);assert.equal(categories.length,1);categories[0].props.onQuestion('A normal category question');
  buttons.forEach(button=>button.props.onClick());
- assert.deepEqual(questions,['A normal category question','Start the workforce demo']);
+ assert.deepEqual(questions,['A normal category question']);
  assert.deepEqual(navigation,[]);
 });
 

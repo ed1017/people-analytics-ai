@@ -876,7 +876,7 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
  main.app-home-composer:has(.home-workspace) .guided-mobile-menu-button { display:block; min-height:44px; padding:8px; border:1px solid var(--border); border-radius:6px; font-size:14px; }
  main.app-home-composer:has(.home-workspace) .guided-header-navigation { flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
  main.app-home-composer:has(.home-workspace) .app-top-header:not([data-mobile-menu-open]) :is(.guided-header-navigation,.guided-header-context),
- main.app-home-composer:has(.home-workspace):has(.app-top-header:not([data-mobile-menu-open])) :is(#guided-workspace-controls) { display:none; }
+ main.app-home-composer:has(.home-workspace):has(.app-top-header:not([data-mobile-menu-open])) :is(#guided-workspace-controls):not([data-compact-actions]) { display:none; }
  main.app-home-composer:has(.home-workspace) .app-top-header[data-mobile-menu-open] { position:relative; }
  .demo-stepper { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
  .demo-stepper li { padding:6px; }
