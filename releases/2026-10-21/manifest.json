@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "fb3ce3de5469cc0a7f32da2a4707ce91216d3e4d",
+  "sourceCommit": "de3e6cf227f891d7cce598cb8ce093aabae47927",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "a2f3e91f1376f19d81a5285a1ddeb58eb87614af0e294f5dacc8c0f66e6e359c",
-      "bytes": 5405
+      "sha256": "1ab1ede7230aae7e7ae1736f1ab4e7ce048bc188da7e613483fc1908812963e6",
+      "bytes": 5409
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
