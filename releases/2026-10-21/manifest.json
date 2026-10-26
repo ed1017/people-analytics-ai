@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "f41f9642bae5a6b0fdbe6d7c2076a10ceb44739c",
+  "sourceCommit": "1142ecda45caf787ec8e39d203e914df2f625236",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -399,8 +399,8 @@
     },
     {
       "path": "components/decision-store.ts",
-      "sha256": "d6598fb4e2ff112babc04b3d97033c4a2a8898c2b0f0ddd4abcecf7b32808415",
-      "bytes": 2200
+      "sha256": "e412c96e9a38d964b824c3d939e53ff722f01763af377229ad3c1a2aef62d9f3",
+      "bytes": 2994
     },
     {
       "path": "components/development-workspace.tsx",
@@ -879,8 +879,8 @@
     },
     {
       "path": "components/problem-conversation.tsx",
-      "sha256": "7a55496e0c5df488d9400d0ee9dbd4cc831335cbaf6a38e922bfb6b1a88c4bf0",
-      "bytes": 29521
+      "sha256": "277c6ea5f3f10f6342b65d757f6b3fbbf2a55bc4fa87d05d31ec214291802641",
+      "bytes": 29377
     },
     {
       "path": "components/project-case-study.tsx",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 5925,
-      "sha256": "ca33620a50ebe5c0b17ca755ef7a878c78c200d7e65960c7cbbb7d5812969978"
+      "bytes": 8285,
+      "sha256": "3e774ec0bb9f7079ecabc08873f0b00b1728c8a6f122be66e2450f080e669207"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

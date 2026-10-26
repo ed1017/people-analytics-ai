@@ -48,3 +48,21 @@ test('orientation is compact and about link preserves current tab; demo entry ca
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.ok(source.includes('onStartDemo={()=>submitStarterQuestion(swpDemoPrompt)}'));
  assert.ok(source.includes("if(message===swpDemoPrompt){setChatError('The planning scenario is not ready."));
 });
+import * as localDecisions from '../lib/local-decisions.ts';
+import * as datasetIdentity from '../lib/dataset-identity.mjs';
+function hydratedStore(localEntries=[],sessionEntries=[]){
+ const local=new Map(localEntries),session=new Map(sessionEntries),storage=map=>({getItem:key=>map.get(key)??null,setItem:(key,value)=>map.set(key,value),removeItem:key=>map.delete(key)}),localStorage=storage(local),sessionStorage=storage(session),exports={};
+ const source=ts.transpileModule(fs.readFileSync(new URL('../components/decision-store.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ vm.runInNewContext(source,{exports,window:{},localStorage,sessionStorage,require:name=>name==='@/lib/local-decisions'?localDecisions:name==='@/lib/dataset-identity.mjs'?datasetIdentity:name==='@/lib/home-onboarding'?onboarding:require(name)});
+ return {api:exports,local,session};
+}
+test('actual dataset initialization preserves fresh first-visit observation, consumes it once and respects existing data',()=>{
+ const fresh=hydratedStore();fresh.api.switchDecisionDataset(token);
+ assert.ok(fresh.local.has(localDecisions.datasetDecisionKey(token)),'real initialize writes an envelope before Home mounts');
+ assert.equal(onboarding.isFirstHomeVisit({getItem:key=>fresh.local.get(key)??null},empty,token),false,'post-hydration check alone reproduces the bug');
+ assert.equal(fresh.api.consumeFirstHomeVisit(),true);assert.equal(fresh.api.consumeFirstHomeVisit(),false,'remount is existing use');
+ const switched=hydratedStore();switched.api.switchDecisionDataset(token);switched.api.switchDecisionDataset(token.replace(":5",":6"));assert.equal(switched.api.consumeFirstHomeVisit(),false,"switching datasets cannot reuse the initial observation");
+ const returning=hydratedStore([...fresh.local]);returning.api.switchDecisionDataset(token);assert.equal(returning.api.consumeFirstHomeVisit(),false);
+ const dismissed=hydratedStore();dismissed.api.switchDecisionDataset(token);dismissed.local.set(onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1');assert.equal(dismissed.api.consumeFirstHomeVisit(),false);
+ const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),false);
+});
