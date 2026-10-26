@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "1ca8f98c908eb08753a427cea83b885d5662f6a0",
-  "deployment": "pending-protected-verification",
+  "sourceCommit": "3fa65fa0f4ea2f46c01ab2d49d4407e794c66687",
+  "deployment": "local-preview-only-upload-blocked",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "79a43a2e673a9a426a448e2db9f9e26c0f3a190a8030747c876f233ba727cf38",
-      "bytes": 8965
+      "sha256": "72d39f6001d0f1f6e20be75d22e1f870f4c09d7f8521326e27d4e2b6ec70d73b",
+      "bytes": 9814
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -4434,8 +4434,8 @@
     },
     {
       "path": "components/home-company-intro.tsx",
-      "bytes": 1738,
-      "sha256": "5ab6dfe8fd5e04252ed82c7a1ab1a84fbe44dc1c04431eac3f82abd063c3eaa1"
+      "bytes": 1628,
+      "sha256": "ac52527a9f05776f4bf5f010e9e91861937464048fa0972fb82e43425eedcc5a"
     },
     {
       "path": "lib/demo-company-profile.ts",
@@ -4449,13 +4449,13 @@
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
-      "bytes": 2896,
-      "sha256": "11b4aece73b476b5195b29f1c9abb5da0a1a4254ed7818893285c8fe197b93fe"
+      "bytes": 3115,
+      "sha256": "0b098d864d840de6f9f057d17a3cdfaa27f788cd65c95cd78e9060c194264d88"
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 10269,
-      "sha256": "bd18e0b7546151b39d4df0ce1e8fd30499d85a0765b896847ef577265a4bc610"
+      "bytes": 11523,
+      "sha256": "74666bcb3fc1e6296e9d072be5c01c68a5cbbe472cd130e9adee9550fc8399e8"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

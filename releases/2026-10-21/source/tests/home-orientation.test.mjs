@@ -26,7 +26,7 @@ function harness(initial={}){
  const render=()=>{cursor=0;current=exports.HomeGettingStarted(props);for(const n of nodes(current)){if(n.type==='dialog')n.props.ref.current=native;if(n.type==='h2')n.props.ref.current=title;if(n.type==='button'&&n.props.ref)n.props.ref.current=trigger;}return current;};
  const flush=(next={})=>{props={...props,...next};render();for(const e of effects.splice(0))e();return render();};
  const button=text=>nodes(current).find(n=>n.type==='button'&&n.props.children===text);
- return {flush,button,native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
+ return {document,flush,button,native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
 }
 test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
@@ -79,10 +79,20 @@ test('explicit intro resume releases only local demo debounce and retains shared
  assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
 });
 test('expanded creator introduction keeps keyboard-scrollable content separate from persistent actions',()=>{
- const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),footer=all.find(n=>n.type==='footer');
- assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(footer.props.className,/shrink-0/);
+ const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');
+ assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(header.props.className,/shrink-0/);
  const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
- assert.deepEqual(headings,['Why I built this','What you can do','Try a planning decision','How to read the results','My role in the project']);
- assert.equal(nodes(footer).filter(n=>n.type==='button').length,2);
+ assert.deepEqual(headings,['Purpose of the project','What you can do','Try a planning decision','How to read the results','Project development','Contact Ed Om']);
+ assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
+});
+
+test('top actions precede scroll region, verified contacts wrap, and focus wraps in DOM order',()=>{
+ const h=harness(),all=nodes(h.flush()),dialog=h.dialog(),region=all.find(n=>n.props?.role==='region'),start=h.button('Start guided demo');
+ assert.ok(all.indexOf(start)<all.indexOf(region));assert.match(dialog.props.className,/max-w-4xl/);
+ const links=all.filter(n=>n.type==='a'),email=links.find(n=>n.props.href==='mailto:edwinom.nyc@gmail.com'),linkedin=links.find(n=>n.props.href==='https://www.linkedin.com/in/ed-om-62a57818');
+ assert.ok(email);assert.match(nodes(email).find(n=>n.type==='span').props.className,/break-all/);assert.equal(linkedin.props.target,'_blank');assert.match(linkedin.props.rel,/noopener/);
+ let focused='',prevented=false;const first={focus:()=>focused='start'},last={focus:()=>focused='linkedin'},currentTarget={querySelectorAll:()=>[first,last]};
+ h.document.activeElement=last;dialog.props.onKeyDown({key:'Tab',shiftKey:false,currentTarget,preventDefault(){prevented=true;}});assert.equal(focused,'start');assert.equal(prevented,true);
+ h.document.activeElement=first;dialog.props.onKeyDown({key:'Tab',shiftKey:true,currentTarget,preventDefault(){}});assert.equal(focused,'linkedin');
 });

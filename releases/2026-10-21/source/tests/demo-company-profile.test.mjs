@@ -30,7 +30,10 @@ test('Company describes its actual business units and distinguishes history from
  assert.match(source,/>Company<\/h2>/);
  for(const phrase of ['consulting','client operations','managed services','technology','digital services','data and AI','sales','corporate services'])assert.ok(source.includes(phrase));
  assert.match(source,/monthly headcount history from January 2024/);
- assert.match(source,/Data and updates/);
+ assert.doesNotMatch(source,/Business profile|Data and updates/);
+ assert.equal((source.match(/text-sm italic leading-snug/g)||[]).length,3);
+ assert.match(source,/<h2 className="font-semibold not-italic"/);
+ assert.doesNotMatch(source,/mt-3|leading-relaxed/);
  assert.match(source,/synthetically generated for this demonstration/);
  assert.match(source,/There is no automatic data-refresh schedule/);
  assert.equal((source.match(/September 30, 2026/g)||[]).length,1);
