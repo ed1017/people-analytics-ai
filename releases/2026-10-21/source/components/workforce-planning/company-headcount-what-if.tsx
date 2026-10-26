@@ -9,7 +9,7 @@ function WhatIfInputs({snapshot}:{snapshot:CompanySnapshot}){
  let points:ReturnType<typeof companyHeadcountWhatIf>=null,error='';
  try{points=companyHeadcountWhatIf(snapshot,hires,exits);}catch(e){error=e instanceof Error?e.message:'Review your inputs.';}
  return <div className="space-y-3">
-  <p>Recorded synthetic snapshot: <strong>{count(snapshot.opening)} people</strong> on <strong>{snapshot.asOf}</strong>.</p>
+  <p>Recorded snapshot: <strong>{count(snapshot.opening)} people</strong> on <strong>{snapshot.asOf}</strong>.</p>
   <p className="text-sm text-muted-foreground">Company-wide, across all countries, business units and levels. Dashboard filters do not narrow this calculation. This is a fixed released snapshot, not a live workforce feed.</p>
   <div className="grid gap-3 sm:grid-cols-2">
    <label className="text-sm font-medium">External hires per month<input type="text" inputMode="numeric" value={hires} onChange={e=>setHires(e.target.value)} aria-describedby="company-what-if-help" className="mt-1 block min-h-11 w-full rounded-md border bg-background px-3" /></label>

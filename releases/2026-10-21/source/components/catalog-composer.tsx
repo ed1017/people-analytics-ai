@@ -31,10 +31,10 @@ export function CatalogComposer({value,onChange,textareaRef,rows,workforce,datas
 export function PromptTemplates({value,onChange,textareaRef}:{value:string;onChange:(v:string)=>void;textareaRef:RefObject<HTMLTextAreaElement|null>}){
  const insertHelper=(helperId:string)=>{const next=insertPromptHelper(value,helperId);if(!next)return;onChange(next.value);requestAnimationFrame(()=>{textareaRef.current?.focus();textareaRef.current?.setSelectionRange(next.start,next.end);});};
  return <section aria-label="Prompt templates" className="space-y-1">
-  <div role="group" aria-label="Templates" className="mb-2 flex flex-wrap items-center gap-2">
-   <span className="text-xs text-muted-foreground">Templates</span>
-   {composerPromptHelpers.map(helper=><button key={helper.id} type="button" onClick={()=>insertHelper(helper.id)} title={value.length?'Add an editable starter after your current draft':'Insert an editable starter'} className="min-h-11 rounded-full border px-3 py-1 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{helper.label}</button>)}
+  <div role="group" aria-label="Templates" className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+
+   {composerPromptHelpers.map(helper=><button key={helper.id} type="button" onClick={()=>insertHelper(helper.id)} title={value.length?'Add an editable starter after your current draft':'Insert an editable starter'} className="flex min-h-16 flex-col items-start justify-center rounded-lg border bg-card px-3 py-2 text-left text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="font-medium">{helper.label}</span><span className="text-xs text-muted-foreground">Edit prompt</span></button>)}
   </div>
-  <p className="mb-2 text-xs text-muted-foreground">For your own plan: fill what you know and leave unknowns blank. Templates edit your draft; you choose Send.</p>
+
  </section>;
 }

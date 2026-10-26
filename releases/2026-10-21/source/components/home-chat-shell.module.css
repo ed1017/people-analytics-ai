@@ -267,9 +267,9 @@
 
 .shell :global(.home-answer-empty) { padding: 4px 0; font-size: 14px; line-height: 1.5; color: var(--muted-foreground); overflow-wrap: anywhere; }
 
-.promptCategories { display:flex; flex-wrap:wrap; gap:4px; margin:8px 0; }
-.promptCategories button { min-height:44px; padding:6px 10px; border-radius:7px; font-size:13px; font-weight:600; border:1px solid transparent; }
-.promptCategories button[aria-selected="true"] { color:var(--primary); background:var(--accent); border-color:var(--border); }
+.promptCategories { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:8px 0; }
+.promptCategories button { min-height:52px; padding:10px 8px; border-radius:9px; font-size:clamp(15px,1.3vw,18px); line-height:1.25; font-weight:750; border:1px solid var(--border); background:var(--card); overflow-wrap:normal; }
+.promptCategories button[aria-selected="true"] { color:var(--primary-foreground); background:var(--primary); border-color:var(--primary); box-shadow:inset 0 -3px 0 currentColor; }
 .promptCategories button:focus-visible { outline:2px solid var(--ring); outline-offset:2px; }
 
 /* Snapshot-local rail: the chat split remains unchanged. Stack only when the

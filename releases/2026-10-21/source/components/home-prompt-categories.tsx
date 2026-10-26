@@ -1,10 +1,10 @@
 'use client';
-import {useId,useRef,useState} from 'react';
+import {useId,useRef,useState,type ReactNode} from 'react';
 import {ChartNoAxesCombined,Sparkles,Users} from 'lucide-react';
 import {homePromptCategories} from '@/lib/home-prompt-categories';
 import styles from './home-chat-shell.module.css';
 const icons=[ChartNoAxesCombined,Users,Sparkles];
-export function HomePromptCategories({onQuestion,disabled=false}:{onQuestion:(question:string)=>void;disabled?:boolean}){
+export function HomePromptCategories({onQuestion,disabled=false,templates}:{onQuestion:(question:string)=>void;disabled?:boolean;templates?:ReactNode}){
  const [selected,setSelected]=useState(0),id=useId(),tabs=useRef<(HTMLButtonElement|null)[]>([]);
  const category=homePromptCategories[selected],Icon=icons[selected];
  return <section aria-label="Suggested questions">
@@ -14,5 +14,6 @@ export function HomePromptCategories({onQuestion,disabled=false}:{onQuestion:(qu
   <div role="tabpanel" id={id+'-questions'} aria-labelledby={id+'-'+category.id} className={styles.questions}>
    {category.prompts.map(question=><button key={question} type="button" disabled={disabled} onClick={()=>onQuestion(question)}><Icon size={19} aria-hidden="true"/><span>{question}</span></button>)}
   </div>
+  {category.id==='capacity'&&templates}
  </section>;
 }
