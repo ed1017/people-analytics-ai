@@ -97,6 +97,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <div><p>Current headcount</p><strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong><span>{known(headcount) ? ' people · ' + snapshotDate : ' · Verified snapshot needed'}</span></div>
       </div>
 
+      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
       <p className={styles.scope}>{scopeLabel} · Recorded workforce history</p>
       <div className={styles.snapshotGrid}><div className={styles.snapshotCharts}>
       {(first && last || checked) ? <figure className={styles.historyFigure}>
@@ -113,7 +114,6 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         <figcaption><span>{periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
       {tooltip}
-      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
       {current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting hires scope and definition">ⓘ</summary><small>Company-wide · monthly</small></details></li>
