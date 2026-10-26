@@ -8,7 +8,7 @@ Ed defined the workforce-planning problem, product requirements and acceptance c
 
 ## Try the public app
 
-Start with Try a planning scenario on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
+Start with Planning Scenario on Home, compare staffing options, and save a proposal in your browser. Saved proposals are browser-local planning records. They are not approved workforce actions or shared enterprise records.
 
 The public workforce snapshot contains 9,037 synthetic people as of September 30, 2026. The company headcount what-if takes explicit monthly hires and exits for October 2026 through March 2027. It illustrates conditional arithmetic, not a validated prediction or a payroll forecast.
 
@@ -16,7 +16,7 @@ This is a portfolio prototype. No measured adoption, savings, business impact or
 
 ## Repository and deployment status
 
-The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. Production is PR413, runtime `df84a97a65d202104a3073f2ba809168b772aae1`, deployment `dpl_EkWHP14PvoKYLo7Po3v8eMstkxcQ`. See the [active roadmap](docs/roadmap-status-2026-10-17.md) and [PR413 verification record](docs/release-verification-pr413.md) for current acceptance and remaining limits. Older dated release sections are historical.
+The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. Production is PR419, runtime `d42993cf33448fade057969f1ada113751bab79a`, deployment `dpl_C75pvjgcz3C61mtX78FU2Ap5T1Ng`. See the [active roadmap](docs/roadmap-status-2026-10-17.md) and [PR419 verification record](docs/release-verification-pr419.md) for current acceptance and remaining limits. Older dated release sections are historical.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
