@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "8bb67718b0a3e1ba2edac6c2ce46166c9c66669e",
-  "deployment": "https://people-analytics-jdqo8mnyd-ed-56dc.vercel.app",
+  "sourceCommit": "1ca8f98c908eb08753a427cea83b885d5662f6a0",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "47b049d46dc5d4d1d4e4c0a331c777dfaedf0df0908fa16d5b937b4eacf6dab7",
-      "bytes": 5695
+      "sha256": "79a43a2e673a9a426a448e2db9f9e26c0f3a190a8030747c876f233ba727cf38",
+      "bytes": 8965
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "60c2300bceea9cfb55156f5c2b309eb5c3874e2007ad427d1f85b3cbdbd8fcf2",
-      "bytes": 16762
+      "sha256": "55dd45128fb62bffa060bdb1a41e9b8a478a56cf2368ac145c37d5860fa782d6",
+      "bytes": 16757
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4434,13 +4434,13 @@
     },
     {
       "path": "components/home-company-intro.tsx",
-      "bytes": 1012,
-      "sha256": "9032ae5305b8eff3b3ecfbc33e74801ae78a03bcaacfba73a113a59b3c801736"
+      "bytes": 1738,
+      "sha256": "5ab6dfe8fd5e04252ed82c7a1ab1a84fbe44dc1c04431eac3f82abd063c3eaa1"
     },
     {
       "path": "lib/demo-company-profile.ts",
-      "bytes": 812,
-      "sha256": "03d48bccb250e1b2419f6d7f5bcad0abe44c23f40387805fb53b016abbc257f2"
+      "bytes": 891,
+      "sha256": "79b7904784f347ed7cf10a855e17c12d7d1735acf68c0421d524a18da8ee64c0"
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
@@ -4449,13 +4449,13 @@
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
-      "bytes": 1709,
-      "sha256": "60ceba372bf73b521c5b16ac37bb022bcba8cb4beeb4d239b06d587ba8771f7e"
+      "bytes": 2896,
+      "sha256": "11b4aece73b476b5195b29f1c9abb5da0a1a4254ed7818893285c8fe197b93fe"
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 9398,
-      "sha256": "1ecb352982524636111bd51f3a2b85c52eead22edef244fa6fc8a6d37138ef0a"
+      "bytes": 10269,
+      "sha256": "bd18e0b7546151b39d4df0ce1e8fd30499d85a0765b896847ef577265a4bc610"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

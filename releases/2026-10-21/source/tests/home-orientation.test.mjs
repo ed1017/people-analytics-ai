@@ -44,7 +44,7 @@ test('context interruption closes without opening a demo or stealing focus',()=>
  const h=harness();h.flush();h.flush({active:false,dismissKey:'two'});assert.equal(h.native.open,false);assert.equal(h.starts,0);assert.equal(h.writes.length,0);
  h.flush({active:true});assert.equal(h.native.shown,1);
 });
-test('orientation is compact and about link preserves current tab; demo entry cannot fall through to provider',()=>{
+test('orientation about link preserves current tab; demo entry cannot fall through to provider',()=>{
  const h=harness();const tree=h.flush(),all=nodes(tree);const about=all.find(n=>n.type==='a');assert.equal(about.props.href,'/about');assert.equal(about.props.target,'_blank');assert.match(about.props.rel,/noopener/);
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');assert.ok(source.includes('onStartDemo={startIntroDemo}'));
  assert.ok(source.includes("if(message===swpDemoPrompt){setChatError('The planning scenario is not ready."));
@@ -77,4 +77,12 @@ test('explicit intro resume releases only local demo debounce and retains shared
  assert.equal(launches,1);assert.equal(recentSuggestions.current.has('question:other'),true);
  assert.match(source,/queuedSuggestion.current\|\|chatLoading\|\|sending.current/);
  assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
+});
+test('expanded creator introduction keeps keyboard-scrollable content separate from persistent actions',()=>{
+ const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),footer=all.find(n=>n.type==='footer');
+ assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(footer.props.className,/shrink-0/);
+ const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
+ assert.deepEqual(headings,['Why I built this','What you can do','Try a planning decision','How to read the results','My role in the project']);
+ assert.equal(nodes(footer).filter(n=>n.type==='button').length,2);
+ const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
 });

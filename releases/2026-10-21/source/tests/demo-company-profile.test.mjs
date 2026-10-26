@@ -15,8 +15,26 @@ test('company profile matches the complete released country and unit populations
  assert.equal(countries.reduce((sum,row)=>sum+row.headcount,0),profile.people);
  assert.deepEqual(businessUnits.map(row=>row.org_code).sort(),[...profile.businessUnits].sort());
  assert.ok(countries.every(row=>row.as_of===profile.asOf&&row.headcount>0));
+ assert.equal(data.trend[0].snapshot_date,profile.historyStart);
+ assert.equal(data.trend.length,33);
+ assert.equal(profile.refreshPolicy,'published-version');
 });
 test('missing, prior, future or wrong-date dataset cannot acquire this profile',()=>{
  for(const token of [undefined,null,'legacy-v1:0','workforce-demo-9037-public-aggregates-v4:6','other:5'])assert.equal(demoCompanyProfile(token,P.cutoff),null);
  for(const date of [undefined,null,'2026-08-31','2027-09-30'])assert.equal(demoCompanyProfile(P.token,date),null);
+});
+
+test('Company describes its actual business units and distinguishes history from refreshing',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const source=await readFile(new URL('../components/home-company-intro.tsx',import.meta.url),'utf8');
+ assert.match(source,/>Company<\/h2>/);
+ for(const phrase of ['consulting','client operations','managed services','technology','digital services','data and AI','sales','corporate services'])assert.ok(source.includes(phrase));
+ assert.match(source,/monthly headcount history from January 2024/);
+ assert.match(source,/Data and updates/);
+ assert.match(source,/synthetically generated for this demonstration/);
+ assert.match(source,/There is no automatic data-refresh schedule/);
+ assert.equal((source.match(/September 30, 2026/g)||[]).length,1);
+ assert.doesNotMatch(source,/text-xs/);
+ assert.match(source,/Refreshing the page does not generate new records or advance the snapshot date/);
+ assert.doesNotMatch(source,/mid-sized|updated daily|refreshed monthly/i);
 });
