@@ -1,6 +1,6 @@
 # Position modeling and external evidence
 
-Candidate runtime: 7d04968 (full identity in the source manifest). Production remains PR425 until reviewed promotion.
+Candidate runtime: `7d0496874f5b995f427783488105a58f96fdab6a`; protected deployment `dpl_4hqgnfh6SN8YdUz5edfvfemYNLUQ` at https://people-analytics-gks199ze0-ed-56dc.vercel.app. Production remains PR425 until reviewed promotion.
 
 ## Position modeling
 
@@ -16,6 +16,6 @@ The official BLS catalog at https://www.bls.gov/oes/tables.htm returned an autom
 
 ## Verification
 
-Independent review completed. Sixteen focused model/component tests cover unknowns, revision integrity, overflow, goal isolation and source semantics. Local production-build browser checks at 1440 and 390 pixels each passed nine journeys: adoption, edit/cancel, explicit goal/save, reset confirmation, reload/reopen, vacancy/unknown-cost/zero-FTE, removal, invalid-edit recovery and external role/location/source controls. No provider calls. Final staged/public evidence is recorded in the release PR.
+Independent review completed. The full runtime suite passes 806 tests. Sixteen focused model/component tests cover unknowns, revision integrity, overflow, goal isolation and source semantics. Local production-build browser checks at 1440 and 390 pixels each passed nine journeys: adoption, edit/cancel, explicit goal/save, reset confirmation, reload/reopen, vacancy/unknown-cost/zero-FTE, removal, invalid-edit recovery and external role/location/source controls. No provider calls. Final staged/public evidence is recorded in the release PR.
 
 Three unrelated aggregate failures reproduced on the released baseline and were corrected as test debt: readable role names, the actual priority-summary component import, and deliberate budget preservation with provenance. Application behavior was not weakened.
