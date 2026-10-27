@@ -9,7 +9,7 @@ test('fixed ledger path preserves exact reservation values and exposes no status
  }});
  assert.equal((await ledger.admit(reservation,signal())).granted,true);
  assert.equal(Object.hasOwn(ledger,'readLedgerStatus'),false);
- assert.deepEqual(Object.keys(ledger),['admit','settle']);
+ assert.deepEqual(Object.keys(ledger),['readPricing','renewPricing','admit','settle']);
  assert.equal(requests.length,1);
  assert.equal(requests[0].u,url+'/rest/v1/rpc/reserve_public_ai');
  assert.deepEqual(JSON.parse(requests[0].body),{p_request_id:'r1',p_context_id:reservation.contextId,p_policy_id:reservation.policyId,p_reserve_micro_usd:500000});
