@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "47b621645b8de5f53cf43daced86615d6702d423",
-  "deployment": "https://people-analytics-4wp9o8vpk-ed-56dc.vercel.app",
+  "sourceCommit": "5d52980ea5dd2218125d81ca62f92947784291d9",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "1d35959ab68607d65223672812c91e3353d89e6dbf4915cb5a122a963f17a440",
-      "bytes": 10537
+      "sha256": "eba31eb21bdd7a5bbd775ae6e5dcdb3dca081fb6fb35ebb3485bc1d84e0d525b",
+      "bytes": 10430
     },
     {
       "path": "components/site-footer.tsx",
