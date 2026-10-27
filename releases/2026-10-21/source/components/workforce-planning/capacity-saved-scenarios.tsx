@@ -93,12 +93,13 @@ export function CapacitySavedScenarios(){
  const options=bucket.entries.map(e=><option key={e.record.id} value={e.record.id}>{e.record.name}</option>);
  return <section aria-label="Saved capacity scenarios" className="space-y-3 border-t pt-4">
   <h3 className="font-semibold">Save &amp; compare</h3>
+  <p className="text-xs text-muted-foreground">Drafts are not saved automatically: they survive navigation but clear on reload or dataset change.</p>
   {!goalId?<><p className="text-sm text-muted-foreground">Session only. Choose a goal to save scenarios; no goal is created automatically.</p>{carriedGoalActions&&<CarriedPlanningGoal key={carriedGoalActions.businessGoal} actions={carriedGoalActions}/>}</>:<>
    <div className="flex flex-wrap items-end gap-2">
     <label className="min-w-0 flex-1 text-sm">Scenario name<input aria-label="Capacity scenario name" maxLength={160} value={name} onChange={e=>{setName(e.target.value);setActionError('');}} className={`${control} mt-1 w-full`} placeholder="e.g. Base workload"/></label>
     <button type="button" disabled={disabled} onClick={save} className={`${control} disabled:opacity-50`}>Save scenario</button>
    </div>
-   <p className="text-xs text-muted-foreground">Saved only in this browser under the selected goal. Calculate complete capacity inputs before saving. The cost rate is optional. Changes create a new named scenario.</p>
+   <p className="text-xs text-muted-foreground">Calculate complete capacity inputs, then save a new named scenario in this browser under the selected goal. Cost rate is optional.</p>
    <p role="alert" aria-atomic="true" className={saveError?'text-sm text-destructive':'sr-only'}>{saveError}</p>
    <p role="status" aria-atomic="true" className={notice?'text-sm':'sr-only'}>{notice}</p>
    <p role="status" aria-atomic="true" className={comparisonStatus?'text-sm':'sr-only'}>{comparisonStatus}</p>
