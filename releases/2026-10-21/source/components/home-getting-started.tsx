@@ -6,13 +6,14 @@ import {HOME_INSTRUCTIONS_DISMISSED_KEY} from '@/lib/home-onboarding';
 import type { AppPage } from "@/lib/types";
 
 /** Intro only. The existing Planning Scenario entry owns all calculation and draft safeguards. */
-export function HomeGettingStarted({busy,active,ready,autoOpen,onStartDemo,demoReady=true,status,dismissKey}: {
+export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=false,onStartDemo,demoReady=true,status,dismissKey}: {
   liveChatAvailable?:boolean;
   conversational?:boolean;
   busy:boolean;
   active:boolean;
   ready:boolean;
   autoOpen:boolean;
+  suppressAutoOpen?:boolean;
   onNavigate:(page:AppPage)=>void;
   onStartDemo:()=>void;
   demoReady?:boolean;
@@ -28,10 +29,13 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,onStartDemo,demoR
   const dismiss=()=>{remember();dialog.current?.close();};
   useEffect(()=>{activeHome.current=active;if(!active||previousKey.current!==dismissKey){restoreFocus.current=false;dialog.current?.close();}previousKey.current=dismissKey;},[active,dismissKey]);
   useEffect(()=>{
-    if(!ready||attempted.current||!active||busy||!autoOpen)return;
-    attempted.current=true;
+    if(!ready||attempted.current||!active)return;
+    // Resumed work consumes this visit's automatic opportunity, even after reset.
+    if(suppressAutoOpen){attempted.current=true;return;}
+    if(busy||!autoOpen||!dialog.current)return;
     show();
-  },[ready,autoOpen,active,busy,show]);
+    attempted.current=true;
+  },[ready,autoOpen,suppressAutoOpen,active,busy,show]);
   useEffect(()=>{
     const dismissed=(event:StorageEvent)=>{if(event.key===HOME_INSTRUCTIONS_DISMISSED_KEY&&event.newValue!==null)dialog.current?.close();};
     window.addEventListener('storage',dismissed);return()=>window.removeEventListener('storage',dismissed);
@@ -47,7 +51,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,onStartDemo,demoR
   };
   return <section aria-label="Product introduction" className="min-w-0 text-sm">
     <div className="flex flex-wrap items-center justify-between gap-x-3">
-      <button ref={trigger} type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded px-1 text-sm font-medium text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">About Workforce Intelligence</button>
+      <button ref={trigger} type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Introduction</button>
       {status}
     </div>
     {ready&&createPortal(<dialog ref={dialog} id={id} aria-labelledby={id+'-title'} aria-describedby={id+'-purpose'} onClose={finish} onCancel={event=>{event.preventDefault();dismiss();}} onKeyDown={event=>{
