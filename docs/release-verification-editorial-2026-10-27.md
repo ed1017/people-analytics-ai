@@ -1,6 +1,6 @@
 # Editorial and guided-demo release verification - October 27, 2026
 
-Status: candidate prepared; hosted staging, exact-head release CI, promotion and public desktop/mobile verification are pending. PR438 remains the last verified public release in this record.
+Status: PR440 merged and the exact tested deployment promoted. Direct public desktop and mobile verification passed.
 
 - Candidate runtime: `394fedbb6c7162216df1b1c50bd961b364aa4038`
 - Runtime baseline: `5d52980ea5dd2218125d81ca62f92947784291d9`
@@ -19,7 +19,7 @@ Status: candidate prepared; hosted staging, exact-head release CI, promotion and
 
 Independent review passed. The final aggregate run passed 901 of 901 tests. TypeScript passed. Lint reported zero errors and one unused-variable warning in a test. Focused tests cover primary-versus-Details presentation, preserved metric quantities and unknown/suppressed states, intro preferences and scroll restoration, scenario calculations and explicit adoption, saved-revision behavior, exact/paraphrased FTE-investigation routing, scope guards and error handling.
 
-An isolated Chromium check at desktop and mobile widths reproduced background scrolling at the intro boundary before the lock, and verified containment afterward. The separate report of a blank screen has not been causally reproduced. Hosted integration verification remains pending.
+An isolated Chromium check at desktop and mobile widths reproduced background scrolling at the intro boundary before the lock, and verified containment afterward. The separate report of a blank screen has not been causally reproduced. Protected desktop/mobile integration checks passed.
 
 ## Digest baseline correction
 
@@ -38,11 +38,24 @@ Relevant source and regression records in the versioned source include:
 
 The available FTE history establishes net change, not a reconciled movement-level FTE decomposition or causal attribution. Investigation suggestions are guidance, not measured findings. The original visitor-reported AI failure remains without a correlated request trace; controlled and deterministic coverage does not establish fresh provider-answer acceptance. No paid model calls, accounting changes, credentials, pricing-policy changes or access changes are part of this release.
 
-## Hosted and production checklist
+## Hosted and production verification
 
-Pending: exact candidate deployment identity; desktop/mobile intro scrolling, short viewport, focus, opt-out and draft preservation; worked-example adoption and actual $325,000/$200,000 outputs; risk Details; settled Workforce, Talent Acquisition, Skills, Finance, Learning, Listening, Positions and About rendering; primary-copy inventory, overflow and page errors; exact-head release CI; promotion and matching public verification.
+Runtime `394fedbb6c7162216df1b1c50bd961b364aa4038`, deployment `dpl_Ew6ENEJWrRvPq9HNF41xeSDT4wWe`, source `4b2db3792b30e6763fec81cd2a54b1d9a297f1d2`, merge `b9a4484b644cd2d8d9e5a4b16ce94bee8218ba6c`.
 
-CI follow-up: the new module render test originally required private runtime files absent from the public checkout. It now uses explicit invented presentation fixtures without skipping cases; five checks pass without private inputs. Application bytes are unchanged from the independently reviewed fcc86d6 candidate. The first unpromoted stage rejected a missing organization-ID binding; corrected staging uses the documented non-secret deployment-scoped ID and leaves identity guards and persistent settings unchanged.
+Exact source-head CI [40535413252](https://github.com/ed1017/people-analytics-ai/actions/runs/40535413252) passed every step, including 3,092/3,092 root regression contracts, generated-artifact verification and TypeScript. The new versioned editorial checks passed 34 tests with one existing private-source skip. The 901-test runtime suite and ten final market presentation/carry checks passed. Independent semantic review approved both runtime increments.
 
-Final presentation follow-up: repeated Labor Market interpretation was moved into existing closed Details while occupation, geography, date, wage/jobs units and missing/reset behavior remain visible. Ten focused render/carry tests and independent semantic review passed. Five obsolete source-root copy assertions were updated to the new wording while retaining numeric, scope, suppression and closed-Details checks.
+Protected 1,440px and 390px checks covered intro scrolling at a short viewport, focus restoration, ordinary dismissal/reload, explicit checkbox opt-out/re-enable, manual reopening and retained drafts; explicit example adoption and unchanged $325,000/$200,000 recommendations; risk Details; settled Workforce, Attrition, Compensation, Succession, Talent, Skills, Finance, Learning, Listening, Positions, About and static Labor Market references. Final Labor Market/Overview checks verified the last copy-only increment. No page errors or horizontal overflow were found in completed checks.
+
+The exact staged deployment was promoted without rebuilding. Both public aliases point to it. Direct public desktop checks passed the main journey, actual Listening source, Labor Market presentation and dataset-scoped readiness (HTTP200, configured, five routes). Public mobile checks also passed the same core journey. Dataset-scoped readiness at 15:58:24 and 15:58:33 UTC returned configured for all five routes; actual Listening data loaded at both widths.
+
+### Preserved diagnostic limits
+
+- The first unpromoted package returned HTTP500 because its deployment-scoped organization ID was omitted. The corrected package used the documented existing ID; identity guards and persistent settings were unchanged.
+- A protected-preview readiness request aborted at 4.942 seconds while its transport delivered a valid HTTP200 response after 11.056 seconds. Direct public readiness passed; this is not provider-answer acceptance.
+- Listening initially displayed unavailable during a preview sweep. Fresh timed actual-source checks passed at both widths; the original timeout trigger remains unproven.
+- Optional national indicators are outside the public source projection. After the observed503, subsequent browser coverage used an explicitly labeled unavailable fixture and did not repeat upstream requests. Static sourced labor-market references remained visible.
+- A local Windows source-root run failed 39 cases, including confirmed CRLF digest and path-separator incompatibilities; no goldens or guards were weakened. The exact Linux CI run passed all 3,092 cases.
+- Local disk exhaustion interrupted a final screenshot pass. Only generated build cache and one obsolete package lock were removed; source, user data and evidence were retained. The final staged check then passed.
+
+No paid model requests, source-data regeneration, financial settings, credentials or access changes were made. The specific FTE question passed actual synthetic-data binding/service acceptance with zero model rounds: Managed Services decreased 27.8 FTE, from 1,451.6 in June to 1,423.8 in September 2026, with four dated observations and investigation guidance. This does not prove fresh provider interpretation or a reconciled causal decomposition.
 
