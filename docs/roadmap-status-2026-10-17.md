@@ -2,9 +2,14 @@
 
 ## Current live release and active parallel work
 
-### PR436 live — public acceptance verified
+### PR438 live — public browser verification passed
 
-PR436 deploys the bounded diagnostic-reference and repeated empty-progress/capacity-copy change, runtime `47b621645b8de5f53cf43daced86615d6702d423`, deployment `dpl_AUm6KzfJeKrgsiatEoeNgUyvHbck`. Independent review, seven focused tests, TypeScript and lint passed; exact-head CI `40453861548` and protected 1440px/390px QA passed. Merge `bd4e0dd45fde130e07901244dbc7125011ffe45c` and exact deployment/alias promotion are confirmed; public desktop/mobile checks passed with no page errors. Actual unmocked dataset-scoped readiness returned HTTP 200/configured and Home showed 9,037 people at both widths. Earlier stale-selector and post-hydration fixture failures are retained as harness failures; corrected runs passed without application changes. PR436 is the latest completed public-flow acceptance. See [release verification](release-verification-pr436.md).
+PR438 removes the duplicate worked-example heading while preserving shared Scenario levers, accessible labels and calculations. Runtime `5d52980ea5dd2218125d81ca62f92947784291d9`, deployment `dpl_BZ8Qx6VWwwj7F7J2ZnZAhSxXqwMy`, merge `79d5e152932c416decc9df2f9b2652480becdf91`, CI `40455787985` successful. Six existing tests, independent review and protected/public 1440px/390px checks passed with no page errors. Public checks confirmed one Scenario levers heading, no duplicate Adjust assumptions heading, retained accessible labels/inputs and unchanged actual $325,000/$200,000 calculations. See [release verification](release-verification-pr438.md).
+
+
+### Previous diagnostic release: PR436 — public acceptance verified
+
+PR436 deploys the bounded diagnostic-reference and repeated empty-progress/capacity-copy change, runtime `47b621645b8de5f53cf43daced86615d6702d423`, deployment `dpl_AUm6KzfJeKrgsiatEoeNgUyvHbck`. Independent review, seven focused tests, TypeScript and lint passed; exact-head CI `40453861548` and protected 1440px/390px QA passed. Merge `bd4e0dd45fde130e07901244dbc7125011ffe45c` and exact deployment/alias promotion are confirmed; public desktop/mobile checks passed with no page errors. Actual unmocked dataset-scoped readiness returned HTTP 200/configured and Home showed 9,037 people at both widths. Earlier stale-selector and post-hydration fixture failures are retained as harness failures; corrected runs passed without application changes. PR436 remains the previous diagnostic/recovery acceptance record. See [release verification](release-verification-pr436.md).
 
 The original feedback #1 remains untraced: the 03:00–03:40 UTC search across deployment logs returned no entries, which proves neither absence of an error nor complete retention. Readiness is not provider-answer acceptance. External applicant availability and hiring-time evidence remain gaps; independent-source research does not reopen the denied BLS retrieval route. Completed PR431–434 streams below remain delivered. JSA confirms applicant-per-vacancy and vacancy-duration measures exist, but exact official CSV/DOCX fetches timed out; values and definitions remain unverified. This is a retrieval limit, not a denial or paid-permission blocker, and other permitted options remain.
 
