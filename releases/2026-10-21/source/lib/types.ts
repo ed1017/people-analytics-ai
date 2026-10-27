@@ -819,6 +819,10 @@ export type StructuralPositionCatalogResponse = {
     job_profile_code: string;
     current_positions: number;
     vacant_positions: number;
+    frozen_positions?: number;
+    open_requisition_vacancies?: number;
+    on_hold_requisition_vacancies?: number;
+    uncovered_vacancies?: number;
     annual_cost_per_position_usd: number | null;
   }>;
 };

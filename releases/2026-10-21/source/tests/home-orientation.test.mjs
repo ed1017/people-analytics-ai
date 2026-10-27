@@ -82,13 +82,18 @@ test('explicit intro resume releases only local demo debounce and retains shared
  assert.ok(source.includes('onStartDemo={startIntroDemo}'));
  const intro=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(intro,/data-orientation-return[\s\S]*?onClick=\{show\}/);
 });
-test('expanded creator introduction keeps keyboard-scrollable content separate from persistent actions',()=>{
+test('product introduction keeps neutral attribution and keyboard-scrollable content separate from persistent actions',()=>{
  const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');
  assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(header.props.className,/shrink-0/);
  const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
  assert.deepEqual(headings,['Purpose of the project','What you can do','Try a planning decision','How to read the results','Project development','Contact Ed Om']);
  assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
+ assert.doesNotMatch(source,/Developed by Ed Om|Ed Om defined/);
+ assert.match(source,/The workforce-planning problem, product requirements and acceptance criteria shaped this project/);
+ assert.equal(region.props['aria-label'],'About Workforce Intelligence');
+ assert.ok(all.some(n=>n.type==='h2'&&n.props.children==='Workforce Intelligence'));
+ assert.ok(all.some(n=>n.type==='a'&&n.props.href==='/about'));
 });
 
 test('top actions precede scroll region, verified contacts wrap, and focus wraps in DOM order',()=>{

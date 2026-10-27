@@ -8,13 +8,13 @@ The portfolio prototype uses a fictional company with 9,037 people as of Septemb
 
 ## Try a planning decision
 
-1. **Open the example.** On Overview, choose **Planning Scenario**, then **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
+1. **Open the example.** On Overview, choose **Introduction**, then **Start guided demo** and **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
 2. **Test a different approach.** Review the role, timing and budget; adjust the available inputs and compare cost, readiness and uncovered work alongside the charts.
 3. **Keep a proposal.** Save the reviewed plan in your browser, reopen it, and compare a revision while retaining the original assumptions.
 
 Prefer to start with workload? Open [Scenarios](https://www.ed-ai.app/scenarios) and choose **Open worked example**, or enter your own work and team inputs.
 
-**Live AI status, October 26, 2026:** provider-backed conversation is unavailable while its verification window is expired; renewal remains blocked and has not been applied. The worked example and local scenario calculations remain available.
+**Live AI status, October 27, 2026:** automatic pricing verification is installed and public readiness checks report configured. Readiness is not proof that every answer succeeds; recent visitor-reported answer failures remain under investigation. The worked example and local scenario calculations do not require a paid model call.
 
 ## Product decisions and tradeoffs
 
@@ -29,7 +29,7 @@ The application demonstrates the planning workflow and its software behavior. Ad
 
 ## Next steps
 
-The current focus is usability and reliability across existing journeys: clear entry points, concise results, and recovery when data or local saving is unavailable. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Live-AI availability and any fresh provider-backed acceptance remain a separate operational decision.
+The current focus is usability and reliability across existing journeys, chart-first position management, and source-grounded workforce evidence. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Fresh paid model testing is not part of the current acceptance checks.
 
 ## Repository and deployment status
 

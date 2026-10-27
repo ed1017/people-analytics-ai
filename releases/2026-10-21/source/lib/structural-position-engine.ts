@@ -684,6 +684,10 @@ export function structuralPositionCatalog(inventory: StructuralPositionInventory
         current_positions:
           row.filled + row.vacant,
         vacant_positions: row.vacant,
+        frozen_positions: row.frozen,
+        open_requisition_vacancies: row.open_req,
+        on_hold_requisition_vacancies: row.on_hold_req,
+        uncovered_vacancies: row.uncovered,
         annual_cost_per_position_usd:
           round2(
             row.cost_per_position

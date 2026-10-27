@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "95f4b8378b1b3f99fbabf08ac22b0cbed748643a",
-  "deployment": "https://people-analytics-7lwfn95zp-ed-56dc.vercel.app",
+  "sourceCommit": "6400ea60f01b2c1b8a717cacf3a3247df32ffc0a",
+  "deployment": "https://people-analytics-reygm05bh-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -344,8 +344,8 @@
     },
     {
       "path": "components/catalog-composer.tsx",
-      "sha256": "35dc046d6676b757a717ea7a8fe538bc3a3a5ebfe04596a0bf8578d37f4e7f61",
-      "bytes": 8220
+      "sha256": "a851bdb3d649989b5235c6fc9dd204f39fd4bdb5b946c4fcd6305df6ec3a5fb9",
+      "bytes": 8329
     },
     {
       "path": "components/chat-content.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "eefdaaeca330aec6b1c4ab38b73c8f8d7b779601d20ff71da23cce28e82591dd",
-      "bytes": 10972
+      "sha256": "20f1a8f95a4f13e928f5206d3a5d13c85aa66d0108ba0b9504f7bd0d1d339682",
+      "bytes": 10890
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "bd6fa8e82478dbe287789c7f5e832ded3c05b26c24dbb60ab3542c78ffb9f66a",
-      "bytes": 72809
+      "sha256": "a236fccd23cdf8ca7b8e924559f5dfaae9dbc5cc7e75d8a5933c305d8714c72d",
+      "bytes": 73273
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -1234,8 +1234,8 @@
     },
     {
       "path": "components/workforce-planning/position-workforce-design-destination.tsx",
-      "sha256": "ea41945e5cdc4611586f9ba8e4ba0ae42abd52dc29aaafd14086f5ced5d120f7",
-      "bytes": 3778
+      "sha256": "57fc21cb5c39b42f582c14e0a26d8f5022ba24e267a77ed6b7d14b9de517fc13",
+      "bytes": 4560
     },
     {
       "path": "components/workforce-planning/response-portfolio-allocation-section.tsx",
@@ -3114,8 +3114,8 @@
     },
     {
       "path": "lib/public-9037-fields.json",
-      "sha256": "0ad759700470548279f733b5849e7c6ade66c5ab45ea53e7849db93596fa3d5f",
-      "bytes": 121181
+      "sha256": "337727af4d25a2dc33408cad13a44ccc2c2ab1c77f2a127be8928c3c574e2401",
+      "bytes": 121363
     },
     {
       "path": "lib/public-9037-options.mjs",
@@ -3424,8 +3424,8 @@
     },
     {
       "path": "lib/structural-position-engine.ts",
-      "sha256": "60cb56244278893c17915c90350fe484f818e4a2df98192461f5ac556281cdd4",
-      "bytes": 40085
+      "sha256": "43760035557be13c604780d932559c7f5946cba1c4a465aa79cc3579cf0e278a",
+      "bytes": 40273
     },
     {
       "path": "lib/structural-position-scenario.ts",
@@ -3584,8 +3584,8 @@
     },
     {
       "path": "lib/types.ts",
-      "sha256": "112babae24647bd033938227f52f37d72e56200687ca423f1f1bf3373e51bac3",
-      "bytes": 41346
+      "sha256": "8936c1cae122d49f0ba1c9e1e5f85a45927cba6f36ce748a68271f26d203ff92",
+      "bytes": 41496
     },
     {
       "path": "lib/utils.ts",
@@ -3804,8 +3804,8 @@
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",
-      "sha256": "9e0919a417f82b0b2cf426ff928d347088f310a1b4254026eb5cf79c6bc78cfe",
-      "bytes": 8417
+      "sha256": "9ce33f05b2e6b99a8b2d5971552caa035bcea90dc60c123b7c7e0ef745d500df",
+      "bytes": 9343
     },
     {
       "path": "tests/context-findings.test.mjs",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 16392,
-      "sha256": "6030cf8ae8aa3d67683b12c23385e57c0ffa4e2a40a0ca31d526a39f7535e128"
+      "bytes": 16817,
+      "sha256": "cbdf5ea605593e5860544437904fe737f55ece68b34a4281791f373f50ea7cf7"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
@@ -4586,6 +4586,21 @@
       "path": "tests/public-pricing-verifier.test.mjs",
       "bytes": 5621,
       "sha256": "a3c73c6d71bbc20be0f96a4d5449d260e5c2c2ee87b93a33bbc0a83dc37b60ec"
+    },
+    {
+      "path": "components/workforce-planning/position-dashboard.tsx",
+      "bytes": 9027,
+      "sha256": "5bc061705669fd92ab28a436d4e772979cf86979a1bd517cbf24fdaf3a2b3494"
+    },
+    {
+      "path": "lib/position-dashboard.ts",
+      "bytes": 2881,
+      "sha256": "90fa9cf8dbb305faaa96941eaf37e8b85aad36113332271e14fc8905acb1e6cd"
+    },
+    {
+      "path": "tests/position-dashboard.test.mjs",
+      "bytes": 8667,
+      "sha256": "f6bd3238e817f1d2a76f5ea1daef2858de6070b0f62c25562395cc3dbae886f8"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
