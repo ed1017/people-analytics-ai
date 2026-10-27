@@ -3,6 +3,7 @@ import {capacityBalanceLabel} from '@/lib/capacity-display';
 
 import {useState} from 'react';
 import {ChartNoAxesCombined, SlidersHorizontal, Lightbulb, RotateCcw} from 'lucide-react';
+import {guidedExample,guidedExampleCapacityDraft} from '@/lib/guided-workload';
 import {type CapacityDraft} from '@/lib/swp-capacity-draft';
 import {capacityPreview} from '@/lib/capacity-preview';
 import {capacitySliders} from '@/lib/planning-slider';
@@ -11,7 +12,7 @@ import {CapacityProjection} from './capacity-projection';
 import styles from './planning-landing.module.css';
 
 // Illustrative inputs only. Never copied into the live planning session or saved store.
-const example:CapacityDraft={scope:'Service desk — tickets',openingDate:'2026-09-30',months:'6',people:'40',fte:'40',volume:'8000',effort:'1',hours:'160',hires:'2',exits:'1',hireFte:'1',exitFte:'1',allocation:'100',productivity:'0',costRate:'',fullTimeMovements:true,confirmed:true};
+const example:CapacityDraft={...guidedExampleCapacityDraft(),confirmed:true};
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString(undefined,{maximumFractionDigits:2});
 
 export function PlanningLanding(){
@@ -24,7 +25,7 @@ export function PlanningLanding(){
   : <label className={styles.field} key={key}><span>{label}</span><span className={styles.inputWrap}><input aria-label={label} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} value={draft[key]} onChange={event=>edit(key,event.target.value)}/>{unit&&<span>{unit}</span>}</span></label>;
  return <section className={styles.landing} aria-label="Illustrative workforce planning">
   <header className={styles.header}>
-   <div><h3>Shape your next move.</h3><p>Explore a service-desk staffing example.</p></div>
+   <div><h3>Shape your next move.</h3><p>Explore the worked example: 5 FTE to cover.</p></div>
    <span className={styles.demo}>Illustrative demo</span>
   </header>
   <div className={styles.context}><span><strong>{draft.scope}</strong><span> · {draft.months}-month scenario</span></span><span>Opening {draft.openingDate} · {draft.people} people / {draft.fte} FTE</span></div>
@@ -34,12 +35,12 @@ export function PlanningLanding(){
     <p className={styles.muted}>Small changes. A clearer view.</p>
     {field('hires','Monthly hires','people')}
     {field('productivity','Productivity improvement','%')}
-    {field('volume','Monthly workload','tickets')}
+    {field('volume','Monthly workload','service units')}
     <p className={styles.status} role="status">{error?'Check your inputs':result?.status==='needs-inputs'?'More inputs needed':'Projection updates as you edit'}</p>
     {error&&<p role="alert" className={styles.error}>{error}</p>}
     <details className={styles.assumptions}><summary>All demo assumptions</summary>
-     <p>Editable illustrative values, repeated each month. No transfers. Departures leave before hires; hires work the full month. Each hire and departure is 1 FTE.</p>
-     {field('openingDate','Opening month-end')}{field('months','Planning months')}{field('people','Opening people')}{field('fte','Opening contracted FTE')}{field('exits','Monthly departures')}{field('effort','Hours per ticket')}{field('hours','Productive hours per FTE / month')}{field('allocation','Time assigned to this work','%')}
+     <p>{guidedExample.scope}. This three-month workload view uses the same starting demand as the {guidedExample.staffingMonths}-month staffing comparison with a ${guidedExample.budgetUsd.toLocaleString()} incremental budget. The budget is not a monthly FTE cost. Effective allocation is 50% assigned time × 60% proficiency coverage = 30%.</p><p>Editable illustrative values, repeated each month. No transfers. Departures leave before hires; hires work the full month. Each hire and departure is 1 FTE.</p>
+     {field('openingDate','Opening month-end')}{field('months','Planning months')}{field('people','Opening people')}{field('fte','Opening contracted FTE')}{field('exits','Monthly departures')}{field('effort','Hours per service unit')}{field('hours','Productive hours per FTE / month')}{field('allocation','Effective capacity allocation','%')}
      <p>Productive hours exclude leave and non-work time. Productivity increases throughput once. No cost rate is assumed.</p>
     </details>
     <button className={styles.reset} type="button" onClick={()=>{setDraft(example);}}><RotateCcw size={14} aria-hidden="true"/> Reset demo</button>

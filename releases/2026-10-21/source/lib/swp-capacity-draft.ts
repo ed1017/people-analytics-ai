@@ -14,7 +14,7 @@ export const emptyCapacityDraft:CapacityDraft={scope:'',openingDate:'',months:'3
 export const capacityLabels:Record<Exclude<keyof CapacityDraft,'fullTimeMovements'|'confirmed'|'sourceNote'>,string>={
  costRate:'Cost per contracted FTE per month (USD, optional)',
  scope:'Workload scope',openingDate:'Opening date (month end)',months:'Planning months',people:'Opening people',fte:'Opening contracted FTE',
- volume:'Work units each month',effort:'Hours per work unit',hours:'Productive hours per FTE each month',hires:'Hires each month (people)',exits:'Departures each month (people)',hireFte:'FTE per hire',exitFte:'FTE per departure',allocation:'Time assigned to this work (%)',productivity:'Productivity improvement (%)',
+ volume:'Work units each month',effort:'Hours per work unit',hours:'Productive hours per FTE each month',hires:'Hires each month (people)',exits:'Departures each month (people)',hireFte:'FTE per hire',exitFte:'FTE per departure',allocation:'Capacity allocation (%)',productivity:'Productivity improvement (%)',
 };
 function number(value:string,label:string):number|null {
  if(!value.trim())return null;

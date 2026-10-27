@@ -10,7 +10,8 @@ test('versioned fictional slice computes same monthly handoff and excludes unsup
  assert.equal(draft.confirmed,false);assert.equal(draft.costRate,'');assert.ok(draft.sourceNote.length<=300);
  assert.deepEqual(risk.result,syntheticCapacityCalculation(draft));assert.deepEqual(risk.result.points.map(p=>[p.month,p.headcount,p.contractedFte,p.allocatedFte,p.requiredFte,p.gapFte]),['2026-10','2026-11','2026-12'].map(m=>[m,10,10,3,8,5]));assert.deepEqual(draft,before);
  for(const [f,date,token] of [[{...filters,country:'US'},'2026-09-30',PUBLIC_9037.token],[{...filters,org:'BU-TECH'},'2026-09-30',PUBLIC_9037.token],[filters,'2026-10-31',PUBLIC_9037.token],[filters,'2026-09-30','legacy-v1:0']])assert.equal(visibleSyntheticCapacityRisk(f,date,token),null);
- assert.ok(visibleSyntheticCapacityRisk({...filters,org:'BU-CLIENTOPS'},'2026-09-30',PUBLIC_9037.token));
+ assert.equal(visibleSyntheticCapacityRisk({...filters,org:'BU-CLIENTOPS'},'2026-09-30',PUBLIC_9037.token),null);
+ assert.equal(visibleSyntheticCapacityRisk({...filters,org:'Fictional Service Operations'},'2026-09-30',PUBLIC_9037.token),null);
 });
 test('editing workload changes calculated risk; unknown and zero retain their meanings',()=>{
  const d=syntheticCapacityDraft();assert.equal(syntheticCapacityCalculation({...d,volume:'480'}).points[0].gapFte,0);assert.equal(syntheticCapacityCalculation({...d,volume:'0'}).points[0].requiredFte,0);assert.equal(syntheticCapacityCalculation({...d,volume:''}).points[0].gapFte,null);assert.equal(syntheticCapacityCalculation({...d,allocation:''}).points[0].allocatedFte,null);

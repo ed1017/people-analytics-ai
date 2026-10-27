@@ -21,7 +21,7 @@ function reader(change=()=>{},filters={country:'all',org:'all',level:'all'}){
 test('exact question and paraphrases preserve source ranking, full BU chart and separate general checks',async()=>{
  for(const question of [exact,'Which BU has the lowest voluntary attrition? What checks should HR consider before acting?','Show the business unit with the highest voluntary turnover; what should we review before taking action?']){
   const r=reader(),reply=await turnoverInvestigationReply(question,r.read,new AbortController().signal);
-  assert.equal(r.count(),1);assert.match(reply.answer,/Suggested investigation checks/);assert.match(reply.answer,/general guidance, not findings/);assert.match(reply.answer,/denominator/);assert.match(reply.answer,/Do not assume any factor caused/);
+  assert.equal(r.count(),1);assert.match(reply.answer,/Suggested investigation checks|What to investigate/);assert.match(reply.answer,/general guidance, not findings/);assert.match(reply.answer,/denominator/);assert.match(reply.answer,/Do not assume any factor caused/);
   assert.equal(reply.charts.length,1);assert.equal(reply.charts[0].points.length,8);assert.equal(readChatEvidenceSeries(reply.charts,'investigation',P.token).length,1);
   assert.match(reply.answer,question.includes('lowest') ? /: 1 percent/ : /: 8 percent/);assert.doesNotMatch(reply.answer,/13\.6/);
  }
@@ -55,7 +55,7 @@ test('unavailable values do not become numeric facts; provenance failure and abo
 test('actual conversation service completes both intents without invoking provider or dropping chart',async()=>{
  const r=reader(),question={version:1,requestId:'investigation',goal:{id:'',statement:''},scope:'Company-wide',filters:{country:'all',org:'all',level:'all'},timeZone:'UTC',evidence:buildHomePack({},'Company-wide',exact),goalContext:null,selectedId:null,catalog:null,state:emptySolutionState(),message:{id:'question',text:exact}};
  const reply=await converseSolutions(question,{readDatasetQuestions:r.read,complete:()=>assert.fail('no model request'),loadProjection:()=>assert.fail('no projection')},new AbortController().signal);
- assert.equal(reply.usage.modelRounds,0);assert.equal(r.count(),1);assert.equal(reply.charts.length,1);assert.equal(reply.state.turns.at(-1).text,reply.answer);assert.match(reply.answer,/Suggested investigation checks/);
+ assert.equal(reply.usage.modelRounds,0);assert.equal(r.count(),1);assert.equal(reply.charts.length,1);assert.equal(reply.state.turns.at(-1).text,reply.answer);assert.match(reply.answer,/Suggested investigation checks|What to investigate/);
 });
 test('ties retain all equal winners and the full comparison; they do not become a single winner',async()=>{
  const r=reader(d=>d.business_units[6].voluntary_turnover_ytd_pct=8);

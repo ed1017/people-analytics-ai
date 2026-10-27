@@ -40,6 +40,8 @@ function monthLabel(value: string) {
 export const AttritionPage = memo(function AttritionPage({ data: sourceData, loading, error, exitData, exitLoading, exitError }: Props) {
   const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
+  const showRegrettable = (summary?.regrettable_exits ?? 0) > 0 || (data?.levels ?? []).some(row => (row.regrettable_exits ?? 0) > 0);
+  const hasConstructedReasons = (data?.reasons ?? []).some(row => /^Constructed demo /i.test(row.separation_reason));
   const trend2026 = useMemo(() => (data?.trend ?? []).filter((row) => row.month >= "2026-01-01"), [data?.trend]);
 
   return (
@@ -48,7 +50,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Diagnose turnover patterns, regrettable losses, workforce segments, and reported separation reasons.
+            Explore turnover by business unit, tenure and career level.
           </p>
         </div>
         <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
@@ -70,7 +72,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
               ["Annualized Voluntary", summary.annualized_voluntary_turnover_pct.toFixed(1) + "%", "Run-rate based on Jan-Sep", "Current year-to-date voluntary turnover converted to a 12-month run rate. It is a pace indicator, not a forecast."],
               ["Exits flagged regrettable", typeof summary.regrettable_exits==='number'?summary.regrettable_exits.toLocaleString():'Unavailable', typeof summary.regrettable_share_of_voluntary_pct==='number'?summary.regrettable_share_of_voluntary_pct.toFixed(1)+'% of voluntary exits':'Classification share unavailable', "Source-reported exits flagged as regrettable. Zero means none flagged in the supplied data; it does not establish that every exit was assessed. Missing counts remain unavailable."],
               ["Total Exits YTD", summary.total_exits.toLocaleString(), summary.total_turnover_ytd_pct.toFixed(1) + "% total turnover", "All recorded separations year to date, including voluntary, involuntary, retirement, and other recorded exits."],
-            ].map(([label, value, note, definition]) => (
+            ].filter(([label]) => label !== "Exits flagged regrettable" || showRegrettable).map(([label, value, note, definition]) => (
               <div key={label} className="rounded-lg border p-4">
                 <p
                   className="inline cursor-help border-b border-dotted text-sm text-muted-foreground"
@@ -121,17 +123,17 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
 
           <div className="mt-6 grid gap-6">
             <div className="rounded-lg border p-4">
-              <h3 className="font-semibold">Reported Separation Reasons</h3>
+              <h3 className="font-semibold">Separation Classifications</h3>
               <p className="mb-4 text-sm text-muted-foreground">All 2026 YTD separation records</p>
-              <EvidenceTableRegion label="Reported separation reasons">
+              <EvidenceTableRegion label="Separation classifications">
                 <table className="w-full min-w-[540px] text-sm">
                   <thead><tr className="border-b text-left text-xs text-muted-foreground">
                     <th className="pb-3">Reason</th><th className="pb-3">Type</th>
                     <th className="pb-3 text-right">Exits</th><th className="pb-3 text-right">Share</th>
                   </tr></thead>
                   <tbody>{data.reasons.map((row) => (
-                    <tr key={row.separation_reason.replace(/^Constructed demo (voluntary|involuntary)$/i, '$1 (constructed classification)')} className="border-b last:border-0">
-                      <td className="py-3 font-medium">{row.separation_reason.replace(/^Constructed demo (voluntary|involuntary)$/i, '$1 (constructed classification)')}</td>
+                    <tr key={row.separation_reason} className="border-b last:border-0">
+                      <td className="py-3 font-medium">{row.separation_reason.replace(/^Constructed demo (voluntary|involuntary)$/i, '$1')}</td>
                       <td className="py-3 capitalize">{row.separation_type.replaceAll("_", " ")}</td>
                       <td className="py-3 text-right">{row.exits}</td>
                       <td className="py-3 text-right">{row.pct_of_exits.toFixed(1)}%</td>
@@ -168,14 +170,14 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
               <table className="w-full min-w-[680px] text-sm">
                 <thead><tr className="border-b text-left text-xs text-muted-foreground">
                   <th className="pb-3">Level</th><th className="pb-3 text-right">Total Exits</th>
-                  <th className="pb-3 text-right">Voluntary</th><th className="pb-3 text-right">Regrettable</th>
+                  <th className="pb-3 text-right">Voluntary</th>{showRegrettable && <th className="pb-3 text-right">Regrettable</th>}
                 </tr></thead>
                 <tbody>{data.levels.map((row) => (
                   <tr key={row.level_code} className="border-b last:border-0">
                     <td className="py-3">{catalogDisplayLabel(row.level_name)}</td>
                     <td className="py-3 text-right">{row.exits}</td>
                     <td className="py-3 text-right">{row.voluntary_exits}</td>
-                    <td className="py-3 text-right">{typeof row.regrettable_exits==='number'?row.regrettable_exits.toLocaleString():'Unavailable'}</td>
+                    {showRegrettable && <td className="py-3 text-right">{typeof row.regrettable_exits==='number'?row.regrettable_exits.toLocaleString():'Unavailable'}</td>}
                   </tr>
                 ))}</tbody>
               </table>
@@ -184,6 +186,9 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
 
           <details className="mt-6 text-sm text-muted-foreground">
             <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Details</summary>
+            <p className="mt-2">Exits flagged regrettable: {typeof summary.regrettable_exits === 'number' ? summary.regrettable_exits.toLocaleString() : 'Unavailable'}. Zero means none flagged in the source; it does not establish that every exit was assessed.</p>
+            {!showRegrettable && <ul className="mt-2">{data.levels.map(row => <li key={row.level_code}>{catalogDisplayLabel(row.level_name)}: {typeof row.regrettable_exits === 'number' ? row.regrettable_exits.toLocaleString() : 'Unavailable'} flagged regrettable</li>)}</ul>}
+            {hasConstructedReasons && <p className="mt-2">Voluntary and involuntary classifications in this dataset are constructed categories, not reported motivations for leaving.</p>}
             <p className="mt-2">Separation reasons are recorded administrative classifications. Tenure charts show exit counts; turnover rates require the population in each tenure band.</p>
           </details>
         </>

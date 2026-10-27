@@ -59,13 +59,13 @@ export function CapacityWorkspace(){
    <h3 className="border-t pt-3 font-semibold">2. How many people do you have?</h3>
    <p className="text-sm text-muted-foreground">Count people separately from working time. FTE means full-time equivalent: two half-time people = 1 FTE.</p>
    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('people')}{field('fte')}</div>
-   <p className="text-sm text-muted-foreground">Enter your dates and time assigned to this work below.</p>
+   <p className="text-sm text-muted-foreground">Enter your dates and capacity allocation below.</p>
    <details className="border-t pt-1">
     <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Timing &amp; capacity assumptions (required)</summary>
     <p className="mb-3 text-xs text-muted-foreground">Starting people and FTE are measured just before the first planning month. FTE is contracted working time, before assigning time to this work. Leave blanks when unknown; enter 0 only when none.</p>
     <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('openingDate')}{field('months','Plan 1-6 months.')}</div>
-    <div className="mt-3 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hours','After leave and other non-work time; before time assigned to this work.')}</div>
-    <div className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','Share of productive time assigned to this work (0-100%).')}{field('productivity','Throughput improvement (0-100%).')}</div>
+    <div className="mt-3 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hours','After leave and other non-work time; before workload allocation.')}</div>
+    <div className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hires','Count each joiner once.')}{field('exits','All departures, including retirement; count each person once.')}{field('allocation','Share of contracted FTE available for this workload (0-100%).')}{field('productivity','Throughput improvement (0-100%).')}</div>
     <label className="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" checked={draft.fullTimeMovements} onChange={e=>edit({fullTimeMovements:e.target.checked})}/>Assume each person joining or leaving accounts for 1 FTE</label>
     {!draft.fullTimeMovements&&<div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3">{field('hireFte','0-1 FTE per person.')}{field('exitFte','0–1 FTE/person.')}</div>}
    {field('costRate','USD per contracted FTE per month. Leave blank if unknown.')}
@@ -89,7 +89,7 @@ export function CapacityWorkspace(){
     {result.status==='needs-inputs'&&<p className="text-sm">Fill in the missing numbers, including Timing &amp; capacity assumptions, then confirm and calculate. Known work needs can still be shown while available time is unknown.</p>}
     <p className="text-sm">{result.assumptions.scope.label} · Opening {result.assumptions.opening.asOf}.</p>
     <details className="border-t"><summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Monthly detail · people and FTE</summary>
-    <p className="mb-3 text-xs text-muted-foreground">Available FTE is contracted time assigned to this work; productivity changes required FTE. An FTE gap is not a hiring count. Cost is a monthly estimate from your rate and contracted FTE, rounded to cents; assignment and productivity do not change it. It does not measure actual pay, cumulative spend or savings.</p>
+    <p className="mb-3 text-xs text-muted-foreground">Available FTE is the modeled capacity allocated to this work; productivity changes required FTE. An FTE gap is not a hiring count. Cost is a monthly estimate from your rate and contracted FTE, rounded to cents; assignment and productivity do not change it. It does not measure actual pay, cumulative spend or savings.</p>
     <div className="overflow-x-auto" role="region" aria-label="Monthly capacity comparison" tabIndex={0}>
      <div className="space-y-3 sm:hidden">{result.points.map(p=><div key={p.month} className="rounded-md border p-3">
       <p className="mb-2 font-medium">{p.month}</p>

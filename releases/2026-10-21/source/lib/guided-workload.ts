@@ -1,3 +1,4 @@
+import type {CapacityDraft} from './swp-capacity-draft';
 import type {Assumption,BundleInputs} from './home-bundle-reconciliation';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {calculateServiceDemand,type ServiceDemand} from './swp-demand.ts';
@@ -5,6 +6,12 @@ export const guidedWorkloadFields=['volume','hoursPerUnit','productiveHours','ex
 export type GuidedWorkloadField=typeof guidedWorkloadFields[number];
 export type GuidedWorkload={version:1}&Record<GuidedWorkloadField,Assumption<number>>;
 export const guidedWorkloadLabels:Record<GuidedWorkloadField,string>={volume:'Service units per month',hoursPerUnit:'Hours per service unit',productiveHours:'Productive hours per FTE per month',existingPeople:'Existing role holders excluding develop and move pools',ftePerPerson:'Contracted FTE per existing person',allocationPct:'Available allocation percent',skillCoveragePct:'Allocated FTE meeting required proficiency percent'};
+export const guidedExample = Object.freeze({businessUnit:'Fictional Service Operations',role:'Service Analyst',scope:'Fictional Service Operations / Service Analyst',budgetUsd:325000,staffingMonths:12});
+/** A monthly workload slice of the guided staffing example; never a saved-draft migration. */
+export function guidedExampleCapacityDraft():CapacityDraft {
+ const w=defaultGuidedWorkload(),v=(key:GuidedWorkloadField)=>w[key].value!;
+ return {scope:guidedExample.scope+' - service units',openingDate:'2026-09-30',months:'3',people:String(v('existingPeople')),fte:String(v('existingPeople')*v('ftePerPerson')),volume:String(v('volume')),effort:String(v('hoursPerUnit')),hours:String(v('productiveHours')),hires:'0',exits:'0',hireFte:'1',exitFte:'1',allocation:String(v('allocationPct')*v('skillCoveragePct')/100),productivity:'0',costRate:'',fullTimeMovements:true,confirmed:false,sourceNote:'Guided Service Analyst example: 50% allocation x 60% proficiency coverage = 30% effective allocation. Three-month workload view with the same starting assumptions as the 12-month $325,000 staffing comparison; budget is not a salary rate. Costs unknown. Separate fictional internal pools.'};
+}
 export function defaultGuidedWorkload():GuidedWorkload {
  const values=[1280,1,160,10,1,50,60];
  return {version:1,...Object.fromEntries(guidedWorkloadFields.map((key,i)=>[key,{value:values[i],kind:'illustrative',basis:'Fictional service scenario; existing role holders exclude all separate develop/move pools. Not measured workforce data.'}]))} as GuidedWorkload;
