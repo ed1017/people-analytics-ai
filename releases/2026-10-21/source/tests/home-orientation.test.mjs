@@ -10,7 +10,8 @@ const require=createRequire(import.meta.url);
 const empty={getItem:()=>null},token='workforce-demo-9037-public-aggregates-v4:5';
 test('first visit honors old dismissal and exact dataset decisions/recovery without changing storage',()=>{
  assert.equal(onboarding.isFirstHomeVisit(empty,empty,token),true);
- for(const key of [onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'insights-to-action.decisions.v1','insights-to-action.decisions.v1.dataset.'+token])assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===key?'{}':null},empty,token),false);
+ assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY?'1':null},empty,token),false);
+ for(const key of ['insights-to-action.decisions.v1','insights-to-action.decisions.v1.dataset.'+token,'insights-to-action.goals.v1','people-analytics.saved-workforce-scenarios.v1'])assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===key?'{}':null},empty,token),true);
  assert.equal(onboarding.isFirstHomeVisit(empty,{getItem:k=>k==='insights-to-action.decisions.recovery.v1.dataset.'+token?'{}':null},token),false);
  assert.equal(onboarding.isFirstHomeVisit({getItem:()=>{throw Error('blocked');}},empty,token),false);
 });
@@ -32,13 +33,13 @@ test('first visit waits for safe active readiness, opens once, dismisses and reo
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
  h.flush({busy:false});assert.equal(h.native.shown,1);assert.equal(h.focus,'title');h.flush();assert.equal(h.native.shown,1);
  h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);assert.equal(h.focus,'fallback');assert.deepEqual(h.writes,[[onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1']]);assert.equal(h.starts,0);
- h.button('About Workforce Intelligence').props.onClick();h.flush();assert.equal(h.native.shown,2);h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.native.open,false);
+ h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.shown,2);h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.native.open,false);
 });
 test('launch is explicit and single-shot, disabled state cannot start, storage failure cannot trap dismissal',()=>{
  const h=harness({demoReady:false,storageFails:true});h.flush();h.button('Start guided demo').props.onClick();assert.equal(h.starts,0);assert.equal(h.native.open,true);
  h.flush({demoReady:true});const start=h.button('Start guided demo');start.props.onClick();start.props.onClick();h.flush();assert.equal(h.starts,1);assert.equal(h.native.open,false);
- h.button('About Workforce Intelligence').props.onClick();h.flush();h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
- h.button('About Workforce Intelligence').props.onClick();h.flush();const resume=h.button('Start guided demo');resume.props.onClick();resume.props.onClick();h.flush();assert.equal(h.starts,2,'an explicit immediate reopen permits one new launch, not two');
+ h.button('Introduction').props.onClick();h.flush();h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
+ h.button('Introduction').props.onClick();h.flush();const resume=h.button('Start guided demo');resume.props.onClick();resume.props.onClick();h.flush();assert.equal(h.starts,2,'an explicit immediate reopen permits one new launch, not two');
 });
 test('context interruption closes without opening a demo or stealing focus',()=>{
  const h=harness();h.flush();h.flush({active:false,dismissKey:'two'});assert.equal(h.native.open,false);assert.equal(h.starts,0);assert.equal(h.writes.length,0);
@@ -60,10 +61,10 @@ function hydratedStore(localEntries=[],sessionEntries=[]){
 test('actual dataset initialization preserves fresh first-visit observation, consumes it once and respects existing data',()=>{
  const fresh=hydratedStore();fresh.api.switchDecisionDataset(token);
  assert.ok(fresh.local.has(localDecisions.datasetDecisionKey(token)),'real initialize writes an envelope before Home mounts');
- assert.equal(onboarding.isFirstHomeVisit({getItem:key=>fresh.local.get(key)??null},empty,token),false,'post-hydration check alone reproduces the bug');
+ assert.equal(onboarding.isFirstHomeVisit({getItem:key=>fresh.local.get(key)??null},empty,token),true,'hydration does not mean introduction was seen');
  assert.equal(fresh.api.consumeFirstHomeVisit(),true);assert.equal(fresh.api.consumeFirstHomeVisit(),false,'remount is existing use');
  const switched=hydratedStore();switched.api.switchDecisionDataset(token);switched.api.switchDecisionDataset(token.replace(":5",":6"));assert.equal(switched.api.consumeFirstHomeVisit(),false,"switching datasets cannot reuse the initial observation");
- const returning=hydratedStore([...fresh.local]);returning.api.switchDecisionDataset(token);assert.equal(returning.api.consumeFirstHomeVisit(),false);
+ const returning=hydratedStore([...fresh.local]);returning.api.switchDecisionDataset(token);assert.equal(returning.api.consumeFirstHomeVisit(),true);
  const dismissed=hydratedStore();dismissed.api.switchDecisionDataset(token);dismissed.local.set(onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1');assert.equal(dismissed.api.consumeFirstHomeVisit(),false);
  const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),false);
 });
@@ -96,4 +97,18 @@ test('top actions precede scroll region, verified contacts wrap, and focus wraps
  let focused='',prevented=false;const first={focus:()=>focused='start'},last={focus:()=>focused='linkedin'},currentTarget={querySelectorAll:()=>[first,last]};
  h.document.activeElement=last;dialog.props.onKeyDown({key:'Tab',shiftKey:false,currentTarget,preventDefault(){prevented=true;}});assert.equal(focused,'start');assert.equal(prevented,true);
  h.document.activeElement=first;dialog.props.onKeyDown({key:'Tab',shiftKey:true,currentTarget,preventDefault(){}});assert.equal(focused,'linkedin');
+});
+
+
+test('resumed draft, history or active plan never auto-opens after clear/reset; explicit reopen remains available',()=>{
+ for(const state of ['draft','history','plan']){
+  const h=harness({suppressAutoOpen:true});h.flush();assert.equal(h.native.shown,0,state);
+  h.flush({suppressAutoOpen:false});assert.equal(h.native.shown,0,state+' cleared');
+  h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.shown,1,state+' explicit');
+ }
+});
+test('introduction control is outside More and active work guard remains explicit',()=>{
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
+ assert.ok(source.indexOf('<HomeGettingStarted')<source.indexOf('<details className="relative ml-auto"'));
+ assert.match(source,/suppressAutoOpen=\{Boolean\(conversation.input.trim\(\)\|\|conversation.issueEditor\|\|conversation.activeGoalId\|\|messages.length\|\|swpDemoVisible\|\|guidedExampleActive\)\}/);
 });

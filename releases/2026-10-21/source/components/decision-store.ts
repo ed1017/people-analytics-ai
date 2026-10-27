@@ -5,8 +5,11 @@ import { LEGACY_DATASET_TOKEN } from "@/lib/dataset-identity.mjs";
 import {HOME_INSTRUCTIONS_DISMISSED_KEY,isFirstHomeVisit} from '@/lib/home-onboarding';
 export let decisionStore=new DecisionStore();
 let pendingHomeVisit:{token:string;first:boolean}|null=null;
+let homeVisitConsumed=false;
 /** Consume the pre-hydration observation once; saved records remain authoritative on remount. */
 export function consumeFirstHomeVisit(){
+ if(homeVisitConsumed)return false;
+ homeVisitConsumed=true;
  const pending=pendingHomeVisit;pendingHomeVisit=null;
  try {
   if(localStorage.getItem(HOME_INSTRUCTIONS_DISMISSED_KEY)!==null)return false;
