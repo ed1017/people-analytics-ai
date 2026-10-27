@@ -1,3 +1,4 @@
+import {PositionDashboard} from "./position-dashboard";
 import {ExternalWorkforceEvidencePanel} from "@/components/external-workforce-evidence-panel";
 import {PositionScenarioEditor} from "./position-scenario-editor";
 import {KeyFindings} from "@/components/key-findings";
@@ -15,6 +16,8 @@ type PositionWorkforceDesignDestinationProps = {
   visible: boolean;
   selectedPlanningScenario: string;
   positionModelingLoading: boolean;
+  positionCatalogLoading: boolean;
+  positionCatalogError: string | null;
   positionActionProps: ComponentProps<
     typeof PositionActionSimulator
   >;
@@ -33,6 +36,8 @@ export function PositionWorkforceDesignDestination({
   visible,
   selectedPlanningScenario,
   positionModelingLoading,
+  positionCatalogLoading,
+  positionCatalogError,
   positionActionProps,
   structuralActionProps,
   structuralPositionResult,
@@ -60,8 +65,9 @@ export function PositionWorkforceDesignDestination({
 
       </div>
 
-      <PositionScenarioEditor />
-      <ExternalWorkforceEvidencePanel />
+      <PositionDashboard catalog={structuralActionProps.catalog} loading={positionCatalogLoading} error={positionCatalogError} />
+      <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-semibold focus-visible:ring-2 focus-visible:ring-ring">Edit individual positions &amp; saved revisions</summary><div className="pt-3"><PositionScenarioEditor /></div></details>
+      <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">External role &amp; location evidence</summary><div className="pt-3"><ExternalWorkforceEvidencePanel /></div></details>
 
       <details className="rounded-lg border p-4">
         <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Grouped inventory tools</summary>

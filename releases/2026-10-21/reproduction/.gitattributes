@@ -1,0 +1,2 @@
+# Preserve byte-pinned historical field-map identity on every platform.
+captured-public-fields.json -text

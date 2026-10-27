@@ -20,7 +20,8 @@ for(const item of JSON.parse(fs.readFileSync(path.join(here,'public-support.json
  fs.mkdirSync(path.dirname(path.join(output,item.path)),{recursive:true});write(item.path,text);
 }
 write('lib/fixtures.json',bytes);
-write('lib/fixture-handler.mjs',fs.readFileSync(path.join(here,'fixture-handler.mjs')));
+write('lib/captured-public-fields.json',fs.readFileSync(path.join(here,'captured-public-fields.json')));
+write('lib/fixture-handler.mjs',fs.readFileSync(path.join(here,'fixture-handler.mjs'),'utf8').replaceAll('../source/lib/','./'));
 write('lib/verify-receipts.mjs',fs.readFileSync(path.join(here,'verify-receipts.mjs'),'utf8').replaceAll('../source/lib/','./'));
 write('lib/fixture-runtime.mjs',`import fs from 'node:fs';\nimport crypto from 'node:crypto';\nimport {createFixtureHandler} from './fixture-handler.mjs';\nconst bytes=fs.readFileSync(process.cwd()+'/lib/fixtures.json');\nif(crypto.createHash('sha256').update(bytes).digest('hex')!=='${pin}')throw Error('Fixture pin mismatch');\nexport const fixtureHandle=createFixtureHandler(JSON.parse(bytes));\n`);
 write('proxy.ts',`import {NextResponse,type NextRequest} from 'next/server';\nimport {fixtureHandle} from './lib/fixture-runtime.mjs';\nexport function proxy(request:NextRequest){return fixtureHandle(request,process.env)??NextResponse.next();}\nexport const config={matcher:'/:path*'};\n`);
@@ -28,11 +29,11 @@ write('lib/dataset-runtime.ts',`import {fixtureHandle} from './fixture-runtime.m
 const layout=fs.readFileSync(path.join(output,'app/layout.tsx'),'utf8');
 if(!layout.includes('<body>'))throw Error('Unrecognized layout');
 write('app/layout.tsx',layout.replace('<body>','<body><aside role="note" style={{padding:12,borderBottom:"1px solid currentColor"}}>Local historical synthetic fixture replay. Company-wide recorded data only; AI, external services and unrecorded calculations are unavailable.</aside>'));
-write('next.config.ts',`import type {NextConfig} from 'next';\nconst config:NextConfig={outputFileTracingIncludes:{'/**':['./lib/fixtures.json']}};\nexport default config;\n`);
+write('next.config.ts',`import type {NextConfig} from 'next';\nconst config:NextConfig={outputFileTracingIncludes:{'/**':['./lib/fixtures.json','./lib/captured-public-fields.json']}};\nexport default config;\n`);
 write('vercel.json',JSON.stringify({git:{deploymentEnabled:false}},null,2)+'\n');
 const pkg=JSON.parse(fs.readFileSync(path.join(output,'package.json')));
 pkg.scripts={dev:'node run-next.mjs dev',build:'node run-next.mjs build',start:'node run-next.mjs start',typecheck:'tsc --noEmit'};
 write('package.json',JSON.stringify(pkg,null,2)+'\n');
 write('run-next.mjs',fs.readFileSync(path.join(here,'run-next.mjs')));
-write('REPRODUCTION.json',JSON.stringify({sourceManifest:'releases/2026-10-21/manifest.json',fixtureSha256:pin,publicSupport:JSON.parse(fs.readFileSync(path.join(here,'public-support.json'),'utf8')),overrides:['proxy.ts','lib/dataset-runtime.ts','app/layout.tsx','next.config.ts','package.json','vercel.json'],added:['lib/fixtures.json','lib/fixture-handler.mjs','lib/fixture-runtime.mjs','lib/verify-receipts.mjs','run-next.mjs'],scope:'Historical company-wide public GET replay; no live AI, DB, private inputs or unrecorded calculator parity'},null,2)+'\n');
+write('REPRODUCTION.json',JSON.stringify({sourceManifest:'releases/2026-10-21/manifest.json',fixtureSha256:pin,publicSupport:JSON.parse(fs.readFileSync(path.join(here,'public-support.json'),'utf8')),overrides:['proxy.ts','lib/dataset-runtime.ts','app/layout.tsx','next.config.ts','package.json','vercel.json'],added:['lib/captured-public-fields.json','lib/fixtures.json','lib/fixture-handler.mjs','lib/fixture-runtime.mjs','lib/verify-receipts.mjs','run-next.mjs'],scope:'Historical company-wide public GET replay; no live AI, DB, private inputs or unrecorded calculator parity'},null,2)+'\n');
 console.log('Prepared isolated fixture application: '+output);

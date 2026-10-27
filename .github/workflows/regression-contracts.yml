@@ -49,6 +49,9 @@ jobs:
       - name: Verify durable pricing without provider requests
         working-directory: releases/2026-10-21/source
         run: node --test tests/public-pricing-verifier.test.mjs tests/public-pricing-renewal.test.mjs tests/public-pricing-policy.test.mjs tests/public-planner-ledger.test.mjs tests/public-planner-round.test.mjs
+      - name: Verify chart-first positions and intro controls
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-dashboard.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
       - name: Run regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing

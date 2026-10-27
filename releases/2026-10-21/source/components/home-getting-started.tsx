@@ -75,7 +75,6 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
     }} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden rounded-2xl border bg-card p-0 text-foreground shadow-xl backdrop:bg-black/60 open:flex open:flex-col">
       <header className="shrink-0 border-b px-5 py-4 sm:px-6">
-        <p className="text-sm font-semibold text-primary">Developed by Ed Om</p>
         <h2 ref={title} id={id+'-title'} tabIndex={-1} className="mt-1 text-2xl font-bold tracking-tight focus:outline-none">Workforce Intelligence</h2>
         <p id={id+'-purpose'} className="mt-2 text-base font-semibold">Turn workforce evidence into a staffing decision.</p>
       <div className="mt-3">
@@ -91,7 +90,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       {!demoReady&&<p role="status" className="mt-2 text-sm">Finish loading or recover unsaved work to start the demo.</p>}
       </div>
       </header>
-      <div tabIndex={0} role="region" aria-label="About Ed and Workforce Intelligence" className="min-h-0 overflow-y-auto px-5 py-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6">
+      <div tabIndex={0} role="region" aria-label="About Workforce Intelligence" className="min-h-0 overflow-y-auto px-5 py-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6">
         <section aria-labelledby={id+'-why'}>
           <h3 id={id+'-why'} className="text-base font-bold">Purpose of the project</h3>
           <p className="mt-1">This independent portfolio project explores a practical question: how can a team turn workforce evidence into a staffing decision, with the assumptions and tradeoffs visible?</p>
@@ -116,7 +115,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
         </section>
         <section aria-labelledby={id+'-role'} className="mt-4">
           <h3 id={id+'-role'} className="text-base font-bold">Project development</h3>
-          <p className="mt-1">Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing. This project demonstrates the planning workflow and the reasoning behind it.</p>
+          <p className="mt-1">The workforce-planning problem, product requirements and acceptance criteria shaped this project. AI assisted with implementation, design and testing. This project demonstrates the planning workflow and the reasoning behind it.</p>
           <a href="/about" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center rounded text-sm text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">About this project<span className="sr-only"> (opens a new tab)</span></a>
         </section>
         <section aria-labelledby={id+'-contact'} className="mt-4">

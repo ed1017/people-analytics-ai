@@ -8,13 +8,13 @@ The portfolio prototype uses a fictional company with 9,037 people as of Septemb
 
 ## Try a planning decision
 
-1. **Open the example.** On Overview, choose **Planning Scenario**, then **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
+1. **Open the example.** On Overview, choose **Introduction**, then **Start guided demo** and **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
 2. **Test a different approach.** Review the role, timing and budget; adjust the available inputs and compare cost, readiness and uncovered work alongside the charts.
 3. **Keep a proposal.** Save the reviewed plan in your browser, reopen it, and compare a revision while retaining the original assumptions.
 
 Prefer to start with workload? Open [Scenarios](https://www.ed-ai.app/scenarios) and choose **Open worked example**, or enter your own work and team inputs.
 
-**Live AI status, October 26, 2026:** provider-backed conversation is unavailable while its verification window is expired; renewal remains blocked and has not been applied. The worked example and local scenario calculations remain available.
+**Live AI status, October 27, 2026:** automatic pricing verification is installed and public readiness checks report configured. Readiness is not proof that every answer succeeds; recent visitor-reported answer failures remain under investigation. The worked example and local scenario calculations do not require a paid model call.
 
 ## Product decisions and tradeoffs
 
@@ -29,15 +29,15 @@ The application demonstrates the planning workflow and its software behavior. Ad
 
 ## Next steps
 
-The current focus is usability and reliability across existing journeys: clear entry points, concise results, and recovery when data or local saving is unavailable. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Live-AI availability and any fresh provider-backed acceptance remain a separate operational decision.
+The current focus is usability and reliability across existing journeys, chart-first position management, and source-grounded workforce evidence. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Fresh paid model testing is not part of the current acceptance checks.
 
 ## Repository and deployment status
 
-The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. The current source release is [PR425](https://github.com/ed1017/people-analytics-ai/pull/425), runtime `2922eb96944d61aa58f4fada4ea95c651a11b2ad`, with its deployment pinned by the manifest. The release record tracks final CI, promotion and public verification. The [active roadmap](docs/roadmap-status-2026-10-17.md) separates completed work, remaining evidence and deferred scope; [PR424 verification](docs/release-verification-pr424.md) preserves the preceding production checkpoint. Older dated sections are historical.
+The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. [PR431](https://github.com/ed1017/people-analytics-ai/pull/431) publishes the chart-first position candidate, runtime `6400ea60f01b2c1b8a717cacf3a3247df32ffc0a`, with its protected deployment pinned by the manifest. PR430 remains the last confirmed public release until promotion and public checks are recorded. The [active roadmap](docs/roadmap-status-2026-10-17.md) separates live work, candidates, remaining evidence and deferred scope. Older dated sections are historical.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
-Automatic Vercel deployments from main and this publication branch remain disabled. No production rebuild, configuration change or paid call accompanies this source publication. The release notes distinguish protected provider checks, captured-answer replay, local continuity tests and public configuration smoke; no fresh paid production browser journey through every step is claimed.
+Automatic Vercel deployments from main and this publication branch remain disabled. Releases use separately checked builds and explicit promotion. The release notes distinguish protected provider checks, captured-answer replay, local continuity tests and public configuration smoke; no fresh paid production browser journey through every step is claimed.
 See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
 
 See [Public portfolio MVP acceptance](docs/public-portfolio-mvp-acceptance.md) for completed evidence, operational dependencies and optional extensions.

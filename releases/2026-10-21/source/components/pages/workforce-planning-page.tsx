@@ -257,6 +257,8 @@ export function WorkforcePlanningPage({
     onPlanningDestinationChange(view);
   };
 
+  const [positionCatalogLoading, setPositionCatalogLoading] = useState(true);
+  const [positionCatalogError, setPositionCatalogError] = useState<string | null>(null);
   const [scenarioDefaultsError, setScenarioDefaultsError] = useState<string | null>(null);
   const [scenarioDefaultSource, setScenarioDefaultSource] = useState<ScenarioDefaultSource | null>(null);
   const [scenarioDefaults, setScenarioDefaults] =
@@ -536,6 +538,8 @@ export function WorkforcePlanningPage({
     let cancelled = false;
 
     async function loadStructuralPositionCatalog() {
+      setPositionCatalogLoading(true);
+      setPositionCatalogError(null);
       try {
         const response = await datasetFetch(
           "/api/position-structure",
@@ -557,12 +561,14 @@ export function WorkforcePlanningPage({
         }
       } catch (error) {
         if (!cancelled) {
-          setStructuralPositionError(
+          setPositionCatalogError(
             error instanceof Error
               ? error.message
               : "Failed to load structural position catalog."
           );
         }
+      } finally {
+        if (!cancelled) setPositionCatalogLoading(false);
       }
     }
 
@@ -2172,11 +2178,13 @@ export function WorkforcePlanningPage({
                   onReset: resetPositionActions,
                   onRun: runPositionActions,
                 }}
+                positionCatalogLoading={positionCatalogLoading}
+                positionCatalogError={positionCatalogError}
                 structuralActionProps={{
                   actions: structuralPositionActions,
                   catalog: structuralPositionCatalog,
                   loading: structuralPositionLoading,
-                  error: structuralPositionError,
+                  error: positionCatalogError || structuralPositionError,
                   onAdd: addStructuralPositionAction,
                   onReset: resetStructuralPositionActions,
                   onRun: runStructuralPositionActions,
