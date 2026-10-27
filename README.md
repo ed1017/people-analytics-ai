@@ -29,11 +29,11 @@ The application demonstrates the planning workflow and its software behavior. Ad
 
 ## Next steps
 
-The current focus is usability and reliability across existing journeys, chart-first position management, and source-grounded workforce evidence. Follow the [active roadmap](docs/roadmap-status-2026-10-17.md) for verified work, unresolved evidence and explicitly deferred features. Fresh paid model testing is not part of the current acceptance checks.
+Chart-first position management, editable workload risk and sourced workforce references are delivered. The next work is targeted acceptance and resolving the remaining model-failure evidence and external-data gaps, as tracked in the [active roadmap](docs/roadmap-status-2026-10-17.md). Fresh paid model testing is outside current acceptance checks.
 
 ## Repository and deployment status
 
-The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. [PR432](https://github.com/ed1017/people-analytics-ai/pull/432) is verified live, runtime `4c6bc839ce4affbfb94157065102f747fd0b4ec9`, adding turnover investigation guidance, sourced UK pay and an editable fictional workload risk. The manifest pins the next Toronto evidence and missing-state candidate for protected verification. The [active roadmap](docs/roadmap-status-2026-10-17.md) separates live work, candidates, remaining evidence and deferred scope. Older dated sections are historical.
+The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. [PR434](https://github.com/ed1017/people-analytics-ai/pull/434) is verified live, runtime `568b064e59ad2001f5137fe4cc8e793893d3d887`. The manifest pins that deployed source, including goal-bound external references, source attribution and native-unit preservation. The [active roadmap](docs/roadmap-status-2026-10-17.md) separates live work, candidates, remaining evidence and deferred scope. Older dated sections are historical.
 
 The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
 
