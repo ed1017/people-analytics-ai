@@ -7,7 +7,7 @@ import {selectStaffingOptions} from './staffing-option-presentation.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {guidedPlanTarget,optionMonthlyCoverage,monthlyCapacityEffort,guidedOptionEffort as guidedEffortForRanking} from './guided-plan-summary.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
-import {defaultGuidedWorkload,syncGuidedWorkloadDemand} from './guided-workload.ts';
+import {defaultGuidedWorkload,syncGuidedWorkloadDemand,guidedExample} from './guided-workload.ts';
 /** A presentation/commit adapter over existing staffing, plan and progress contracts.
  * No model, network, workforce write or replacement workflow engine. */
 // @ts-expect-error Native Node tests share TypeScript source.
@@ -52,9 +52,9 @@ export async function createSwpDemo(goalId:string,now:string):Promise<BundleDraf
  draft.bundle=swpDemoBundle();draft.signature=bundleSignature(draft.bundle);
  draft.binding.goalId=goalId;draft.binding.goal=swpDemoGoal;
  const input=draft.inputs,capacity=input.capacity!;
- input.budget={amount:assumed(325000),basis:assumed('cash')};capacity.input.budget='325000';capacity.origins.budget={kind:'illustrative',basis:premise};
- input.scope.population=assumed('Fictional Service Operations / Service Analyst');
- input.scope.businessUnit=assumed('Fictional Service Operations');input.scope.jobProfile=assumed('Service Analyst');
+ input.budget={amount:assumed(guidedExample.budgetUsd),basis:assumed('cash')};capacity.input.budget=String(guidedExample.budgetUsd);capacity.origins.budget={kind:'illustrative',basis:premise};
+ input.scope.population=assumed(guidedExample.scope);
+ input.scope.businessUnit=assumed(guidedExample.businessUnit);input.scope.jobProfile=assumed(guidedExample.role);
  input.scope.requirements=assumed('Cover the entered fictional service workload. Review productive hours, qualified allocation, separate internal pools and dated readiness; these assumptions do not establish measured outcomes.');
  input.guidedWorkload=defaultGuidedWorkload();syncGuidedWorkloadDemand(input);
  capacity.input.businessUnit=input.scope.businessUnit.value!;capacity.input.jobProfile=input.scope.jobProfile.value!;

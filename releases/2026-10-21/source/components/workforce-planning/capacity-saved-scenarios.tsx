@@ -22,7 +22,7 @@ const assumptionFields = [
  ['exits','Departures each month','people/month'],
  ['hireFte','Contracted time per hire','FTE/person'],
  ['exitFte','Contracted time per departure','FTE/person'],
- ['allocation','Time assigned to this work','%'],
+ ['allocation','Capacity allocation','%'],
  ['productivity','Productivity improvement','%'],
  ['costRate','Cost per contracted FTE','USD/FTE/month'],
 ] as const;

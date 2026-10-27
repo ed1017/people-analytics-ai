@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "394fedbb6c7162216df1b1c50bd961b364aa4038",
-  "deployment": "https://people-analytics-m1kyg0v08-ed-56dc.vercel.app",
+  "sourceCommit": "8600d5053e0cd5c09430f08c06c3e676ae29d9f9",
+  "deployment": "https://people-analytics-de70jlvm0-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -424,8 +424,8 @@
     },
     {
       "path": "components/exit-survey-feedback.tsx",
-      "sha256": "8264b0283a1e839215adc0825d2b19bb8ea3198f9f64d9dc193d8a6416740983",
-      "bytes": 4491
+      "sha256": "ca15f6d13754364871abd40e788b14e15c8ea8f47f7ba02985e0773cd7f4fb08",
+      "bytes": 4474
     },
     {
       "path": "components/focused-issue.tsx",
@@ -739,8 +739,8 @@
     },
     {
       "path": "components/pages/attrition-page.tsx",
-      "sha256": "6e0715f797496996e40b32a5379e8e13e225c59c5df3ffd7bf516b09c27bffb1",
-      "bytes": 11313
+      "sha256": "6727d433f6d4a6ac36ac705dd6a808d00f20ab8fbe4107289e335d9c64a4bce9",
+      "bytes": 12251
     },
     {
       "path": "components/pages/career-growth-mobility-page.tsx",
@@ -1154,13 +1154,13 @@
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
-      "sha256": "8e1d355a2d0f9d784e9f5b891a73af1565c8cad5d68f5e7be2726b6c00d13b9d",
-      "bytes": 13342
+      "sha256": "13c02e235d5c9dda3a37f3c06e3b6f13739a950d7dee9d77de8d88952b3f98ed",
+      "bytes": 13335
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "0d3b9cdb3bb83e65d5d21c9c3c3d30d7b2c8a2667c8065ac69430fda2fc81409",
-      "bytes": 12321
+      "sha256": "57ec17d25eb549776b8caf685ca0dfcdee4920fa6f8d72c731a96027bb31701e",
+      "bytes": 12318
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -1209,8 +1209,8 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
-      "sha256": "f0a1fe1cd173e156a9b0aea9763dadd3212c4177e95359f3f51b4135cefbc9d0",
-      "bytes": 6384
+      "sha256": "01bd0df288f4331b0802257c52e1fdba09b49cc7afbaf34ed9f27b1803729e46",
+      "bytes": 6614
     },
     {
       "path": "components/workforce-planning/planning-overview.tsx",
@@ -2029,8 +2029,8 @@
     },
     {
       "path": "lib/guided-workload.ts",
-      "sha256": "86a0f920f50574d755f4bb5e63571e1bada8fe45046becb071bb2df6790fd550",
-      "bytes": 4761
+      "sha256": "057ebe7088a5dd4051603c470f0c39ec417a1c94a3c83cffb3750eeee4834988",
+      "bytes": 6006
     },
     {
       "path": "lib/hiring-budget-authority.ts",
@@ -2239,8 +2239,8 @@
     },
     {
       "path": "lib/home-dataset-query.mjs",
-      "sha256": "4831daa82e22f2166082e7b39c80d4a7039d492b94ea6258dbf40e5ef218e029",
-      "bytes": 3774
+      "sha256": "f9fa382a67fe83ade0ed8800665f495f27a5cd7d6de0c3f9ef0da92729f028ed",
+      "bytes": 3673
     },
     {
       "path": "lib/home-decision-journey.ts",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "82dd15f6bebbf11fa079e3175a7c8bfd18aeba3fc83c7220f6322e9b1fc7eb5c",
-      "bytes": 45125
+      "sha256": "5148941dc5b16782332254a0b882c736c75c2703bb4133ac6c6467e1fc06f4af",
+      "bytes": 45307
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "102cf05cb8d5b4b318b8bf4e8a93dc5bb1903de9ae0532cfe427145368f219e8",
-      "bytes": 8152
+      "sha256": "dd14585350f4cd8718b0daf673835f73164fabb848a6a3c38285b7e390750043",
+      "bytes": 8111
     },
     {
       "path": "lib/labor-outlook.mjs",
@@ -3464,8 +3464,8 @@
     },
     {
       "path": "lib/swp-capacity-draft.ts",
-      "sha256": "8ede08f0e1fc6ea55f7a34f5b50ef8a38253f4e014f4d2cbbedb6c40eb8b6a52",
-      "bytes": 5613
+      "sha256": "3d3ac2cabde09f8d7a354c0f194705edf14f54737a8ee38649a160849867dd1c",
+      "bytes": 5606
     },
     {
       "path": "lib/swp-capacity-record.ts",
@@ -3499,8 +3499,8 @@
     },
     {
       "path": "lib/swp-demo.ts",
-      "sha256": "ab2eae3fe50e70d74fe34674f5cb1c8cc4ca14401e79dc698b493b3fb9ba611d",
-      "bytes": 27765
+      "sha256": "7d054634120e1ea5a117dfdaed59bc53403911650ae949804974f62b7357a71d",
+      "bytes": 27787
     },
     {
       "path": "lib/swp-history-qualification.ts",
@@ -3864,8 +3864,8 @@
     },
     {
       "path": "tests/home-dataset-query.test.mjs",
-      "sha256": "5ee5b8a82b297721f5a5aa1f6c5f854d5ad0ae803390fe173467bc3f2ce6745b",
-      "bytes": 5171
+      "sha256": "caa16fcddec14be8b8a5142b20c2cb427df6c730f6a26750849d70db5b9cd210",
+      "bytes": 5230
     },
     {
       "path": "tests/home-flows-catalog.test.mjs",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "5f014b961ac1db750148a73518dbc6ead46de41c2d36a54c6923bc8693182152",
-      "bytes": 6862
+      "sha256": "17ea3188d5a0c5725ac97b99a828e4de72f2184cfc8cfab7be874cdf885131f0",
+      "bytes": 7069
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4404,8 +4404,8 @@
     },
     {
       "path": "tests/urgent-missing-display.test.mjs",
-      "bytes": 3362,
-      "sha256": "ac16086a5d1a1e30cc7dda92e78e9ebd059ba692a4f417ecb95c8b36b0830f9d"
+      "bytes": 6256,
+      "sha256": "f1ddbe2424f90340273b6314a784a0963a73806cfa1d8a6966df52bfaed18305"
     },
     {
       "path": "tests/recruiting-metric-semantics.test.mjs",
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 3688,
-      "sha256": "f7a4e7754c35c03fead6d0b4ff1b68bde96c14a3f0e627745568abfb80215680"
+      "bytes": 3851,
+      "sha256": "f7f3a2ab08b6cc5fea7956b31bb7bf4e36194bf799cb23cd1c426606ef89f0f2"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
@@ -4604,8 +4604,8 @@
     },
     {
       "path": "components/synthetic-capacity-risk-scenario.tsx",
-      "bytes": 2222,
-      "sha256": "d2116640348801ad7317fbcdd95d72e445da80c8439b7c7c9d3787e895abedd2"
+      "bytes": 2195,
+      "sha256": "4b49ea76a567b50c47383ded9d32cd1325f93aa6c084f7e8ec7868d3d2d0c3b4"
     },
     {
       "path": "lib/home-turnover-investigation.mjs",
@@ -4614,8 +4614,8 @@
     },
     {
       "path": "lib/synthetic-capacity-risk.ts",
-      "bytes": 2033,
-      "sha256": "76976c277752f6df1656741158ff0cec9319963f240df580357f3605a00f3bc7"
+      "bytes": 1536,
+      "sha256": "a999cd937197734583d701560240ab37e24da1c39e93ed3ad0ab939d4722f58c"
     },
     {
       "path": "tests/fixtures/external-workforce-evidence/ons-ashe-2026-source-extract.json",
@@ -4624,13 +4624,13 @@
     },
     {
       "path": "tests/home-turnover-investigation.test.mjs",
-      "bytes": 7113,
-      "sha256": "6de3582e36d6ab7a2a4d91f4291be974b15cc0e01fa6b17f24256a26d58fbe02"
+      "bytes": 7153,
+      "sha256": "bc41b2c0d2c48d543ec2f22ec6335a6c5bf95f838a910420f16d3d10c65fd6b6"
     },
     {
       "path": "tests/synthetic-capacity-risk.test.mjs",
-      "bytes": 10333,
-      "sha256": "af781e2cc041d481af4e4a8350d4ff21be3aa891e99d057f85f85b46cb75fd54"
+      "bytes": 10471,
+      "sha256": "b36c5ed81f0f04423e1ce69e7042d84ea891bada4a70a94b36235ce4b7347025"
     },
     {
       "path": "tests/fixtures/external-workforce-evidence/statcan-toronto-source-extract.json",
@@ -4691,6 +4691,21 @@
       "path": "tests/market-reference-editorial.test.mjs",
       "bytes": 1914,
       "sha256": "1e202599639945c980aea25a0c49de094a5780da57c3848adb65758f5c3a5278"
+    },
+    {
+      "path": "lib/home-bu-turnover-chat.mjs",
+      "bytes": 6843,
+      "sha256": "f708f03f9cca63259f1122f347a825a675eafa76843c96b8ec00df5d6f160a12"
+    },
+    {
+      "path": "tests/canonical-worked-example.test.mjs",
+      "bytes": 4817,
+      "sha256": "f12b6187f1fef3217a08d60d2e0f7fd55ba9d97427321cdbebe6f5b344c6728b"
+    },
+    {
+      "path": "tests/home-bu-turnover-chat.test.mjs",
+      "bytes": 12332,
+      "sha256": "c4608d10e4086e85ba1a680bf085d749965d5304c3a41c305cad64ba0322acea"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
