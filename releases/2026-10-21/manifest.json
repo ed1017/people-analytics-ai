@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "7d0496874f5b995f427783488105a58f96fdab6a",
-  "deployment": "https://people-analytics-gks199ze0-ed-56dc.vercel.app",
+  "sourceCommit": "58659c3f16145e570aac281ed698afc83521238c",
+  "deployment": "https://people-analytics-mxg1nfy7d-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3134,8 +3134,8 @@
     },
     {
       "path": "lib/public-ai-application.server.mjs",
-      "sha256": "fbc8cde664fb421f1e752baa880163e2ab0e7e94dfe2ef8975d61c598439d2c9",
-      "bytes": 2943
+      "sha256": "21060206e4c14cd0a1ec526b9d80042eb5568b4566146fa94f39aa49027db1e4",
+      "bytes": 2985
     },
     {
       "path": "lib/public-ai-capabilities.mjs",
@@ -3159,8 +3159,8 @@
     },
     {
       "path": "lib/public-ai-runtime.server.ts",
-      "sha256": "177c608ed96b2b025ae150d526174ed7699363e7c79a50e21f58a20e566ecd4b",
-      "bytes": 2217
+      "sha256": "abe7599b3a8bd20e01d6580c85c0680d48699a044359562a88da979a780e7d07",
+      "bytes": 2938
     },
     {
       "path": "lib/public-chat-conversation.mjs",
@@ -3204,8 +3204,8 @@
     },
     {
       "path": "lib/public-planner-ledger.server.mjs",
-      "sha256": "cac1f42e64b1fb3de0c9eacbe21bf76804eed63dd5ddbe37f59eb93efbaa05d4",
-      "bytes": 1732
+      "sha256": "fb0f0fffa9627aeebe6909411b75088917b7e7cdc3dd6d931ed77e456839fbcf",
+      "bytes": 2168
     },
     {
       "path": "lib/public-planner-price-candidate.mjs",
@@ -3219,8 +3219,8 @@
     },
     {
       "path": "lib/public-planner-round.server.mjs",
-      "sha256": "f9c820dc29675d273084b36fe070afc8c44ad8a2508bd85e685b83e11e0cce99",
-      "bytes": 15566
+      "sha256": "0f1260b8ec25eb74b83281db3852a6c6a7d4c56fddfaadcda54f3494f1f528dc",
+      "bytes": 15567
     },
     {
       "path": "lib/public-projection-contract.mjs",
@@ -3764,8 +3764,8 @@
     },
     {
       "path": "proxy.ts",
-      "sha256": "2d7884c914f216fdeccdb8bb97bb06d52d7be94dd6cbde3e9cccc445abe764ad",
-      "bytes": 2580
+      "sha256": "4c9c33c7dc528a4a63e35ce118f1f46cdba88fdc671badf7dd145dd5e096bdf1",
+      "bytes": 3072
     },
     {
       "path": "public/file.svg",
@@ -3944,8 +3944,8 @@
     },
     {
       "path": "tests/public-ai-application.test.mjs",
-      "bytes": 29312,
-      "sha256": "e9f5ce951b20950891e6531f9344cbc17a4bc5419697fd57a9a451aac97dc13b"
+      "bytes": 31846,
+      "sha256": "bfd784c6c9852f6e62a44abdc7096d06a63d08a99f7c5ca5df46a26d69659809"
     },
     {
       "path": "tests/public-home-aggregate.test.mjs",
@@ -3979,8 +3979,8 @@
     },
     {
       "path": "tests/public-planner-ledger.test.mjs",
-      "sha256": "b2e1fc9e2aebc4c189bb003cc3c6718be8ab62288e07d49ea3a653c35847916a",
-      "bytes": 2436
+      "sha256": "f2b07586e074a240c71d4a6237aab57e888b812acfe1f0d6b9e1736c9f5eac8b",
+      "bytes": 3475
     },
     {
       "path": "tests/public-planner-price-proposal.test.mjs",
@@ -3989,8 +3989,8 @@
     },
     {
       "path": "tests/public-planner-round.test.mjs",
-      "sha256": "ea285a3ad56434723d3bc3523a9d3c2b7c449de3869dd5dd2128762960485458",
-      "bytes": 15668
+      "sha256": "fe7d5cf43b85df0fd40bc57024743046a97525610b357b840275e2534d065d1d",
+      "bytes": 15670
     },
     {
       "path": "tests/public-projection-restoration.test.mjs",
@@ -4039,8 +4039,8 @@
     },
     {
       "path": "vercel.json",
-      "sha256": "c9f33c545b21f6eb391cdd09a24827c71dd2e3bc016b18b68f7258900d981f98",
-      "bytes": 435
+      "sha256": "149de02ee536ba4de042d8a58e371b0ae73919415c138aa472a383ce34a28c06",
+      "bytes": 515
     },
     {
       "path": "tests/home-next-details.test.mjs",
@@ -4516,6 +4516,76 @@
       "path": "tests/position-goal-isolation.test.mjs",
       "bytes": 5028,
       "sha256": "21e312b136385ee3d18397611699fc0fbb8c138cc620e04d1849e82ea893971d"
+    },
+    {
+      "path": "app/api/internal/pricing-renewal/route.ts",
+      "bytes": 1467,
+      "sha256": "588f581482624e6b48d9b0f349e87d332751e4a8cea09a7b205c19878c623312"
+    },
+    {
+      "path": "docs/durable-live-ai.md",
+      "bytes": 2662,
+      "sha256": "7f027c2c621e25f192097c67d30463f34c1b31f2a6b9376868ba3ddbcbdd7820"
+    },
+    {
+      "path": "docs/migrations/20261027-durable-pricing-validation.json",
+      "bytes": 2412,
+      "sha256": "368d2211b809d016238969b55c35f4dc38595fa8b917946bf64c28415979a5cf"
+    },
+    {
+      "path": "docs/migrations/20261027-durable-pricing.sql",
+      "bytes": 24862,
+      "sha256": "a3ec106f6b649fe3b2b806ced538f9555a89dea7de3170a6bf323eb518a3cdeb"
+    },
+    {
+      "path": "lib/public-pricing-policy.server.mjs",
+      "bytes": 1538,
+      "sha256": "b5f095994553b3b668bff17d75ca9606d60c64cd2b14ced190ec276ca04fef72"
+    },
+    {
+      "path": "lib/public-pricing-renewal.server.mjs",
+      "bytes": 5455,
+      "sha256": "502e2242b01ba57b910672d074ca07bf6bec3529368ab13cc69655bad671f6a9"
+    },
+    {
+      "path": "lib/public-pricing-verifier.server.mjs",
+      "bytes": 8345,
+      "sha256": "49ed547ff11c3a1d0371fa7acff7f5f8367b2c0cbb2757a6e458fcf4d8737838"
+    },
+    {
+      "path": "tests/fixtures/public-pricing/cache.md.json",
+      "bytes": 58402,
+      "sha256": "9ec4860bd6f9616286ce6324a81489598cf3f9f3ccc749c77f21fd6df824fd7d"
+    },
+    {
+      "path": "tests/fixtures/public-pricing/luna.md.json",
+      "bytes": 3772,
+      "sha256": "71d0b1e7cd6c2c694bb04fc7c0e17f4f87896454392e01f4e49d80466a4909ae"
+    },
+    {
+      "path": "tests/fixtures/public-pricing/pricing.md.json",
+      "bytes": 23462,
+      "sha256": "99fe18ca1e59074f49762366c551838fe662cf8bf8af8284bfcc4350ba0fc8bb"
+    },
+    {
+      "path": "tests/fixtures/public-pricing/sol.md.json",
+      "bytes": 4009,
+      "sha256": "0118a3ad007763509117e95d6b9426add7911d4b3b63ef412fa744704cb26a81"
+    },
+    {
+      "path": "tests/public-pricing-policy.test.mjs",
+      "bytes": 2315,
+      "sha256": "b35208f438790a805141a749193f805054ac074360b85e50fa964f1633e26bc9"
+    },
+    {
+      "path": "tests/public-pricing-renewal.test.mjs",
+      "bytes": 9581,
+      "sha256": "cd893c86fc440b66a494673d9633ba519e487c635a9120f053d42396162cd39f"
+    },
+    {
+      "path": "tests/public-pricing-verifier.test.mjs",
+      "bytes": 5621,
+      "sha256": "a3c73c6d71bbc20be0f96a4d5449d260e5c2c2ee87b93a33bbc0a83dc37b60ec"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

@@ -20,6 +20,9 @@ export function proxy(request: NextRequest){
  const success=()=>scenarioAlias?NextResponse.redirect(url,307):NextResponse.next();
  const publicRelease=public9037Options(process.env);
  if(publicRelease){
+  // Only the authenticated production scheduler handler may evaluate renewal.
+  // No dataset token grants access, and the handler rejects missing/invalid secrets.
+  if(url.pathname==='/api/internal/pricing-renewal')return publicRelease.production&&request.method==='GET'&&url.protocol==='https:'&&['www.ed-ai.app','ed-ai.app',publicRelease.hostname].includes(url.host)&&!url.search?NextResponse.next():NextResponse.json({available:false},{status:404,headers:{'cache-control':'no-store'}});
   if(new URL(request.url).pathname==='/api/public-qa-diagnostic')return publicQaDiagnosticAllowed(process.env,request)?NextResponse.next():NextResponse.json({available:false},{status:404,headers:{'cache-control':'no-store'}});
   return publicAiRequestAllowed(publicRelease,checkedRequest)||public9037RequestAllowed(publicRelease,checkedRequest)?success():NextResponse.json({error:'Unavailable in the public synthetic release.'},{status:503});
  }

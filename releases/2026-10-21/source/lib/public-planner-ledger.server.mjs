@@ -2,7 +2,7 @@
  * retries, redirects, schema exposure, refunds, or ledger creation. */
 import {boundedJson} from './public-qa-stream.server.mjs';
 export const PUBLIC_PLANNER_DATABASE_URL='https://noykvmztefmmhyuwuppv.supabase.co';
-export function createPublicPlannerLedger({transport,url,secretKey}={}){
+export function createPublicPlannerLedger({transport,url,secretKey,renewalToken}={}){
  const configured=typeof transport==='function'&&url===PUBLIC_PLANNER_DATABASE_URL&&typeof secretKey==='string'&&secretKey.length>0;
  const rpc=async(name,args,signal)=>{
   if(!configured||!(signal instanceof AbortSignal))throw Error('Planner ledger unavailable.');
@@ -16,6 +16,11 @@ export function createPublicPlannerLedger({transport,url,secretKey}={}){
   return boundedJson(response.body,4096,signal);
  };
  return Object.freeze({
+  async readPricing(signal){return rpc('get_public_ai_pricing',{},signal);},
+  async renewPricing({eventId,pricingDigest,observedAt,sources},signal){
+   if(typeof renewalToken!=='string'||renewalToken.length<32)throw Error('Renewal unavailable.');
+   return rpc('renew_public_ai_pricing',{p_token:renewalToken,p_event_id:eventId,p_verification_digest:pricingDigest,p_observed_at:observedAt,p_sources:sources},signal);
+  },
   async admit(reservation,signal){
    try{return await rpc('reserve_public_ai',{p_request_id:reservation.requestId,p_context_id:reservation.contextId,
     p_policy_id:reservation.policyId,p_reserve_micro_usd:reservation.reserveMicroUsd},signal);}

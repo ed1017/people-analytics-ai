@@ -10,13 +10,13 @@ import {loadPublic9037Binding} from './public-9037.server.mjs';
 import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 
 /**
- * @param {{options?:{hostname:string,production?:boolean},enabled?:boolean,admit?:Function,settle?:Function,provider?:Function,now?:()=>number,progressEnabled?:boolean}} config
+ * @param {{options?:{hostname:string,production?:boolean},enabled?:boolean,admit?:Function,settle?:Function,provider?:Function,now?:()=>number,progressEnabled?:boolean,policyForRoute?:Function}} config
  */
-export function createPublicAiApplication({options,enabled=PUBLIC_AI_ENABLED,admit,settle,provider,now=Date.now,progressEnabled=false}={}){
+export function createPublicAiApplication({options,enabled=PUBLIC_AI_ENABLED,admit,settle,provider,now=Date.now,progressEnabled=false,policyForRoute=publicPlannerPriceCandidate}={}){
  const configured=enabled===true&&typeof admit==='function'&&typeof provider==='function';
  if(!configured)return createPublicAiDispatcher({options,enabled:false,now});
  const completionFactory=({kind,currentContext})=>createPublicPlannerRoundBoundary({
-  enabled:true,policy:publicPlannerPriceCandidate(kind),admit,settle,provider,currentContext,now,
+  enabled:true,policy:policyForRoute(kind),admit,settle,provider,currentContext,now,
  });
  const home=createPublicHomeRoute({enabled:true,hostname:options?.hostname,progressEnabled,
   completionFactory:context=>completionFactory({...context,kind:'home-solution'})});
@@ -32,7 +32,7 @@ export function createPublicAiApplication({options,enabled=PUBLIC_AI_ENABLED,adm
   signal.throwIfAborted();
   const at=now();
   return Number.isFinite(at)&&['home-solution','chat','plan','intake','capability'].every(kind=>{
-   const policy=publicPlannerPriceCandidate(kind);
+   const policy=policyForRoute(kind);
    // Receipt lasts30seconds; leave the per-round timeout and safety margin too.
    return at>=Date.parse(policy.verifiedAt)&&at+30000+policy.timeoutMs+30000<Date.parse(policy.validUntil);
   });

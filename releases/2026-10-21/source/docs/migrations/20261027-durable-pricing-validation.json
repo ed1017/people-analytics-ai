@@ -1,0 +1,80 @@
+{
+  "engine": {
+    "version": "PostgreSQL 18.6 (PGlite 0.5.12) on wasm32-unknown-emscripten, compiled by emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.74 (1092ec30a3fb1d46b1782ff1b4db5094d3d06ae5), 32-bit"
+  },
+  "draftSha256": "a3ec106f6b649fe3b2b806ced538f9555a89dea7de3170a6bf323eb518a3cdeb",
+  "tests": [
+    {
+      "name": "stale baseline refuses and rolls back",
+      "pass": true
+    },
+    {
+      "name": "exact migration preserves prior rows/gross and raises cap cumulatively",
+      "pass": true
+    },
+    {
+      "name": "no seeded credentials or proof; pricing and admission fail closed",
+      "pass": true
+    },
+    {
+      "name": "wrong token rejects; exact four-source proof renews <=24h",
+      "pass": true
+    },
+    {
+      "name": "same event replay returns first expiry; changed proof cannot extend",
+      "pass": true
+    },
+    {
+      "name": "exact six-field grant and private immutable binding",
+      "pass": true
+    },
+    {
+      "name": "renewal never enables killed rollout",
+      "pass": true
+    },
+    {
+      "name": "settlement after renewal uses originally admitted verification",
+      "pass": true
+    },
+    {
+      "name": "public roles cannot read/renew; app cannot write terms or token table",
+      "pass": true
+    },
+    {
+      "name": "legacy unknown hold stays unbound and cannot auto-settle",
+      "pass": true
+    },
+    {
+      "name": "stale new proof and reservation replay refuse",
+      "pass": true
+    },
+    {
+      "name": "concurrent same event renewals return one immutable window",
+      "pass": true
+    },
+    {
+      "name": "concurrent duplicate admissions create one binding",
+      "pass": true
+    },
+    {
+      "name": "bound Luna5001/10000 settle,10001 and bound Sol4001 retain holds",
+      "pass": true
+    },
+    {
+      "name": "unbound legacy output5001 retains original5000 ceiling",
+      "pass": true
+    },
+    {
+      "name": "effective cumulative cap refuses new calls including unknown holds",
+      "pass": true
+    },
+    {
+      "name": "expired current verification stops new admission but admitted version settles",
+      "pass": true
+    }
+  ],
+  "fixtureOnly": true,
+  "productionWrites": 0,
+  "providerCalls": 0,
+  "limitations": "Single-process WASM engine; no independent PostgreSQL server sessions or network transport; no production guard values used in invented fixture."
+}
