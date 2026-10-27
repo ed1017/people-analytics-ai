@@ -2,6 +2,12 @@
 
 ## Current live release and active parallel work
 
+### PR442 live — turnover scope and worked-example consistency
+
+Runtime `8600d5053e0cd5c09430f08c06c3e676ae29d9f9`, source `4de833ee2e9376f5044ab8378e9e7ef18374f4bc`, merge `6206b03a4c90d226b376904e2a2fef848f78ce65`, deployment `dpl_HqHsGQ6qUMKCZEqCE1ibDdtgvAH8`. Exact-head CI `40557803942` passed; canonical public host https://www.ed-ai.app resolves to this deployment. Public desktop/mobile acceptance passed at 1440px and 390px: canonical 5-FTE example, global/filter return, unchanged guided recommendation, compact Attrition states, controlled three-turn turnover flow and preserved legacy saved inputs. Both `ed-ai.app` and `www.ed-ai.app` resolve to this deployment.
+
+BU turnover routing preserves the requested group and supported period; unsupported dates do not substitute current YTD data. New worked examples use the same 5-FTE gap while saved legacy 4-FTE scenarios retain their original inputs. Recorded zero regrettable-exit counts remain in Details, positive counts remain prominent, and unavailable exit-survey evidence is compact. Homepage findings and supported example-risk scope are corrected. The bounded loading check did not reproduce the reported delay; fresh paid-provider acceptance remains unverified. [Verification and limits](release-verification-pr442.md).
+
 ### PR440 live - comprehensive editorial cleanup and guided-demo recovery
 
 Runtime `394fedbb6c7162216df1b1c50bd961b364aa4038`, deployment `dpl_Ew6ENEJWrRvPq9HNF41xeSDT4wWe`, source `4b2db3792b30e6763fec81cd2a54b1d9a297f1d2`, merge `b9a4484b644cd2d8d9e5a4b16ce94bee8218ba6c`. Exact-head CI 40535413252 passed, including 3,092 root contracts. Independent review, runtime regressions and protected desktop/mobile checks passed. Direct public desktop and mobile verification passed. Repeated primary caveats/internal QA prose moved into Details across the public modules, planners and answer templates. The red risk preamble is removed; intro background scrolling is contained; explicit example adoption immediately calculates the existing recommendation; supported BU FTE investigation returns dated change, chart and action guidance. README leads with the product and decisions. [Release verification and limits](release-verification-editorial-2026-10-27.md).
