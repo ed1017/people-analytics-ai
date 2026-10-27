@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "fcc86d6eaf8796bfff36f7e1b9d43c24231a9a17",
-  "deployment": "https://people-analytics-biqdmfe13-ed-56dc.vercel.app",
+  "sourceCommit": "0c8ab9a8b69c2f9b371633828d9385e70fc2f737",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -4679,8 +4679,8 @@
     },
     {
       "path": "tests/module-editorial-presentation.test.mjs",
-      "bytes": 5438,
-      "sha256": "89cc5527e4f2377fa7c3fdcd708d6fdb9f4800db9ce1d37e10bb7f04b8ed5574"
+      "bytes": 7036,
+      "sha256": "bf120d607aff0e3376f937dd6f18abdee98a8d28b3ad97bd8efe44d35c968471"
     },
     {
       "path": "tests/planner-editorial-presentation.test.mjs",

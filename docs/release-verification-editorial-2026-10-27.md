@@ -2,7 +2,7 @@
 
 Status: candidate prepared; hosted staging, exact-head release CI, promotion and public desktop/mobile verification are pending. PR438 remains the last verified public release in this record.
 
-- Candidate runtime: `fcc86d6eaf8796bfff36f7e1b9d43c24231a9a17`
+- Candidate runtime: `0c8ab9a8b69c2f9b371633828d9385e70fc2f737`
 - Runtime baseline: `5d52980ea5dd2218125d81ca62f92947784291d9`
 - Scope: 101 runtime files, including presentation, narrowly scoped behavior fixes and regression tests; documentation is separate.
 
@@ -41,3 +41,5 @@ The available FTE history establishes net change, not a reconciled movement-leve
 ## Hosted and production checklist
 
 Pending: exact candidate deployment identity; desktop/mobile intro scrolling, short viewport, focus, opt-out and draft preservation; worked-example adoption and actual $325,000/$200,000 outputs; risk Details; settled Workforce, Talent Acquisition, Skills, Finance, Learning, Listening, Positions and About rendering; primary-copy inventory, overflow and page errors; exact-head release CI; promotion and matching public verification.
+
+CI follow-up: the new module render test originally required private runtime files absent from the public checkout. It now uses explicit invented presentation fixtures without skipping cases; five checks pass without private inputs. Application bytes are unchanged from the independently reviewed fcc86d6 candidate. The first unpromoted stage rejected a missing organization-ID binding; corrected staging uses the documented non-secret deployment-scoped ID and leaves identity guards and persistent settings unchanged.
