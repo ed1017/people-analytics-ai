@@ -2,18 +2,18 @@
 
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {createPortal} from 'react-dom';
-import {HOME_INSTRUCTIONS_DISMISSED_KEY} from '@/lib/home-onboarding';
+import {HOME_INTRO_OPT_OUT_KEY} from '@/lib/home-onboarding';
 import type { AppPage } from "@/lib/types";
 
 /** Intro only. The existing Planning Scenario entry owns all calculation and draft safeguards. */
-export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=false,onStartDemo,demoReady=true,status,dismissKey}: {
+export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=false,onStartDemo,demoReady=true,status,dismissKey}: {
   liveChatAvailable?:boolean;
   conversational?:boolean;
   busy:boolean;
   active:boolean;
   ready:boolean;
   autoOpen:boolean;
-  suppressAutoOpen?:boolean;
+  deferAutoOpen?:boolean;
   onNavigate:(page:AppPage)=>void;
   onStartDemo:()=>void;
   demoReady?:boolean;
@@ -21,23 +21,26 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=
   dismissKey:string;
 }) {
   const [open,setOpen]=useState(false),id=useId();
+  const [preferenceError,setPreferenceError]=useState<string|null>(null);
   const dialog=useRef<HTMLDialogElement>(null),title=useRef<HTMLHeadingElement>(null),trigger=useRef<HTMLButtonElement>(null);
   const attempted=useRef(false),previousKey=useRef(dismissKey),restoreFocus=useRef(true),activeHome=useRef(active),launching=useRef(false);
   const fallback=()=>document.querySelector<HTMLButtonElement>('[data-orientation-return]');
-  const remember=()=>{try{localStorage.setItem(HOME_INSTRUCTIONS_DISMISSED_KEY,'1');}catch{/* Dismissal still works when storage is unavailable. */}};
-  const show=useCallback(()=>{if(!active||busy||!ready||dialog.current?.open)return;restoreFocus.current=true;launching.current=false;dialog.current?.showModal();title.current?.focus();setOpen(true);},[active,busy,ready]);
-  const dismiss=()=>{remember();dialog.current?.close();};
+  const show=useCallback(()=>{if(!active||busy||!ready||!dialog.current||dialog.current.open)return;restoreFocus.current=true;launching.current=false;dialog.current.showModal();attempted.current=true;title.current?.focus();setOpen(true);},[active,busy,ready]);
+  const dismiss=()=>{dialog.current?.close();};
+  const optOut=()=>{
+    try{localStorage.setItem(HOME_INTRO_OPT_OUT_KEY,'1');setPreferenceError(null);dismiss();}
+    catch{setPreferenceError('This browser could not save the preference. You can still close the introduction for this visit.');}
+  };
   useEffect(()=>{activeHome.current=active;if(!active||previousKey.current!==dismissKey){restoreFocus.current=false;dialog.current?.close();}previousKey.current=dismissKey;},[active,dismissKey]);
   useEffect(()=>{
     if(!ready||attempted.current||!active)return;
-    // Resumed work consumes this visit's automatic opportunity, even after reset.
-    if(suppressAutoOpen){attempted.current=true;return;}
-    if(busy||!autoOpen||!dialog.current)return;
+    // Wait for blocking recovery/editor flows; never clear or replace their work.
+    if(deferAutoOpen||busy||!autoOpen||!dialog.current)return;
     show();
     attempted.current=true;
-  },[ready,autoOpen,suppressAutoOpen,active,busy,show]);
+  },[ready,autoOpen,deferAutoOpen,active,busy,show]);
   useEffect(()=>{
-    const dismissed=(event:StorageEvent)=>{if(event.key===HOME_INSTRUCTIONS_DISMISSED_KEY&&event.newValue!==null)dialog.current?.close();};
+    const dismissed=(event:StorageEvent)=>{if(event.key===HOME_INTRO_OPT_OUT_KEY&&event.newValue==='1'){attempted.current=true;dialog.current?.close();}};
     window.addEventListener('storage',dismissed);return()=>window.removeEventListener('storage',dismissed);
   },[]);
   const finish=()=>{
@@ -46,7 +49,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=
   };
   const start=()=>{
     if(launching.current||!active||busy||!ready||!demoReady)return;
-    launching.current=true;restoreFocus.current=false;remember();dialog.current?.close();
+    launching.current=true;restoreFocus.current=false;dialog.current?.close();
     fallback()?.focus({preventScroll:true});onStartDemo();
   };
   return <section aria-label="Product introduction" className="min-w-0 text-sm">
@@ -54,7 +57,11 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=
       <button ref={trigger} type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Introduction</button>
       {status}
     </div>
-    {ready&&createPortal(<dialog ref={dialog} id={id} aria-labelledby={id+'-title'} aria-describedby={id+'-purpose'} onClose={finish} onCancel={event=>{event.preventDefault();dismiss();}} onKeyDown={event=>{
+    {ready&&createPortal(<dialog ref={dialog} id={id} aria-labelledby={id+'-title'} aria-describedby={id+'-purpose'} onClose={finish} onCancel={event=>{event.preventDefault();dismiss();}} onClick={event=>{
+      if(event.target!==event.currentTarget)return;
+      const box=event.currentTarget.getBoundingClientRect();
+      if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dismiss();
+    }} onKeyDown={event=>{
       if(event.key!=='Tab')return;
       const controls=event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]');
       const first=controls[0],last=controls[controls.length-1];
@@ -69,7 +76,9 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,suppressAutoOpen=
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button type="button" disabled={!demoReady||busy||!active} onClick={start} className="min-h-11 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Start guided demo</button>
         <button type="button" onClick={dismiss} className="min-h-11 rounded-lg border px-4 py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Explore on my own</button>
+        <button type="button" onClick={optOut} className="min-h-11 rounded-lg px-4 py-2 text-sm font-medium text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Do not show again</button>
       </div>
+      {preferenceError&&<p role="alert" className="mt-2 text-sm text-destructive">{preferenceError}</p>}
       {!demoReady&&<p role="status" className="mt-2 text-sm">Finish loading or recover unsaved work to start the demo.</p>}
       </div>
       </header>

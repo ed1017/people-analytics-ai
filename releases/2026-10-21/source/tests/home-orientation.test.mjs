@@ -8,12 +8,12 @@ import React from 'react';
 import * as onboarding from '../lib/home-onboarding.ts';
 const require=createRequire(import.meta.url);
 const empty={getItem:()=>null},token='workforce-demo-9037-public-aggregates-v4:5';
-test('first visit honors old dismissal and exact dataset decisions/recovery without changing storage',()=>{
+test('only explicit opt-out suppresses a new load; legacy dismissal and saved state do not',()=>{
  assert.equal(onboarding.isFirstHomeVisit(empty,empty,token),true);
- assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY?'1':null},empty,token),false);
- for(const key of ['insights-to-action.decisions.v1','insights-to-action.decisions.v1.dataset.'+token,'insights-to-action.goals.v1','people-analytics.saved-workforce-scenarios.v1'])assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===key?'{}':null},empty,token),true);
- assert.equal(onboarding.isFirstHomeVisit(empty,{getItem:k=>k==='insights-to-action.decisions.recovery.v1.dataset.'+token?'{}':null},token),false);
- assert.equal(onboarding.isFirstHomeVisit({getItem:()=>{throw Error('blocked');}},empty,token),false);
+ assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===onboarding.HOME_INTRO_OPT_OUT_KEY?'1':null},empty,token),false);
+ for(const key of [onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'insights-to-action.decisions.v1','insights-to-action.decisions.v1.dataset.'+token,'insights-to-action.goals.v1','people-analytics.saved-workforce-scenarios.v1'])assert.equal(onboarding.isFirstHomeVisit({getItem:k=>k===key?'{}':null},empty,token),true);
+ assert.equal(onboarding.isFirstHomeVisit(empty,{getItem:k=>k==='insights-to-action.decisions.recovery.v1.dataset.'+token?'{}':null},token),true);
+ assert.equal(onboarding.isFirstHomeVisit({getItem:()=>{throw Error('blocked');}},empty,token),true);
 });
 function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')return;out.push(n);React.Children.forEach(n.props?.children,walk);}walk(tree);return out;}
 function harness(initial={}){
@@ -32,7 +32,7 @@ function harness(initial={}){
 test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
  h.flush({busy:false});assert.equal(h.native.shown,1);assert.equal(h.focus,'title');h.flush();assert.equal(h.native.shown,1);
- h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);assert.equal(h.focus,'fallback');assert.deepEqual(h.writes,[[onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1']]);assert.equal(h.starts,0);
+ h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);assert.equal(h.focus,'fallback');assert.deepEqual(h.writes,[]);assert.equal(h.starts,0);
  h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.shown,2);h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.native.open,false);
 });
 test('launch is explicit and single-shot, disabled state cannot start, storage failure cannot trap dismissal',()=>{
@@ -65,8 +65,8 @@ test('actual dataset initialization preserves fresh first-visit observation, con
  assert.equal(fresh.api.consumeFirstHomeVisit(),true);assert.equal(fresh.api.consumeFirstHomeVisit(),false,'remount is existing use');
  const switched=hydratedStore();switched.api.switchDecisionDataset(token);switched.api.switchDecisionDataset(token.replace(":5",":6"));assert.equal(switched.api.consumeFirstHomeVisit(),false,"switching datasets cannot reuse the initial observation");
  const returning=hydratedStore([...fresh.local]);returning.api.switchDecisionDataset(token);assert.equal(returning.api.consumeFirstHomeVisit(),true);
- const dismissed=hydratedStore();dismissed.api.switchDecisionDataset(token);dismissed.local.set(onboarding.HOME_INSTRUCTIONS_DISMISSED_KEY,'1');assert.equal(dismissed.api.consumeFirstHomeVisit(),false);
- const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),false);
+ const dismissed=hydratedStore();dismissed.api.switchDecisionDataset(token);dismissed.local.set(onboarding.HOME_INTRO_OPT_OUT_KEY,'1');assert.equal(dismissed.api.consumeFirstHomeVisit(),false);
+ const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),true);
 });
 
 test('explicit intro resume releases only local demo debounce and retains shared duplicate guards',()=>{
@@ -85,7 +85,7 @@ test('expanded creator introduction keeps keyboard-scrollable content separate f
  assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(header.props.className,/shrink-0/);
  const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
  assert.deepEqual(headings,['Purpose of the project','What you can do','Try a planning decision','How to read the results','Project development','Contact Ed Om']);
- assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
+ assert.equal(nodes(header).filter(n=>n.type==='button').length,3);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
 });
 
@@ -100,15 +100,40 @@ test('top actions precede scroll region, verified contacts wrap, and focus wraps
 });
 
 
-test('resumed draft, history or active plan never auto-opens after clear/reset; explicit reopen remains available',()=>{
- for(const state of ['draft','history','plan']){
-  const h=harness({suppressAutoOpen:true});h.flush();assert.equal(h.native.shown,0,state);
-  h.flush({suppressAutoOpen:false});assert.equal(h.native.shown,0,state+' cleared');
-  h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.shown,1,state+' explicit');
+test('blocking recovery defers introduction, then opens once without repeated navigation',()=>{
+ const h=harness({deferAutoOpen:true});h.flush();assert.equal(h.native.shown,0);
+ h.flush({deferAutoOpen:false});assert.equal(h.native.shown,1);
+ h.button('Explore on my own').props.onClick();h.flush({active:false});h.flush({active:true});assert.equal(h.native.shown,1);
+ assert.deepEqual(h.writes,[]);
+});
+test('explicit opt-out alone writes preference and manual reopening remains available',()=>{
+ const h=harness();h.flush();h.button('Do not show again').props.onClick();h.flush();assert.equal(h.native.open,false);
+ assert.deepEqual(h.writes,[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]);
+ h.flush({autoOpen:false});h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.open,true);
+ h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.writes.length,1);
+});
+test('ordinary dismissal, Escape, backdrop and demo launch never write an opt-out',()=>{
+ for(const action of ['close','escape','backdrop','demo']){
+  const h=harness();h.flush();
+  if(action==='close')h.button('Explore on my own').props.onClick();
+  if(action==='escape')h.dialog().props.onCancel({preventDefault(){}});
+  if(action==='backdrop'){const target={getBoundingClientRect:()=>({left:10,right:90,top:10,bottom:90})};h.dialog().props.onClick({target,currentTarget:target,clientX:1,clientY:1});}
+  if(action==='demo')h.button('Start guided demo').props.onClick();
+  h.flush();assert.equal(h.native.open,false,action);assert.deepEqual(h.writes,[],action);
+  const nextLoad=harness();nextLoad.flush();assert.equal(nextLoad.native.open,true,action+' next load');
  }
 });
-test('introduction control is outside More and active work guard remains explicit',()=>{
+test('failed opt-out is reported without trapping ordinary close',()=>{
+ const h=harness({storageFails:true});h.flush();h.button('Do not show again').props.onClick();const tree=h.flush();
+ assert.equal(h.native.open,true);assert.ok(nodes(tree).some(n=>n.props?.role==='alert'));assert.deepEqual(h.writes,[]);
+ h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
+});
+test('manual open during recovery consumes automatic opportunity without changing work',()=>{
+ const h=harness({deferAutoOpen:true});h.flush();h.button('Introduction').props.onClick();h.flush();
+ h.button('Explore on my own').props.onClick();h.flush({deferAutoOpen:false});assert.equal(h.native.shown,1);assert.deepEqual(h.writes,[]);
+});
+test('introduction control remains outside More; recovery is a live deferral',()=>{
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
  assert.ok(source.indexOf('<HomeGettingStarted')<source.indexOf('<details className="relative ml-auto"'));
- assert.match(source,/suppressAutoOpen=\{Boolean\(conversation.input.trim\(\)\|\|conversation.issueEditor\|\|conversation.activeGoalId\|\|messages.length\|\|swpDemoVisible\|\|guidedExampleActive\)\}/);
+ assert.ok(source.includes('deferAutoOpen={Boolean(conversation.recovery||conversation.issueEditor||!conversation.saved||swpDemoVisible||guidedExampleActive)}'));
 });
