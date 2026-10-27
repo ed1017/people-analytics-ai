@@ -14,7 +14,7 @@ User-approved October 27 chart-first scope is delivered in PR431. The inventory 
 
 ## Delivered: answers, external pay and synthetic workload risk
 
-PR432 is live: runtime `4c6bc839ce4affbfb94157065102f747fd0b4ec9`, deployment `dpl_EXEhZinaM5yhFAUjp41gnVzZhXmw`, exact-head CI40448388137. Independent review, 43 focused checks, TypeScript and protected/public desktop/mobile verification passed. Saved edits reopen correctly, original revisions remain intact, and reset/scope guards pass. Configuration readiness was verified without a paid model call.
+PR432 delivered and verified runtime `4c6bc839ce4affbfb94157065102f747fd0b4ec9`, deployment `dpl_EXEhZinaM5yhFAUjp41gnVzZhXmw`, exact-head CI40448388137. Independent review, 43 focused checks, TypeScript and protected/public desktop/mobile verification passed. Saved edits reopen correctly, original revisions remain intact, and reset/scope guards pass. Configuration readiness was verified without a paid model call.
 
 - Multipart turnover ranking plus generic investigation questions use the verified BU comparison and chart, followed by separate noncausal checks. Qualified dates/scopes/causal questions retain normal routing. Controlled desktop/mobile service replay passes with zero provider calls; the original visitor failure has no correlated retained trace and remains unexplained.
 - A permitted ONS 2026 provisional UK SOC2020 2134 full-time annual-pay reference includes separate GBP median and mean, tax-year scope and provenance. Raw archive/workbooks and source cells were independently verified. This is national occupational pay, not available candidates, local hiring time, an internal salary mapping or a hire-versus-train recommendation. The new US role/location catalogue remains source-only; existing curated OEWS references are retained. The denied BLS retrieval route is not retried.
@@ -22,7 +22,7 @@ PR432 is live: runtime `4c6bc839ce4affbfb94157065102f747fd0b4ec9`, deployment `d
 
 ## Delivered: Toronto evidence and concise missing-data states
 
-PR433 runtime 2dc320549231b3cdc378dbc6546068cd86132d33 is live and publicly verified. Statistics Canada Q2 2026 Toronto economic-region NOC21231 evidence reports 1,065 vacancies and CAD60.95 hourly average offered wage, with source vintage, quality and units. This measures employer demand, not available applicants. The raw archive and exact vector rows were independently checked. Exit-survey absence becomes a concise unavailable state while true zero, partial data, loading and errors remain distinct. Aggregate answers remove internal presentation jargon. PR434 carries these references into existing planning goals; no cost autofill or new persistence system was introduced.
+PR433 delivered runtime 2dc320549231b3cdc378dbc6546068cd86132d33, which was publicly verified. Statistics Canada Q2 2026 Toronto economic-region NOC21231 evidence reports 1,065 vacancies and CAD60.95 hourly average offered wage, with source vintage, quality and units. This measures employer demand, not available applicants. The raw archive and exact vector rows were independently checked. Exit-survey absence becomes a concise unavailable state while true zero, partial data, loading and errors remain distinct. Aggregate answers remove internal presentation jargon. PR434 carries these references into existing planning goals; no cost autofill or new persistence system was introduced.
 
 ## Remaining evidence and scope limits
 
