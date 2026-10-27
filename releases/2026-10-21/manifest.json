@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "57b0a76093a74d2a2e8850b43a4933846fdd1986",
-  "deployment": "https://people-analytics-qw8fy2b5s-ed-56dc.vercel.app",
+  "sourceCommit": "8600d5053e0cd5c09430f08c06c3e676ae29d9f9",
+  "deployment": "https://people-analytics-de70jlvm0-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2759,8 +2759,8 @@
     },
     {
       "path": "lib/key-findings.ts",
-      "sha256": "102cf05cb8d5b4b318b8bf4e8a93dc5bb1903de9ae0532cfe427145368f219e8",
-      "bytes": 8152
+      "sha256": "dd14585350f4cd8718b0daf673835f73164fabb848a6a3c38285b7e390750043",
+      "bytes": 8111
     },
     {
       "path": "lib/labor-outlook.mjs",

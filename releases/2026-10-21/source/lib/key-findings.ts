@@ -27,7 +27,7 @@ export const workforceFindings = (d: WorkforceResponse) => {
 export const attritionFindings = (d: AttritionResponse) => result(`Company workforce · year to date through ${d.as_of}`, [
   fact(d.summary.total_exits, v => `${n(v)} total exits are recorded${numeric(d.summary.total_turnover_ytd_pct) ? ` (${n(d.summary.total_turnover_ytd_pct)}% total turnover)` : ''}.`),
   fact(d.summary.voluntary_exits, v => `${n(v)} exits were voluntary${numeric(d.summary.voluntary_turnover_ytd_pct) ? ` (${n(d.summary.voluntary_turnover_ytd_pct)}% voluntary turnover)` : ''}.`),
-  numeric(d.summary.total_exits) && d.summary.total_exits > 0 && numeric(d.summary.voluntary_exits) && d.summary.voluntary_exits <= d.summary.total_exits ? `${n(100*d.summary.voluntary_exits/d.summary.total_exits)}% of recorded exits were voluntary; this does not establish why people left.` : null,
+  numeric(d.summary.total_exits) && d.summary.total_exits > 0 && numeric(d.summary.voluntary_exits) && d.summary.voluntary_exits <= d.summary.total_exits ? `${n(100*d.summary.voluntary_exits/d.summary.total_exits)}% of recorded exits were voluntary.` : null,
 ]);
 export const recruitingFindings = (d: TalentAcquisitionResponse) => result(`Recruiting snapshot · ${d.as_of}`, [
   fact(d.summary.median_time_to_fill_days, v => `Recorded median time to fill: ${n(v)} days.`),
