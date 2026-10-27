@@ -2,11 +2,13 @@
 
 ## Current live release and active parallel work
 
+Latest verified production is PR433: runtime `2dc320549231b3cdc378dbc6546068cd86132d33`, deployment `dpl_CZuDU4djPHDj7xj3ZgTSz4vd2xV7`, exact-head CI40450768267. Public desktop/mobile verified Toronto evidence, source/period/quality, UK/US selection preservation and the concise source-backed exit-survey unavailable state. The next candidate carries external references into existing planning goals; it is not yet live.
+
 PR431 is live: runtime `6400ea60f01b2c1b8a717cacf3a3247df32ffc0a`, deployment `dpl_A3FumEqn8UbUzs9Li7FLKaLcUhzE`, exact-head CI40446919535. Protected and direct public desktop/mobile verified position counts, filters, empty scopes, keyboard/touch drilldowns, custom baseline/goal/edit/save/reload/reopen, original preservation, centered prompt cards and reduced intro attribution. The introduction still opens once per app load unless explicitly opted out via its checkbox; manual reopening reflects the choice and unchecking re-enables future loads. Contacts, About attribution and planning access remain. Creating a goal closes the secondary position editor; reopening preserves the draft.
 
 Active October 27 tracks: chart-first position dashboard; centered helper cards and less repetitive intro attribution; multipart turnover-answer completeness; a versioned synthetic workload/capacity example and calculated risk; permitted external numeric workforce evidence. These are independent approved workstreams, not all live. No paid model tests, new vendor accounts or access changes are included. The denied BLS automated route will not be retried through another route.
 
-## Active: chart-first position dashboard
+## Delivered: chart-first position dashboard
 
 User-approved October 27 chart-first scope is delivered in PR431. The inventory reconciles 9,234 positions = 9,037 filled + 197 vacant; all 197 active vacancies are covered by open requisitions. Budget approval is not recorded, so budgeted inventory is an explicit demo assumption. Frozen zero is a structural demo assumption, not a verified freeze register. No country/FTE filter is invented where the grouped source lacks those fields. Independent review corrected malformed-catalog rendering. Historical fixture replay now pins its original field map without changing captured receipts; 9 compatibility tests and isolated preparation pass.
 
@@ -15,14 +17,24 @@ User-approved October 27 chart-first scope is delivered in PR431. The inventory 
 PR432 is live: runtime `4c6bc839ce4affbfb94157065102f747fd0b4ec9`, deployment `dpl_EXEhZinaM5yhFAUjp41gnVzZhXmw`, exact-head CI40448388137. Independent review, 43 focused checks, TypeScript and protected/public desktop/mobile verification passed. Saved edits reopen correctly, original revisions remain intact, and reset/scope guards pass. Configuration readiness was verified without a paid model call.
 
 - Multipart turnover ranking plus generic investigation questions use the verified BU comparison and chart, followed by separate noncausal checks. Qualified dates/scopes/causal questions retain normal routing. Controlled desktop/mobile service replay passes with zero provider calls; the original visitor failure has no correlated retained trace and remains unexplained.
-- A permitted ONS 2026 provisional UK SOC2020 2134 full-time annual-pay reference includes separate GBP median and mean, tax-year scope and provenance. Raw archive/workbooks and source cells were independently verified. This is national occupational pay, not available candidates, local hiring time, an internal salary mapping or a hire-versus-train recommendation. US numeric references remain unavailable; the denied BLS route is not retried.
+- A permitted ONS 2026 provisional UK SOC2020 2134 full-time annual-pay reference includes separate GBP median and mean, tax-year scope and provenance. Raw archive/workbooks and source cells were independently verified. This is national occupational pay, not available candidates, local hiring time, an internal salary mapping or a hire-versus-train recommendation. The new US role/location catalogue remains source-only; existing curated OEWS references are retained. The denied BLS retrieval route is not retried.
 - A versioned fictional Client Operations workload slice uses 1,280 units/month, one hour per unit, 160 hours/FTE, 10 contracted FTE and 30% assignment for October–December 2026. The shared engine calculates 8 FTE needed, 3 assigned and a 5-FTE gap. This is not observed BU staffing or additional company headcount. The Details handoff reuses the editable planner and existing goal/revision storage; mounted edit/goal/save/reload/reopen, original-goal preservation, reset and scope checks passed on public desktop/mobile. Unknown costs remain unknown, and the original worked example is preserved.
 
-## Active: Toronto evidence and concise missing-data states
+## Delivered: Toronto evidence and concise missing-data states
 
-Reviewed runtime 2dc320549231b3cdc378dbc6546068cd86132d33 is staged for verification. Statistics Canada Q2 2026 Toronto economic-region NOC21231 evidence reports 1,065 vacancies and CAD60.95 hourly average offered wage, with source vintage, quality and units. This measures employer demand, not available applicants. The raw archive and exact vector rows were independently checked. Exit-survey absence becomes a concise unavailable state while true zero, partial data, loading and errors remain distinct. Aggregate answers remove internal presentation jargon. External-reference carry into existing planning goals is the next active implementation; no cost autofill or new persistence system is planned.
+PR433 runtime 2dc320549231b3cdc378dbc6546068cd86132d33 is live and publicly verified. Statistics Canada Q2 2026 Toronto economic-region NOC21231 evidence reports 1,065 vacancies and CAD60.95 hourly average offered wage, with source vintage, quality and units. This measures employer demand, not available applicants. The raw archive and exact vector rows were independently checked. Exit-survey absence becomes a concise unavailable state while true zero, partial data, loading and errors remain distinct. Aggregate answers remove internal presentation jargon. External-reference carry into existing planning goals is the next active implementation; no cost autofill or new persistence system is planned.
 
-## Installed: durable Live AI verification
+## Next release gates and remaining evidence
+
+1. Toronto evidence and concise survey states: PR433 is promoted and publicly verified. Final CI passed after correcting a stale mirrored empty-state assertion; application code and the tested deployment were unchanged by that test correction.
+2. External references in planning: canonical UK/Toronto source IDs now use existing goal-scoped persistence, history and native-unit displays. Code review and 23 tests pass; mounted carry/reload/remove/goal-isolation checks are active. They supply evidence context, not automatic employer-cost inputs or an optimizer verdict.
+3. Live-model reliability: unpaid deterministic and rendering coverage is complete for the identified turnover multi-intent gap. The separate visitor-reported failure has no correlated retained trace; fresh paid reproduction remains outside current authorization.
+4. External data limits: the denied BLS automated retrieval route remains closed; no alternate access attempt, Census key or vendor purchase is included. Toronto vacancy estimates and UK pay do not establish available applicant pools or hiring time.
+5. The first scheduled PR427 renewal at 06:00 UTC remains a separate operational verification. This work does not manually renew or change its policy.
+
+The chart-first position dashboard and intro/helper cleanup are delivered. Video, real-company ingestion and unrelated new modeling engines remain deferred; no additional feature is inferred merely to keep work active.
+
+## Installed Live AI verification record
 
 PR426 is live: position modeling and source-only external workforce references, runtime `7d0496874f5b995f427783488105a58f96fdab6a`, deployment `dpl_4hqgnfh6SN8YdUz5edfvfemYNLUQ`. Public desktop/mobile each passed 11 controlled journeys, including saved goal isolation and current/proposed revisions. At that release, external numeric evidence was unavailable; later PR432 adds UK pay. No talent-pool numbers are invented.
 

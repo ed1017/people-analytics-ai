@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "3cbe5b728cd0c87c15db0a13a6b3c89466f6cb49",
+  "sourceCommit": "568b064e59ad2001f5137fe4cc8e793893d3d887",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -384,8 +384,8 @@
     },
     {
       "path": "components/decision-brief.tsx",
-      "sha256": "513f8fef4eb54f39931b2cb1a3d116865ffa91af2b959f49af39bebe0cbce187",
-      "bytes": 10300
+      "sha256": "dfb7c097d4a499106514042e2e63a92f819803571b24e08a5bd3a595a39fd0b8",
+      "bytes": 12039
     },
     {
       "path": "components/decision-landing.module.css",
@@ -4646,6 +4646,11 @@
       "path": "tests/market-reference-carry.test.mjs",
       "bytes": 8444,
       "sha256": "8eb58030d4c5aa9d7dace6081288f9d47a21a4580fb1677bec8dc458c3cd7689"
+    },
+    {
+      "path": "tests/decision-brief-market-attribution.test.mjs",
+      "bytes": 4408,
+      "sha256": "dcc6bbb07b3c4bd19f121a0cb18ffbdbb2cff26cd4c0d346cad216fab1726c6e"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
