@@ -2,6 +2,7 @@ import {PUBLIC_AI_ENABLED} from './public-ai-capabilities.mjs';
 import {createPublicAiDispatcher} from './public-ai-dispatch.server.mjs';
 import {after} from 'next/server';
 import {awaitPublicQaBinding} from './public-qa-application.server.mjs';
+import {pricingPolicyForRoute} from './public-pricing-policy.server.mjs';
 
 /** No dynamic configuration can enable this gate. A reviewed code release is
  * required after the ledger, provider and route acceptance checks pass. */
@@ -26,7 +27,17 @@ export function createPublicAiRuntime(options: {hostname:string;production?:bool
         after(task.then(()=>undefined));
         return task;
       };
-      return createPublicAiApplication({options,enabled:true,...ledger,settle,provider});
+      // Read a fresh immutable verification for each request. Never cache a
+      // dated application forever or fall back to the expired compiled dates.
+      return async (currentRequest:Request)=>{
+        try{
+          const signal=AbortSignal.any([currentRequest.signal,AbortSignal.timeout(5000)]);
+          const record=await ledger.readPricing(signal);
+          const policyForRoute=(route:string)=>pricingPolicyForRoute(record,route);
+          for(const route of ['home-solution','chat','plan','intake','capability'])policyForRoute(route);
+          return createPublicAiApplication({options,enabled:true,...ledger,settle,provider,policyForRoute})(currentRequest);
+        }catch{return disabled(currentRequest);}
+      };
     })().catch(()=>disabled);
     return (await application)(request);
   };

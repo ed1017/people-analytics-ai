@@ -11,7 +11,7 @@ import {normalizePublicPlannerReceipt,PUBLIC_PLANNER_PROVIDER_REQUEST_ID} from '
 export class PublicPlannerAdmissionError extends Error { constructor(){super('planner_admission_unavailable');this.name='PublicPlannerAdmissionError';} }
 export const PUBLIC_PLANNER_ENABLED=false;
 export const PUBLIC_PLANNER_LEDGER='public-9037-ai-initial-v1';
-export const PUBLIC_PLANNER_CAP_MICRO_USD=50000000;
+export const PUBLIC_PLANNER_CAP_MICRO_USD=100000000;
 export const PUBLIC_PLANNER_PROVIDER_URL='https://api.openai.com/v1/responses';
 export const PUBLIC_PLANNER_ROUTE_LIMITS=Object.freeze({
  'home-solution':Object.freeze({model:'gpt-6.1-sol',rounds:4,outputTokens:4000}),

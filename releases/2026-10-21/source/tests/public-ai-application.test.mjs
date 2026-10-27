@@ -25,7 +25,7 @@ function http(path,body,id='app-test',host=hostname,method='POST'){
 const message=(text)=>({type:'message',id:'message-test',role:'assistant',status:'completed',content:[{type:'output_text',text,annotations:[]}]});
 const raw=(spec,text='',calls=[])=>({id:'response-test',status:'completed',model:spec.model,usage:{input_tokens:10,output_tokens:10,total_tokens:20},output:calls.length?calls:[message(text)],output_text:text});
 const tool=(name,args,id='call-test')=>({type:'function_call',id:'fc-test',status:'completed',call_id:id,name,arguments:JSON.stringify(args)});
-function fixture(script,{reserved=0,deny=false,enabled=true,production=false,rowPatch={},now=()=>NOW,malformedGrant=false,settle}={}){
+function fixture(script,{reserved=0,deny=false,enabled=true,production=false,rowPatch={},now=()=>NOW,malformedGrant=false,settle,policyForRoute}={}){
  const grants=new Map(),events=[],specs=[];let attempts=0;
  const row=()=>({id:PUBLIC_PLANNER_LEDGER,cap_micro_usd:PUBLIC_PLANNER_CAP_MICRO_USD,reserved_micro_usd:reserved,enabled:true,policy_id:PUBLIC_PLANNER_PRICE_GROUP,per_call_micro_usd:PUBLIC_PLANNER_PRICE_MAX_RESERVATION,pricing_valid_until:publicPlannerPriceCandidate('plan').validUntil,...rowPatch});
  const admit=async(r,signal)=>{
@@ -41,7 +41,7 @@ function fixture(script,{reserved=0,deny=false,enabled=true,production=false,row
   assert.equal(spec.store,false);assert.equal(spec.service_tier,'default');assert.deepEqual(spec.prompt_cache_options,{mode:'explicit'});assert.equal(spec.parallel_tool_calls,spec.tools?.length?false:spec.parallel_tool_calls);assert.equal('previous_response_id' in spec,false);
   return script(spec,specs.length);
  };
- const app=createPublicAiApplication({options:{hostname,production},enabled,admit,settle,provider,now});
+ const app=createPublicAiApplication({options:{hostname,production},enabled,admit,settle,provider,now,policyForRoute});
  return {app,events,specs,grants,get reserved(){return reserved;},get attempts(){return attempts;}};
 }
 const home=()=>({version:1,requestId:'app-test',goal:{id:'goal1',statement:'Review workforce evidence'},scope,filters,timeZone:'UTC',evidence:structuredClone(pack),goalContext:null,selectedId:null,catalog:null,state:{version:1,verifiedMetrics:[],turns:[],constraints:[],working:[],analyses:[],rejected:[],questions:[],focusCandidateId:null},message:{id:'turn1',text:'Explain the available workforce evidence.'}});
@@ -241,4 +241,37 @@ test('explicit guided scenario actual Home route uses shared calculator without 
  const invalid=structuredClone(request);invalid.goalContext.scenarioReview.inputKey='changed';
  const bad=http('/api/home-solution-conversation',invalid);bad.headers.set('x-workforce-conversation','fictional-swp-demo-v1');
  assert.notEqual((await f.app(bad)).status,200);assert.equal(f.attempts,0);
+});
+
+
+test('renewed injected policy configures and completes requests after compiled pricing has expired',async()=>{
+ const clock=Date.parse(publicPlannerPriceCandidate('chat').validUntil)+3600000;
+ const verifiedAt=new Date(clock-60000).toISOString(),validUntil=new Date(clock+86400000-60000).toISOString();
+ const routes=[];
+ const policyForRoute=kind=>{routes.push(kind);return {...publicPlannerPriceCandidate(kind),verifiedAt,validUntil};};
+ const f=fixture(spec=>raw(spec,chatFinal),{now:()=>clock,policyForRoute,rowPatch:{pricing_valid_until:validUntil}});
+ assert.ok(clock>Date.parse(publicPlannerPriceCandidate('chat').validUntil));
+ const status=await f.app(http('/api/public-ai-capabilities',null,'renewed-read',hostname,'GET'));
+ const receipt=await status.json();assert.equal(receipt.status,'configured');assert.ok(readPublicAiCapabilityReceipt(receipt,clock));
+ assert.deepEqual(routes,['home-solution','chat','plan','intake','capability']);assert.equal(f.attempts,0);assert.equal(f.specs.length,0);
+ const response=await f.app(http('/api/chat',homeChat,'renewed-chat'));
+ assert.equal(response.status,200,JSON.stringify(await response.clone().json()));
+ assert.match((await response.json()).answer,/9,037/);assert.equal(routes.at(-1),'chat');
+ assert.equal(f.attempts,1);assert.equal(f.specs.length,1);assert.equal(f.reserved,publicPlannerPriceCandidate('chat').reserveMicroUsd);
+ assert.equal(f.specs[0].model,publicPlannerPriceCandidate('chat').model);assert.deepEqual(f.events,['admit','provider']);
+});
+
+test('expired or missing injected pricing never configures or admits an actual chat request',async()=>{
+ const clock=Date.parse(publicPlannerPriceCandidate('chat').validUntil)+3600000;
+ for(const policyForRoute of [
+  kind=>({...publicPlannerPriceCandidate(kind),verifiedAt:new Date(clock-86400000).toISOString(),validUntil:new Date(clock-1).toISOString()}),
+  ()=>null,
+  ()=>{throw Error('Missing verified pricing');},
+ ]){
+  const f=fixture(()=>{throw Error('Provider must not run');},{now:()=>clock,policyForRoute,rowPatch:{pricing_valid_until:new Date(clock+86400000).toISOString()}});
+  const receipt=await(await f.app(http('/api/public-ai-capabilities',null,'closed-read',hostname,'GET'))).json();
+  assert.equal(receipt.status,'unavailable');assert.deepEqual(receipt.routes,[]);
+  const response=await f.app(http('/api/chat',homeChat,'closed-chat'));assert.ok(response.status>=400);
+  assert.equal(f.attempts,0);assert.equal(f.specs.length,0);assert.equal(f.reserved,0);
+ }
 });

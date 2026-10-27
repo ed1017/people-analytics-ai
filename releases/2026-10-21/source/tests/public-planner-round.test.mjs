@@ -133,10 +133,10 @@ test('HTTP provider uses one fixed request with no redirects/retries and builds 
  await assert.rejects(fail(spec(),new AbortController().signal));assert.equal(calls,1);
 });
 test('readiness requires fresh exact enabled ledger state and never reserves',async()=>{
- const p=policy(),row={id:'public-9037-ai-initial-v1',cap_micro_usd:50000000,reserved_micro_usd:34,enabled:true,policy_id:p.id,per_call_micro_usd:p.reserveMicroUsd,pricing_valid_until:p.validUntil};
+ const p=policy(),row={id:'public-9037-ai-initial-v1',cap_micro_usd:100000000,reserved_micro_usd:34,enabled:true,policy_id:p.id,per_call_micro_usd:p.reserveMicroUsd,pricing_valid_until:p.validUntil};
  const base={enabled:true,policy:p,now:()=>NOW,readLedgerStatus:async()=>row};
  assert.equal(await publicPlannerReadiness(base),true);
- for(const changed of [{enabled:false},{reserved_micro_usd:50000000},{policy_id:'other'},{cap_micro_usd:5000000},{cap_micro_usd:20000000},{cap_micro_usd:30000000},{per_call_micro_usd:1},{pricing_valid_until:'2026-10-20T15:00:00Z'},{extra:true}]){
+ for(const changed of [{enabled:false},{reserved_micro_usd:100000000},{policy_id:'other'},{cap_micro_usd:5000000},{cap_micro_usd:20000000},{cap_micro_usd:30000000},{per_call_micro_usd:1},{pricing_valid_until:'2026-10-20T15:00:00Z'},{extra:true}]){
   assert.equal(await publicPlannerReadiness({...base,readLedgerStatus:async()=>({...row,...changed})}),false);
  }
  assert.equal(await publicPlannerReadiness({...base,readLedgerStatus:undefined}),false);
