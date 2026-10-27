@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "17499e117148b8000fddc2141b994bf688fb37b7",
-  "deployment": "https://people-analytics-f5gfif26p-ed-56dc.vercel.app",
+  "sourceCommit": "bde3bc017641da933a1e54438d0255c9a4269633",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -399,8 +399,8 @@
     },
     {
       "path": "components/decision-store.ts",
-      "sha256": "95c230e98231587f7cc3fb179f0d4685f8b3a92da690827525d20a21845ebd5c",
-      "bytes": 3084
+      "sha256": "5ca3e471fa21057d75b57fdab9ec23d5f55402ffe1c0f7a25d289f4d2c1e98e9",
+      "bytes": 2889
     },
     {
       "path": "components/development-workspace.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "12eec70b46fefbb81e48228c4695a172e5b038fa0072408fed831d0fbad4fb75",
-      "bytes": 9601
+      "sha256": "d74f3a267363a38ec3faf6c3064ee39c1c968d422f0658dcde7ddbc70c2fc52d",
+      "bytes": 10329
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "b1c70cc1a8f527510ec7a78745d123c21f48638b95cfafa559a41ca40cf69cb7",
-      "bytes": 105111
+      "sha256": "e79e591e8d18969d63a89b822833edab281d42ae483c85637ef42ab9aee4961e",
+      "bytes": 105080
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -2439,8 +2439,8 @@
     },
     {
       "path": "lib/home-onboarding.ts",
-      "sha256": "e6009cb1c3809a6aef7c1cf665031826238d15cebd16ce40589a767d8dbb76a8",
-      "bytes": 798
+      "sha256": "094bf82edfd67b8f5eaf0172647d75a4610159327aea7eaba19804985e4ae8ab",
+      "bytes": 619
     },
     {
       "path": "lib/home-pack.mjs",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 12701,
-      "sha256": "a16671eec0e3da27e3889b361d7fafd94959e31aa937f8d9590c590df7e0ccaf"
+      "bytes": 14577,
+      "sha256": "f0cf5b835ca849484a30e3e02c09d6fe2d6b37c84b25efbfe98f01120b9a19f4"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
