@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "4c6bc839ce4affbfb94157065102f747fd0b4ec9",
-  "deployment": "https://people-analytics-gqijoe6z0-ed-56dc.vercel.app",
+  "sourceCommit": "2dc320549231b3cdc378dbc6546068cd86132d33",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -424,8 +424,8 @@
     },
     {
       "path": "components/exit-survey-feedback.tsx",
-      "sha256": "2627cb75e2999b4df510ecf27d66ef27e56b382097bfd59d8c46941e7b3deb58",
-      "bytes": 3960
+      "sha256": "8264b0283a1e839215adc0825d2b19bb8ea3198f9f64d9dc193d8a6416740983",
+      "bytes": 4491
     },
     {
       "path": "components/focused-issue.tsx",
@@ -764,8 +764,8 @@
     },
     {
       "path": "components/pages/intelligence-page.tsx",
-      "sha256": "61521cf66a8c08d0724a0ee63a6da3e8ae3cc55e0b3c41668b4dbcda58da7dfa",
-      "bytes": 2607
+      "sha256": "f9d781fb72a87a75c9a2a412ecab40c57c30cc6f47712cb9722dd559414b2561",
+      "bytes": 2787
     },
     {
       "path": "components/pages/learning-development-page.tsx",
@@ -2084,8 +2084,8 @@
     },
     {
       "path": "lib/home-aggregate-registry.mjs",
-      "sha256": "351a8740d5047f225f1cdcd6a52e51c3eaad0cd55383699d3bbdd82a4628ea83",
-      "bytes": 15980
+      "sha256": "998af5a1df2278cfa4ed9dec0e09383ce48c7918825e77b5935491555973a8ca",
+      "bytes": 15959
     },
     {
       "path": "lib/home-aggregate-tool.mjs",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "49f8a106057e26d9ac93005535d2b68b115ce205de7ef5305040fe84e9223532",
-      "bytes": 13614
+      "sha256": "ed7f3c0e2c2781a54acda34414c526b761046839e43a73f4bccfbd986495397e",
+      "bytes": 13627
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -3949,8 +3949,8 @@
     },
     {
       "path": "tests/public-home-aggregate.test.mjs",
-      "bytes": 4240,
-      "sha256": "eba83a59ba50e55b8e9c72c9e04232002f4d9251fd764ce2d8bcb0373e476047"
+      "bytes": 4391,
+      "sha256": "bc9b79beb49367618024e9142f0bb33a96a413c6d8f5e855fbde5b985eef9c3c"
     },
     {
       "path": "tests/public-home-association.test.mjs",
@@ -4404,8 +4404,8 @@
     },
     {
       "path": "tests/urgent-missing-display.test.mjs",
-      "bytes": 3133,
-      "sha256": "fb7e4c3ed4331ef894e0450cb0f18c5863e94a98e4519b877a59578c244be992"
+      "bytes": 3362,
+      "sha256": "ac16086a5d1a1e30cc7dda92e78e9ebd059ba692a4f417ecb95c8b36b0830f9d"
     },
     {
       "path": "tests/recruiting-metric-semantics.test.mjs",
@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 6706,
-      "sha256": "af0a39b0ee4066c59b175f674c203962a2b10dc1c1a052565040f1a3f43aba85"
+      "bytes": 9547,
+      "sha256": "3fe0636697ea016898220314f8383d208ed48adeb5cb8379adc23a81d3be776d"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4489,8 +4489,8 @@
     },
     {
       "path": "lib/external-workforce-evidence.ts",
-      "bytes": 7602,
-      "sha256": "199b2400c0ff00bf4f0fef0b62154ffdc949833a2bb30ef25531628a19324afb"
+      "bytes": 11941,
+      "sha256": "7ad0e7d803c44e793fd50026e9f544429fc5fbb7892b03656ef86200c0a9886e"
     },
     {
       "path": "lib/position-design-scenario.ts",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 10921,
-      "sha256": "f32e6a9bb98620e6d2dac4decb1def7c6bb77d7f18c54b38967441d959776049"
+      "bytes": 16007,
+      "sha256": "757ee439db155c80b10a3f0a83da47e4cca099e5cbe4c3f8f4603c1912de0205"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
@@ -4631,6 +4631,11 @@
       "path": "tests/synthetic-capacity-risk.test.mjs",
       "bytes": 10333,
       "sha256": "af781e2cc041d481af4e4a8350d4ff21be3aa891e99d057f85f85b46cb75fd54"
+    },
+    {
+      "path": "tests/fixtures/external-workforce-evidence/statcan-toronto-source-extract.json",
+      "bytes": 1863,
+      "sha256": "79cd4ff75384de84db5b256746bb1881776c45c3e6455558199f2e3d4231b609"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
