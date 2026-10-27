@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "0c8ab9a8b69c2f9b371633828d9385e70fc2f737",
-  "deployment": "pending-protected-verification",
+  "sourceCommit": "394fedbb6c7162216df1b1c50bd961b364aa4038",
+  "deployment": "https://people-analytics-m1kyg0v08-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -709,8 +709,8 @@
     },
     {
       "path": "components/market-reference.tsx",
-      "sha256": "4dcc38eff4576e0902b8029ba724eebc2fc368d6e771bfe8db21f8a36828741e",
-      "bytes": 18160
+      "sha256": "99cd066daac031523c52590c11ed2747b6869af5d3262a62dc353275647304d8",
+      "bytes": 17766
     },
     {
       "path": "components/model-capability-planner.tsx",
@@ -4686,6 +4686,11 @@
       "path": "tests/planner-editorial-presentation.test.mjs",
       "bytes": 3355,
       "sha256": "3139d175ed7462f56256d064a554e6a2d59632463791c7373a6cad8fca4f930f"
+    },
+    {
+      "path": "tests/market-reference-editorial.test.mjs",
+      "bytes": 1914,
+      "sha256": "1e202599639945c980aea25a0c49de094a5780da57c3848adb65758f5c3a5278"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

@@ -28,7 +28,7 @@ test('four public domains load, normalize stably, and retain their limitations',
  const p=buildHomePack(results(),scope);assert.deepEqual(normalizeHomePack(p),p);
  for(const id of ['R1','T2','T5','P2']){const s=p.sources.find(s=>s.id===id);assert.equal(s.status,'loaded',id);assert.equal(s.sourceContext.datasetId,P.datasetId);assert.equal(s.sourceContext.bundleDigest,digest);}
  assert.match(p.sources.find(s=>s.id==='R1').limitation,/Accepted-offer/);
- assert.match(p.sources.find(s=>s.id==='T5').limitation,/suppressed complements/);
+ assert.match(p.sources.find(s=>s.id==='T5').limitation,/Readiness requires assessment; protected counts remain unavailable/);
  const bad=results();bad['learning-development'].data.as_of='2026-09-29';assert.equal(buildHomePack(bad,scope).sources.find(s=>s.id==='T2').status,'invalid');
  const suppressed=results();suppressed['succession-coverage'].data.ready_now_suppressed=true;assert.equal(buildHomePack(suppressed,scope).sources.find(s=>s.id==='T5').status,'invalid');
 });
