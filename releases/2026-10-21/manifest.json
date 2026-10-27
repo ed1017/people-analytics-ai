@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "2dc320549231b3cdc378dbc6546068cd86132d33",
+  "sourceCommit": "3cbe5b728cd0c87c15db0a13a6b3c89466f6cb49",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -59,8 +59,8 @@
     },
     {
       "path": "app/api/chat/route.ts",
-      "sha256": "9274201d3bc2aa5ee1baadfb8c85209ec204ff0c09a4cf0c34a11b7cd953df64",
-      "bytes": 94322
+      "sha256": "bee0c352a2207b0482ca2d4dc0ee478f4d2357bd97ad7aa7c98dbb7989bddb8a",
+      "bytes": 94343
     },
     {
       "path": "app/api/compensation-job-release/route.ts",
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "79fe4f7d9263e41f52d1d19968456911b9659e126142730aef3e1bca34bfb915",
-      "bytes": 90519
+      "sha256": "106d0c16e5b42dc53402cf11d056280c170b79702d09987e5158aebda3c3bb3b",
+      "bytes": 90909
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -709,8 +709,8 @@
     },
     {
       "path": "components/market-reference.tsx",
-      "sha256": "4af1670b5d934f134ee92c42b65c22fca58c588cfc53426bb097441eece39096",
-      "bytes": 15737
+      "sha256": "4dcc38eff4576e0902b8029ba724eebc2fc368d6e771bfe8db21f8a36828741e",
+      "bytes": 18160
     },
     {
       "path": "components/model-capability-planner.tsx",
@@ -764,8 +764,8 @@
     },
     {
       "path": "components/pages/intelligence-page.tsx",
-      "sha256": "f9d781fb72a87a75c9a2a412ecab40c57c30cc6f47712cb9722dd559414b2561",
-      "bytes": 2787
+      "sha256": "81c0021f6df00aaff5939b83e8b86623315c1fa049830e3fd9bad0759e372a20",
+      "bytes": 2970
     },
     {
       "path": "components/pages/learning-development-page.tsx",
@@ -1744,8 +1744,8 @@
     },
     {
       "path": "lib/dataset-conversation-adapters.mjs",
-      "sha256": "b43483928a625919191ebd5cebb53fe31395110f635fd9cf6e6ec21e0304c54e",
-      "bytes": 16039
+      "sha256": "0dbb77bead5929196561134ed9f356768c6a67feb92f06f0697694feec6e012a",
+      "bytes": 16056
     },
     {
       "path": "lib/dataset-conversation-inputs.mjs",
@@ -3164,8 +3164,8 @@
     },
     {
       "path": "lib/public-chat-conversation.mjs",
-      "sha256": "07a845af5994f54cf0935435145bf5b0c9b17a33545748cdfdd5206bdb4b9787",
-      "bytes": 11635
+      "sha256": "574cef762c5d2ac45d50e34bad03279205b77c1c76d83d3315722242c86de225",
+      "bytes": 11652
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 9547,
-      "sha256": "3fe0636697ea016898220314f8383d208ed48adeb5cb8379adc23a81d3be776d"
+      "bytes": 10056,
+      "sha256": "1eb460299f94e522e27e5434d251bf2a565982af512948854c6336fdbe3ec865"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 16007,
-      "sha256": "757ee439db155c80b10a3f0a83da47e4cca099e5cbe4c3f8f4603c1912de0205"
+      "bytes": 16225,
+      "sha256": "142e2c60626141111688154852d0cd1572910bba54166d00f57feea566441393"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
@@ -4636,6 +4636,16 @@
       "path": "tests/fixtures/external-workforce-evidence/statcan-toronto-source-extract.json",
       "bytes": 1863,
       "sha256": "79cd4ff75384de84db5b256746bb1881776c45c3e6455558199f2e3d4231b609"
+    },
+    {
+      "path": "lib/market-reference-carry.ts",
+      "bytes": 3582,
+      "sha256": "161d9a5f8628f186856523c7c4a709f9482cddf4cf6130a93378daad90395c4b"
+    },
+    {
+      "path": "tests/market-reference-carry.test.mjs",
+      "bytes": 8444,
+      "sha256": "8eb58030d4c5aa9d7dace6081288f9d47a21a4580fb1677bec8dc458c3cd7689"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

@@ -23,7 +23,7 @@ import {buildHomeBundleFormat,homeBundleInstructions} from './home-solution-bund
 import {inspectBundleResponse} from './home-bundle-response.ts';
 import {homeBundleTask,homeBundleTaskInstructions} from './home-bundle-task.ts';
 import {homeTurnPurpose,homeConversationInstructions} from './home-conversation.ts';
-import {marketCarryEvidence} from './oews-reference.mjs';
+import {marketCarryEvidence} from './market-reference-carry.ts';
 
 export const LOCAL_CONVERSATION_ROUTES=Object.freeze(['/api/chat','/api/capability-agent','/api/workforce-solution/intake','/api/home-plan-conversation','/api/home-solution-conversation']);
 const pages={workforce:'workforce',attrition:'attrition','workforce-planning':'workforce-planning',finance:'finance',skills:'skills','learning-development':'learning-development','career-mobility':'career-mobility','career-growth-mobility':'career-growth-mobility','succession-planning':'succession-coverage','talent-acquisition':'talent-acquisition','survey-sentiment':'survey-sentiment','occupational-references':'occupational-reference'};
@@ -56,7 +56,7 @@ export function createConversationAdapters({api,inputs,metadata,modelPorts={},fe
   else evidence=await inputs.read('/api/'+pages[body.page],undefined,signal);
   const history=summary?[]:(Array.isArray(body.history)?body.history:[]).slice(-8).filter(x=>x&&['user','assistant'].includes(x.role)&&typeof x.content==='string').map(x=>({role:x.role,content:x.content.slice(0,6000)}));
   const message=body.message.trim(),purpose=homeTurnPurpose(message,history),prepareGoal=!summary&&['goal','discovery'].includes(purpose),style=homeResponseStyle(message);
-  const context={evidence,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
+  const context={evidence,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference,goal.goal),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
   const input=missingPage?[...history,{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goal)+'\nQUESTION: '+message}]:[{role:'user',content:'VERIFIED CURRENT DATA AND USER INTENT (separate): '+JSON.stringify(context)},...history,{role:'user',content:message}];
   if(home&&!summary&&[HOME_ACTION_REQUEST,HOME_BUNDLE_REQUEST].includes(message)){
    requireInput(body.hasFocusedIssue===true&&goal.goal&&body.goalContext?.goal===goal.goal,'Confirm an exact goal before preparing actions.');
