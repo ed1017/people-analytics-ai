@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "5d52980ea5dd2218125d81ca62f92947784291d9",
-  "deployment": "https://people-analytics-6f4n77br2-ed-56dc.vercel.app",
+  "sourceCommit": "fcc86d6eaf8796bfff36f7e1b9d43c24231a9a17",
+  "deployment": "https://people-analytics-biqdmfe13-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -299,8 +299,8 @@
     },
     {
       "path": "components/action-plan-quick-summary.tsx",
-      "sha256": "efadfce3fc06fd336a580d51e3b88b16fe9bcf7b5423630a01f3866a7f752a8e",
-      "bytes": 15248
+      "sha256": "8d91a9607bd0524e0abcc514c56f58aef7043ee92d8e125cde6ee0f824aef534",
+      "bytes": 15148
     },
     {
       "path": "components/ai-panel.tsx",
@@ -324,13 +324,13 @@
     },
     {
       "path": "components/assumptions-disclosure.tsx",
-      "sha256": "a0bec74b03bed107f9a980fc69715f635c8e4f3636e40f2de6477ea0d91dbb90",
-      "bytes": 766
+      "sha256": "9453ba72cff77173656eac5a8950d3c6840ab6518901c8de360e0477ecca6d90",
+      "bytes": 749
     },
     {
       "path": "components/attached-action-plans-brief.tsx",
-      "sha256": "599019298980f4270b4b378ed8816416f8f1abc81ebe6bf01bee950a8e4a71a8",
-      "bytes": 5219
+      "sha256": "5185207fac25cb527fe06a1eab4c7d1458bd8908811ba19aa2a0339ce57f7036",
+      "bytes": 5148
     },
     {
       "path": "components/calibrated-ta-panels.tsx",
@@ -339,8 +339,8 @@
     },
     {
       "path": "components/capability-journey.tsx",
-      "sha256": "cd86d90ec44718e8c7e0d8317d4b5d5f7f63cbf65039178ea13f9c8986fa71f7",
-      "bytes": 11681
+      "sha256": "c5a0adaac7d55a7d561812fa09ba874e3438885d42d6a5ed33ab3b722df6ebad",
+      "bytes": 11184
     },
     {
       "path": "components/catalog-composer.tsx",
@@ -364,8 +364,8 @@
     },
     {
       "path": "components/compensation-benchmarks.tsx",
-      "sha256": "94c9aa978a017e4102304f8cede9684b15120f63ea8c58e289e3feb4c2d527cc",
-      "bytes": 7541
+      "sha256": "c62824fe2a5b8ecc1b60e8e5516223c958d523c77d9c0bdfbeb17b855010f3d0",
+      "bytes": 7331
     },
     {
       "path": "components/compensation-job-ranges.tsx",
@@ -414,8 +414,8 @@
     },
     {
       "path": "components/evidence-scope-notice.tsx",
-      "sha256": "469d665ec5cf0766806e461a66b434f0f5029a312bfc46d24eb73f1afaf00007",
-      "bytes": 2221
+      "sha256": "c9b173664b087742183141d52045716a264d5dbdaaa1e380ee36c87e0aff29d8",
+      "bytes": 2207
     },
     {
       "path": "components/evidence-table-region.tsx",
@@ -454,8 +454,8 @@
     },
     {
       "path": "components/goal-progress-summary.tsx",
-      "sha256": "24bf1e1c87099a8c0d3423c66931155e3102b2b749dc0083b6461773799cc489",
-      "bytes": 9862
+      "sha256": "ce471d2acd4063198f41179b5a4867961d29c86d47ad2ee7f0c5747e056987b9",
+      "bytes": 9679
     },
     {
       "path": "components/goal-takeaway.tsx",
@@ -469,13 +469,13 @@
     },
     {
       "path": "components/guided-demo.tsx",
-      "sha256": "979eca4fc169a5501ac061d29ee354ea74bba690bf3d049cd484b3ff4073fec5",
-      "bytes": 16621
+      "sha256": "df948d3d198d984efec5c0b44d341a79203c04886fd85e3c433103c268c34823",
+      "bytes": 16393
     },
     {
       "path": "components/guided-plan-summary.tsx",
-      "sha256": "50279250fb375965f9a5624e514379b25f686bb64a759749bf240a7bae0c683a",
-      "bytes": 2654
+      "sha256": "805ab9cb1ad818ff75b053a825e5ad7b00fe486994b38101330cbdf349500eda",
+      "bytes": 2453
     },
     {
       "path": "components/guided-workload-summary.tsx",
@@ -489,8 +489,8 @@
     },
     {
       "path": "components/hiring-scenario-controls.tsx",
-      "sha256": "426248860ffca2dfec95a6b158688194d3aed77111e3ad928616c10e4e710381",
-      "bytes": 4467
+      "sha256": "19b1796e19654a1eeb8737b26bb716c55f98a726f40ffdd45f7fd40e4c4eef7d",
+      "bytes": 4442
     },
     {
       "path": "components/historical-metric-context.tsx",
@@ -534,18 +534,18 @@
     },
     {
       "path": "components/home-bundle-plans.tsx",
-      "sha256": "43e85fbd1b30d3dd6595bd11e3dd787185f4ebf6329e5dacbfeef7062483617c",
-      "bytes": 43501
+      "sha256": "e05aaf430f5c1c386c06873ddc85055e158f2a72ab75cb0640b63f0cbd64357c",
+      "bytes": 43410
     },
     {
       "path": "components/home-business-planning-review.tsx",
-      "sha256": "1b096ce5b2fc749f73a86cf3d1c59c46abaa7bf99d359de2421080abf959e4d5",
-      "bytes": 10510
+      "sha256": "1b02ff307ccbe22f736a1043beab50cf2db464e6fee91f5baca12d9f768c4e71",
+      "bytes": 10092
     },
     {
       "path": "components/home-candidate-options.tsx",
-      "sha256": "dc9236847170a2f12484927e2be8ad7641ab79f636f52da60976dd8f2edbb0c7",
-      "bytes": 12709
+      "sha256": "dd5f1528bdfb7c3bc2f379a6aedfee8889c43505565d16037131676058979ad4",
+      "bytes": 12498
     },
     {
       "path": "components/home-capacity-adoption.tsx",
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "c3a0b9b5c8a07f733410884ae8b00d710ef72cbfceb2defc372dd5be2599c33e",
-      "bytes": 19654
+      "sha256": "061843ea056a4f1f8351aa7f36a76e203f54602f88319917f4972db0a446ac6b",
+      "bytes": 19584
     },
     {
       "path": "components/home-data-status.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "20f1a8f95a4f13e928f5206d3a5d13c85aa66d0108ba0b9504f7bd0d1d339682",
-      "bytes": 10890
+      "sha256": "53300d1190bcfd0618cc61f5173adc1e8063c9e4f187e9c8d296afc415b6fd52",
+      "bytes": 10814
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -604,8 +604,8 @@
     },
     {
       "path": "components/home-hiring-plan-review.tsx",
-      "sha256": "7ba8ae1fa9e6e0eac1fe84c94dbbcaf7749df6e3cb1320c3798a7a1076d21cff",
-      "bytes": 5096
+      "sha256": "1cfb4237e8c943338341eab23580b63b322a6307365033cc98582d7c8ee2e608",
+      "bytes": 4956
     },
     {
       "path": "components/home-linked-attachment.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "063c61b65abb9da1bec815a5e68f96c1b1924fa6cb9e193c7965f5dd07e9799a",
-      "bytes": 11835
+      "sha256": "8e3e2d3f841ebc735a1289581ab5a2d42c0798c0c6751b37cadd18e104e52f11",
+      "bytes": 11620
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -679,8 +679,8 @@
     },
     {
       "path": "components/home-solution-conversation-review.tsx",
-      "sha256": "62c9125f63ae961fcfc084cf788b3be5bbe23c751179a503a1d95fbd55a4d0bf",
-      "bytes": 23127
+      "sha256": "81eba883fdc001c713b890ff69818c0a5fa136d0926603800cd4c4990a1d4148",
+      "bytes": 22993
     },
     {
       "path": "components/home-success-measure-review.tsx",
@@ -689,8 +689,8 @@
     },
     {
       "path": "components/home-workforce-flows.tsx",
-      "sha256": "8bdf9676e69eccfb04fd5d63c6fb5dbdd114dd2d2daefb80b225cddc6f92e53a",
-      "bytes": 4116
+      "sha256": "a76a98a8261220755d4fdcdb2e8e38dd7a2d04d1bade9a27e6021a43693ee657",
+      "bytes": 4084
     },
     {
       "path": "components/key-findings.tsx",
@@ -714,8 +714,8 @@
     },
     {
       "path": "components/model-capability-planner.tsx",
-      "sha256": "6f1eb04c7f3351f3f9d89fe114ba5dd17c6bdf0e3e28a120c350d3b48adab81c",
-      "bytes": 10340
+      "sha256": "0c06eb6bec3789570a33793aafed31d3f85714582cdc26e6d43526736cb9de85",
+      "bytes": 9953
     },
     {
       "path": "components/occupational-reference.tsx",
@@ -739,13 +739,13 @@
     },
     {
       "path": "components/pages/attrition-page.tsx",
-      "sha256": "a6f2debb6d7f5e38db8c263e15a1bf2cb09fc502d3c3edd7344a79a8664bdee4",
-      "bytes": 11371
+      "sha256": "6e0715f797496996e40b32a5379e8e13e225c59c5df3ffd7bf516b09c27bffb1",
+      "bytes": 11313
     },
     {
       "path": "components/pages/career-growth-mobility-page.tsx",
-      "sha256": "5405cedda8ddf75aabeb4e32fc0e6ca849ecbaf6b0605c707274fd8fb3e41dbb",
-      "bytes": 13731
+      "sha256": "813a20bbaf0edb8d679156eb45a8c03e6de8cbff13f046f8a1edd3b53b3d0f41",
+      "bytes": 13473
     },
     {
       "path": "components/pages/career-mobility-page.tsx",
@@ -754,18 +754,18 @@
     },
     {
       "path": "components/pages/compensation-page.tsx",
-      "sha256": "bbd932a5fde621bb1b1e25f8530006437e4964764fd7ff46dfa0dd3eef37e148",
-      "bytes": 8781
+      "sha256": "1edafee8308e02e9446015eb4e2187d8b2e91029595fda9be694f241d532f3a6",
+      "bytes": 8468
     },
     {
       "path": "components/pages/finance-page.tsx",
-      "sha256": "148bdb5eb85fc17c1cd6b235e82abe5c4830d9185593ef65e1c77db5a6d6874c",
-      "bytes": 17444
+      "sha256": "f81ba7530829dc52012da665f272be6f999969f31cf3e23d189141d831d1a101",
+      "bytes": 17391
     },
     {
       "path": "components/pages/intelligence-page.tsx",
-      "sha256": "81c0021f6df00aaff5939b83e8b86623315c1fa049830e3fd9bad0759e372a20",
-      "bytes": 2970
+      "sha256": "04d3d35b0b832328b08fe43c8cc351afd47a4b40daa592a2b3b7a766c9aa9831",
+      "bytes": 2849
     },
     {
       "path": "components/pages/learning-development-page.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "7f375d49a375428445a92b6814efcd14768ef4dbabd4e4518dc57e6c01d4aa7c",
-      "bytes": 105445
+      "sha256": "0d995ab39304db461496b6569a87ef7155c74791cc4d745b562ea0e42b5eae2c",
+      "bytes": 104356
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -784,13 +784,13 @@
     },
     {
       "path": "components/pages/skills-page.tsx",
-      "sha256": "623fe9f43121309df0fe6e1c4b3be3374a778061c6a05f4d17d40fa9a6e29ea3",
-      "bytes": 14994
+      "sha256": "783c22a7cad3d09df089045f7950fd7ffe11fda1c02d0cebb6f6ed71e910c79d",
+      "bytes": 14949
     },
     {
       "path": "components/pages/succession-planning-page.tsx",
-      "sha256": "9269ea8c0c87ca736dca3be225337690882d760bf97dac0aaebcece3ea177cd2",
-      "bytes": 11780
+      "sha256": "69439baf778c9967a2fc7149f482145743ef103d5768185c0f791c1edb5fe2f6",
+      "bytes": 10856
     },
     {
       "path": "components/pages/survey-sentiment-page.tsx",
@@ -799,18 +799,18 @@
     },
     {
       "path": "components/pages/talent-acquisition-page.tsx",
-      "sha256": "3bdb50999599918495e55800de329f41538447699ab0300c7e6ef7ecc359e973",
-      "bytes": 15101
+      "sha256": "d28a54477b71bfbeacbd8db384717cab5549af190d1932d50aee0a4999c70165",
+      "bytes": 14919
     },
     {
       "path": "components/pages/workforce-page.tsx",
-      "sha256": "a862f72111b5a3ca87096642edf179d32145669434530512efe5e8fd96cf229d",
-      "bytes": 11913
+      "sha256": "b6a36e8f28472355bfbf789ad13c6174de772697cc92cb708d1234d6c9df0ec0",
+      "bytes": 11789
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "a236fccd23cdf8ca7b8e924559f5dfaae9dbc5cc7e75d8a5933c305d8714c72d",
-      "bytes": 73273
+      "sha256": "b971801395a5ffc802a2f3fd6da8410d398880ac37992ae11b2d685b73391eb6",
+      "bytes": 73208
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -829,8 +829,8 @@
     },
     {
       "path": "components/plan-directions.tsx",
-      "sha256": "054901c7d0dac8c60efa8ba64bb049c5da2ceae5e3a277c7069619a0f38b68fa",
-      "bytes": 1671
+      "sha256": "6c855fcbcc22a1be9afd546bb959b4fc2faa96d13e2287efdc9ef38dd820003a",
+      "bytes": 1586
     },
     {
       "path": "components/plan-review-next-step.tsx",
@@ -859,8 +859,8 @@
     },
     {
       "path": "components/planning-evidence-handoff-card.tsx",
-      "sha256": "7d5edaf6ddc05762422aceb88fa27fe674126bde91909a511bc788925bdf5d8e",
-      "bytes": 9820
+      "sha256": "932c9813cef2f890d6aa54e5b6e312b9a071a5d54fdb6981da663b67efdcb7ef",
+      "bytes": 10237
     },
     {
       "path": "components/planning-guide.tsx",
@@ -884,8 +884,8 @@
     },
     {
       "path": "components/project-case-study.tsx",
-      "sha256": "d8740a57883f4c5f1dbaf2100d868278e21fa7dfd11156908d6cfbcd617c4a8c",
-      "bytes": 3238
+      "sha256": "1134b49ebe4c12adf048250e68548bb683822f95748565f4ea2e9b75ff79cd1e",
+      "bytes": 3126
     },
     {
       "path": "components/projection-backtest-details.tsx",
@@ -899,8 +899,8 @@
     },
     {
       "path": "components/proposed-planning-editor.tsx",
-      "sha256": "3f37b4e4a83ace0416414971af03d11fe394c2bbbb07b232f3772ad289b1643b",
-      "bytes": 6139
+      "sha256": "1945cd2a90288045b1581c090251762aeecf1b46c49ec6ea5568aee7ba0a566d",
+      "bytes": 6187
     },
     {
       "path": "components/public-ai-configuration-status.tsx",
@@ -909,8 +909,8 @@
     },
     {
       "path": "components/retention-what-if-panel.tsx",
-      "sha256": "2643f2622bcce8a600746830b511126fab83523af4b6822a7f0da681885d28af",
-      "bytes": 13774
+      "sha256": "9aab34ee1c5470b2a5df4bd9a7e92ddce250ad9374f8808d701414df9f92b671",
+      "bytes": 13679
     },
     {
       "path": "components/scenario-decision-summary.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "eba31eb21bdd7a5bbd775ae6e5dcdb3dca081fb6fb35ebb3485bc1d84e0d525b",
-      "bytes": 10430
+      "sha256": "563cc4e57e8ceb2ea96027889d35de4be9610795c0d514ceed18921445af37e4",
+      "bytes": 10335
     },
     {
       "path": "components/site-footer.tsx",
@@ -934,43 +934,43 @@
     },
     {
       "path": "components/staffing-mix-controls.tsx",
-      "sha256": "d283cd796b7bee2097138465721cfb59d4bda76fa904aa283b2ba7ffa6b0d1b7",
-      "bytes": 2514
+      "sha256": "ac60f24803039bab237f8d9c4fcf62c65f4b3a9ca26c59d4026e9c4de38e6c9e",
+      "bytes": 2459
     },
     {
       "path": "components/staffing-option-cost.tsx",
-      "sha256": "e9a501ed7485dc856f74e0b3533662150f257462b199b8e32dbfc59efc544248",
-      "bytes": 1588
+      "sha256": "c9d96ee301ec8449001b6dd8536aeefe7ff86b41dac766d20136aae3dbad0c8b",
+      "bytes": 1533
     },
     {
       "path": "components/staffing-options-table.tsx",
-      "sha256": "f8d752d7816068c932fc7163114287435ad8b85490f78ca4ac48c8549b2fa95a",
-      "bytes": 1639
+      "sha256": "47dbee1aa21db99233b635615610044d10b26eabd1f0dd368d9372c449277cc3",
+      "bytes": 1620
     },
     {
       "path": "components/swp-demand-editor.tsx",
-      "sha256": "365a3717dbfe3461034f3d7418e364d42527af89927d9f415a2e5a30376dabee",
-      "bytes": 6240
+      "sha256": "78d25d9b2754dfdb78b8eb02711e2534815840a51c95f7b5df0a2e8370cc835e",
+      "bytes": 6061
     },
     {
       "path": "components/swp-demand-journey.tsx",
-      "sha256": "4523055ad39909e3427e6b04dd4841ac838e96907574ec1e5b10bb940acb7955",
-      "bytes": 14198
+      "sha256": "a188b064cc2f916ca0cd094dfff6e31613e121dba3bbbde315d3d933288d4582",
+      "bytes": 14145
     },
     {
       "path": "components/swp-demo-inputs.tsx",
-      "sha256": "bf4dd3c8965bedcb208be5fc69b82b9b186f0283348ddef6c77d706a8bd19bb3",
-      "bytes": 7648
+      "sha256": "322044f4b7a3eb5f77984fbbc5a445f7166563a5b2ddc1d685be5d69fbcc049d",
+      "bytes": 7570
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "b3f7e7713051fdb781ac6f286a774708478f4a480208a2edb20cf56e5fa61d72",
-      "bytes": 39814
+      "sha256": "b07213dabc178e16d9a20bead4070cd8aa3c91402ec6faca54625d9b5e740573",
+      "bytes": 38076
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
-      "sha256": "7248a4f7b041db254f75fe34b1db9e5c95cdac65cacf57252158955a1bf2d6a2",
-      "bytes": 8306
+      "sha256": "daeae60fbb6198f6e01a1bbd1071c9b52524a58d450e30f6306ae2e9481cdd81",
+      "bytes": 8723
     },
     {
       "path": "components/swp-outcome-chart.tsx",
@@ -979,8 +979,8 @@
     },
     {
       "path": "components/synthetic-career-demo.tsx",
-      "sha256": "f1a0f57ef5040245da8d1be65fe2f4cede4772b9a1d9d1be11daa546b3649271",
-      "bytes": 7712
+      "sha256": "71919d1e631cea621e83633c3485f4590c31bb7a8854c973c43b73a279edd098",
+      "bytes": 7117
     },
     {
       "path": "components/synthetic-domain-chart.tsx",
@@ -994,8 +994,8 @@
     },
     {
       "path": "components/synthetic-domain-prediction.tsx",
-      "sha256": "2de5bec139ce4b33d8a94bc636bbe33923120be88ac165a7707e61ff9f9a9e32",
-      "bytes": 2507
+      "sha256": "c1008e3a11ff86c5e871ecd68512e543e96bd2d5685d838a9cb8a020dfb0aec5",
+      "bytes": 2460
     },
     {
       "path": "components/synthetic-exit-count-example.tsx",
@@ -1009,8 +1009,8 @@
     },
     {
       "path": "components/synthetic-pay-demo.tsx",
-      "sha256": "d8cd09d5504f72a588bbbfceb7c664e8e6fff37a352aab221ac8788f539b1d86",
-      "bytes": 7696
+      "sha256": "777ea18d08297055a6ce97107778d85473583030c3dee702fdec619f57501f56",
+      "bytes": 7541
     },
     {
       "path": "components/synthetic-ta-preview.tsx",
@@ -1129,23 +1129,23 @@
     },
     {
       "path": "components/workforce-local-search.tsx",
-      "sha256": "a7e6f79ba55461be6dacd6b4a2e670efd6f5f58dd35ce0bb890cfae150cfee39",
-      "bytes": 9332
+      "sha256": "fb61584485ddcc515890b54074d0a920c4e10c8443015bbc3918c4d32b6e426d",
+      "bytes": 8968
     },
     {
       "path": "components/workforce-performance.tsx",
-      "sha256": "7d504c83bd6f7339e878392c3a78d8d227292a19e8c445b2ef2221d6ade8bac1",
-      "bytes": 4183
+      "sha256": "5d0e5fb13b36217c76f4ed9bac3890ed292facec48c8232f10a38cc6ed111fb6",
+      "bytes": 3966
     },
     {
       "path": "components/workforce-planning/business-unit-response-allocation-panel.tsx",
-      "sha256": "0919f300ba3858f66fcf6fe34c31e61924b2d61f0483e91fd8cb6e081803ce83",
-      "bytes": 12690
+      "sha256": "810b4d5115c512e27e6ad08b047a9f30eb490ae45b0a77cdd27462782060a610",
+      "bytes": 12465
     },
     {
       "path": "components/workforce-planning/candidate-scheduling-assumptions.tsx",
-      "sha256": "e4e4e5f685a7290be457e6e6cb9de692d220e464ce96ceeae5b0ce34f4102804",
-      "bytes": 2196
+      "sha256": "e12753ca75f8dc55d22528c83e96a27b9f90453934078d2b50ed6c15ec137125",
+      "bytes": 2026
     },
     {
       "path": "components/workforce-planning/capacity-projection.tsx",
@@ -1154,13 +1154,13 @@
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
-      "sha256": "404c735c77500b3609ede4a7027ccb62971f339eba4f963ff884e5fa2782253e",
-      "bytes": 13524
+      "sha256": "8e1d355a2d0f9d784e9f5b891a73af1565c8cad5d68f5e7be2726b6c00d13b9d",
+      "bytes": 13342
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "e75aefffcd60e9a949ba2b2e5e9fd0a679e9ec57d8782a7fa5f88dea2da70ab5",
-      "bytes": 12590
+      "sha256": "0d3b9cdb3bb83e65d5d21c9c3c3d30d7b2c8a2667c8065ac69430fda2fc81409",
+      "bytes": 12321
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -1169,8 +1169,8 @@
     },
     {
       "path": "components/workforce-planning/company-headcount-what-if.tsx",
-      "sha256": "0731ccfb6a83cfd93dfe1ac70f5cb7d433674bb73a83341ab2e8ae7acdb2ca8a",
-      "bytes": 4651
+      "sha256": "b5c3bd1456e5f5fcd27471ddee3893e367441764f7c56e1cbd121c016fcc6672",
+      "bytes": 4416
     },
     {
       "path": "components/workforce-planning/constraint-aware-schedule-summary.tsx",
@@ -1179,13 +1179,13 @@
     },
     {
       "path": "components/workforce-planning/constructed-response-feasibility.tsx",
-      "sha256": "34ee3c7112842dc474046b175377d8fce1c0630de9ede3111773ea0c5a032025",
-      "bytes": 1035
+      "sha256": "f0883f5fda309acedb735cd1c195043733c1a27ff2d3e05da3b9ab08bbf956d8",
+      "bytes": 1186
     },
     {
       "path": "components/workforce-planning/constructed-talent-profile-fit.tsx",
-      "sha256": "025f12252f9eb0edf5063d026fc1384f4fb8d41ea520b840e63e8f1d900cfba7",
-      "bytes": 2278
+      "sha256": "cdee668bbd8b00d69efeaf175c7942ba90b3ebf413101ff38c6f7bff10923c7e",
+      "bytes": 2731
     },
     {
       "path": "components/workforce-planning/execution-feasibility-destination.tsx",
@@ -1199,8 +1199,8 @@
     },
     {
       "path": "components/workforce-planning/headcount-demo-workspace.tsx",
-      "sha256": "195b81370d3991945f49729e64cffcd40ebdb8e75dbcaf754d3abca092a8b1d2",
-      "bytes": 2638
+      "sha256": "84e630a5e262f27c1737e3b0ccb40b67233471e7bd0a6a50e5697304edccb6ab",
+      "bytes": 2502
     },
     {
       "path": "components/workforce-planning/planning-landing.module.css",
@@ -1209,8 +1209,8 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
-      "sha256": "ddf868c746dffe09149747696b358a20826575a438e789c1d240b2a051a7a477",
-      "bytes": 6447
+      "sha256": "f0a1fe1cd173e156a9b0aea9763dadd3212c4177e95359f3f51b4135cefbc9d0",
+      "bytes": 6384
     },
     {
       "path": "components/workforce-planning/planning-overview.tsx",
@@ -1244,23 +1244,23 @@
     },
     {
       "path": "components/workforce-planning/response-portfolio-controls.tsx",
-      "sha256": "ce9c89c35aea486bacbf391158c394e8905e7fc04d0c19fc7ddb0945387cca7a",
-      "bytes": 15781
+      "sha256": "943f4460d3d16f620e380635c217a985ac3e7591a2bb5bb6e945a6e8c522949e",
+      "bytes": 15932
     },
     {
       "path": "components/workforce-planning/response-strategy-evidence.tsx",
-      "sha256": "8fdcc39756161e24c266c2353b22b88a30c3c45a5a5e8c2d7a0696307309dd4a",
-      "bytes": 8878
+      "sha256": "6f63f12d75f392e21c0aa87af7c1aa185cc04db443905f0c87395590b18c4095",
+      "bytes": 9029
     },
     {
       "path": "components/workforce-planning/role-response-evidence-summary.tsx",
-      "sha256": "c9e10c4f4681fffdda84bd7af340054e08fa7af3882118b6cfce6fbb6e74efe7",
-      "bytes": 17080
+      "sha256": "66db3536e94034fa665bfc35ae3b3cebd1caf74c2620868c6445e07fa65da50a",
+      "bytes": 17684
     },
     {
       "path": "components/workforce-planning/role-workforce-response-plan.tsx",
-      "sha256": "d7c881681696b53016f7f9c241486c8426ea71cb0aabab867c5bc4954577bb66",
-      "bytes": 11150
+      "sha256": "2906b4c34134d7845409347c1fd11bd27f9061042f9c50993fadd8f72429cd16",
+      "bytes": 11019
     },
     {
       "path": "components/workforce-planning/scenario-comparison-table.tsx",
@@ -1274,8 +1274,8 @@
     },
     {
       "path": "components/workforce-planning/scenario-modeling-panel.tsx",
-      "sha256": "bd13017fb0c21ca1993c97420fe6956d0713b713dd5cb086a5f26f0ecffd2390",
-      "bytes": 47571
+      "sha256": "b932a55dcee802024acd34a594e26429e324a388be14ba9f77ac737f139f0642",
+      "bytes": 47722
     },
     {
       "path": "components/workforce-planning/scenario-plan-summary.tsx",
@@ -1284,13 +1284,13 @@
     },
     {
       "path": "components/workforce-planning/skill-client-demand.tsx",
-      "sha256": "577a8fafecdca3c668b6bdacf7919e0926bc0573980e3dc50d92b0a9924bd1f0",
-      "bytes": 3697
+      "sha256": "d5ee85967f014d0af30cc42a5db2550e9534dcdfee201b2e1ff6858c5e23b716",
+      "bytes": 3398
     },
     {
       "path": "components/workforce-planning/skill-workforce-response-plan.tsx",
-      "sha256": "7c84066ea7dfccda92b25dc81f7e151fed4dbe1ff5f3ace7f2e76c4cf4c43dbb",
-      "bytes": 18616
+      "sha256": "add47142904df05eef65b40dec254a0b1c665d1bc1f55d42ac658152788dd769",
+      "bytes": 18453
     },
     {
       "path": "components/workforce-planning/staffing-target-companion.module.css",
@@ -1299,8 +1299,8 @@
     },
     {
       "path": "components/workforce-planning/staffing-target-companion.tsx",
-      "sha256": "84fad219fdf2830ed9b75e96ef1c9b28ca847125ec4033cfb776afcd47d627fc",
-      "bytes": 8087
+      "sha256": "d522b52cddb01ee294b45d7d4f909cc0441acc7e9112e4456cdfec3abba66386",
+      "bytes": 8238
     },
     {
       "path": "components/workforce-planning/structural-position-action-results.tsx",
@@ -1319,8 +1319,8 @@
     },
     {
       "path": "components/workforce-planning/talent-response-evidence.tsx",
-      "sha256": "a7dc03953ceeebfcbd7e97927c61bb44c15d924db673979db01a6a7acc11621e",
-      "bytes": 11328
+      "sha256": "27ab58ab6c1783d1bde1c9ec5ba4a97360cf0be90be0cfda492fcf91b01b741d",
+      "bytes": 12385
     },
     {
       "path": "components/workforce-planning/use-planning-decision-state.ts",
@@ -1334,8 +1334,8 @@
     },
     {
       "path": "components/workforce-planning/workforce-execution-panel.tsx",
-      "sha256": "9ba575f9d3c8cc3f00f58304aee3910000ca93aedcf02f92199668a5ccb56bff",
-      "bytes": 52809
+      "sha256": "1a5d08341fbe63063b659554c76b56f6cd1e25ed5ce53a4564bdf2e13033a358",
+      "bytes": 52504
     },
     {
       "path": "components/workforce-planning/workforce-response-destination.tsx",
@@ -1759,8 +1759,8 @@
     },
     {
       "path": "lib/dataset-display-context.mjs",
-      "sha256": "699829819ad2d9c7cb84d22b1567cd2ae923f53fc8c9f1d97da515f25abc7226",
-      "bytes": 2784
+      "sha256": "d76f2f0a31b4e357ce9508c8a70c0c0afadae8496ef9eda201344c6b2b130ef4",
+      "bytes": 2754
     },
     {
       "path": "lib/dataset-domain-presenters.mjs",
@@ -2339,8 +2339,8 @@
     },
     {
       "path": "lib/home-history-query.mjs",
-      "sha256": "468196e660cf324060405419fe119e0b628417c770949cfae1b4607e661d45a1",
-      "bytes": 1906
+      "sha256": "61f6e95b4185dc54131a423bec325d3de50c881f0bb7a370480735db5f431cb3",
+      "bytes": 1750
     },
     {
       "path": "lib/home-history-selection.ts",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "f57b7d15d72b1ca261da6e61cc35022f07b6191b737c9664f15d9ed09a2cadc2",
-      "bytes": 44952
+      "sha256": "82dd15f6bebbf11fa079e3175a7c8bfd18aeba3fc83c7220f6322e9b1fc7eb5c",
+      "bytes": 45125
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2694,8 +2694,8 @@
     },
     {
       "path": "lib/home-starter-goals.ts",
-      "sha256": "b048ae2d88bf3e432d5bcbd8eaa98471e65aa0a31acd9fd64457e91105d83adb",
-      "bytes": 5381
+      "sha256": "19728ee8855bb06b1d0fd64f71cc8bc023c3320b52dd2462c9d83c1f41c96c19",
+      "bytes": 4987
     },
     {
       "path": "lib/home-strategic-planning.ts",
@@ -2714,8 +2714,8 @@
     },
     {
       "path": "lib/home-turnover-chat.ts",
-      "sha256": "4eeec160955b304ed4855aeaffdeca2d24558fdde404ba309c515215ca0e08b0",
-      "bytes": 19503
+      "sha256": "19adc4ddb76341756ba53d14a6818e3e2b098f3a5d68d3244fb185e677cb867f",
+      "bytes": 19446
     },
     {
       "path": "lib/home-turnover-context.ts",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "ed7f3c0e2c2781a54acda34414c526b761046839e43a73f4bccfbd986495397e",
-      "bytes": 13627
+      "sha256": "59ae98feb8225cc3282e54c763ad95c61e670743256204cf71296932557fc1a2",
+      "bytes": 13478
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -3864,8 +3864,8 @@
     },
     {
       "path": "tests/home-dataset-query.test.mjs",
-      "sha256": "5118035d5c86a6b9789f17f6d30fefc461bdf5a34a74d746693723c3b3098e49",
-      "bytes": 5122
+      "sha256": "5ee5b8a82b297721f5a5aa1f6c5f854d5ad0ae803390fe173467bc3f2ce6745b",
+      "bytes": 5171
     },
     {
       "path": "tests/home-flows-catalog.test.mjs",
@@ -3884,8 +3884,8 @@
     },
     {
       "path": "tests/home-public-provenance.test.mjs",
-      "bytes": 4566,
-      "sha256": "c07f02dca21c692ec77f16318cf2cfd89f57e5154807ca4a3103b0df0a8e25a2"
+      "bytes": 4579,
+      "sha256": "b8c02ed314cac04c37c236a87aad1a16e60fa13d4b7bc16a4d62eecfef12b0c8"
     },
     {
       "path": "tests/home-role-recruiting.test.mjs",
@@ -3944,13 +3944,13 @@
     },
     {
       "path": "tests/public-ai-application.test.mjs",
-      "bytes": 31846,
-      "sha256": "bfd784c6c9852f6e62a44abdc7096d06a63d08a99f7c5ca5df46a26d69659809"
+      "bytes": 31832,
+      "sha256": "ff5eaee472b330315494833dae4f9be22d82bf8f3e1c0eb599a6df86a9151d6d"
     },
     {
       "path": "tests/public-home-aggregate.test.mjs",
-      "bytes": 4391,
-      "sha256": "bc9b79beb49367618024e9142f0bb33a96a413c6d8f5e855fbde5b985eef9c3c"
+      "bytes": 4356,
+      "sha256": "98a19639dccbac55ff3bc749e3c096186863bccdd0fef3c34676963f65e1767a"
     },
     {
       "path": "tests/public-home-association.test.mjs",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "878cb84abd18ad0246df2a464cd58575aeba4a4ebdfc8a619b479b5ddfee64c2",
-      "bytes": 20513
+      "sha256": "9a57bd335a683de0ffac20c364418a944a8c951b98f15a407d8e43c6659406c5",
+      "bytes": 20486
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -3994,8 +3994,8 @@
     },
     {
       "path": "tests/public-projection-restoration.test.mjs",
-      "sha256": "18f69e39e039a185c9d15cef1d3e9fb176e1efcdf4bd210622ae9db2c8f424ec",
-      "bytes": 9975
+      "sha256": "bacdd85f61dfbc130afb7918c7ede0f9a7df01f7fc74a4fbdcaf6868c493735f",
+      "bytes": 10024
     },
     {
       "path": "tests/public-saved-evidence.test.mjs",
@@ -4004,8 +4004,8 @@
     },
     {
       "path": "tests/realism-version-transition.test.mjs",
-      "sha256": "cb19095896a3884f62de33d4bb2041c48ae07e7e233713807c76df53b61842e0",
-      "bytes": 5023
+      "sha256": "09c8c5718201a1d6f5df817011f69f84b18bcaa31f8018b92f34c97f4316903f",
+      "bytes": 5113
     },
     {
       "path": "tests/review-polish-contracts.test.mjs",
@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "b1a7b3fc073cec679e45a2e36c9e2ee259b6122fa62f6ae8e98a3a0c380cfd79",
-      "bytes": 15054
+      "sha256": "693cce5c164c05980137b7c039a392756d24bbe92643b30539a11a07ba683e91",
+      "bytes": 14841
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4129,8 +4129,8 @@
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "c5a3f58e0fc16c0b9f0a7bc6cac615518a4c0785a7c38414a8acfa52aaa8b5a0",
-      "bytes": 1778
+      "sha256": "8c37a7c492175f43090540405ee66df6c7b56fd426692ad008d4a5c2f89e5511",
+      "bytes": 1958
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4149,8 +4149,8 @@
     },
     {
       "path": "components/headcount-projection-planner.tsx",
-      "sha256": "e9d679a860b6fd41f8a1423f278e7dd22e5e031ae39de7f3020cfb2d5c70ff90",
-      "bytes": 7075
+      "sha256": "adbb571f3a85cb49e12ff755b1f5f49ccb3001ad2db997afa9970f0a6e0246e0",
+      "bytes": 7143
     },
     {
       "path": "lib/headcount-projection-edit.ts",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "b401f1e43fe444152f713cc5327b1bef779e8f7ebf758fbac6a263b664a1ef64",
-      "bytes": 6605
+      "sha256": "7429ec35141a740e172941696a6a24ee981981ce7f50fce02840f586bb0e5698",
+      "bytes": 6570
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "2a4230e124925fe98f8da41854269ed86552ac6709285b95ca728d200d874f93",
-      "bytes": 6894
+      "sha256": "5f014b961ac1db750148a73518dbc6ead46de41c2d36a54c6923bc8693182152",
+      "bytes": 6862
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4394,8 +4394,8 @@
     },
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
-      "bytes": 7425,
-      "sha256": "5184c279f87829e47cca706a50f8428eddeb1116a0e292b4c55408ce104c70dd"
+      "bytes": 7529,
+      "sha256": "d557bb696887ceb4a6f67393b57b851d944408173ff7b091c14edfe747fde7e3"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
@@ -4419,8 +4419,8 @@
     },
     {
       "path": "tests/public-recruiting-cohort-recovery.test.mjs",
-      "bytes": 2903,
-      "sha256": "8701c159405c17e3da8c769d46cdd4bfe4e7cd197af9d5dffd62a1ba8933c676"
+      "bytes": 2987,
+      "sha256": "28f614656407c627e275fba76462b516d1984fa4de98a66dadf9af8c5f9f482c"
     },
     {
       "path": "tests/concise-talent-findings.test.mjs",
@@ -4429,13 +4429,13 @@
     },
     {
       "path": "tests/projection-save-retry.test.mjs",
-      "bytes": 5546,
-      "sha256": "4e4aea102d67463470b73424a4426df26fd326da6cb3ea59bec9dbe8df47bd63"
+      "bytes": 6107,
+      "sha256": "46e0486f1d91f1e47565355450848300c90f2628936860e0a8d7c3df770d16f9"
     },
     {
       "path": "components/home-company-intro.tsx",
-      "bytes": 1628,
-      "sha256": "ac52527a9f05776f4bf5f010e9e91861937464048fa0972fb82e43425eedcc5a"
+      "bytes": 1422,
+      "sha256": "a428c033d70d00d2600de4c0919328ad2041cef923568b081639d60b987841c6"
     },
     {
       "path": "lib/demo-company-profile.ts",
@@ -4444,23 +4444,23 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 3528,
-      "sha256": "66f6f12ef696844a995267f89b01fcd98564d742aef09314668a83d6eb659490"
+      "bytes": 3688,
+      "sha256": "f7a4e7754c35c03fead6d0b4ff1b68bde96c14a3f0e627745568abfb80215680"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
-      "bytes": 3115,
-      "sha256": "0b098d864d840de6f9f057d17a3cdfaa27f788cd65c95cd78e9060c194264d88"
+      "bytes": 3051,
+      "sha256": "c65da4146b63c760775208ff1bf9bc08304ee6ee2f3953d2d537fd8bb69ffbd6"
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 16817,
-      "sha256": "cbdf5ea605593e5860544437904fe737f55ece68b34a4281791f373f50ea7cf7"
+      "bytes": 19042,
+      "sha256": "525b9bbfda2da3aa4879c7957f638253e7bab2dce344446273d6ea1322e9e580"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
-      "bytes": 2878,
-      "sha256": "4c3bf114b038b6b4267f66835d2275c782c55974ceb8f36fc36d3a9290fb94c8"
+      "bytes": 3214,
+      "sha256": "7431a697c184031758a02286d62f955df7334f05b996c5bc859e0a142198bfb8"
     },
     {
       "path": "tests/scenario-route-aliases.test.mjs",
@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 10056,
-      "sha256": "1eb460299f94e522e27e5434d251bf2a565982af512948854c6336fdbe3ec865"
+      "bytes": 10026,
+      "sha256": "09d30d4bf7a8953bc08a76bef549f15f2f132066d40732d4b551d5023cfb34b9"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4661,6 +4661,31 @@
       "path": "tests/planning-empty-progress.test.mjs",
       "bytes": 3914,
       "sha256": "22e74903ccf2b1ab893ac8545a78676744a047a376c1049994039d0b77417e78"
+    },
+    {
+      "path": "lib/home-fte-investigation.mjs",
+      "bytes": 3763,
+      "sha256": "371f87941302ffd5744475779fad4f4f0666bfaaa93a72a6590bc4aedee6c798"
+    },
+    {
+      "path": "lib/intro-scroll-lock.ts",
+      "bytes": 688,
+      "sha256": "e6ae15e0b540e5066bb410b40bc1df3941386eb8f07904e9f99eb1522cab0a47"
+    },
+    {
+      "path": "tests/home-fte-investigation.test.mjs",
+      "bytes": 5746,
+      "sha256": "520fc31b82a0dbd5d885f214c4e4d8075a0bf702a8bf2b66a016df1528c640b2"
+    },
+    {
+      "path": "tests/module-editorial-presentation.test.mjs",
+      "bytes": 5438,
+      "sha256": "89cc5527e4f2377fa7c3fdcd708d6fdb9f4800db9ce1d37e10bb7f04b8ed5574"
+    },
+    {
+      "path": "tests/planner-editorial-presentation.test.mjs",
+      "bytes": 3355,
+      "sha256": "3139d175ed7462f56256d064a554e6a2d59632463791c7373a6cad8fca4f930f"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

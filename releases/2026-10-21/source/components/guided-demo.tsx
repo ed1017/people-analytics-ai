@@ -14,7 +14,7 @@ const legacySteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. No question is sent until you use the real Send button.'],
  ['Submit the example question','Review the prefilled question, then follow Next → Submit to the actual Send button. Wait for the answer before pinning.'],
  ['Pin the example goal','Follow Next → Pin goal to the real button. After the goal is saved, its Action Plans will be prepared using the normal Pin flow.'],
- ['Review the plans and choose one','Compare the plans, proposed owners, cash costs and employee hours. Check the baseline, target and review date; ask in chat about missing values. Activities completed are not measured outcomes. Select any available Action Plan; if preparation failed, use Retry Action Plans.'],
+ ['Review the plans and choose one','Compare the plans, proposed owners, cash costs and employee hours. Check the baseline, target and review date; ask in chat about missing values. Select any available Action Plan; if preparation failed, use Retry Action Plans.'],
  ['Attach your chosen plan','Follow Next → Attach Action Plan to the real button. Review any displayed conflict or assumptions. This step advances only after the attachment is saved.'],
  ['Edit your Action Plan','A suggested coordination-hours adjustment is filled into chat. Review or change it, then follow Next → Submit to the real Send button. The goal, budget and original attachment are kept.'],
  ['Select the revised plan','Follow the arrow to the new numbered plan. Review the recalculated assumptions and compare it with the original before attaching.'],
@@ -23,14 +23,14 @@ const legacySteps=[
 const conversationSteps=[
  ['Review the retention example','Start a separate example conversation. Your current conversation and draft are kept. Send only when you are ready.'],
  ['Describe the goal in chat','Review the example question, then use the actual Send button. A useful reply can propose approaches without saving a goal yet.'],
- ['Explore and refine the approach','In the proposed plan, review the owner, baseline, target and review date. Keep unverified values unknown and ask in chat about gaps. Activities completed are not measured outcomes. Say what to keep or change, or ask for another approach.'],
- ['Save an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Save plan. The plan and goal are saved together; saving does not apply the plan.'],
+ ['Explore and refine the approach','In the proposed plan, review the owner, baseline, target and review date. Keep unverified values unknown and ask in chat about gaps. Say what to keep or change, or ask for another approach.'],
+ ['Save an Action Plan','Review the plan’s goal, actions, success measure and unknowns, then choose Save plan. The plan and goal are saved together.'],
  ['Refine your selected plan in chat','Describe another adjustment and Send. Reuse the known context; mention only what should change. The original proposal stays attached.'],
  ['Pin the revised Action Plan','Review the new proposal and its unknowns, then pin it. Both versions remain with their goal and progress history.'],
 ] as const;
 /** Read-only completion guidance follows the same flag as the Track summary. */
 export function GuidedCompletionGuidance(){
- return <p className="text-xs text-white/85">{goalProgressEnabled?'To record progress, review and confirm proposed dated measurements in chat, then inspect the saved measurements in Track. Saving a plan does not record execution or achieved results.':'Progress tracking is not enabled in this environment.'} Share Action Plan is not available yet.</p>;
+ return <p className="text-xs text-white/85">{goalProgressEnabled?'To record progress, review and confirm proposed dated measurements in chat, then inspect the saved measurements in Track. ':'Progress tracking is not enabled in this environment.'}</p>;
 }
 export type GuidedDemoActions={ready:boolean;loading:boolean;draft:string;begin:(id:string)=>void;fillDraft:(text:string)=>void;cancel:()=>void;leave:()=>void};
 const button='min-h-11 rounded border border-white/60 px-3 py-2 text-sm font-semibold text-white hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:opacity-50';

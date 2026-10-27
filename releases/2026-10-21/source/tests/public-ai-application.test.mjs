@@ -55,12 +55,12 @@ for(const [question,registryId,metric]of [
  const req={...home(),goal:{id:'',statement:''},message:{id:'turn1',text:question}};
  const f=fixture(spec=>{assert.ok(spec.tools.some(t=>t.name==='read_aggregate_comparison'));return raw(spec,'',[tool('read_aggregate_comparison',{registryId,metric,order:registryId==='learning.job_profiles'?'ascending':'descending',limit:3,scope:'company-wide',asOf:'current'})]);});
  const result=await f.app(http('/api/home-solution-conversation',req));assert.equal(result.status,200,JSON.stringify(await result.clone().json()));
- const answer=await result.json();assert.equal(f.specs.length,1);assert.equal(answer.usage.modelRounds,1);assert.equal(answer.usage.toolCalls,1);assert.equal(answer.charts.length,1);if(registryId==='learning.job_profiles')assert.match(answer.answer,/All 50 released groups are tied/);else {assert.match(answer.answer,/Recorded as of 2026-09-30/);assert.match(answer.answer,/released groups/);}assert.equal(answer.state.turns.at(-1).text,answer.answer);
+ const answer=await result.json();assert.equal(f.specs.length,1);assert.equal(answer.usage.modelRounds,1);assert.equal(answer.usage.toolCalls,1);assert.equal(answer.charts.length,1);if(registryId==='learning.job_profiles')assert.match(answer.answer,/All 50 groups are tied/);else {assert.match(answer.answer,/Recorded as of 2026-09-30/);assert.match(answer.answer,/groups/);}assert.equal(answer.state.turns.at(-1).text,answer.answer);
  if(registryId!=='learning.job_profiles'){
   const [path,collection]=({'workforce.countries':['workforce','countries'],'finance.business_units':['finance','by_business_unit'],'recruiting.business_units':['talent-acquisition','business_units']})[registryId];
   const source=await(await binding.handle(new Request('https://'+hostname+'/api/'+path))).json();
   const maximum=Math.max(...source[collection].map(row=>row[metric]));assert.ok(answer.answer.includes(maximum.toLocaleString('en-US',{maximumFractionDigits:10})));assert.match(answer.answer,/highest to lowest/);
-  assert.ok(answer.answer.includes(`all ${source[collection].length} released groups`));
+  assert.ok(answer.answer.includes(`all ${source[collection].length} groups`));
  }
 });
 test('aggregate scope and date limitations do not silently become current company facts',async()=>{
@@ -84,9 +84,9 @@ for(const [registryId,metric,path,question]of [
  const data=await(await binding.handle(new Request('https://'+hostname+'/api/'+path))).json();
  const rows=registryId.startsWith('skills.')?data[registryId.split('.')[1]]:registryId==='pay.job_compa'?data.rows.filter(r=>r.status==='published'):data.constructedPolicy.bands.filter(r=>data.jobs.some(j=>j.job_profile_code===r.job)&&data.levels.some(l=>l.level_code===r.level));
  const maximum=Math.max(...rows.map(r=>r[metric]));assert.ok(result.answer.includes(maximum.toLocaleString('en-US',{maximumFractionDigits:10})));
- if(registryId.startsWith('skills.'))assert.match(result.answer,/not the complete skills inventory/);
- if(registryId==='pay.job_compa'){assert.match(result.answer,/48 eligible groups/);assert.match(result.answer,/2 groups are excluded.*Withheld/);assert.match(result.answer,/not actual market pay/);}
- if(registryId==='catalog.policy_bands'){assert.match(result.answer,/all 550 released groups/);assert.match(result.answer,/USD annual base at 1 FTE/);}
+ if(registryId.startsWith('skills.'))assert.match(result.answer,/Ranking covers the available source list/);
+ if(registryId==='pay.job_compa'){assert.match(result.answer,/48 available groups/);assert.match(result.answer,/2 groups excluded.*Withheld/);assert.match(result.answer,/Compa uses constructed policy midpoints/);}
+ if(registryId==='catalog.policy_bands'){assert.match(result.answer,/all 550 groups/);assert.match(result.answer,/USD annual base at 1 FTE/);}
 });
 test('survey ranking actual Home route reads all eight grounded groups and accepts scoped factual answer',async()=>{
  const survey=await(await binding.handle(new Request('https://'+hostname+'/api/survey-sentiment'))).json();

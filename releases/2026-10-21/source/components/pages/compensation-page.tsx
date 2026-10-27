@@ -51,9 +51,9 @@ export function CompensationPage({scope}: {scope?: RangeScope}) {
     <div className="min-w-0 space-y-4 px-4 pt-4 sm:px-6 sm:pt-6"><CompensationJobRanges scope={scope}/><CompensationBenchmarks /></div>
     <section className="evidence-workspace min-w-0 space-y-5 p-4 sm:p-6" aria-label="Compensation cost context" aria-busy={loading}>
       <div className="space-y-2">
-        <p className="text-xs font-medium text-primary">Demo data · Aggregate evidence · USD</p>
+        <p className="text-xs font-medium text-primary">Labor cost · USD</p>
         <h2 className="text-lg font-semibold">Workforce cost context</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">Compare reported demo labor cost across business units. This internal source has no salary ranges or pay-equity measures.</p>
+        <p className="max-w-3xl text-sm text-muted-foreground">Compare labor cost across business units.</p>
       </div>
 
       {loading ? <p role="status" className="rounded-lg border p-6 text-sm text-muted-foreground">Loading compensation cost context…</p>
@@ -70,17 +70,17 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
   return <>
     <div className="rounded-lg border bg-muted/20 p-3 text-xs leading-relaxed text-muted-foreground">
       <p>Company scope · {data.by_business_unit.length} business units · Snapshot: {snapshot}. Workforce filters do not apply here.</p>
-      <p>Cost period and source refresh date are not supplied. Employee-level cost coverage is unknown.</p>
+      <p>Cost period: unavailable.</p>
     </div>
-    {incomplete && <p role="status" className="text-sm text-muted-foreground">Some source values are missing or invalid. Affected totals and comparisons are unavailable.</p>}
+    {incomplete && <p role="status" className="text-sm text-muted-foreground">Some costs are unavailable.</p>}
     <dl className="grid gap-3 sm:grid-cols-3">
-      <div className="rounded-lg border p-4"><dt className="text-sm text-muted-foreground">Reported labor cost · USD</dt><dd className="mt-2 break-words text-2xl font-semibold tabular-nums">{display(data.current.labor_cost_usd, true)}</dd><dd className="mt-1 text-xs text-muted-foreground">Sum of supplied business-unit costs</dd></div>
+      <div className="rounded-lg border p-4"><dt className="text-sm text-muted-foreground">Reported labor cost · USD</dt><dd className="mt-2 break-words text-2xl font-semibold tabular-nums">{display(data.current.labor_cost_usd, true)}</dd><dd className="mt-1 text-xs text-muted-foreground">Business-unit total</dd></div>
       <div className="rounded-lg border p-4"><dt className="text-sm text-muted-foreground">Labor cost per FTE · USD</dt><dd className="mt-2 text-2xl font-semibold tabular-nums">{display(data.current.cost_per_fte_usd, true)}</dd><dd className="mt-1 text-xs text-muted-foreground">Reported cost ÷ reported FTE</dd></div>
       <div className="rounded-lg border p-4"><dt className="text-sm text-muted-foreground">Snapshot headcount</dt><dd className="mt-2 text-2xl font-semibold tabular-nums">{display(data.current.headcount)}</dd><dd className="mt-1 text-xs text-muted-foreground">{display(data.current.fte)} FTE · full-time equivalent</dd></div>
     </dl>
     <div className="min-w-0 rounded-lg border p-4">
       <h3 className="font-semibold">Business-unit comparison</h3>
-      <p id="compensation-table-note" className="mt-1 text-xs text-muted-foreground">Highest reported cost first. Cost per FTE reflects workforce mix; it is not average salary.</p>
+      <p id="compensation-table-note" className="mt-1 text-xs text-muted-foreground">Highest reported cost first.</p>
       <div className="mt-3 overflow-x-auto" role="region" aria-label="Business-unit cost comparison" tabIndex={0}>
         <table className="w-full min-w-[650px] text-sm" aria-describedby="compensation-table-note">
           <caption className="sr-only">Demo business-unit labor costs in USD for the {snapshot} snapshot. Cost period is unknown.</caption>

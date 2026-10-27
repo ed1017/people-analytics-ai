@@ -87,11 +87,11 @@ export function PlanningEvidenceHandoffCard({
               {statusLabel}
             </span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-1 text-sm text-muted-foreground">
             Context only. No scenario has been
             run, approved, or applied from this
             handoff.
-          </p>
+          </p></details>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -294,10 +294,10 @@ export function PlanningEvidenceHandoffCard({
           <p className="mt-2 whitespace-pre-wrap text-sm">
             {handoff.businessGoal}
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-2 text-xs text-muted-foreground">
             This is intent supplied by the user,
             not an observed workforce fact.
-          </p>
+          </p></details>
         </div>
 
         <div className="rounded-md border p-3">
@@ -308,12 +308,12 @@ export function PlanningEvidenceHandoffCard({
             {handoff.userAssumptions ??
               "No assumptions stated."}
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-2 text-xs text-muted-foreground">
             Assumptions are not approved model
             inputs until the user explicitly
             chooses to model them with supported
             values.
-          </p>
+          </p></details>
         </div>
       </div>
     </section>

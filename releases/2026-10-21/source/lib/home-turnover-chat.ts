@@ -151,7 +151,7 @@ export function turnoverChatReply(request:SolutionRequest,grounding:Grounding|un
  if(months.some(m=>!selected.some(r=>String(r.month).slice(0,7)===m)))return {answer:`Turnover for one or more requested months is unknown in the current verified evidence. ${provenance} Please choose available months: ${[...new Set(dates)].join(', ')||'none'}.`,chartQuestion:null,context};
  const valid=selected.filter(r=>r.suppressed!==true&&/^20\d{2}-(0[1-9]|1[0-2])-01$/.test(String(r.month))&&String(r.month)<=source.date!&&rate(r[key]));
  if(new Set(valid.map(r=>r.month)).size!==valid.length||!valid.length)return {answer:`${label} is unknown for the requested periods in the current verified evidence. ${provenance} No chart is available.`,chartQuestion:null,context};
- const answer=`${label}: ${valid.map(r=>`${String(r.month).slice(0,7)}: ${r[key]}%`).join('; ')}. ${provenance} These are monthly rates, not annual or YTD rates.${valid.length<selected.length?' Other selected values are unknown and omitted.':''}${valid.length<2?' At least two known periods are needed for a trend chart.':''}`;
+ const answer=`${label}: ${valid.map(r=>`${String(r.month).slice(0,7)}: ${r[key]}%`).join('; ')}. ${provenance}${valid.length<selected.length?' Other selected periods are unavailable.':''}${valid.length<2?' At least two known periods are needed for a trend chart.':''}`;
  return {answer,chartQuestion:valid.length>=2?`Monthly ${metric==='voluntary'?'voluntary ':''}turnover ${months.join(' ')}`:null,context};
 }
 

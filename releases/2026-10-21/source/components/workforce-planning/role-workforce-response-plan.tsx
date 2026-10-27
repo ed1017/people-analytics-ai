@@ -189,7 +189,7 @@ export function RoleWorkforceResponsePlan({
                                 </div>
 
                                 <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                                  One planned role unit is counted once across the entire required-skill bundle. Skill-level learning, mobility, and hiring signals are evidence only and are never summed as unique people.
+                                  Allocate the role target across develop, move and hire.
                                 </div>
 
                                 {roleResponsePlanError && (

@@ -71,9 +71,9 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
       ) : (
         <a className={link} href={record.source.url} target="_blank" rel="noopener noreferrer">View BLS area sources <span className="sr-only">(opens a new tab)</span></a>
       )}
-      {onCarry&&(ukOnly||torontoOnly)&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Carry reference to Planning</button><p className="mt-1 text-xs">{goal.trim()?'Saves this reference; assumptions stay unchanged.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
+      {onCarry&&(ukOnly||torontoOnly)&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Carry reference to Planning</button><p className="mt-1 text-xs">{goal.trim()?'Carry the reference with your goal.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
       <details className="text-sm text-slate-600">
-        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">Sources and definitions</summary>
+        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">Details</summary>
         <div className="space-y-2 pt-1">
           {torontoOnly ? <>
             <p>{toronto.source.attribution}</p>

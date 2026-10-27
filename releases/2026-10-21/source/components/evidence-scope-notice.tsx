@@ -58,7 +58,7 @@ export function EvidenceScopeNotice({
       </div>
 
       {selectedNarrow && <p className="mt-1 font-medium">Company-wide evidence; selected filters are not applied.</p>}
-      <details className="mt-2 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Scope and methodology</summary>
+      <details className="mt-2 text-xs text-muted-foreground"><summary className="cursor-pointer min-h-6">Details</summary>
       <p className="mt-2">
         Selected business context:{" "}
         {selectedContext.country} ·{" "}

@@ -18,13 +18,13 @@ export function WorkforcePerformanceField({ value, filters, selectedContext, pop
               <div className="flex justify-between gap-2"><span>Rating {i + 1}</span><span className="tabular-nums">{n.toLocaleString('en-US')}</span></div><div className="h-3 rounded bg-muted" aria-hidden="true"><div className="h-full rounded bg-primary" style={{ width: `${100 * n / Math.max(...counts.ratings)}%` }} /></div>
             </li>)}
           </ul>
-          <p className="mt-4 text-xs text-muted-foreground">{counts.rated.toLocaleString('en-US')} rated / {counts.population.toLocaleString('en-US')} employees. Unavailable ratings: {counts.unavailable}. Not-rated status: not collected.</p>
-        </> : <p role="status" className="mt-3 text-sm text-muted-foreground">{!supportsPerformanceFilters(filters) ? 'Unavailable for this selection. Ratings support the whole company or one business unit only; select all countries and all levels.' : loading ? 'Loading ratings for the selected workforce…' : 'Ratings unavailable. No active, validated aggregate release was returned for this workforce.'}</p>}
+          <p className="mt-4 text-xs text-muted-foreground">{counts.rated.toLocaleString('en-US')} rated / {counts.population.toLocaleString('en-US')} employees. Unavailable ratings: {counts.unavailable}.</p>
+        </> : <p role="status" className="mt-3 text-sm text-muted-foreground">{!supportsPerformanceFilters(filters) ? 'Unavailable for this selection. Ratings support the whole company or one business unit only; select all countries and all levels.' : loading ? 'Loading ratings for the selected workforce…' : 'Ratings unavailable. Reload to try again.'}</p>}
       </section>
       <UnavailableMeasure title="Promotion rate" unit="Promoted employees / eligible employees · %" reason="Unavailable. A verified promotion-eligible population and linked promotion outcomes for this workforce and period are not available. Recorded event shares are not promotion rates." />
       <UnavailableMeasure title="Median time in prior level" unit="Months before promotion" reason="Unavailable. Verified prior-level start dates and linked promotion dates are not available for this workforce. Current tenure and recorded movement counts cannot establish this duration." />
     </div>
-    <details className="mt-3 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">Rating definitions &amp; availability</summary><p>Numeric ratings are ordinal categories; category names and calibration are unverified. The September 30 availability date is a simulated display convention, not a verified historical release date. These measures are descriptive only and excluded from AI evidence.</p></details>
+    <details className="mt-3 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary><p>Numeric ratings are ordinal categories. Rating names, calibration and not-rated status are unavailable. The displayed September 30 date is a dataset convention.</p></details>
   </section>;
 }
 function UnavailableMeasure({ title, unit, reason }: { title: string; unit: string; reason: string }) {

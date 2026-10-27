@@ -31,7 +31,7 @@ export function CompensationBenchmarks() {
         </select>
       </label>
     </div>
-    <p className="text-xs text-muted-foreground">3 occupations · 3 US geographies · No internal role matched</p>
+    <p className="text-xs text-muted-foreground">3 occupations · 3 US geographies · Occupation reference</p>
     {!selected ? <p role="status" className="rounded-md bg-muted/20 p-4 text-sm">Choose an occupation to view wage percentiles.</p> : <div className="space-y-3" aria-live="polite">
       <div className="rounded-md bg-muted/20 p-3 text-sm">
         <h3 className="font-semibold">{selected.occupation.onet_title} · {selected.area.label}</h3>
@@ -47,13 +47,13 @@ export function CompensationBenchmarks() {
           <tbody>{comparisons.map(item => <tr key={item.area.code} className="border-b last:border-0"><th scope="row" className="py-3 pr-4 font-medium">{item.area.label}<span className="mt-1 block text-xs font-normal text-muted-foreground">{item.area.kind} · {item.area.code}</span></th>{item.percentiles.map(percentile => <td key={percentile.field} className="px-2 py-3 text-right tabular-nums">{formatOewsEstimate(percentile.estimate, true)}</td>)}</tr>)}</tbody>
         </table>
       </div>
-      <p className="text-xs text-muted-foreground">Percentiles describe the wage distribution across workers in the selected occupation and geography. They do not identify junior, mid-level or senior pay.</p>
-      <p className="text-xs text-muted-foreground">Estimated employment: {formatOewsEstimate(selected.employment)}. Employment PRSE: {formatOewsEstimate(selected.employmentPrse)}{selected.employmentPrse.status === "published" ? "%" : ""}. Employment is not vacancies or available candidates; this PRSE is not uncertainty for the wage percentiles.</p>
+
+      <p className="text-xs text-muted-foreground">Estimated employment: {formatOewsEstimate(selected.employment)}. Employment PRSE: {formatOewsEstimate(selected.employmentPrse)}{selected.employmentPrse.status === "published" ? "%" : ""}. </p>
       <a href={selected.source.url} target="_blank" rel="noreferrer" className="inline-block text-sm text-primary underline">Official BLS source workbook</a>
     </div>}
     <AssumptionsDisclosure>
       <div className="mt-3 space-y-2 text-xs leading-relaxed text-muted-foreground">
-        <p>Occupation percentiles are not seniority levels, salary bands or total compensation. A job title alone does not verify an internal role match. Workforce filters do not change this public reference. A market median is not an internal salary-range midpoint and cannot supply a compa-ratio.</p>
+        <p>Percentiles describe the worker wage distribution, rather than seniority levels or salary bands. Employment measures filled jobs; employment PRSE measures precision of that employment estimate. A job title alone does not verify an internal role match. Workforce filters do not change this public reference. A market median is not an internal salary-range midpoint and cannot supply a compa-ratio.</p>
         <p>BLS OEWS May 2025, released May 15, 2026. Versioned subset checked October 5, 2026; no automatic refresh or inflation adjustment. US nonfarm wage and salary employment, including full- and part-time workers; self-employed workers are excluded.</p>
         <p>OEWS wages include base rates and some incentive pay. Overtime premiums, nonproduction bonuses and employer benefit costs are excluded. These are published annual wage estimates, not take-home pay or total employer cost. The percentile range is not a confidence interval.</p>
         <p>Missing/suppressed estimates stay unavailable. A BLS “#” is shown as ≥ $239,200 annually, not an exact wage; “*” means wage unavailable and “**” means employment unavailable. The nine included records have published numeric estimates.</p>

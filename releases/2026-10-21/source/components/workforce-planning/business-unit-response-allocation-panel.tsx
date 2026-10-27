@@ -85,7 +85,7 @@ export function BusinessUnitResponseAllocationPanel({
       <div className="border-t p-4">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <p className="max-w-3xl text-xs text-muted-foreground">
-            Allocate the existing role portfolio to destination business units. BU totals must reconcile back to each role&apos;s Build / Move / Buy target. A Move row identifies the destination only; source BU is not inferred. Amounts are modeled role capacity and may be fractional.
+            Allocate each role target across destination business units. Enter role capacity, including fractional amounts.
           </p>
 
           <div className="flex gap-2">
@@ -333,7 +333,7 @@ export function BusinessUnitResponseAllocationPanel({
 
             <div className="mt-3 text-[11px] text-muted-foreground">
               {formatWholeCount(result.unallocated_destinations.length)} positive destination row(s) remain unallocated ·{" "}
-              {formatWholeCount(result.contractions.length)} contraction offset row(s). Destination gaps are not automatically treated as company gaps.
+              {formatWholeCount(result.contractions.length)} contraction offset row(s).
             </div>
 
             {result.warnings.length > 0 && (

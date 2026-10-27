@@ -140,9 +140,7 @@ export function SkillsPage({
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                  Apparent proficiency gaps compare recorded employee proficiency with the proficiency required by the employee&apos;s current job profile. Missing or stale skill records should not be interpreted as proof that an employee lacks a capability.
-                </div>
+                <details className="mt-4 text-sm text-muted-foreground"><summary className="w-fit min-h-11 cursor-pointer py-2 font-medium">Details</summary><p>Apparent proficiency gaps compare recorded proficiency with current role requirements. Missing or stale assessments require confirmation before planning development.</p></details>
 
                 <div className="mt-6 evidence-panel-grid grid gap-6">
                   <div className="rounded-lg border p-4">

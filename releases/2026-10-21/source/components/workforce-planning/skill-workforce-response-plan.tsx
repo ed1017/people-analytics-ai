@@ -207,7 +207,7 @@ export function SkillWorkforceResponsePlan({
                                 </div>
 
                                 <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">
-                                  This is a user-directed plan, not an optimizer. Planned coverage assumes each executed action closes one unit of this selected skill gap. Do not sum separate skill plans as unique people because one person or role can satisfy multiple skills.
+                                  Allocate coverage for this skill gap. Each action contributes one planned unit.
                                 </div>
 
                                 {responsePlanError && (

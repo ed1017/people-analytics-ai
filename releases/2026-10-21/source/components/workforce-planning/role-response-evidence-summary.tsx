@@ -71,7 +71,7 @@ export function RoleResponseEvidenceSummary({
           </p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Conditional coverage if executed. Profile fit and historical recruiting signals do not establish current staffing availability.</p>
+      <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-3 text-xs text-muted-foreground">Conditional coverage if executed. Profile fit and historical recruiting signals do not establish current staffing availability.</p></details>
       <details className="mt-4 rounded-md border p-3">
         <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Talent and recruiting evidence</summary>
       {readiness.assessment_status === "not_assessed" ? <ConstructedTalentProfileFit data={readiness} /> : (
@@ -222,9 +222,9 @@ export function RoleResponseEvidenceSummary({
           </div>
         )}
 
-        <p className="mt-3 text-[11px] text-muted-foreground">
+        <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-3 text-[11px] text-muted-foreground">
           Aggregate planning signal only. Missing skill records mean no demonstrated proficiency in the loaded data; they do not prove an employee lacks the skill. No individual employees are exposed or ranked.
-        </p>
+        </p></details>
       </div>
       )}
       <div className="mt-4 rounded-md border p-4">
@@ -232,9 +232,9 @@ export function RoleResponseEvidenceSummary({
           <p className="font-medium">
             External Recruiting Feasibility
           </p>
-          <p className="text-xs text-muted-foreground">
+          <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="text-xs text-muted-foreground">
             Whole-role ATS evidence for Buy. Current pipeline is context only; historical recruiting performance is not a forecast.
-          </p>
+          </p></details>
         </div>
 
         {result.external_recruiting_feasibility.data_meta && <p className="mb-3 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{result.external_recruiting_feasibility.data_meta.sourceLabel}. Future hiring capacity and arrival dates are unknown.</p>}
@@ -315,9 +315,9 @@ export function RoleResponseEvidenceSummary({
           </div>
         </div>
 
-        <p className="mt-3 text-[11px] text-muted-foreground">
+        <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-3 text-[11px] text-muted-foreground">
           Existing open requisitions are not automatically netted against scenario-created Buy demand. Recruiting history describes prior execution at this role; it does not establish future labor-market supply.
-        </p>
+        </p></details>
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-md border p-3">

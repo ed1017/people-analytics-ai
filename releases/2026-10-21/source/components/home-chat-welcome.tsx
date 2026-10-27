@@ -115,7 +115,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
           </g>)}
           {futurePlot.slice(1).map((point,index)=><line key={'projection-'+point.month} x1={futurePlot[index].x+'%'} y1={futurePlot[index].y} x2={point.x+'%'} y2={point.y} className={styles.projectionLine}/>)}
         </svg>
-        <figcaption><span>{periodContext} </span>{history.length === 1 ? 'One recorded snapshot: ' + first?.snapshot_date + '; no trend inferred.' : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' recorded monthly snapshots; gaps left unconnected.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
+        <figcaption><span>{periodContext} </span>{history.length === 1 ? 'Snapshot: ' + first?.snapshot_date : history.length ? first?.snapshot_date + ' – ' + last?.snapshot_date + ' · ' + history.length + ' monthly snapshots.' : 'Recorded history unavailable.'}{checked && <span> Dashed: conditional projection through {horizonEnd?.slice(0,7)}.</span>}</figcaption>
       </figure> : <p className={styles.historyState} role="status">{loading ? 'Updating workforce history…' : 'Verified headcount history unavailable.'}</p>}
       {tooltip}
       {current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>

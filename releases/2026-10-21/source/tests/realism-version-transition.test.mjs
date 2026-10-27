@@ -18,10 +18,11 @@ test('historical version is readable but never current-source authority',()=>{
  assert.equal(isStoredPublicProjectionVersion(v),true);assert.equal(isPublicProjectionVersion(v),false);
  for(const patch of [{datasetToken:P.token},{publicationReceiptId:'invented'},{publicDigest:'bad'},{extra:true}])assert.equal(isStoredPublicProjectionVersion({...v,...patch}),false);
 });
+// Released position-inventory fields (6400ea6) changed the public envelope digest; verified against production and committed baseline.
 test('actual new binding rejects old request tokens and publishes revised coherent summaries',async()=>{
  const b=await loadPublic9037Binding({hostname:'www.ed-ai.app'});
  const stale=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':old}}));assert.equal(stale.status,409);
- const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9');
+ const response=await b.handle(new Request('https://www.ed-ai.app/api/dashboard',{headers:{'x-workforce-dataset':P.token}}));assert.equal(response.status,200);const d=await response.json();assert.equal(d.overview.headcount,9037);assert.equal(d.data_meta.datasetToken,P.token);assert.equal(b.router.current().digest,'2ffb177d4343276608d06ae320b8c0c5891ebd39f64c3b4a59e14b0eb416f94b');
 });
 
 test('historical calculated projection reopens unchanged but cannot seed a new calculation',async()=>{

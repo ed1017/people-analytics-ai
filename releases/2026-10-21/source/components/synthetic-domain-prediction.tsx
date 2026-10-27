@@ -14,7 +14,7 @@ export function SyntheticDomainPrediction({domain,data}:{domain:SyntheticDemoDom
   ?'@min-[44rem]:grid-cols-[fit-content(16rem)_minmax(0,1fr)]'
   :'@min-[50rem]:grid-cols-[fit-content(24rem)_minmax(0,1fr)]';
  return <div className="@container min-w-0">
-  {domain === 'satisfaction' && <p className="mb-2 text-xs font-medium">Independent simulated population · Not a projection of recorded engagement</p>}
+  {domain === 'satisfaction' && <p className="mb-2 text-xs font-medium">Separate engagement scenario</p>}
   <div className={`grid min-w-0 items-start gap-3 ${columns}`}>
    <div className="min-w-0 max-w-full">
     <p className="text-xs font-semibold">{ranking?'3 methods ranked by backtest':'3 prediction methods'}</p>

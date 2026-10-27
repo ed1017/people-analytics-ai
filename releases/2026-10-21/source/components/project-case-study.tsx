@@ -15,17 +15,17 @@ export function ProjectCaseStudy({expanded=false}:{expanded?:boolean}={}){
   </section>
   <section className="space-y-1">
    <h3 className="text-base font-semibold">Try the workflow</h3>
-   <p>Open Planning Scenario in Overview to review the existing 5-FTE service-team example. Adopt its example assumptions, adjust the inputs, compare the options and save a proposal to revisit.</p>
+   <p>In Overview, choose Introduction, then Start guided demo. Use the 5-FTE service-team example, adjust the inputs, compare the options and save a proposal to revisit.</p>
   </section>
   <section className="space-y-1">
    <h3 className="text-base font-semibold">Ed&apos;s role</h3>
    <p>Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing.</p>
   </section>
   <details className="border-t pt-2">
-   <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Data, calculations and implementation</summary>
+   <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary>
    <div className="space-y-2">
     <p>The workforce snapshot is dated September 30, 2026. Worked examples use explicit scenario inputs; public references retain their own sources and dates.</p>
-    <p>Workload and productive-hours inputs determine required effort and available capacity. Staffing comparisons use entered action, timing and cost assumptions. Missing values remain unknown. Headcount projections separately use opening people + external hires − exits.</p>
+    <p>Workload and productive hours determine required effort and available capacity. Staffing comparisons use action, timing and cost assumptions. Headcount projections use opening people + external hires - exits.</p>
     <p>The app uses Next.js, React, TypeScript, Tailwind CSS and Recharts, hosted on Vercel. Workforce AI uses the OpenAI integration when available. Scenario controls recalculate through shared calculation code; saved proposals are stored in the visitor&apos;s browser.</p>
    </div>
   </details>

@@ -18,7 +18,7 @@ export function StaffingMixControls({state,disabled,onChange}:{state:BusinessPla
   <p className="text-xs">{staffing.selectedMix?'Your adjusted mix':'First displayed option'} · {gap} additional roles · 1 FTE each.</p>
   {(['build','move'] as const).map(path=><PlanningAssumptionSlider key={path} label={path==='build'?'Develop roles':'Redeploy roles'} value={String(mix[path])} spec={{min:0,max:path==='build'?maxBuild:maxMove,precision:0,keyboardStep:1,extent:path==='build'?maxBuild:maxMove,unit:'whole roles'}} disabled={disabled||!eligible||(path==='build'?maxBuild:maxMove)===0} onChange={text=>change(path,text)}/>)}
   <p><strong>Hire remaining: {mix.buy}</strong></p>
-  {!eligible&&<p className="text-xs">Internal allocations need explicit distinct pools, release and backfill assumptions. Missing availability is not zero capacity.</p>}
+  {!eligible&&<p className="text-xs">Add internal pools, release and backfill assumptions to adjust this mix.</p>}
   <button type="button" className="min-h-11 rounded border px-3 text-sm disabled:opacity-50" disabled={disabled||!staffing.selectedMix} onClick={()=>{try{onChange(null);setError('');}catch(e){setError((e as Error).message);}}}>Reset to comparison</button>
   {error&&<p role="alert">{error}</p>}
  </section>;

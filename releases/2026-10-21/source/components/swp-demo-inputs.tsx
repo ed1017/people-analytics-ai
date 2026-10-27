@@ -45,7 +45,7 @@ export function SwpDemoInputs({draft,disabled,onReview,onPrimaryChange,onValidit
    {draft.inputs.guidedWorkload&&guidedWorkloadFields.filter(key=>key!=='volume').map(key=><label key={key}>{guidedWorkloadLabels[key]}<input name={key} type="number" min="0" max={key.endsWith('Pct')?100:key==='ftePerPerson'?1:1000000} step={key==='existingPeople'?'1':'0.01'} defaultValue={draft.inputs.guidedWorkload![key].value??''}/></label>)}
    <label>Coverage deadline<input name="deadlineMonth" type="month" defaultValue={deadline}/></label>
    <label>Acceptable uncovered work over this period (hours)<input name="maxUncoveredHours" type="number" min="0" max="100000000" step="0.01" placeholder="Not set" defaultValue={draft.inputs.mixConstraints?.maxUncoveredHours?.value??''}/></label>
-   <p className="text-xs">Choose your own service target. Blank means not assessed; zero means no uncovered hours. Meeting this modeled target is not operational approval.</p>
+   <p className="text-xs">Leave blank for no target, or enter 0 for no uncovered hours.</p>
    <label>Recruiting fee per new hire (USD, one-time)<input name="hireFee" type="number" min="0" step="1" defaultValue={capacity.hireFee} required/></label>
    <label>Assumed redeployment / Move effective month<input name="moveMonth" type="month" defaultValue={capacity.moveMonth} required/></label>
    <label>Annual cost per new hire (USD/year)<input name="annualHireCost" type="number" min="0" max="1000000" step="1" defaultValue={capacity.annualHireCost} required/></label>
@@ -54,7 +54,7 @@ export function SwpDemoInputs({draft,disabled,onReview,onPrimaryChange,onValidit
    <label>Total training effort (staff hours)<input name="trainingHours" type="number" min="0" max="100000" step="1" defaultValue={capacity.trainingHours} required/></label>
    <label>Assumed skill readiness / Build effective month<input name="buildMonth" type="month" defaultValue={capacity.buildMonth} required/></label>
    <label>Assumed new-hire arrival date<input name="arrivalDate" type="date" defaultValue={capacity.arrivalDate} required/></label>
-   </div><p className="my-2 text-xs text-muted-foreground">Existing role holders exclude the separate develop/move pools. Allocation and proficiency coverage apply once. Training completion does not prove readiness. Blank workload values remain unknown.</p>  <button type="submit" disabled={disabled} className="min-h-11 rounded border bg-card px-3 py-2 text-sm font-medium disabled:opacity-50">Review input changes</button></details>
+   </div><p className="my-2 text-xs text-muted-foreground">Existing role holders exclude the separate develop/move pools. Allocation and proficiency coverage apply once. Enter readiness separately from training completion. Leave unknown workload values blank.</p>  <button type="submit" disabled={disabled} className="min-h-11 rounded border bg-card px-3 py-2 text-sm font-medium disabled:opacity-50">Review input changes</button></details>
   </fieldset>
 
   {error&&<p role="alert" className="mt-2 text-sm">{error}</p>}

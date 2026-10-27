@@ -1,68 +1,50 @@
 # Workforce Intelligence
 
-[Open the app](https://www.ed-ai.app) · [About the project](https://www.ed-ai.app/about)
+[Open the app](https://www.ed-ai.app) | [About the project](https://www.ed-ai.app/about)
 
-Workforce Intelligence helps a planning conversation move from “What is happening in our workforce?” to “How could we cover the work?” It brings workforce evidence, adjustable staffing assumptions and calculated comparisons into one workspace for recruiters, hiring managers and workforce planners.
+Workforce Intelligence connects workforce evidence with staffing decisions. Recruiters, hiring managers and workforce planners can identify a gap, compare developing people, moving people internally and hiring, then adjust the plan and see its cost, timing and uncovered work change.
 
-The portfolio prototype uses a fictional company with 9,037 people as of September 30, 2026. Visitors can explore its workforce, test a workload or headcount scenario, and compare developing people, moving people internally and hiring.
+The demo uses a fictional company with 9,037 people as of September 30, 2026.
 
 ## Try a planning decision
 
-1. **Open the example.** On Overview, choose **Introduction**, then **Start guided demo** and **Use example assumptions** to start the existing service-team example with a 5-FTE gap.
-2. **Test a different approach.** Review the role, timing and budget; adjust the available inputs and compare cost, readiness and uncovered work alongside the charts.
-3. **Keep a proposal.** Save the reviewed plan in your browser, reopen it, and compare a revision while retaining the original assumptions.
-
-Prefer to start with workload? Open [Scenarios](https://www.ed-ai.app/scenarios) and choose **Open worked example**, or enter your own work and team inputs.
-
-**Live AI status, October 27, 2026:** automatic pricing verification is installed and public readiness checks report configured. Readiness is not proof that every answer succeeds; recent visitor-reported answer failures remain under investigation. The worked example and local scenario calculations do not require a paid model call.
+1. **Start with a worked example.** Open [Scenarios](https://www.ed-ai.app/scenarios) and choose **Open worked example**. In Overview, the same guided example is available through **Introduction > Start guided demo**.
+2. **Compare responses.** Use the example assumptions, review the 5-FTE gap, then change the budget or staffing mix to compare cost, readiness and uncovered work.
+3. **Keep a proposal.** Save the reviewed plan in your browser. Reopen it and compare a revision with its original assumptions.
 
 ## Product decisions and tradeoffs
 
-Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing. The work emphasizes four product decisions:
+Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing.
 
-- **Evidence beside decisions.** Keep group, period and source context accessible while moving from a workforce question into planning.
-- **An adjustable recommendation.** Use shared calculations for controls, results and charts, so changing an input changes the corresponding result.
-- **Distinct planning measures.** Keep people, FTE, workload, incremental cash and employee time separate; leave missing inputs unknown instead of assigning zero.
-- **Reversible exploration.** Preserve drafts and original saved assumptions while visitors edit, compare, cancel or reopen a plan. Browser-local saving keeps the prototype simple; it is not a shared enterprise workflow.
+- **Evidence beside decisions.** Group, period and source context remain accessible as a workforce finding becomes a plan.
+- **Adjustable recommendations.** Shared calculations connect controls, results and charts.
+- **Practical tradeoffs.** Compare staffing choices using cost, timing and uncovered work; keep people, FTE, workload, cash and employee time distinct.
+- **Reversible exploration.** Preserve drafts and saved revisions while visitors edit, compare or cancel. Proposals are stored in the visitor's browser.
 
-The application demonstrates the planning workflow and its software behavior. Adoption, savings and business impact have not been measured.
+## Explore the product
+
+- **Workforce:** headcount, turnover, skills and recruiting evidence.
+- **Scenario planning:** workload, staffing options and headcount projections.
+- **Position management:** budgeted, filled and vacant positions, with a current-versus-proposed comparison.
+- **Workforce references:** dated external labor-market evidence alongside planning assumptions.
+
+[Read the case study](https://www.ed-ai.app/about) for the problem, product decisions and creator's role.
 
 ## Next steps
 
-Chart-first position management, editable workload risk and sourced workforce references are delivered. The next work is targeted acceptance and resolving the remaining model-failure evidence and external-data gaps, as tracked in the [active roadmap](docs/roadmap-status-2026-10-17.md). Fresh paid model testing is outside current acceptance checks.
+The [active roadmap](docs/roadmap-status-2026-10-17.md) tracks answer-quality improvements, end-to-end acceptance and additional external recruitment evidence. [Acceptance records](docs/public-portfolio-mvp-acceptance.md) document tested behavior and remaining evidence gaps.
 
-## Repository and deployment status
+## Source and local development
 
-The versioned application source subset is published in [releases/2026-10-21](releases/2026-10-21/README.md), with a file-hash manifest and dependency-free verifier. [PR438](https://github.com/ed1017/people-analytics-ai/pull/438) is verified live, runtime `5d52980ea5dd2218125d81ca62f92947784291d9`; exact-head CI and protected/public desktop/mobile checks passed. The manifest pins that source, removing the duplicate worked-example heading while preserving shared controls and calculations. The [active roadmap](docs/roadmap-status-2026-10-17.md) separates live work, candidates, remaining evidence and deferred scope. Older dated sections are historical.
-
-The root development application remains distinct from that versioned snapshot. Private synthetic runtime inputs, credentials and release evidence are excluded. Publishing the source closes the missing-source record; it does not make this repository a self-contained reproduction of the hosted service. A [local public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) now builds and serves the versioned UI without private inputs or credentials. It preserves recorded company-wide receipts; live AI, narrowed filters and unrecorded server calculations are deliberately unavailable.
-
-Automatic Vercel deployments from main and this publication branch remain disabled. Releases use separately checked builds and explicit promotion. The release notes distinguish protected provider checks, captured-answer replay, local continuity tests and public configuration smoke; no fresh paid production browser journey through every step is claimed.
-See [Product architecture and availability](docs/product-architecture.md) for the distinction between the live prototype, the repository and proposed capabilities.
-
-See [Public portfolio MVP acceptance](docs/public-portfolio-mvp-acceptance.md) for completed evidence, operational dependencies and optional extensions.
-
-## Technology
-
-The application uses Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts and Vercel. This repository also contains Supabase/PostgreSQL and OpenAI integration code. The hosted release uses reviewed server-side provider and admission configuration; those credentials and services are not supplied by this repository.
-
-Deterministic analytics and planning engines own the calculations. The public prototype does not require a visitor to make a paid AI call.
-
-## Local development of this repository
-
-These commands start the repository's application, not the exact deployed release. Individual integrations may require their own configuration; do not assume access to the live site's runtime inputs.
+The hosted release's versioned source is in [releases/2026-10-21](releases/2026-10-21/README.md). Use the [public-fixture replay recipe](releases/2026-10-21/reproduction/README.md) to run that UI with recorded demo data. The repository's root development app can be started with:
 
 ```powershell
 npm.cmd install
 npm.cmd run dev
 ```
 
-Open http://localhost:3000. To build this source:
+Open http://localhost:3000. Run `npm.cmd run build` to build it. Server integrations require their own configuration; private runtime inputs and credentials are excluded.
 
-```powershell
-npm.cmd run build
-```
+Built with Next.js, React, TypeScript, Tailwind CSS, shadcn/ui and Recharts, with Vercel hosting and Supabase/PostgreSQL and OpenAI integrations. Shared analytics and planning engines calculate the results.
 
-## Historical maintenance record
-
-Historical pricing renewal PR379 (superseded; current recorded maintenance window is in the active roadmap): app, rollout, admission and settlement upper windows align at October 24 23:14 UTC. Round admission cutoff 23:12:30 UTC; new configuration receipts stop at 23:12:00 UTC. Independent review, 30 focused tests, CI, protected/public Home and capability checks passed. Rates, $50 cumulative cap, original reservations, receipts and uncertain holds are unchanged; accounting preservation verified. No paid provider call. This is configuration acceptance, not fresh-model answer acceptance.
+[Architecture and availability](docs/product-architecture.md) | [Release and operational records](docs/readme-operational-record-2026-10-27.md)

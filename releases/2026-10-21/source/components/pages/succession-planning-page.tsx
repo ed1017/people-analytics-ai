@@ -68,7 +68,7 @@ export function SuccessionPlanningPage({
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="max-w-3xl text-muted-foreground">
-            {illustrative ? 'Illustrative plan coverage and authored flags; not assessed readiness.' : 'Company-wide recorded plan coverage and source-assessed readiness.'}
+            {illustrative ? 'Illustrative succession-plan coverage' : 'Company-wide succession-plan coverage'}
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export function SuccessionPlanningPage({
             Succession summary unavailable
           </p>
           <p className="mt-1">
-            The governed company aggregate is not currently available. No fallback or inferred succession data is shown.
+            Reload to try again.
           </p>
         </div>
       )}
@@ -113,7 +113,7 @@ export function SuccessionPlanningPage({
         <>
           {validZeroState && (
             <div className="mb-6 rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
-              {illustrative ? 'No filled critical-position population is recorded for this demo. This is a valid zero state, not an unavailable-data fallback.' : 'No filled critical-position population is recorded for this assessment. This is a valid zero state, not an unavailable-data fallback.'}
+              {illustrative ? 'No filled critical positions are recorded.' : 'No filled critical positions are recorded.'}
             </div>
           )}
 
@@ -176,7 +176,7 @@ export function SuccessionPlanningPage({
                 )}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {illustrative ? 'Plans with an authored flag; not assessed readiness' : 'Planned positions with at least one candidate recorded as ready now'}
+                {illustrative ? 'Plans with an illustrative flag' : 'Planned positions with at least one candidate recorded as ready now'}
               </p>
             </div>
           </div>
@@ -263,16 +263,14 @@ export function SuccessionPlanningPage({
               <p className="font-medium text-foreground">
                 Small-cell protection applied
               </p>
-              <p className="mt-1">
-                Counts are suppressed in paired partitions when either side would expose a cell from 1–9. Downstream {illustrative ? 'illustrative flag' : 'readiness'} detail is also suppressed whenever its upstream plan partition is suppressed. Suppressed values are intentionally not estimated.
-              </p>
+              <details><summary className="min-h-11 cursor-pointer py-2">Details</summary><p>Small groups and related totals are suppressed together to protect privacy.</p></details>
             </div>
           )}
 
           <details className="mt-6 text-sm text-muted-foreground">
-            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Succession sources and definitions</summary>
+            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Details</summary>
             <p className="mt-1">
-              {illustrative ? 'Illustrative plan flags are authored examples, not source assessments or model predictions. The flags establish no individual readiness, capability, promotion or transfer recommendation. Career preferences are employee-expressed interests and remain separate from assessed readiness.' : 'Recorded plan coverage means a filled position in an active critical job profile has a source succession-plan record. Ready-now coverage means that source plan records at least one candidate in the ready-now category. These are recorded source assessments, not model predictions, promotion recommendations, transfer recommendations, or individual employment decisions.'}
+              {illustrative ? 'Illustrative plan flags are authored examples. Readiness requires an assessment; career preferences record interests.' : 'Plan coverage counts filled critical positions with a succession plan. Ready-now coverage counts plans with at least one candidate assessed as ready now.'}
             </p>
           </details>
         </>

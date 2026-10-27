@@ -8,5 +8,5 @@ export function queryWorkforceHistory(data,args){
  const points=rows.filter(r=>r.snapshot_date>=args.start&&r.snapshot_date<=args.end).map(r=>({date:r.snapshot_date,value:r[args.metric]}));
  const unit=args.metric==='headcount'?'people':'FTE', first=points[0],last=points.at(-1),change=Math.round((last.value-first.value)*10)/10;
  return {status:'available',metric:args.metric,unit,start:first.date,end:last.date,points,change,
-  answer:`Recorded ${args.metric==='headcount'?'headcount':'full-time-equivalent capacity'} (${unit}), ${first.date} through ${last.date}.\n\n${points.map(p=>`${p.date}: ${p.value.toLocaleString('en-US',{maximumFractionDigits:1})} ${unit}`).join('\n')}\n\nNet stock change: ${change.toLocaleString('en-US',{maximumFractionDigits:1})} ${unit}. These are synthetic month-end stocks, not hires, departures, rates or forecasts. FTE is rounded to one decimal; no turnover denominator is inferred.`};
+  answer:`Recorded ${args.metric==='headcount'?'headcount':'full-time equivalents'} (${unit}), ${first.date} through ${last.date}.\n\n${points.map(p=>`${p.date}: ${p.value.toLocaleString('en-US',{maximumFractionDigits:1})} ${unit}`).join('\n')}\n\nNet stock change: ${change.toLocaleString('en-US',{maximumFractionDigits:1})} ${unit}. `};
 }

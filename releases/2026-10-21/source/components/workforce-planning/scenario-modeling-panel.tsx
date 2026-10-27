@@ -317,7 +317,7 @@ export function ScenarioModelingPanel({
                 : "hidden"
             }
           >
-          <p className="mb-3 text-sm text-muted-foreground">Company what-if · returned Baseline window · assumptions, not actuals. Dates and any gaps depend on the source plan. Workspace filters do not narrow this calculation. Cost period is unverified; outputs are not a spending forecast.</p>
+          <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mb-3 text-sm text-muted-foreground">Company what-if · returned Baseline window · assumptions, not actuals. Dates and any gaps depend on the source plan. Workspace filters do not narrow this calculation. Cost period is unverified; outputs are not a spending forecast.</p></details>
           <div className="mb-6 rounded-lg border p-4">
             <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
               <div>

@@ -61,6 +61,9 @@ jobs:
       - name: Verify planning empty states and public error references
         working-directory: releases/2026-10-21/source
         run: node --test tests/planning-empty-progress.test.mjs tests/home-public-error-reference.test.mjs tests/staffing-priority-presentation.test.mjs
+      - name: Verify editorial clarity and actionable FTE answers
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/home-fte-investigation.test.mjs tests/module-editorial-presentation.test.mjs tests/planner-editorial-presentation.test.mjs tests/projection-save-retry.test.mjs tests/public-recruiting-cohort-recovery.test.mjs tests/home-dataset-query.test.mjs tests/demo-company-profile.test.mjs tests/about-project-profile.test.mjs
       - name: Run regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing

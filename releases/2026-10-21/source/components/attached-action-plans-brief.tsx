@@ -35,7 +35,7 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
  }
  return <section aria-label="Attached Action Plans" className="min-w-0 space-y-2 rounded-lg border p-4">
   <h2 className="text-lg font-semibold">Attached Action Plans</h2>
-  <p className="text-sm text-muted-foreground">Historical Home proposals · not approvals or achieved outcomes. Assumptions are not revalidated here; review on Home before acting.</p>
+  <p className="text-sm text-muted-foreground">Saved plans. Open a plan to review or update its assumptions.</p>
   {alternatives!==undefined&&!catalog&&<p role="status">Saved numbered alternatives cannot be verified. Their records are kept unchanged.</p>}
   {catalog?.attachments.map(item=>{const plan=catalog.plans.find(plan=>plan.id===item.planId)!;return <div key={item.id}><p>Attached {item.attachedAt.slice(0,10)}{savedGoal!==goal?' · goal wording has changed':''}{plan.deleted?' · removed from active list':''}</p><PlanAlternativeCard plan={plan} catalog={catalog} snapshot/></div>;})}
   {!workspace?<p role="status">Saved Action Plan records cannot be verified. They are kept unchanged; review them on Home.</p>:!workspace.attachments.length&&!catalog?.attachments.length?<p className="text-sm">No Action Plan attached to this goal yet. Review and attach a calculated plan on Home to include it here.</p>:<>

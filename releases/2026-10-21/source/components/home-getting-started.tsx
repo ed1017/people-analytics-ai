@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import {createPortal} from 'react-dom';
 import {HOME_INTRO_OPT_OUT_KEY} from '@/lib/home-onboarding';
+import {lockIntroPageScroll} from '@/lib/intro-scroll-lock';
 import type { AppPage } from "@/lib/types";
 
 /** Intro only. The existing Planning Scenario entry owns all calculation and draft safeguards. */
@@ -30,8 +31,12 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
     if(!active||busy||!ready||!dialog.current||dialog.current.open)return;
     try{setOptedOut(localStorage.getItem(HOME_INTRO_OPT_OUT_KEY)==='1');setPreferenceError(null);}
     catch{setPreferenceError('This browser could not read the saved introduction preference.');}
-    restoreFocus.current=true;launching.current=false;dialog.current.showModal();attempted.current=true;title.current?.focus();setOpen(true);
+    restoreFocus.current=true;launching.current=false;dialog.current.showModal();attempted.current=true;title.current?.focus({preventScroll:true});setOpen(true);
   },[active,busy,ready]);
+  useEffect(()=>{
+    if(!open)return;
+    return lockIntroPageScroll(document);
+  },[open]);
   const dismiss=()=>{dialog.current?.close();};
   const changeOptOut=(checked:boolean)=>{
     try{if(checked)localStorage.setItem(HOME_INTRO_OPT_OUT_KEY,'1');else localStorage.removeItem(HOME_INTRO_OPT_OUT_KEY);setOptedOut(checked);setPreferenceError(null);}
@@ -73,7 +78,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       const first=controls[0],last=controls[controls.length-1];
       if(event.shiftKey&&(document.activeElement===first||document.activeElement===title.current)){event.preventDefault();last?.focus();}
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
-    }} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-4xl overflow-hidden rounded-2xl border bg-card p-0 text-foreground shadow-xl backdrop:bg-black/60 open:flex open:flex-col">
+    }} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-4xl overscroll-none overflow-hidden rounded-2xl border bg-card p-0 text-foreground shadow-xl backdrop:bg-black/60 open:flex open:flex-col">
       <header className="shrink-0 border-b px-5 py-4 sm:px-6">
         <h2 ref={title} id={id+'-title'} tabIndex={-1} className="mt-1 text-2xl font-bold tracking-tight focus:outline-none">Workforce Intelligence</h2>
         <p id={id+'-purpose'} className="mt-2 text-base font-semibold">Turn workforce evidence into a staffing decision.</p>
@@ -90,15 +95,15 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       {!demoReady&&<p role="status" className="mt-2 text-sm">Finish loading or recover unsaved work to start the demo.</p>}
       </div>
       </header>
-      <div tabIndex={0} role="region" aria-label="About Workforce Intelligence" className="min-h-0 overflow-y-auto px-5 py-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6">
+      <div tabIndex={0} role="region" aria-label="About Workforce Intelligence" className="min-h-0 overscroll-contain overflow-y-auto px-5 py-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6">
         <section aria-labelledby={id+'-why'}>
           <h3 id={id+'-why'} className="text-base font-bold">Purpose of the project</h3>
-          <p className="mt-1">This independent portfolio project explores a practical question: how can a team turn workforce evidence into a staffing decision, with the assumptions and tradeoffs visible?</p>
-          <p className="mt-2">Workforce Intelligence brings exploration and planning together. Start with the workforce you have, identify a question worth investigating, then test a possible response before saving a proposal.</p>
+          <p className="mt-1">Workforce decisions connect people, work and budgets. This project brings those decisions into one place: understand the workforce, compare staffing options and develop a plan.</p>
+          <p className="mt-2">Start with the workforce you have, identify a priority and compare ways to respond.</p>
         </section>
         <section aria-labelledby={id+'-explore'} className="mt-4">
           <h3 id={id+'-explore'} className="text-base font-bold">What you can do</h3>
-          <p className="mt-1">Explore workforce trends, recruiting, skills and employee listening. Use the suggested questions or your own question to investigate the evidence. In supported planning scenarios, adjust inputs and see the calculated numbers and charts change together.</p>
+          <p className="mt-1">Explore workforce trends, recruiting, skills and employee listening. Use the suggested questions or your own question to investigate the evidence. Adjust scenario inputs to update the numbers and charts together.</p>
         </section>
         <section aria-labelledby={id+'-try'} className="mt-4">
           <h3 id={id+'-try'} className="text-base font-bold">Try a planning decision</h3>
@@ -111,11 +116,11 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
         </section>
         <section aria-labelledby={id+'-read'} className="mt-4">
           <h3 id={id+'-read'} className="text-base font-bold">How to read the results</h3>
-          <p className="mt-1">Compare scenarios using their stated inputs, scope and dates. Open calculation details to review the method and sources.</p>
+          <p className="mt-1">Compare cost, readiness and uncovered work. Methods and sources are available in Details.</p>
         </section>
         <section aria-labelledby={id+'-role'} className="mt-4">
           <h3 id={id+'-role'} className="text-base font-bold">Project development</h3>
-          <p className="mt-1">The workforce-planning problem, product requirements and acceptance criteria shaped this project. AI assisted with implementation, design and testing. This project demonstrates the planning workflow and the reasoning behind it.</p>
+          <p className="mt-1">Product design focused on workforce decisions and practical tradeoffs. AI assisted with implementation, design and testing.</p>
           <a href="/about" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center rounded text-sm text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">About this project<span className="sr-only"> (opens a new tab)</span></a>
         </section>
         <section aria-labelledby={id+'-contact'} className="mt-4">

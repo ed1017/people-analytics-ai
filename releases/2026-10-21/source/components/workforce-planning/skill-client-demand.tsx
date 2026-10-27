@@ -26,12 +26,12 @@ function SkillReference({token,onStart}:{token:string;onStart:(draft:CapacityDra
   if(!token.startsWith('pending'))void load();return ()=>controller.abort();
  },[token,attempt]);
  return <section aria-label="Skill client demand setup" className="space-y-3 text-sm">
-  <p>Partial company-wide list; dashboard filters do not change it. Skills do not tell us how much working time is available.</p>
+  <p>Company-wide skill references.</p>
   {error?<div><p role="alert">{error}</p><button type="button" className={control} onClick={()=>{setCatalog(null);setSelected('');setError('');setNotice('');setAttempt(value=>value+1);}}>Retry skill references</button></div>:!catalog?<p role="status">Loading skill references.</p>:<>
    <label className="block">Skill reference<select aria-label="Skill reference" className={control} value={selected} onChange={event=>{setSelected(event.target.value);setNotice('');}}><option value="">Choose a skill</option>{catalog.skills.map(skill=><option key={skill.id} value={skill.id}>{skill.name} ({skill.code})</option>)}</select></label>
-   <p className="text-xs text-muted-foreground">Skill list dated {catalog.asOf}. This date stays in the saved name; it is not a live assessment.</p>
-   <p>Enter clients per month and hours per client below. Team numbers are your estimates, not inferred from revenue or skill records.</p>
-   <p className="text-xs text-muted-foreground">Replaces unsaved worksheet inputs; saved scenarios are kept. One skill workload per scenario: do not add overlapping skill capacities together.</p>
+   <p className="text-xs text-muted-foreground">Skill list dated {catalog.asOf}.</p>
+   <p>Enter clients per month, hours per client and available team time.</p>
+   <p className="text-xs text-muted-foreground">Replaces unsaved worksheet inputs; saved scenarios are kept.</p>
    <button type="button" disabled={!selected} className={`${control} font-medium disabled:opacity-50`} onClick={()=>{if(!catalog||datasetSession.snapshot()!==token)return;onStart(skillClientDraft(catalog,selected));setNotice('Skill selected. Enter the work below.');}}>Start new skill workload</button>
   </>}
   {notice&&<p role="status">{notice}</p>}

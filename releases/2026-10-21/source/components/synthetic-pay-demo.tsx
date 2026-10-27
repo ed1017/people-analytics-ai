@@ -9,7 +9,7 @@ const selectClass='mt-1 min-h-11 w-full min-w-0 rounded-md border bg-background 
 export function SyntheticPayDemoPanel({evidence=artifact}:{evidence?:unknown}){
  const view=resolveSyntheticPayDemo(evidence);
  return <section aria-label="Synthetic pay demo" className="@container min-w-0 space-y-3 rounded-lg border bg-muted/10 p-4 sm:p-5">
-  <div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-semibold">Synthetic pay comparison</h2><span className="rounded-full border px-2 py-1 text-xs font-semibold">DEMO ONLY</span></div>
+  <div className="flex flex-wrap items-center gap-2"><h2 className="text-lg font-semibold">Pay comparison example</h2></div>
   <p className="text-xs text-muted-foreground">Separate simulated workforce · Dashboard filters excluded.</p>
   {view.status==='ready'?<PayResults data={view.data}/>:<p role="status">{view.message}</p>}
  </section>;
@@ -33,7 +33,7 @@ function PayResults({data}:{data:SyntheticPayDemo}){
     <Metric label="Pay spread (SD)" value={usd(metrics.sd)} note="Population standard deviation"/>
    </dl>
    <PayQuartiles q1={metrics.q1} median={metrics.median} q3={metrics.q3} mean={metrics.mean}/>
-   <p className="text-xs">Invented range midpoint: {usd(metrics.rangeMidpoint)}. These figures are not a pay-equity finding or a pay recommendation.</p>
+   <p className="text-xs">Invented range midpoint: {usd(metrics.rangeMidpoint)}. </p>
   </div>}
   <AssumptionsDisclosure><div className="space-y-2 text-xs leading-relaxed text-muted-foreground">
    <p>{data.definitions.population} The dataset is independent of the workforce-cost source, dashboard filters, selected goal and BLS occupation references. No internal role is matched to a BLS occupation.</p>

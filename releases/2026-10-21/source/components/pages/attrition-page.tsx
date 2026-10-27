@@ -156,7 +156,7 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
                 </ResponsiveContainer>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
-                Counts describe where exits occurred; they are not turnover rates because historical tenure-band denominators are not modeled here.
+                Exit counts by tenure at separation.
               </p>
             </div>
           </div>
@@ -183,8 +183,8 @@ export const AttritionPage = memo(function AttritionPage({ data: sourceData, loa
           </div>
 
           <details className="mt-6 text-sm text-muted-foreground">
-            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Separation reason definitions</summary>
-            <p className="mt-2">Separation reasons are recorded administrative classifications, not proven causes of attrition.</p>
+            <summary className="w-fit cursor-pointer rounded-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-4">Details</summary>
+            <p className="mt-2">Separation reasons are recorded administrative classifications. Tenure charts show exit counts; turnover rates require the population in each tenure band.</p>
           </details>
         </>
       ) : (

@@ -17,7 +17,9 @@ test('About exposes the case study while the shared header variant remains colla
  const visible=study.ProjectCaseStudy({expanded:true});assert.equal(visible.type,'section');assert.equal(visible.props['aria-labelledby'],'about-case-study');
  const sections=nodes(visible).filter(n=>n.type==='h3').map(n=>text(n));assert.ok(sections.includes('Product and domain decisions'));assert.ok(sections.includes("Ed's role"));assert.ok(sections.includes('Try the workflow'));
  const menu=study.ProjectCaseStudy();assert.equal(menu.type,'details');assert.equal(menu.props.open,undefined);assert.equal(nodes(menu)[1].type,'summary');
- assert.match(text(visible),/AI assisted with implementation, design and testing/);assert.match(text(visible),/Missing values remain unknown/);
+ assert.match(text(visible),/AI assisted with implementation, design and testing/);assert.match(text(visible),/Introduction, then Start guided demo/);
+ const methodology=nodes(visible).find(n=>n.type==='details');assert.equal(text(methodology.props.children[0]),'Details');assert.match(text(methodology),/opening people \+ external hires - exits/);
+ assert.doesNotMatch(text(visible),/Open Planning Scenario|Missing values remain unknown|does not approve|not measured outcomes/);
 });
 test('About includes verified public destinations without unverified resume links',()=>{
  const page=load('../app/about/page.tsx',{'next/link':{default:props=>React.createElement('a',props)},'@/components/project-case-study':study}).default();

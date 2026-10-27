@@ -2076,7 +2076,7 @@ export function WorkforcePlanningPage({
           </div>
           <details open={workflowView==="plan"} hidden={workflowView!=="overview"&&workflowView!=="plan"} className="border-t pt-2">
           <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Stored plans and earlier scenario tools</summary>
-          <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "Stored reference plan"}. Model allocations are assumptions, not organizational approvals.</p>
+          <p className="mb-2 text-sm text-muted-foreground">{goalKey.slice(goalKey.indexOf(":")+1)?"Goal-linked workspace":"General exploration · no goal selected"} · {planningLoading ? "Loading plan…" : "Stored reference plan"}.</p>
           <details className="mb-3 text-sm text-muted-foreground">
             <summary className="min-h-11 cursor-pointer rounded-sm py-2 focus-visible:ring-2 focus-visible:ring-ring">Assumptions &amp; source details</summary>
             <p className="mb-2">Completed results retain their recorded inputs; changes require an explicit model run. Scenario scope comes from its business-unit selector or structural actions; dashboard filters do not narrow these calculations. Source cost period and refresh date are unverified.</p>
