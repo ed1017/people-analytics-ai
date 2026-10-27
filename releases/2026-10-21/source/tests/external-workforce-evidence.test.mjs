@@ -119,3 +119,69 @@ test('role/location changes preserve selection and never transfer broader employ
   assert.equal(select(tree, '-location').props.value, records[1].id);
   assert.match(text(tree), /Local employment and pay estimates pending/);
 });
+
+test('ONS numbers match independently extracted workbook cells and exact national scope', () => {
+  const fixture = JSON.parse(fs.readFileSync(new URL('./fixtures/external-workforce-evidence/ons-ashe-2026-source-extract.json', import.meta.url), 'utf8'));
+  const r = exports.UK_SOFTWARE_PAY_REFERENCE;
+  const [pay, quality] = fixture.records;
+  assert.equal(fixture.kind, 'retrieved-source-extract-not-synthetic');
+  assert.equal(r.source.archiveSha256, fixture.archiveSha256);
+  assert.equal(r.source.downloadUrl, fixture.downloadUrl);
+  assert.equal(r.source.workbook, pay.workbook);
+  assert.equal(r.source.qualityWorkbook, quality.workbook);
+  assert.equal(r.source.sheet, pay.sheet);
+  assert.equal(pay.cells.B86, "'2134");
+  assert.equal(pay.cells.A86.trim(), r.occupation.title);
+  assert.match(pay.cells.A1, /full-time employee jobs.*United Kingdom 2026/);
+  assert.equal(pay.cells.D5, 'Median'); assert.equal(pay.cells.F5, 'Mean');
+  assert.equal(r.estimates.median, Number(pay.cells.D86));
+  assert.ok(Math.abs(r.estimates.mean - Number(pay.cells.F86)) < 0.000001);
+  assert.equal(r.estimates.medianCvPercent, Number(quality.cells.D86));
+  assert.equal(r.estimates.meanCvPercent, Number(quality.cells.F86));
+  assert.equal(r.releasedAt, fixture.releaseDate);
+  assert.equal(r.geography.code, 'GB'); assert.equal(r.currency, 'GBP');
+  assert.equal(r.periodStart, '2025-04-06'); assert.equal(r.periodEnd, '2026-04-05');
+  assert.equal(r.employmentJobs, null); assert.equal(r.availableCandidates, null); assert.equal(r.timeToFillDays, null);
+  assert.match(pay.cells.A560, /indicative purposes only/);
+  assert.ok(Object.isFrozen(r)); assert.ok(Object.isFrozen(r.estimates)); assert.ok(Object.isFrozen(r.source));
+});
+
+const onsInput = () => ({occupationCode:'2134', taxonomy:'UK SOC 2020', geographyCode:'GB',
+  population:'full-time employee jobs; adult rates; same job more than one year', currency:'GBP', measure:'annual gross pay',
+  periodStart:'2025-04-06', periodEnd:'2026-04-05', median:59862.5, mean:69120.6, medianCvPercent:2.4, meanCvPercent:2});
+test('ONS ingestion rejects scope substitutions and invalid numeric coercion', () => {
+  for (const [key,value] of Object.entries({occupationCode:'15-1252', taxonomy:'2018 SOC', geographyCode:'US', population:'all workers', currency:'USD', measure:'hourly pay', periodStart:'2026-04-06', periodEnd:'2027-04-05'})) {
+    assert.throws(() => exports.validateOnsAnnualPaySlice({...onsInput(),[key]:value}), /scope/);
+  }
+  for (const value of ['59862.5', ' ', '59,862.50', 'NaN', -1, Infinity, NaN, {}, true]) {
+    assert.throws(() => exports.parseOnsPayCell(value), /Invalid/);
+  }
+  assert.equal(exports.parseOnsPayCell(0), 0);
+});
+test('ONS missing, suppressed and unknown-quality estimates never become numbers', () => {
+  for(const value of [null, undefined, '', '.', '..', ':', 'x']) {
+    assert.equal(exports.parseOnsPayCell(value), null);
+    assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),median:value}).median, null);
+    assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),meanCvPercent:value}).mean, null);
+  }
+  assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),medianCvPercent:20.1}).median, null);
+  assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),medianCvPercent:20}).median, 59862.5);
+});
+test('UK selection displays distinct pay and scope, and preserves US location on return', () => {
+  const render = panelHarness();
+  const select = (tree, suffix) => nodes(tree).find(n => n.type === 'select' && n.props.id.endsWith(suffix));
+  select(render(), '-location').props.onChange({target:{value:records[1].id}});
+  select(render(), '-role').props.onChange({target:{value:'uk-2134'}});
+  const tree=render(), copy=text(tree);
+  assert.equal(select(tree,'-location').props.value,'GB');
+  assert.equal(select(tree,'-location').props.disabled,true);
+  assert.match(copy,/£59,862.50/); assert.match(copy,/£69,120.60/);
+  assert.match(copy,/tax year 6 April 2025–5 April 2026/); assert.match(copy,/provisional survey estimates/);
+  assert.match(copy,/not a local hiring offer or total employer cost/);
+  assert.match(copy,/Available candidates and time to fill are not measured/);
+  assert.doesNotMatch(copy,/Boston|New York|\$59|362,000/);
+  select(tree,'-role').props.onChange({target:{value:'15-1252'}});
+  assert.equal(select(render(),'-location').props.value,records[1].id);
+  assert.match(text(render()),/verified figures are not loaded yet/);
+  assert.doesNotMatch(text(render()),/£59/);
+});
