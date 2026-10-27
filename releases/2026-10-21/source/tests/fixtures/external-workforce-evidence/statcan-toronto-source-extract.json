@@ -1,0 +1,51 @@
+{
+  "kind": "retrieved-source-extract-not-synthetic",
+  "table": "14-10-0444-01",
+  "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410044401",
+  "downloadUrl": "https://www150.statcan.gc.ca/n1/tbl/csv/14100444-eng.zip",
+  "archiveSha256": "bb50ed47b2b5149c481e11f7be3289f137867df7457f17d7e58e37c5ea6a0080",
+  "releaseDate": "2026-09-15",
+  "releaseUrl": "https://www150.statcan.gc.ca/n1/daily-quotidien/260915/dq260915a-eng.htm",
+  "retrievedAt": "2026-10-27",
+  "licenseUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+  "guideUrl": "https://www150.statcan.gc.ca/n1/pub/75-514-g/75-514-g2024001-eng.htm",
+  "scope": "Toronto economic region, not Toronto city or CMA; unadjusted for seasonality; Q2 2026; NOC 2021 v1.0",
+  "rows": [
+    {
+      "REF_DATE": "2026-04",
+      "GEO": "Toronto, Ontario",
+      "DGUID": "2021S05003530",
+      "National Occupational Classification": "Software engineers and designers [21231]",
+      "Statistics": "Job vacancies",
+      "UOM": "Number",
+      "UOM_ID": "223",
+      "SCALAR_FACTOR": "units",
+      "SCALAR_ID": "0",
+      "VECTOR": "v1569866984",
+      "COORDINATE": "50.398.1",
+      "VALUE": "1065",
+      "STATUS": "C",
+      "SYMBOL": "",
+      "TERMINATED": "",
+      "DECIMALS": "0"
+    },
+    {
+      "REF_DATE": "2026-04",
+      "GEO": "Toronto, Ontario",
+      "DGUID": "2021S05003530",
+      "National Occupational Classification": "Software engineers and designers [21231]",
+      "Statistics": "Average offered hourly wage",
+      "UOM": "Dollars",
+      "UOM_ID": "81",
+      "SCALAR_FACTOR": "units",
+      "SCALAR_ID": "0",
+      "VECTOR": "v1569866985",
+      "COORDINATE": "50.398.5",
+      "VALUE": "60.95",
+      "STATUS": "A",
+      "SYMBOL": "",
+      "TERMINATED": "",
+      "DECIMALS": "2"
+    }
+  ]
+}

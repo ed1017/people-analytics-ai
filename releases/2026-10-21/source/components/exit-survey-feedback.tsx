@@ -5,6 +5,11 @@ import type { SurveySentimentResponse } from "@/lib/types";
 const display = (v: unknown, decimals=0) => typeof v === "number" ? v.toLocaleString("en-US",{minimumFractionDigits:decimals,maximumFractionDigits:decimals}) : "Unavailable";
 export function ExitSurveyFeedback({data,loading,error}:{data:SurveySentimentResponse|null;loading:boolean;error:string|null}) {
  const evidence=exitSurveyEvidence(!loading&&!error?data:null);
+ if(!loading&&!error&&data&&evidence.respondents===null&&!evidence.reasons.length&&!evidence.dimensions.length)return <section aria-label="Exit survey feedback" className="mt-6 space-y-4 rounded-lg border p-4">
+  <h3 className="text-xl font-semibold">Exit Survey Feedback</h3>
+  <p className="text-sm text-muted-foreground">Company-wide; workforce filters do not apply. {evidence.as_of?`As of ${evidence.as_of}.`:'Date not supplied.'}</p>
+  <p role="status">Exit-survey responses are unavailable for this dataset.</p>
+ </section>;
  return <section aria-label="Exit survey feedback" className="mt-6 space-y-4 rounded-lg border p-4">
   <h3 className="text-xl font-semibold">Exit Survey Feedback</h3>
   <p className="text-sm text-muted-foreground">Company-wide recorded responses; workforce filters do not narrow this evidence.{!loading&&!error&&data&&<> {evidence.as_of?`As of ${evidence.as_of}.`:'Date not supplied.'}</>} Exit-survey fieldwork period and monthly trend are not supplied.</p>

@@ -127,3 +127,44 @@ export const UK_SOFTWARE_PAY_REFERENCE = Object.freeze({
   }),
   limitation: "UK national occupational pay reference, not an exact mapping to an internal role or a US metro estimate. Gross employee pay is not a hiring offer or total employer cost. No currency conversion. Provisional survey estimates may be revised. Applicant availability and hiring time are not measured. Indicative job-count cells are not imported.",
 })
+
+/** Admit only the reviewed StatsCan CSV slice; quality flags travel with values. */
+export function parseTorontoVacancyRow(row: Readonly<Record<string, string>>) {
+  const wage = row.Statistics === "Average offered hourly wage"
+  if (row.REF_DATE !== "2026-04" || row.GEO !== "Toronto, Ontario" || row.DGUID !== "2021S05003530" ||
+      row["National Occupational Classification"] !== "Software engineers and designers [21231]" ||
+      (!wage && row.Statistics !== "Job vacancies") || row.SCALAR_FACTOR !== "units" || row.SCALAR_ID !== "0" ||
+      row.UOM !== (wage ? "Dollars" : "Number") || row.UOM_ID !== (wage ? "81" : "223") ||
+      row.VECTOR !== (wage ? "v1569866985" : "v1569866984") || row.COORDINATE !== (wage ? "50.398.5" : "50.398.1") ||
+      row.DECIMALS !== (wage ? "2" : "0") || row.TERMINATED !== "" || row.SYMBOL !== "") throw new Error("Unsupported StatsCan vacancy scope")
+  const qualityLabels: Record<string, string> = { A: "Excellent", B: "Very good", C: "Good", D: "Acceptable", E: "Use with caution", F: "Too unreliable to publish", x: "Suppressed for confidentiality", "..": "Unavailable" }
+  if (!Object.hasOwn(qualityLabels, row.STATUS)) throw new Error("Unknown StatsCan quality status")
+  const missing = row.VALUE === "" || ["F", "x", ".."].includes(row.STATUS)
+  if (!missing && (!/^\d+(?:\.\d+)?$/.test(row.VALUE) || !Number.isFinite(Number(row.VALUE)) || (!wage && !Number.isSafeInteger(Number(row.VALUE))))) throw new Error("Invalid StatsCan value")
+  return Object.freeze({ value: missing ? null : Number(row.VALUE), quality: row.STATUS, qualityLabel: qualityLabels[row.STATUS], vector: row.VECTOR })
+}
+
+const torontoRow = Object.freeze({ REF_DATE: "2026-04", GEO: "Toronto, Ontario", DGUID: "2021S05003530", "National Occupational Classification": "Software engineers and designers [21231]", SCALAR_FACTOR: "units", SCALAR_ID: "0", SYMBOL: "", TERMINATED: "" })
+export const TORONTO_SOFTWARE_VACANCY_REFERENCE = Object.freeze({
+  id: "statcan-jvws-2026-q2-toronto-21231",
+  occupation: Object.freeze({ code: "21231", title: "Software engineers and designers", taxonomy: "NOC 2021 version 1.0" }),
+  geography: Object.freeze({ countryCode: "CA", code: "3530", dguid: "2021S05003530", name: "Toronto, Ontario", type: "economic region", taxonomy: "SGC 2021" }),
+  period: "Q2 2026", periodStart: "2026-04-01", periodEnd: "2026-06-30", seasonallyAdjusted: false,
+  releasedAt: "2026-09-15", retrievedAt: "2026-10-27", currency: "CAD",
+  vacancies: parseTorontoVacancyRow({ ...torontoRow, Statistics: "Job vacancies", UOM: "Number", UOM_ID: "223", VECTOR: "v1569866984", COORDINATE: "50.398.1", VALUE: "1065", STATUS: "C", DECIMALS: "0" }),
+  averageOfferedHourlyWage: parseTorontoVacancyRow({ ...torontoRow, Statistics: "Average offered hourly wage", UOM: "Dollars", UOM_ID: "81", VECTOR: "v1569866985", COORDINATE: "50.398.5", VALUE: "60.95", STATUS: "A", DECIMALS: "2" }),
+  availableCandidates: null, timeToFillDays: null, employmentJobs: null,
+  source: Object.freeze({
+    publisher: "Statistics Canada", table: "14-10-0444-01",
+    url: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410044401",
+    downloadUrl: "https://www150.statcan.gc.ca/n1/tbl/csv/14100444-eng.zip",
+    archiveSha256: "bb50ed47b2b5149c481e11f7be3289f137867df7457f17d7e58e37c5ea6a0080",
+    file: "14100444.csv", metadataFile: "14100444_MetaData.csv",
+    releaseUrl: "https://www150.statcan.gc.ca/n1/daily-quotidien/260915/dq260915a-eng.htm",
+    guideUrl: "https://www150.statcan.gc.ca/n1/pub/75-514-g/75-514-g2024001-eng.htm",
+    license: "Statistics Canada Open Licence",
+    licenseUrl: "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+    attribution: "Adapted from Statistics Canada, Job Vacancy and Wage Survey, Table 14-10-0444-01, Q2 2026. This does not constitute an endorsement by Statistics Canada of this product.",
+  }),
+  limitation: "Employer demand, not available applicants or a count of hires during the quarter. Toronto economic region is not Toronto city or its census metropolitan area. Occupation is a reference category, not an automatic internal-role mapping. Offered wages exclude overtime, tips, commissions and bonuses; employers report the lower end of pay ranges. Actual pay on hiring can differ. Not total employer cost. No currency conversion or annualization.",
+})
