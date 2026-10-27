@@ -80,7 +80,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
 
           {!extension&&<section aria-label="Source recruiting funnel" className="mt-6 rounded-lg border p-4">
             <h3 className="font-semibold">{generatedHireCohort ? "Recorded hired-cohort stages" : "Recruiting funnel"}</h3>
-            <p className="mb-4 text-sm text-muted-foreground">{generatedHireCohort?'Successful-hire records only.':separateDataset?'Constructed source events. Hires count accepted offers; employment starts drive headcount. Internal fills are movements. Screening and a separate acceptance stage are unavailable.':'Recorded recruiting stages.'}</p>
+            <p className="mb-4 text-sm text-muted-foreground">{generatedHireCohort?'Successful-hire records only.':separateDataset?'Accepted offers by recruiting stage.':'Recorded recruiting stages.'}</p>
             <div className="evidence-metric-grid grid gap-3">{([
               ['Applications',summary.applications,null],['Interviewed',summary.interviewed_applications,summary.application_to_interview_pct],
               ['Offers',summary.offered_applications,summary.interview_to_offer_pct],['Hires',summary.hires,summary.offer_to_hire_pct],
@@ -160,7 +160,7 @@ export function TalentAcquisitionPage({ data: sourceData, loading, error }: Tale
 
           <div className="mt-6 rounded-lg border p-4">
             <div className="mb-4 flex items-start justify-between gap-4">
-              <div>{!Array.isArray(data.recruiters)&&<p>Recruiter-level records are excluded from this public synthetic release.</p>}<h3 className="font-semibold">Recruiter Workload</h3><p className="text-sm text-muted-foreground">Recruiters with the largest active requisition loads</p></div>
+              <div>{!Array.isArray(data.recruiters)&&<p>Recruiter-level data unavailable.</p>}<h3 className="font-semibold">Recruiter Workload</h3><p className="text-sm text-muted-foreground">Recruiters with the largest active requisition loads</p></div>
               <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">Top 10 by open reqs</span>
             </div>
             <EvidenceTableRegion label="Recruiter workload">

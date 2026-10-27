@@ -9,8 +9,8 @@ async function run(registryId,metric='application_to_hire_pct',d=data(),filters=
  return readPublicHomeAggregate({binding:{router:{current:()=>identity,bootstrapToken:()=>P.token},handle:async request=>{assert.equal(new URL(request.url).pathname,'/api/talent-acquisition');return Response.json(d,{headers:{'x-workforce-dataset':P.token}});}},hostname:'people-analytics-test-ed-56dc.vercel.app',identity,filters,args:{registryId,metric,order:'descending',limit:1,scope:'company-wide',asOf:'current'},signal:new AbortController().signal});
 }
 for(const id of ['recruiting.business_units','recruiting.sources'])test(id+' service explains absent full applicant denominator and gives supported next steps',async()=>{
- const r=await run(id);assert.match(r.answer,/without the full applicant denominator/);assert.match(r.answer,/recorded accepted offers/);assert.match(r.answer,/business-unit mean time to fill/);assert.doesNotMatch(r.answer,/100|Specify the measure/);assert.equal(r.chart,undefined);
- const counts=await run(id,'hires');assert.match(counts.answer,/10 accepted offers/);assert.match(counts.answer,/Successful-hire journeys only/);
+ const r=await run(id);assert.match(r.answer,/Application-to-hire conversion is unavailable/);assert.match(r.answer,/applicant denominator is incomplete/);assert.match(r.answer,/recorded accepted offers/);assert.match(r.answer,/mean time to fill/);assert.doesNotMatch(r.answer,/100|Specify the measure/);assert.equal(r.chart,undefined);
+ const counts=await run(id,'hires');assert.match(counts.answer,/10 accepted offers/);assert.match(counts.answer,/Successful-hire records only; funnel conversion unavailable/);
 });
 test('suggested mean time-to-fill alternative works without changing metric semantics',async()=>{
  const r=await run('recruiting.business_units','avg_time_to_fill_days');assert.match(r.answer,/33 days/);assert.match(r.answer,/average completed fill duration/);

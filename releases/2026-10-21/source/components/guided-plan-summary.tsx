@@ -7,15 +7,15 @@ export function GuidedPlanSummary({draft,compact=false}:{draft:BundleDraft;compa
  return <section aria-label="Selected workforce choice" className="space-y-1 rounded border p-3 text-sm">
   <p><strong>{summary.mix.build} develop / {summary.mix.move} move / {summary.mix.buy} hire</strong></p>
   <p>Incremental cash: {summary.cash===null?'Unknown':'$'+n(summary.cash)+' USD'}. Conditional readiness: {summary.ready??'Unknown'}.</p>
-  <p>Uncovered work over this period: {summary.effort?n(summary.effort.shortfallHours)+' hours':'Unknown'}. End-date role coverage does not erase earlier shortfalls.</p>
-  <p>Acceptable uncovered work: {summary.serviceTarget===null?'Not set':n(summary.serviceTarget)+' hours'}.{summary.serviceTarget!==null&&summary.effort&&(summary.effort.shortfallHours<=summary.serviceTarget?' Within the entered target.':' Exceeds the entered target.')} This is a planning target, not operational approval.</p>
+  <p>Uncovered work over this period: {summary.effort?n(summary.effort.shortfallHours)+' hours':'Unknown'}.</p>
+  <p>Acceptable uncovered work: {summary.serviceTarget===null?'Not set':n(summary.serviceTarget)+' hours'}.{summary.serviceTarget!==null&&summary.effort&&(summary.effort.shortfallHours<=summary.serviceTarget?' Within the entered target.':' Exceeds the entered target.')}</p>
   {summary.target&&(compact?<div aria-label="Conditional capacity target">
    <p><strong>Scenario target:</strong> {summary.target.roles} whole roles by {summary.target.deadline}.</p>
-   <p>{summary.target.population} · {summary.target.metric}. Roles are not added company headcount.</p>
-   <p>Starting qualified capacity assumption: {summary.target.baselineFte??'Unknown'} FTE. This is the scenario input, not measured capacity.</p><p><strong>Still unverified:</strong> Measured baseline and later outcome for additional-role delivery. Availability, source-team release, skill readiness and funding need confirmation. Proposed milestones do not prove capacity achieved.</p>
-   <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Measurement details and assumptions</summary>{summary.target.lines.filter((_,index)=>index===2||index===3||index===5).map(line=><p key={line}>{line}</p>)}<p>Partial readiness months are excluded.</p></details>
-  </div>:<div aria-label="Conditional capacity target">{summary.target.lines.map(line=><p key={line}>{line}</p>)}</div>)}
+   <p>{summary.target.population} · {summary.target.metric}.</p>
+   <p>Starting qualified capacity assumption: {summary.target.baselineFte??'Unknown'} FTE.</p>
+   <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary><p>Starting qualified capacity is a scenario input, not measured capacity. Role coverage is separate from company headcount. Validate availability, source-team release, skill readiness and funding before delivery.</p>{summary.target.lines.filter((_,index)=>index===2||index===3||index===5).map(line=><p key={line}>{line}</p>)}<p>Partial readiness months are excluded.</p></details>
+  </div>:<div aria-label="Conditional capacity target"><p><strong>Scenario target:</strong> {summary.target.roles} whole roles by {summary.target.deadline}.</p><p>{summary.target.population}</p><details><summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary>{summary.target.lines.map(line=><p key={line}>{line}</p>)}</details></div>)}
   <StaffingOptionCost draft={draft} cash={summary.cashBreakdown}/>
-  {!compact&&<p className="text-xs">Saved or reviewed assumptions only. Partial readiness months are excluded; availability, release, skill readiness and funding remain unverified.</p>}
+
  </section>;
 }

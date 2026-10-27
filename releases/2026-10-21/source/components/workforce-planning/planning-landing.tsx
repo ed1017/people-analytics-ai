@@ -24,7 +24,7 @@ export function PlanningLanding(){
   : <label className={styles.field} key={key}><span>{label}</span><span className={styles.inputWrap}><input aria-label={label} type={key==='openingDate'?'date':'text'} inputMode={key==='scope'||key==='openingDate'?undefined:'decimal'} value={draft[key]} onChange={event=>edit(key,event.target.value)}/>{unit&&<span>{unit}</span>}</span></label>;
  return <section className={styles.landing} aria-label="Illustrative workforce planning">
   <header className={styles.header}>
-   <div><h3>Shape your next move.</h3><p>Try fictional service-desk assumptions. These values are separate from your demand and saved scenarios.</p></div>
+   <div><h3>Shape your next move.</h3><p>Explore a service-desk staffing example.</p></div>
    <span className={styles.demo}>Illustrative demo</span>
   </header>
   <div className={styles.context}><span><strong>{draft.scope}</strong><span> · {draft.months}-month scenario</span></span><span>Opening {draft.openingDate} · {draft.people} people / {draft.fte} FTE</span></div>

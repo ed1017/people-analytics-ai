@@ -2,6 +2,12 @@
 
 ## Current live release and active parallel work
 
+### Active candidate: comprehensive editorial cleanup and guided-demo recovery
+
+Runtime `0c8ab9a8b69c2f9b371633828d9385e70fc2f737` is prepared across 101 runtime files. The candidate removes repeated primary caveats/internal QA prose across public surfaces, keeps essential definitions in Details, fixes demonstrated intro background-scroll chaining, calculates the existing recommendation after explicit example adoption, and completes the supported BU FTE-decline answer with evidence and investigation guidance. README is product-first, with operational records moved to docs. Independent review, 901/901 aggregate tests and TypeScript passed; lint has zero errors and one test-only unused-variable warning. Hosted staging, exact-head release CI, promotion and public checks are pending. PR438 remains the last verified live runtime below. [Candidate verification and limitations](release-verification-editorial-2026-10-27.md).
+
+The FTE cause lacks a reconciled movement-level decomposition; the original blank-screen report and uncorrelated provider failure are not claimed fixed. No paid model acceptance, financial/access change or new data generation is included. Two old digest expectations were corrected only after the unchanged baseline reproduced the failures and released position-field history explained the difference.
+
 ### PR438 live — public browser verification passed
 
 PR438 removes the duplicate worked-example heading while preserving shared Scenario levers, accessible labels and calculations. Runtime `5d52980ea5dd2218125d81ca62f92947784291d9`, deployment `dpl_BZ8Qx6VWwwj7F7J2ZnZAhSxXqwMy`, merge `79d5e152932c416decc9df2f9b2652480becdf91`, CI `40455787985` successful. Six existing tests, independent review and protected/public 1440px/390px checks passed with no page errors. Public checks confirmed one Scenario levers heading, no duplicate Adjust assumptions heading, retained accessible labels/inputs and unchanged actual $325,000/$200,000 calculations. See [release verification](release-verification-pr438.md).

@@ -34,10 +34,10 @@ test('Company describes its actual business units and distinguishes history from
  assert.equal((source.match(/text-sm italic leading-snug/g)||[]).length,3);
  assert.match(source,/<h2 className="font-semibold not-italic"/);
  assert.doesNotMatch(source,/mt-3|leading-relaxed/);
- assert.match(source,/synthetically generated for this demonstration/);
- assert.match(source,/There is no automatic data-refresh schedule/);
+ assert.match(source,/fictional global business/);
+ assert.match(source,/Data updates arrive as new releases/);
  assert.equal((source.match(/September 30, 2026/g)||[]).length,1);
  assert.doesNotMatch(source,/text-xs/);
- assert.match(source,/Refreshing the page does not generate new records or advance the snapshot date/);
+ assert.match(source,/refreshing the page keeps the same snapshot/);
  assert.doesNotMatch(source,/mid-sized|updated daily|refreshed monthly/i);
 });

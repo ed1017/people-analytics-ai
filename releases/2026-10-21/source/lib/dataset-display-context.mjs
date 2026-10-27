@@ -24,6 +24,6 @@ export function readConstructedDisplayContext(input){
 export const DOMAIN_DEMO_LABELS=Object.freeze({
  R1:{label:'Constructed recruiting history',population:'Constructed applications, accepted offers and requisitions',limitation:'Accepted-offer dates count hires; start dates drive headcount. Internal fills are movements. October–December is unmodeled; no candidate stock forecast or screening stage is released.'},
  T2:{label:'Constructed learning pathways',population:'Constructed skill requirements and course catalog',limitation:'Constructed demo catalog availability and duration; not assessed readiness, completion or learning gains.'},
- T5:{label:'Illustrative succession demo',population:'Constructed filled critical positions',limitation:'Illustrative demo plan flags; not assessed or predicted readiness. Never derive suppressed complements or individual recommendations.'},
+ T5:{label:'Illustrative succession demo',population:'Constructed filled critical positions',limitation:'Illustrative succession-plan flags. Readiness requires assessment; protected counts remain unavailable.'},
  P2:{label:'Constructed position inventory',population:'Constructed authorized positions, not employees',limitation:'Current inventory only. The flat draft omits current vacancies; any difference is not an approved closure or headcount reduction.'},
 });

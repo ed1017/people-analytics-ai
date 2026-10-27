@@ -3,7 +3,7 @@ import {queryWorkforceHistory} from '../lib/home-history-query.mjs';
 import {readDatasetQuestions} from '../lib/home-dataset-query.mjs';
 const data={trend:Array.from({length:33},(_,i)=>({snapshot_date:new Date(Date.UTC(2024,i+1,0)).toISOString().slice(0,10),headcount:100+i,fte:90+i/10}))};
 const args={metric:'headcount',start:'2024-02-29',end:'2025-02-28'};
-test('historical stocks retain exact dates and net change, not summed rates',()=>{const r=queryWorkforceHistory(data,args);assert.equal(r.points.length,13);assert.equal(r.change,12);assert.equal(r.points[0].value,101);assert.match(r.answer,/not hires/);});
+test('historical stocks retain exact dates and net change, not summed rates',()=>{const r=queryWorkforceHistory(data,args);assert.equal(r.points.length,13);assert.equal(r.change,12);assert.equal(r.points[0].value,101);assert.match(r.answer,/Net stock change/);assert.doesNotMatch(r.answer,/not hires/);});
 test('FTE keeps fractional precision and zero is an observation',()=>{assert.equal(queryWorkforceHistory(data,{...args,metric:'fte'}).change,1.2);const zero={trend:data.trend.map(r=>({...r,headcount:0,fte:0}))};assert.equal(queryWorkforceHistory(zero,args).points[0].value,0);});
 test('unsupported dates, reversed periods and unavailable metrics never substitute current',()=>{for(const patch of [{start:'2023-12-31'},{start:'2024-02-01'},{end:'2024-01-31'},{metric:'salary'}])assert.equal(queryWorkforceHistory(data,{...args,...patch}).status,'unsupported');});
 test('missing/duplicate/invalid source observations fail closed',()=>{for(const change of [r=>r.pop(),r=>r[1]={...r[0]},r=>r[1].fte=1000]){const rows=structuredClone(data.trend);change(rows);assert.throws(()=>queryWorkforceHistory({trend:rows},args));}});

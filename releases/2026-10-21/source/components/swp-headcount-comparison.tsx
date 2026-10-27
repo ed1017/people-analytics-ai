@@ -28,7 +28,7 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
     <h1 style={{fontSize:22,margin:'0 0 8px'}}>Compare company headcount</h1>
     <p style={{margin:'0 0 8px',padding:10,background:'#fff6df',borderRadius:6}}>{swpDemoDisclaimer}</p>
     <p>Company-wide · opening {format(comparison.opening)} people at 30 Sep 2026.<br/>Six month ends: Oct 2026–Mar 2027.</p>
-    <p><strong>Demo baseline:</strong> drift fitted to Jan 2024–Sep 2026 synthetic headcount. This extrapolation does not predict separate hires or departures.</p>
+    <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p><strong>Demo baseline:</strong> drift fitted to Jan 2024–Sep 2026 synthetic headcount. This extrapolation does not predict separate hires or departures.</p></details>
     <form onSubmit={submit} noValidate>
       <fieldset style={{border:'1px solid #cbd5e1',borderRadius:6,padding:12,margin:0}}>
         <legend>Your assumptions</legend>
@@ -50,7 +50,7 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
       <tbody>{comparison.points.map(p=><tr key={p.month}><th scope="row" style={{padding:'8px 3px',textAlign:'left',fontWeight:400,borderBottom:'1px solid #e2e8f0'}}>{monthLabel(p.month)}</th>{[p.baseline,p.scenario,p.difference].map((v,i)=><td key={i} style={{padding:'8px 3px',textAlign:'right',borderBottom:'1px solid #e2e8f0'}}>{v===null?'—':(i===2&&v>0?'+':'')+format(v)}</td>)}</tr>)}</tbody>
     </table>
     {comparison.cost && <section aria-label="Assumed monthly cost run-rates" style={{marginTop:16}}>
-      <p><strong>Your cost assumption: USD {money(comparison.cost.assumption.amount)} per employee per month.</strong> Calculated from your rate, not sourced actual cost or statistically predicted spend. Each row is a month-end monthly run-rate; no six-month spending total is calculated.</p>
+      <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p><strong>Your cost assumption: USD {money(comparison.cost.assumption.amount)} per employee per month.</strong> Calculated from your rate, not sourced actual cost or statistically predicted spend. Each row is a month-end monthly run-rate; no six-month spending total is calculated.</p></details>
       <h2 id={id+'-cost-table'} style={{fontSize:14,fontWeight:600,margin:'8px 0'}}>Assumed monthly cost run-rate · USD/month</h2>
       <p style={{margin:'0 0 6px',color:'#475569'}}>Scroll the table if needed to compare all columns.</p>
       <div style={{overflowX:'auto'}} tabIndex={0} role="region" aria-label="Monthly cost table">
@@ -60,6 +60,6 @@ export function SwpHeadcountComparison({history}:{history:SwpHistory}) {
         </table>
       </div>
     </section>}
-    <p style={{color:'#475569'}}>Difference = your scenario − demo baseline. Costs unavailable from source: period, components and FTE basis are not qualified. No uncertainty interval is available.</p>
+    <details><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p style={{color:'#475569'}}>Difference = your scenario − demo baseline. Costs unavailable from source: period, components and FTE basis are not qualified. No uncertainty interval is available.</p></details>
   </section>;
 }

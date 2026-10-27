@@ -19,8 +19,8 @@ export function SwpDemandEditor({review,disabled,onReview,onCancel}:{review:Dema
  </div>;
  return <section aria-label="Planning Calculator inputs" className="min-w-0 space-y-3 rounded border p-3 text-sm" onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();onCancel();}}}>
   <h3 className="font-semibold">Planning Calculator</h3>
-  <p>Type directly in the boxes, then review to recalculate. Cancel discards your edits. Reviewing does not accept assumptions or save a plan.</p>
-  <p className="text-xs">Inputs remain labelled assumptions or unverified entries. Results are conditional estimates, not verified actuals. Leave unknown inputs blank.</p>
+  <p>Edit the inputs, then review to recalculate. Cancel discards these edits.</p>
+  <p className="text-xs">Leave unknown inputs blank.</p>
   <p className="text-xs">Team or role: {review.spec.scope??'Unknown'}</p>
   <fieldset disabled={disabled} className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2"><legend className="sr-only">Optional planning inputs</legend>
    <div><label className="block min-w-0">Planning months<input ref={first} aria-describedby={`${prefix}-months`} className={control} type="number" min="1" max="24" step="1" value={draft.months} onChange={e=>{setError('');setDraft({...draft,months:e.target.value});}}/></label><p id={`${prefix}-months`} className="text-xs">How long to plan for: 1–24 months.</p><p className="text-xs">{demandInputSourceLabel(review.spec.monthsBasis.kind)}</p></div>

@@ -5,7 +5,7 @@ export function HomeWorkforceFlows({rows:sourceRows,asOf}:{rows:WorkforceFlow[]|
  const {point,tooltip}=useChartPointerTooltip(JSON.stringify([asOf,sourceRows]));
  const end=asOf?.slice(0,7)??sourceRows?.at(-1)?.month;
  const rows=sourceRows?.filter(r=>r.month.slice(0,4)===end?.slice(0,4)&&r.month<=end!)??null;
- if(!rows?.length)return <p className="mt-3 text-xs text-muted-foreground">Monthly hires and separations are available for the verified company-wide snapshot only.</p>;
+ if(!rows?.length)return <p className="mt-3 text-xs text-muted-foreground">Monthly hires and separations unavailable for this view.</p>;
  const net=(r:WorkforceFlow)=>r.hires===null||r.separations===null?'Unavailable':(r.hires-r.separations>0?'+':'')+(r.hires-r.separations);
  const description=(r:WorkforceFlow)=>`${r.month}: hires ${r.hires??'Unavailable'}, separations ${r.separations??'Unavailable'}, net change ${net(r)} people`;
  const high=Math.max(1,...rows.flatMap(r=>[r.hires??0,r.separations??0])),top=Math.ceil(high/50)*50;

@@ -190,9 +190,9 @@ export function ResponsePortfolioControls({
         </table>
       </div>
 
-      <p className="mt-3 text-[11px] text-muted-foreground">
+      <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mt-3 text-[11px] text-muted-foreground">
         {scenario.response_strategy.provenance ? "Recorded preferences target one profile per employee. They do not establish Build/Move availability or readiness. Conditional coverage is capped at each role's demand." : "The governed career-preference model allows one target profile per employee, so interested internal Build/Move pools do not overlap across portfolio roles. Each role is still capped at its own modeled demand."}
-      </p>
+      </p></details>
 
       {error && (
         <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

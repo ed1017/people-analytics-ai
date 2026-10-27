@@ -139,7 +139,7 @@ export function WorkforceExecutionPanel({
                                         <div className="border-t p-4">
                                           <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                                             <p className="max-w-3xl text-xs text-muted-foreground">
-                                              Assign explicit effective months to modeled BU Build, Move, and Buy capacity. Timing is user-supplied; course duration and historical time-to-fill do not set these dates.
+                                              Choose when each business unit’s develop, move and hire capacity becomes available.
                                             </p>
                                             <div className="flex flex-wrap gap-2">
                                               <button
@@ -182,7 +182,7 @@ export function WorkforceExecutionPanel({
                                               Auto-scheduler limits
                                             </p>
                                             <p className="mt-1 text-[10px] text-muted-foreground">
-                                              {constructed ? "Optional limits on the assumed schedule. Blank removes a limit; it does not establish any available capacity. These values are shared with the checks below." : "Optional. Blank monthly caps are unconstrained. These values are shared with the detailed Constraint Feasibility panel below."}
+                                              {constructed ? "Optional schedule limits. Leave blank to remove a limit." : "Optional. Blank monthly caps are unconstrained. These values are shared with the detailed Constraint Feasibility panel below."}
                                             </p>
                                             <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                                               {(
@@ -449,7 +449,7 @@ export function WorkforceExecutionPanel({
                                                 <div className="border-t p-4">
                                                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                                                     <p className="max-w-3xl text-xs text-muted-foreground">
-                                                      {constructed ? "Blank removes a limit. These checks assess your assumptions and schedule integrity; they do not establish actual staffing feasibility. Readiness, mover availability and execution costs remain unknown." : "Blank caps are unconstrained. Hard feasibility uses only the limits you enter plus schedule-integrity checks. Readiness and recruiting history remain separate evidence signals."}
+                                                      {constructed ? "Leave blank to remove a limit. Checks use the capacity and timing entered above." : "Blank caps are unconstrained. Hard feasibility uses only the limits you enter plus schedule-integrity checks. Readiness and recruiting history remain separate evidence signals."}
                                                     </p>
                                                     <div className="flex gap-2">
                                                       <button

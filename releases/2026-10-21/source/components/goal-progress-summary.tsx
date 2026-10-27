@@ -19,11 +19,11 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
  const unconfigured=!!snapshot&&!m&&absent&&!snapshot.stale&&!a.latestReceivedId&&a.currentStatus==='undefined'&&a.gap===null&&!context.history.length&&!context.milestones.length&&!context.planLinks.length&&!pinnedPlanName&&plan?.status!=='available';
  const content=<section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
   <h2 className="font-semibold">Goal progress{goal?` · ${goal}`:''}</h2>
-  {pinnedPlanName&&<p><strong>Pinned proposal:</strong> {pinnedPlanName}. Selection is not approval or execution.</p>}
+  {pinnedPlanName&&<p><strong>Pinned proposal:</strong> {pinnedPlanName}.</p>}
   <p aria-label="Saved progress target"><strong>Target:</strong> {m?`${number(m.target.value)} ${m.unit} by ${m.target.date} · ${targetDirection[m.direction]}`:'Not defined. Review a metric, scope, baseline and target before tracking progress.'}</p>
-  <p><strong>Measured progress:</strong> {latest?`${number(latest.value)} ${m?.unit} · ${latest.period.end} · ${classification(latest.source.classification)}${snapshot?.stale?' · Stale under saved freshness policy':''}${baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}`:missing}. Execution not recorded. Plan assumptions are not measured results.</p>
+  <p><strong>Measured progress:</strong> {latest?`${number(latest.value)} ${m?.unit} · ${latest.period.end} · ${classification(latest.source.classification)}${snapshot?.stale?' · Stale under saved freshness policy':''}${baseline&&latest.period.end===baseline.period.end?' · Baseline only; no later measurement':''}`:missing}.</p>
   {m&&<p className="text-xs">Saved scope: {m.metric} · {m.scope.country} / {m.scope.org} / {m.scope.level}. Page filters do not change this scope.</p>}
-  {context.origin==='demo'&&<p className="text-xs">Fictional demo goal.</p>}
+
   {m&&a.assessedOn>m.target.date&&<p className="text-sm" aria-label="Goal deadline status">Deadline passed ({m.target.date}); review dated evidence.</p>}
   <p><strong>Next action:</strong> {next}</p>
   <details>

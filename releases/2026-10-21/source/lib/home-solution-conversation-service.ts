@@ -9,6 +9,7 @@ import {modelCitationCatalog} from './model-citation-catalog.mjs';
 import {scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
 import {homeAggregateTool} from './home-aggregate-tool.mjs';
 import {turnoverInvestigationReply} from './home-turnover-investigation.mjs';
+import {fteInvestigationReply} from './home-fte-investigation.mjs';
 import {acceptsPublicHomeReceipt,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import type {createPublicHomeGrounding} from './public-home-grounding.server.mjs';
 // @ts-expect-error Native fixtures share source.
@@ -118,7 +119,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:result.answer}].slice(-32);state.questions=[];
   return {requestId:request.requestId,answer:result.answer,charts:[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
- const investigation=!runtime.staffingScenarioOnly&&!runtime.demand&&!runtime.scenario&&runtime.readDatasetQuestions?await turnoverInvestigationReply(request.message.text,runtime.readDatasetQuestions,signal):null;
+ const investigation=!runtime.staffingScenarioOnly&&!runtime.demand&&!runtime.scenario&&runtime.readDatasetQuestions?(await fteInvestigationReply(request.message.text,request.filters,runtime.readDatasetQuestions,signal)??await turnoverInvestigationReply(request.message.text,runtime.readDatasetQuestions,signal)):null;
  if(investigation){
   clearTurnoverChat(state);
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:investigation.answer}].slice(-32);state.questions=[];

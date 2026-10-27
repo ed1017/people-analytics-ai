@@ -13,7 +13,7 @@ export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,
   <div className={focusVisual?styles.focusLayout:styles.layout}>{focusVisual?<details open className={styles.levers}><summary className="min-h-11 cursor-pointer py-2 font-semibold">Adjust scenario</summary>{levers}</details>:<section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section>}<div className={styles.visual}>{visual}</div></div>
   {supplement}
   {actions&&<div className={styles.actions}>{actions}</div>}
-  {assumptions&&<p className={styles.assumptions}>{display(assumptions)}</p>}
+  {assumptions&&<details className={styles.assumptions}><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Details</summary><div>{display(assumptions)}</div></details>}
   {children}
  </section>;
 }

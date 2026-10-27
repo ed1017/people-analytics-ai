@@ -10,7 +10,7 @@ function WhatIfInputs({snapshot}:{snapshot:CompanySnapshot}){
  try{points=companyHeadcountWhatIf(snapshot,hires,exits);}catch(e){error=e instanceof Error?e.message:'Review your inputs.';}
  return <div className="space-y-3">
   <p>Recorded snapshot: <strong>{count(snapshot.opening)} people</strong> on <strong>{snapshot.asOf}</strong>.</p>
-  <p className="text-sm text-muted-foreground">Company-wide, across all countries, business units and levels. Dashboard filters do not narrow this calculation. This is a fixed released snapshot, not a live workforce feed.</p>
+  <p className="text-sm text-muted-foreground">Company-wide scope, across all countries, business units and levels.</p>
   <div className="grid gap-3 sm:grid-cols-2">
    <label className="text-sm font-medium">External hires per month<input type="text" inputMode="numeric" value={hires} onChange={e=>setHires(e.target.value)} aria-describedby="company-what-if-help" className="mt-1 block min-h-11 w-full rounded-md border bg-background px-3" /></label>
    <label className="text-sm font-medium">Exits per month<input type="text" inputMode="numeric" value={exits} onChange={e=>setExits(e.target.value)} aria-describedby="company-what-if-help" className="mt-1 block min-h-11 w-full rounded-md border bg-background px-3" /></label>
@@ -19,7 +19,7 @@ function WhatIfInputs({snapshot}:{snapshot:CompanySnapshot}){
   {error?<p role="alert">{error}</p>:!points?<p role="status">Enter both monthly flows to calculate a what-if. No future headcount is calculated yet.</p>:<div className="overflow-x-auto">
    <table className="w-full text-left text-sm tabular-nums"><caption className="mb-2 text-left font-semibold">Conditional what-if · future months, not recorded history</caption><thead><tr>{['Month','Opening people','Hires','Exits','Closing people'].map(label=><th key={label} scope="col" className="px-2 py-2 first:pl-0">{label}</th>)}</tr></thead><tbody>{points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="py-2 pr-2">{p.month.slice(0,7)}</th>{[p.opening,p.hires,p.exits,p.headcount].map((n,i)=><td key={i} className="px-2 py-2">{count(n)}</td>)}</tr>)}</tbody></table>
   </div>}
-  <p className="text-sm text-muted-foreground">Closing people = opening + external hires − exits. Internal transfers net to zero company-wide. This is a conditional calculation, not a predictive forecast or staffing commitment. Costs are not calculated. Entries are temporary and reset when this tool is reloaded.</p>
+  <p className="text-sm text-muted-foreground">Closing people = opening + external hires − exits. Internal transfers net to zero company-wide. Entries reset when this tool is reloaded.</p>
  </div>;
 }
 export function CompanyHeadcountWhatIf(){

@@ -13,7 +13,7 @@ export function CandidateSchedulingInputs({ value, allocation, onChange }: {
 }) {
   return <fieldset className="my-3 space-y-3 rounded-md border p-3 text-xs">
     <legend className="px-1 font-medium">Conditional scheduling assumptions</legend>
-    <p>Limits do not establish delivery capacity. Enter assumed effective capacity and earliest months for each active path. Blank values remain unknown; no dates are generated until these assumptions are complete. Staffing readiness and actual availability remain unassessed.</p>
+    <p>Enter effective capacity and the earliest start month for each active path to calculate a schedule.</p>
     <label className="block">Assumed scheduling start
       <input className="ml-2 rounded border p-1" type="month" min="2026-10" max="2029-09" value={value.start_month ?? ""} onChange={e => onChange({ ...value, start_month: e.target.value || null })} />
     </label>

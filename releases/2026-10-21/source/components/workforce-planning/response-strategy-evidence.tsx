@@ -31,7 +31,7 @@ export function ResponseStrategyEvidence({
           {responseStrategy.skills_evaluated} skills evaluated
         </span>
       </div>
-      {responseStrategy.provenance && <p className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{responseStrategy.provenance} Skill presence and career preferences do not establish assessed readiness or available movers.</p>}
+      {responseStrategy.provenance && <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 focus-visible:ring-2 focus-visible:ring-ring">Details</summary><p className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">{responseStrategy.provenance} Skill presence and career preferences do not establish assessed readiness or available movers.</p></details>}
       {responseStrategy.skills.length > 0 ? (
         <>
           <div className="mb-4 rounded-md border bg-muted/20 p-3 text-xs text-muted-foreground">

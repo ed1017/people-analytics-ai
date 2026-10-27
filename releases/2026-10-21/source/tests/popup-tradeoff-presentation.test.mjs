@@ -78,5 +78,5 @@ test('compact save review separates assumed qualified capacity from measured out
  const {GuidedPlanSummary}=component('guided-plan-summary.tsx',{'@/lib/guided-plan-summary':summary,'./staffing-option-cost':cost});
  const html=renderToStaticMarkup(React.createElement(GuidedPlanSummary,{draft:comparison.options[0].draft,compact:true}));
  assert.match(html,/Starting qualified capacity assumption: 3 FTE/);
- assert.match(html,/not measured capacity/);assert.match(html,/Measured baseline and later outcome/);assert.doesNotMatch(html,/Baseline: Unknown/);
+ assert.match(html,/<details><summary[^>]*>Details<\/summary><p>Starting qualified capacity is a scenario input, not measured capacity/);assert.match(html,/Actual progress remains unknown until measured/);assert.doesNotMatch(html,/Baseline: Unknown/);
 });

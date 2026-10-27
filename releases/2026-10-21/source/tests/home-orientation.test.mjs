@@ -6,6 +6,7 @@ import {createRequire} from 'node:module';
 import ts from 'typescript';
 import React from 'react';
 import * as onboarding from '../lib/home-onboarding.ts';
+import {lockIntroPageScroll} from '../lib/intro-scroll-lock.ts';
 const require=createRequire(import.meta.url);
 const empty={getItem:()=>null},token='workforce-demo-9037-public-aggregates-v4:5';
 test('only explicit opt-out suppresses a new load; legacy dismissal and saved state do not',()=>{
@@ -18,16 +19,17 @@ test('only explicit opt-out suppresses a new load; legacy dismissal and saved st
 function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')return;out.push(n);React.Children.forEach(n.props?.children,walk);}walk(tree);return out;}
 function harness(initial={}){
  let cursor=0,props={busy:false,active:true,ready:true,autoOpen:true,dismissKey:'one',onNavigate:()=>{},onStartDemo:()=>{starts++;},...initial},starts=0,focus='',writes=[],listeners={},current;
- const states=[],refs=[],deps=[],effects=[],storage=new Map(initial.storedOptOut?[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]:[]);
+ const states=[],refs=[],deps=[],effects=[],cleanups=[],storage=new Map(initial.storedOptOut?[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]:[]);
  const fallback={focus:()=>{focus='fallback';}},title={focus:()=>{focus='title';}},trigger={getClientRects:()=>[],focus:()=>{focus='trigger';}};
  const native={open:false,shown:0,showModal(){this.open=true;this.shown++;},close(){if(this.open){this.open=false;nodes(current).find(n=>n.type==='dialog').props.onClose();}}};
  const source=ts.transpileModule(fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,exports={};
- const document={body:{},activeElement:null,querySelector:()=>fallback};
- vm.runInNewContext(source,{exports,document,localStorage:{getItem:key=>storage.get(key)??null,setItem:(...args)=>{if(props.storageFails)throw Error('blocked');storage.set(...args);writes.push(args);},removeItem:key=>{if(props.storageFails)throw Error('blocked');storage.delete(key);writes.push([key,null]);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(effect);}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:require(name)});
+ const style=()=>{const values=new Map();return {getPropertyValue:key=>values.get(key)?.value??'',getPropertyPriority:key=>values.get(key)?.priority??'',setProperty:(key,value,priority='')=>values.set(key,{value,priority}),removeProperty:key=>values.delete(key)};};
+ const document={documentElement:{style:style()},body:{style:style()},activeElement:null,querySelector:()=>fallback};
+ vm.runInNewContext(source,{exports,document,localStorage:{getItem:key=>storage.get(key)??null,setItem:(...args)=>{if(props.storageFails)throw Error('blocked');storage.set(...args);writes.push(args);},removeItem:key=>{if(props.storageFails)throw Error('blocked');storage.delete(key);writes.push([key,null]);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(()=>{cleanups[i]?.();cleanups[i]=effect();});}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:name==='@/lib/intro-scroll-lock'?{lockIntroPageScroll}:require(name)});
  const render=()=>{cursor=0;current=exports.HomeGettingStarted(props);for(const n of nodes(current)){if(n.type==='dialog')n.props.ref.current=native;if(n.type==='h2')n.props.ref.current=title;if(n.type==='button'&&n.props.ref)n.props.ref.current=trigger;}return current;};
  const flush=(next={})=>{props={...props,...next};render();for(const e of effects.splice(0))e();return render();};
  const button=text=>nodes(current).find(n=>n.type==='button'&&n.props.children===text);
- return {document,flush,button,checkbox:()=>nodes(current).find(n=>n.type==='input'&&n.props.type==='checkbox'),native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
+ return {document,flush,unmount:()=>cleanups.forEach(cleanup=>cleanup?.()),button,checkbox:()=>nodes(current).find(n=>n.type==='input'&&n.props.type==='checkbox'),native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
 }
 test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
@@ -90,7 +92,7 @@ test('product introduction keeps neutral attribution and keyboard-scrollable con
  assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
  assert.doesNotMatch(source,/Developed by Ed Om|Ed Om defined/);
- assert.match(source,/The workforce-planning problem, product requirements and acceptance criteria shaped this project/);
+ assert.match(source,/Product design focused on workforce decisions and practical tradeoffs/);
  assert.equal(region.props['aria-label'],'About Workforce Intelligence');
  assert.ok(all.some(n=>n.type==='h2'&&n.props.children==='Workforce Intelligence'));
  assert.ok(all.some(n=>n.type==='a'&&n.props.href==='/about'));
@@ -152,4 +154,33 @@ test('introduction control remains outside More; recovery is a live deferral',()
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
  assert.ok(source.indexOf('<HomeGettingStarted')<source.indexOf('<details className="relative ml-auto"'));
  assert.ok(source.includes('deferAutoOpen={Boolean(conversation.recovery||conversation.issueEditor||!conversation.saved||swpDemoVisible||guidedExampleActive)}'));
+});
+
+
+test('open introduction locks background scroll and restores exact styles on close and unmount',()=>{
+ const h=harness({autoOpen:false});
+ h.document.documentElement.style.setProperty('overflow','scroll','important');
+ h.document.body.style.setProperty('overflow','auto');
+ h.flush();h.button('Introduction').props.onClick();h.flush();
+ assert.equal(h.document.documentElement.style.getPropertyValue('overflow'),'hidden');
+ assert.equal(h.document.body.style.getPropertyValue('overflow'),'hidden');
+ h.button('Explore on my own').props.onClick();h.flush();
+ assert.equal(h.document.documentElement.style.getPropertyValue('overflow'),'scroll');
+ assert.equal(h.document.documentElement.style.getPropertyPriority('overflow'),'important');
+ assert.equal(h.document.body.style.getPropertyValue('overflow'),'auto');
+ h.button('Introduction').props.onClick();h.flush();h.unmount();
+ assert.equal(h.document.documentElement.style.getPropertyValue('overflow'),'scroll');
+ assert.equal(h.document.body.style.getPropertyValue('overflow'),'auto');
+ const clean=harness();clean.flush();clean.flush();clean.unmount();
+ assert.equal(clean.document.body.style.getPropertyValue('overflow'),'');
+});
+
+test('intro scroll region contains boundary scrolling and route dismissal restores page scrolling',()=>{
+ const h=harness(),all=nodes(h.flush());h.flush();
+ assert.match(all.find(n=>n.props?.role==='region').props.className,/overscroll-contain/);
+ assert.match(h.dialog().props.className,/overscroll-none/);
+ h.flush({active:false});h.flush();
+ assert.equal(h.native.open,false);
+ assert.equal(h.document.documentElement.style.getPropertyValue('overflow'),'');
+ assert.equal(h.document.body.style.getPropertyValue('overflow'),'');
 });

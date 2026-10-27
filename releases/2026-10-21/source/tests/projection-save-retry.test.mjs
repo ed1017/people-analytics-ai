@@ -17,25 +17,31 @@ function harness(onSave,{savedDemand=true}={}){
  async function flush(){let tree;for(let i=0;i<3;i++){tree=render();for(const effect of effects.splice(0))effect();await new Promise(r=>setImmediate(r));}return render();}
  return {flush,render,base,setDisabled:v=>{disabled=v;}};
 }
+function saveButton(tree){
+ const buttons=[];function walk(node){if(!React.isValidElement(node))return;if(node.type==='button')buttons.push(node);React.Children.forEach(node.props.children,walk);}walk(tree.props.actions);
+ assert.equal(buttons.length,1,'exactly one explicit save action');return buttons[0];
+}
+function unsavedNotice(tree){return React.Children.toArray(tree.props.actions.props.children).some(node=>React.isValidElement(node)&&node.type==='p'&&node.props.children==='Unsaved changes');}
+
 test('failed save keeps demand and explicit retry available after storage readiness recovers',async()=>{
  let calls=0,received;
  const h=harness(async(base,edit)=>{calls++;received=edit;if(calls===1)throw Error('Storage full');});
  let tree=await h.flush();tree.props.onDemandChange({volume:'140'});tree=await h.flush();
- assert.equal(tree.props.actions.props.disabled,false);
- await tree.props.actions.props.onClick();tree=await h.flush();
+ assert.equal(saveButton(tree).props.disabled,false);assert.equal(unsavedNotice(tree),true);
+ await saveButton(tree).props.onClick();tree=await h.flush();
  assert.equal(calls,1);assert.equal(tree.props.demand.volume,'140');assert.equal(h.base.demand.inputs.volume,'120');
- h.setDisabled(true);assert.equal(h.render().props.actions.props.disabled,true);
- h.setDisabled(false);tree=await h.flush();assert.equal(tree.props.actions.props.disabled,false);
+ h.setDisabled(true);assert.equal(saveButton(h.render()).props.disabled,true);
+ h.setDisabled(false);tree=await h.flush();assert.equal(saveButton(tree).props.disabled,false);
  assert.equal(calls,1,'recovery must not auto-save');
- await tree.props.actions.props.onClick();assert.equal(calls,2);assert.equal(received.demand.volume,'140');
+ await saveButton(tree).props.onClick();assert.equal(calls,2);assert.equal(received.demand.volume,'140');
 });
 test('pending save and invalid current demand remain blocked after a recoverable source error',async()=>{
  let release,calls=0;
  const h=harness(()=>{calls++;return new Promise((resolve,reject)=>{release=()=>reject(Error('Source check failed'));});});
  let tree=await h.flush();tree.props.onDemandChange({volume:'140'});tree=await h.flush();
- const pending=tree.props.actions.props.onClick();assert.equal(h.render().props.actions.props.disabled,true);
- release();await pending;tree=await h.flush();assert.equal(tree.props.actions.props.disabled,false);assert.equal(calls,1);
- tree.props.onDemandChange({volume:'invalid'});tree=await h.flush();assert.equal(tree.props.actions.props.disabled,true);
+ const pending=saveButton(tree).props.onClick();assert.equal(saveButton(h.render()).props.disabled,true);
+ release();await pending;tree=await h.flush();assert.equal(saveButton(tree).props.disabled,false);assert.equal(calls,1);
+ tree.props.onDemandChange({volume:'invalid'});tree=await h.flush();assert.equal(saveButton(tree).props.disabled,true);
 });
 
 function resetButton(tree){return React.Children.toArray(tree.props.levers.props.children).find(n=>n?.type==='button'&&n.props.children==='Reset to saved revision');}
@@ -46,7 +52,7 @@ test('reset restores saved demand visibility after hide, edits and repeated rese
  tree.props.onDemandOpenChange(false);tree=await h.flush();assert.equal(tree.props.demandOpen,false);
  tree.props.onDemandChange({volume:'160'});tree=await h.flush();assert.equal(tree.props.demandOpen,false,'ordinary edits preserve hidden demand');
  assert.equal(resetButton(tree).props.disabled,false);resetButton(tree).props.onClick();tree=await h.flush();
- assert.equal(tree.props.demandOpen,true);assert.equal(tree.props.demand.volume,'120');assert.equal(tree.props.actions.props.disabled,true);
+ assert.equal(tree.props.demandOpen,true);assert.equal(tree.props.demand.volume,'120');assert.equal(saveButton(tree).props.disabled,true);assert.equal(unsavedNotice(tree),false);
  tree.props.onDemandOpenChange(false);tree.props.onDemandChange(null);tree=await h.flush();resetButton(tree).props.onClick();tree=await h.flush();
  assert.equal(tree.props.demandOpen,true);assert.equal(tree.props.demand.volume,'120');assert.equal(h.base.demand.inputs.volume,'120');assert.equal(calls,0);
 });
@@ -55,5 +61,5 @@ test('reset of a headcount-only saved revision removes added demand and restores
  let tree=await h.flush();assert.equal(tree.props.demandOpen,false);
  tree.props.onDemandChange({volume:'140'});tree.props.onDemandOpenChange(true);tree=await h.flush();
  assert.equal(tree.props.demandOpen,true);resetButton(tree).props.onClick();tree=await h.flush();
- assert.equal(tree.props.demand,null);assert.equal(tree.props.demandOpen,false);assert.equal(tree.props.actions.props.disabled,true);
+ assert.equal(tree.props.demand,null);assert.equal(tree.props.demandOpen,false);assert.equal(saveButton(tree).props.disabled,true);
 });

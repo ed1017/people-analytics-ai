@@ -7,7 +7,7 @@ export function AssumptionsDisclosure({children, className = '', evidenceDetails
   evidenceDetails?: boolean;
 }) {
   return <details data-assumptions-disclosure data-answer-evidence-details={evidenceDetails || undefined} className={`assumptions-disclosure min-w-0 text-sm leading-relaxed ${className}`}>
-    <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Assumptions &amp; limits</summary>
+    <summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Details</summary>
     <div className="space-y-2 break-words pb-2">{children}</div>
   </details>;
 }

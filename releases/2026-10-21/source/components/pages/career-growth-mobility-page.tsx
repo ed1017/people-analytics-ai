@@ -94,10 +94,7 @@ export function CareerGrowthMobilityPage({
       <div className="mt-4 mb-6 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground">
-            Descriptive recorded promotions,
-            lateral moves, transfers, and level
-            transitions from the governed
-            movement-event source.
+            Promotions, lateral moves, transfers and level changes.
           </p>
         </div>
 
@@ -200,9 +197,9 @@ export function CareerGrowthMobilityPage({
             )}
           </div>
 
-          <p className="mt-4 text-sm text-muted-foreground">Incomplete movement history; event shares are not workforce rates.</p>
+
           <details className="mt-2 text-sm">
-            <summary className="min-h-11 cursor-pointer py-2 font-medium">Source coverage &amp; limitations</summary>
+            <summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
               <li>
                 Recorded events cover{" "}

@@ -44,7 +44,7 @@ export function CapacityAssumptionChanges({left,right}:{left:{name:string;draft:
  }
  return <details className="mt-3 border-t">
   <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">What changed between these scenarios</summary>
-  <p className="text-sm text-muted-foreground">Saved input differences, not effects attributed to any one change. Monthly assumptions repeat throughout the plan. Unknown cost is not zero.</p>
+  <p className="text-sm text-muted-foreground">Compare saved monthly assumptions and costs.</p>
   {changes.length?<div className="mt-3 space-y-3">{changes.map(change=><div key={change.label} className="min-w-0 rounded-lg border p-3">
    <h4 className="text-sm font-semibold">{change.label}</h4>
    <dl className="mt-2 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">{[[left.name,change.left],[right.name,change.right]].map(([name,amount],index)=><div key={index} className="min-w-0 break-words"><dt className="text-xs text-muted-foreground">{name}</dt><dd className="text-sm tabular-nums">{amount}</dd></div>)}</dl>
@@ -94,7 +94,7 @@ export function CapacitySavedScenarios(){
  return <section aria-label="Saved capacity scenarios" className="space-y-3 border-t pt-4">
   <h3 className="font-semibold">Save &amp; compare</h3>
   <p className="text-xs text-muted-foreground">Drafts are not saved automatically: they survive navigation but clear on reload or dataset change.</p>
-  {!goalId?<><p className="text-sm text-muted-foreground">Session only. Choose a goal to save scenarios; no goal is created automatically.</p>{carriedGoalActions&&<CarriedPlanningGoal key={carriedGoalActions.businessGoal} actions={carriedGoalActions}/>}</>:<>
+  {!goalId?<><p className="text-sm text-muted-foreground">Choose a goal to save this scenario.</p>{carriedGoalActions&&<CarriedPlanningGoal key={carriedGoalActions.businessGoal} actions={carriedGoalActions}/>}</>:<>
    <div className="flex flex-wrap items-end gap-2">
     <label className="min-w-0 flex-1 text-sm">Scenario name<input aria-label="Capacity scenario name" maxLength={160} value={name} onChange={e=>{setName(e.target.value);setActionError('');}} className={`${control} mt-1 w-full`} placeholder="e.g. Base workload"/></label>
     <button type="button" disabled={disabled} onClick={save} className={`${control} disabled:opacity-50`}>Save scenario</button>
@@ -118,7 +118,7 @@ export function CapacitySavedScenarios(){
       <p className="mb-2 text-xs text-muted-foreground">User-assumed USD per contracted FTE per month: {left.record.name} {formatCapacityCost(costComparison.leftRateCents)}; {right.record.name} {formatCapacityCost(costComparison.rightRateCents)}. Blank and older scenarios have unknown cost.</p>
       <table className="w-full text-left text-sm"><caption className="mb-2 text-left">Monthly supply run-rate (USD/month) · right minus left, not savings</caption><thead><tr>{['Month',left.record.name,right.record.name,'Difference (USD/month)'].map((label,i)=><th key={i} scope="col" className="p-2">{label}</th>)}</tr></thead><tbody>{costComparison.points.map(p=><tr key={p.month} className="border-t"><th scope="row" className="p-2 font-normal">{p.month}</th><td className="p-2">{formatCapacityCost(p.leftCents)}</td><td className="p-2">{formatCapacityCost(p.rightCents)}</td><td className="p-2">{p.deltaCents!==null&&p.deltaCents>0?'+':''}{formatCapacityCost(p.deltaCents)}</td></tr>)}</tbody></table>
      </details>}
-     <p className="mt-2 text-xs text-muted-foreground">Opening assumption differences: {openingDifferences}. Month-level assumption differences: {monthDifferences}. A recurring change counts once per month. These are saved scenarios, not a forecast.</p>
+     <p className="mt-2 text-xs text-muted-foreground">Opening assumption differences: {openingDifferences}. Month-level assumption differences: {monthDifferences}. A recurring change counts once per month. </p>
     </div>}
    </>}
   </>}

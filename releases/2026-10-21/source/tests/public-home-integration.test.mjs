@@ -29,17 +29,17 @@ async function read(filters={country:'all',org:'all',level:'all'}){const r=await
 function render(data,requested,loading=false,error=null){return renderToStaticMarkup(React.createElement(exports.HomeHeadcountSummary,{overview:data.overview,receipt:scope.readDashboardScopeReceipt(data.workforce_filter_scope),requested,scopeLabel:'Reviewed test scope',loading,error,trend:data.trend}));}
 test('public Home consumes 9037 snapshot and nine current-year history points after settlement; pending hides settled values',async()=>{
  const filters={country:'all',org:'all',level:'all'},d=await read(filters),html=render(d,filters);
- assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);assert.equal((html.match(/<circle/g)??[]).length,18);assert.doesNotMatch(html,/Verified headcount history unavailable|Verified snapshot needed/);
+ assert.match(html,/9,037/);assert.match(html,/9 monthly snapshots/);assert.equal((html.match(/<circle/g)??[]).length,18);assert.doesNotMatch(html,/Verified headcount history unavailable|Verified snapshot needed/);
  assert.doesNotMatch(render(d,filters,true),/9,037/);assert.equal(Object.hasOwn(d.workforce_filter_scope,'artifactDigest'),false);
 });
 test('compact landing shows workforce evidence without a duplicate scenario opener or inline example',async()=>{
  const requested={country:'all',org:'all',level:'all'},d=await read(requested);
  const html=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,onQuestion:()=>{}}));
- assert.doesNotMatch(html,/Plan the workforce your business needs|Try the worked example|Explore the full app|Worked example: adjust staffing/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 recorded monthly snapshots/);
+ assert.doesNotMatch(html,/Plan the workforce your business needs|Try the worked example|Explore the full app|Worked example: adjust staffing/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 monthly snapshots/);
  assert.doesNotMatch(html,/Try a planning scenario/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE capacity gap|\$325,000|Choose a staffing option|Develop and move your team/);
 });
 test('public filtered Home keeps exact requested/effective scope; malformed and stale receipts stay unavailable',async()=>{
- const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/9 recorded monthly snapshots/);
+ const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/9 monthly snapshots/);
  assert.match(render(d,{...filters,country:'all'}),/Verified headcount history unavailable/);
  for(const patch of [{datasetToken:'legacy-v1:0'},{contract:'other'},{cutoff:'2026-08-31'},{artifactDigest:'a'.repeat(64)},{version:2},{status:'verified_aggregate'},{effective:{...filters,country:'all'}},{requested:{...filters,extra:'x'}},{metricContract:'other'},{stockStatus:'other'}]){
   const invalid={...d,workforce_filter_scope:{...d.workforce_filter_scope,...patch}};assert.equal(scope.readDashboardScopeReceipt(invalid.workforce_filter_scope),null);assert.match(render(invalid,filters),/Verified headcount history unavailable/);

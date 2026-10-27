@@ -29,13 +29,12 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
   const outlook = nationalOutlookEvidence(selection.soc);
   return <section aria-label="Occupation and location comparison" className="min-w-0 space-y-6">
     <KeyFindings findings={evidence ? {scope:`${evidence.selected.OCC_TITLE} · ${evidence.selected.AREA_TITLE} · BLS OEWS May 2025`,items:[
-      `Median annual wage: ${money(evidence.selected.A_MEDIAN)}; wages exclude other employer costs.`,
-      `Recorded employment: ${count(evidence.selected.TOT_EMP)} wage-and-salary jobs, not available candidates.`,
-      'This occupation and location reference does not establish internal pay, hiring time or individual compensation.',
-    ]} : {scope:'Selected labor-market reference',items:['No comparable occupation/location record is available for this selection.','Company metrics and national outlook are separate evidence.']}} />
+      `Median annual wage: ${money(evidence.selected.A_MEDIAN)}.`,
+      `Estimated employment: ${count(evidence.selected.TOT_EMP)} wage-and-salary jobs.`,
+    ]} : {scope:'Selected labor-market reference',items:['No comparable occupation/location record is available for this selection.']}} />
     <div>
       <h2 className="text-xl font-semibold">Occupation pay, employment and outlook</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Public BLS references · separate from internal workforce and pay</p>
+      <p className="mt-2 text-sm text-muted-foreground">BLS occupation and location references</p>
     </div>
     <div className="grid min-w-0 gap-3 sm:grid-cols-2">
       <label className="min-w-0 text-sm font-medium">Occupation<select aria-label="Market occupation" className="mt-1 min-h-11 w-full min-w-0 rounded border bg-background p-2" value={selection.soc} onChange={event => onChange({ ...selection, soc: event.target.value })}>{oewsOccupations.map(occupation => <option key={occupation.value} value={occupation.value}>{occupation.label}</option>)}</select></label>
@@ -51,7 +50,6 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
             <tbody>{comparisons.occupations.map(item => item && <tr key={item.selected.OCC_CODE} className={`border-t ${item.selected.OCC_CODE === selection.soc ? "bg-primary/5" : ""}`}><th scope="row" className="px-3 py-2 font-medium"><button aria-label={`Select ${item.selected.OCC_TITLE}`} aria-pressed={item.selected.OCC_CODE === selection.soc} onClick={() => onChange({ ...selection, soc: item.selected.OCC_CODE })} className="min-h-11 text-left text-primary underline underline-offset-4">{item.selected.OCC_TITLE}</button>{item.selected.OCC_CODE === selection.soc && <span className="ml-2 text-xs text-muted-foreground">Selected</span>}</th><td className={cell}>{count(item.selected.TOT_EMP)}</td><td className={cell}>{money(item.selected.A_MEDIAN)}</td><td className={`${cell} whitespace-nowrap`}>{money(item.selected.A_PCT25)}–{money(item.selected.A_PCT75)}</td></tr>)}</tbody>
           </table>
         </ReferenceTable>
-        <p className="text-xs text-muted-foreground">Employment counts jobs, not vacancies. Pay ranges are estimated 25th–75th percentiles.</p>
       </article>
 
       <article className="min-w-0 space-y-3" aria-label="Wages and employment by location">
@@ -64,7 +62,6 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
           </table>
         </ReferenceTable>
         {selection.area !== "99" && <p className="text-sm">Selected median: {evidence.medianDifferencePct === null ? "comparison unavailable" : `${Math.abs(evidence.medianDifferencePct)}% ${evidence.medianDifferencePct >= 0 ? "above" : "below"} the U.S. median`} · unadjusted, same occupation and period.</p>}
-        <p className="text-xs text-muted-foreground">The NY-NJ metro extends beyond NYC. Geographies overlap; employment counts are not additive.</p>
         <a href={evidence.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>Official BLS source workbook</a>
       </article>
 
@@ -77,7 +74,6 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
             <tbody>{nationalOutlookComparisons().map(item => item && <tr key={item.selected.soc} className={`border-t ${item.selected.soc === selection.soc ? "bg-primary/5" : ""}`}><th scope="row" className="px-3 py-3 font-medium">{item.selected.title}{item.selected.soc === selection.soc && <span className="ml-2 text-xs text-muted-foreground">Selected</span>}</th><td className={cell}>{thousands(item.selected.employment_base_thousands)}</td><td className={cell}>{thousands(item.selected.employment_projected_thousands)}</td><td className={cell}>{item.selected.employment_change_percent.toFixed(1)}%</td><td className={cell}>{thousands(item.selected.annual_openings_thousands)}</td></tr>)}</tbody>
           </table>
         </ReferenceTable>
-        <p className="text-xs text-muted-foreground">Annual openings include growth and occupational separations, not current vacancies. This population differs from OEWS; growth rates do not apply to the local counts above.</p>
         <a href={outlookProvenance.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>BLS projection table 1.2</a>
       </article>
 
@@ -86,15 +82,15 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
         <h4 className="mt-3 font-semibold">Coverage and sources</h4>
         <p className="mt-2">OEWS May 2025, released May 15, 2026. Three occupations across the U.S., New York State and the full New York–Newark–Jersey City, NY-NJ metro. SOC {selection.soc}; geography code {selection.area}. These public-domain BLS extracts do not refresh automatically.</p>
         <h4 className="mt-4 font-semibold">Pay and employment</h4>
-        <p className="mt-2">OEWS employment covers wage-and-salary jobs, not available candidates. Wage percentiles are not recommended salary bands or seniority levels. Wages exclude benefits and some compensation components; they are not total employer costs.</p>
-        <p className="mt-2">Location differences are not adjusted for cost of living or worker and employer mix. The full NY-NJ metro crosses state lines and is broader than New York City.</p>
+        <p className="mt-2">OEWS employment covers wage-and-salary jobs, not vacancies or available candidates. Pay ranges are estimated 25th-75th percentiles. Wage percentiles are not recommended salary bands or seniority levels. Wages exclude benefits and some compensation components; they are not total employer costs.</p>
+        <p className="mt-2">Location differences are not adjusted for cost of living or worker and employer mix. The full NY-NJ metro crosses state lines and is broader than New York City. Geographies overlap; employment counts are not additive.</p>
         <p className="mt-2">Selected location&apos;s 10th percentile: {money(evidence.selected.A_PCT10)}; 90th percentile: {money(evidence.selected.A_PCT90)}. Employment sampling error (percent relative standard error): {evidence.selected.EMP_PRSE === null ? "Unavailable" : `${evidence.selected.EMP_PRSE}%`}. This error measure does not describe uncertainty in wage percentiles.</p>
         <p className="mt-2">Location quotient: {evidence.selected.LOC_QUOTIENT ?? "Not applicable nationally"}. This measures occupational employment concentration relative to the U.S., not recruiting ease or worker skill.</p>
         <h4 className="mt-4 font-semibold">National projections</h4>
-        <p className="mt-2">BLS Employment Projections, released August 27, 2026, use the National Employment Matrix population, including self-employment. State and metro projections are not included. Values are rounded; projections are not guarantees or company hiring targets.</p>
+        <p className="mt-2">BLS Employment Projections, released August 27, 2026, use the National Employment Matrix population, including self-employment. State and metro projections are not included. Annual openings include growth and occupational separations, not current vacancies. This population differs from OEWS; growth rates do not apply to the local counts above. Values are rounded; projections are not guarantees or company hiring targets.</p>
         {outlook && <p className="mt-2">For {outlook.selected.title.toLowerCase()}, BLS projects a net increase of {thousands(outlook.selected.employment_change_thousands)} thousand jobs over 2025–2035. Annual openings include workers leaving the occupation as well as growth.</p>}
         <h4 className="mt-4 font-semibold">Using the references</h4>
-        <p className="mt-2">Missing or suppressed values remain unavailable. No annual pay trend or internal pay competitiveness is inferred. O*NET descriptions, company job mappings and employee skills are separate evidence; this selection does not establish a company role match or pay midpoint. Carrying a reference sends the selected OEWS snapshot to Planning; national projections stay here.</p>
+        <p className="mt-2">Missing or suppressed values remain unavailable. This occupation and location reference does not establish internal pay, hiring time or individual compensation. No annual pay trend or internal pay competitiveness is inferred. O*NET descriptions, company job mappings and employee skills are separate evidence; this selection does not establish a company role match or pay midpoint. Carrying a reference sends the selected OEWS snapshot to Planning; national projections stay here.</p>
         <div className="mt-2 flex flex-wrap gap-x-5"><a href={oewsProvenance.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>OEWS source tables</a><a href={oewsProvenance.technicalNotesUrl} target="_blank" rel="noreferrer" className={sourceLink}>May 2025 wage definitions</a><a href={outlookProvenance.definitionsUrl} target="_blank" rel="noreferrer" className={sourceLink}>Projection definitions</a><a href={outlookProvenance.releaseUrl} target="_blank" rel="noreferrer" className={sourceLink}>2025–2035 projections release</a></div>
       </details>
     </>}
