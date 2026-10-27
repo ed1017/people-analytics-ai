@@ -47,3 +47,24 @@ test('changed data, receipts, token or coverage cannot masquerade as captured ev
   const changed=structuredClone(capture);mutate(changed);assert.throws(()=>createFixtureHandler(changed));
  }
 });
+
+import {verifyCapturedFieldsBytes,CAPTURED_FIELDS_SHA256} from './verify-receipts.mjs';
+test('historical field map is pinned independently of current aggregate additions',()=>{
+ const bytes=fs.readFileSync(new URL('./captured-public-fields.json',import.meta.url));
+ const fields=verifyCapturedFieldsBytes(bytes);
+ assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),CAPTURED_FIELDS_SHA256);
+ assert.ok(!fields['/api/position-structure'].includes('combinations[].frozen_positions'));
+ assert.throws(()=>verifyCapturedFieldsBytes(Buffer.concat([bytes,Buffer.from(' ')])),/Historical public field map mismatch/);
+ fields['/api/position-structure'].push('combinations[].frozen_positions');
+ assert.throws(()=>verifyCapturedFieldsBytes(Buffer.from(JSON.stringify(fields))),/Historical public field map mismatch/);
+ const currentFields=JSON.parse(fs.readFileSync(new URL('../source/lib/public-9037-fields.json',import.meta.url),'utf8'));
+ assert.ok(currentFields['/api/position-structure'].includes('combinations[].frozen_positions'));
+ assert.doesNotThrow(()=>createFixtureHandler(capture));
+});
+
+test('isolated preparation carries historical map and traces it with the replay fixture',()=>{
+ const prepare=fs.readFileSync(new URL('./prepare.mjs',import.meta.url),'utf8');
+ assert.match(prepare,/write\('lib\/captured-public-fields.json'/);
+ assert.match(prepare,/outputFileTracingIncludes:.*captured-public-fields.json/);
+ assert.match(prepare,/added:\['lib\/captured-public-fields.json'/);
+});

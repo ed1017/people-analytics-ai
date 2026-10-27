@@ -24,7 +24,7 @@ The generated wrapper enables the original Home conversation layout at build tim
 
 ## Provenance and fidelity
 
-`fixtures.json` records the capture time, explicit local replay origin, dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. These are pinned local public-route replay receipts, not a production capture or proof of live-source currentness. All 19 bodies were independently matched against the protected skills preview.
+`fixtures.json` records the capture time, explicit local replay origin, dataset headers and exact bodies. `fixtures.sha256` pins its bytes. `verify-receipts.mjs` reuses the reviewed public projection allowlist, verifies complete metadata and dashboard scope, rejects extra fields, and reconstructs the original source-ordered bundle digest. The reconstruction uses `captured-public-fields.json`, the historical field map retained at source commit `06bea46b749b3a87dbdbaeaaad879dcc9212f0a2` (SHA-256 `0ad759700470548279f733b5849e7c6ade66c5ab45ea53e7849db93596fa3d5f`). Its bytes are verified independently. Current source projection validation still applies to every replay document; later field additions do not rewrite the captured receipts or authorize additional fixture data. These are pinned local public-route replay receipts, not a production capture or proof of live-source currentness. All 19 bodies were independently matched against the protected skills preview.
 
 The fixture is intentionally company-wide. The dataset token in recorded receipts is retained so the original UI validators can inspect those historical responses. A permanent local notice and response header identify replay. Browser storage uses this local origin; do not interpret saved local examples as live production plans.
 
@@ -40,7 +40,7 @@ The source manifest verifies all source files in the current manifest before cop
 - Narrowed country/business-unit/level filters, unknown or duplicate query parameters and mismatched dataset tokens fail visibly. They never receive silently substituted company totals.
 - Full server calculator parity, live AI, private-source reconstruction and company-data onboarding are not reproduced by this increment.
 
-The seven fixture tests cover exact 19-response replay, receipt/data tampering, explicit global scope, unsupported scope, disabled external operations local-only request boundaries and launcher argument restrictions. Run the standalone source verifier as well. Build and browser verification outcomes belong to the implementation report, not inferred from this instruction list.
+The fixture tests cover exact 19-response replay, receipt/data tampering, explicit global scope, unsupported scope, disabled external operations local-only request boundaries and launcher argument restrictions. Run the standalone source verifier as well. Build and browser verification outcomes belong to the implementation report, not inferred from this instruction list.
 
 ## Coordinated baseline revision
 
