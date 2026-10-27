@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "bde3bc017641da933a1e54438d0255c9a4269633",
-  "deployment": "https://people-analytics-fwlqimrvf-ed-56dc.vercel.app",
+  "sourceCommit": "95f4b8378b1b3f99fbabf08ac22b0cbed748643a",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "d74f3a267363a38ec3faf6c3064ee39c1c968d422f0658dcde7ddbc70c2fc52d",
-      "bytes": 10329
+      "sha256": "eefdaaeca330aec6b1c4ab38b73c8f8d7b779601d20ff71da23cce28e82591dd",
+      "bytes": 10972
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "e79e591e8d18969d63a89b822833edab281d42ae483c85637ef42ab9aee4961e",
-      "bytes": 105080
+      "sha256": "f3a867e54d0d171d56313efc9ce11860311244259a444d05a859451c927ac537",
+      "bytes": 104648
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 14577,
-      "sha256": "f0cf5b835ca849484a30e3e02c09d6fe2d6b37c84b25efbfe98f01120b9a19f4"
+      "bytes": 16392,
+      "sha256": "6030cf8ae8aa3d67683b12c23385e57c0ffa4e2a40a0ca31d526a39f7535e128"
     },
     {
       "path": "tests/about-project-profile.test.mjs",

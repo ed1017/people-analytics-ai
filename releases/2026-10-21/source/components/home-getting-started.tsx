@@ -22,13 +22,19 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
 }) {
   const [open,setOpen]=useState(false),id=useId();
   const [preferenceError,setPreferenceError]=useState<string|null>(null);
+  const [optedOut,setOptedOut]=useState(false);
   const dialog=useRef<HTMLDialogElement>(null),title=useRef<HTMLHeadingElement>(null),trigger=useRef<HTMLButtonElement>(null);
   const attempted=useRef(false),previousKey=useRef(dismissKey),restoreFocus=useRef(true),activeHome=useRef(active),launching=useRef(false);
   const fallback=()=>document.querySelector<HTMLButtonElement>('[data-orientation-return]');
-  const show=useCallback(()=>{if(!active||busy||!ready||!dialog.current||dialog.current.open)return;restoreFocus.current=true;launching.current=false;dialog.current.showModal();attempted.current=true;title.current?.focus();setOpen(true);},[active,busy,ready]);
+  const show=useCallback(()=>{
+    if(!active||busy||!ready||!dialog.current||dialog.current.open)return;
+    try{setOptedOut(localStorage.getItem(HOME_INTRO_OPT_OUT_KEY)==='1');setPreferenceError(null);}
+    catch{setPreferenceError('This browser could not read the saved introduction preference.');}
+    restoreFocus.current=true;launching.current=false;dialog.current.showModal();attempted.current=true;title.current?.focus();setOpen(true);
+  },[active,busy,ready]);
   const dismiss=()=>{dialog.current?.close();};
-  const optOut=()=>{
-    try{localStorage.setItem(HOME_INTRO_OPT_OUT_KEY,'1');setPreferenceError(null);dismiss();}
+  const changeOptOut=(checked:boolean)=>{
+    try{if(checked)localStorage.setItem(HOME_INTRO_OPT_OUT_KEY,'1');else localStorage.removeItem(HOME_INTRO_OPT_OUT_KEY);setOptedOut(checked);setPreferenceError(null);}
     catch{setPreferenceError('This browser could not save the preference. You can still close the introduction for this visit.');}
   };
   useEffect(()=>{activeHome.current=active;if(!active||previousKey.current!==dismissKey){restoreFocus.current=false;dialog.current?.close();}previousKey.current=dismissKey;},[active,dismissKey]);
@@ -40,7 +46,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
     attempted.current=true;
   },[ready,autoOpen,deferAutoOpen,active,busy,show]);
   useEffect(()=>{
-    const dismissed=(event:StorageEvent)=>{if(event.key===HOME_INTRO_OPT_OUT_KEY&&event.newValue==='1'){attempted.current=true;dialog.current?.close();}};
+    const dismissed=(event:StorageEvent)=>{if(event.key===HOME_INTRO_OPT_OUT_KEY){attempted.current=true;setOptedOut(event.newValue==='1');setPreferenceError(null);}};
     window.addEventListener('storage',dismissed);return()=>window.removeEventListener('storage',dismissed);
   },[]);
   const finish=()=>{
@@ -54,7 +60,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
   };
   return <section aria-label="Product introduction" className="min-w-0 text-sm">
     <div className="flex flex-wrap items-center justify-between gap-x-3">
-      <button ref={trigger} type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Introduction</button>
+      <button ref={trigger} data-orientation-return type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Introduction</button>
       {status}
     </div>
     {ready&&createPortal(<dialog ref={dialog} id={id} aria-labelledby={id+'-title'} aria-describedby={id+'-purpose'} onClose={finish} onCancel={event=>{event.preventDefault();dismiss();}} onClick={event=>{
@@ -63,7 +69,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dismiss();
     }} onKeyDown={event=>{
       if(event.key!=='Tab')return;
-      const controls=event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]');
+      const controls=event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]');
       const first=controls[0],last=controls[controls.length-1];
       if(event.shiftKey&&(document.activeElement===first||document.activeElement===title.current)){event.preventDefault();last?.focus();}
       else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
@@ -76,7 +82,10 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button type="button" disabled={!demoReady||busy||!active} onClick={start} className="min-h-11 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Start guided demo</button>
         <button type="button" onClick={dismiss} className="min-h-11 rounded-lg border px-4 py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Explore on my own</button>
-        <button type="button" onClick={optOut} className="min-h-11 rounded-lg px-4 py-2 text-sm font-medium text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">Do not show again</button>
+        <label htmlFor={id+'-opt-out'} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium">
+          <input id={id+'-opt-out'} type="checkbox" checked={optedOut} onChange={event=>changeOptOut(event.currentTarget.checked)} className="h-4 w-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"/>
+          Do not show again
+        </label>
       </div>
       {preferenceError&&<p role="alert" className="mt-2 text-sm text-destructive">{preferenceError}</p>}
       {!demoReady&&<p role="status" className="mt-2 text-sm">Finish loading or recover unsaved work to start the demo.</p>}
