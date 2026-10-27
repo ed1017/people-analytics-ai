@@ -21,7 +21,7 @@ import {buildHomeBundleFormat,homeBundleInstructions} from './home-solution-bund
 import {inspectBundleResponse} from './home-bundle-response.ts';
 import {homeBundleTask,homeBundleTaskInstructions} from './home-bundle-task.ts';
 import {homeTurnPurpose,homeConversationInstructions} from './home-conversation.ts';
-import {marketCarryEvidence} from './oews-reference.mjs';
+import {marketCarryEvidence} from './market-reference-carry.ts';
 
 import {createAnalyticsToolDispatch} from './analytics-tool-dispatch.mjs';
 const pages={workforce:'workforce',attrition:'attrition','workforce-planning':'workforce-planning',finance:'finance',skills:'skills','learning-development':'learning-development','career-mobility':'career-mobility','career-growth-mobility':'career-growth-mobility','succession-planning':'succession-coverage','talent-acquisition':'talent-acquisition','survey-sentiment':'survey-sentiment','occupational-references':'occupational-reference'};
@@ -56,7 +56,7 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
   const selectedBusinessContext=Object.fromEntries(['country','businessUnit','level'].filter(k=>typeof body.context?.[k]==='string').map(k=>[k,body.context[k].slice(0,160)]));
   const capacityPrompt=body.page==='workforce-planning'?capacityChatPrompt(body.capacityContext,{datasetToken:metadata().datasetToken,goalId:body.goalId??'',goal:goal.goal}):'';
   const carriedPlanningObjective=home&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
-  const context={evidence,capacityPrompt,carriedPlanningObjective,selectedBusinessContext,selectedContextNarrowsEvidence:false,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
+  const context={evidence,capacityPrompt,carriedPlanningObjective,selectedBusinessContext,selectedContextNarrowsEvidence:false,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference,goal.goal),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
   const input=missingPage?[...history,{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goal)+'\nQUESTION: '+message}]:[{role:'user',content:'CURRENT PUBLIC EVIDENCE AND USER INPUTS (separate; user/session inputs remain unverified): '+JSON.stringify(context)},...history,{role:'user',content:message}];
   if(home&&!summary&&[HOME_ACTION_REQUEST,HOME_BUNDLE_REQUEST].includes(message)){
    requireInput(body.hasFocusedIssue===true&&goal.goal&&body.goalContext?.goal===goal.goal,'Confirm an exact goal before preparing actions.');

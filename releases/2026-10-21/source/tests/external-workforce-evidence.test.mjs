@@ -176,9 +176,9 @@ test('UK selection displays distinct pay and scope, and preserves US location on
   assert.equal(select(tree,'-location').props.value,'GB');
   assert.equal(select(tree,'-location').props.disabled,true);
   assert.match(copy,/£59,862.50/); assert.match(copy,/£69,120.60/);
-  assert.match(copy,/tax year 6 April 2025–5 April 2026/); assert.match(copy,/provisional survey estimates/);
-  assert.match(copy,/not a local hiring offer or total employer cost/);
-  assert.match(copy,/Available candidates and time to fill are not measured/);
+  assert.match(copy,/6 April 2025-5 April 2026/); assert.match(copy,/provisional survey estimates/);
+  assert.match(copy,/National pay estimate/); assert.match(text(nodes(tree).find(n=>n.type==='details')),/not a hiring offer or total employer cost/);
+  assert.match(text(nodes(tree).find(n=>n.type==='details')),/Applicant availability and hiring time are not measured/);
   assert.doesNotMatch(copy,/Boston|New York|\$59|362,000/);
   select(tree,'-role').props.onChange({target:{value:'15-1252'}});
   assert.equal(select(render(),'-location').props.value,records[1].id);
@@ -231,8 +231,8 @@ test('Toronto display keeps candidate availability distinct and US selection int
   assert.equal(select(tree,'-location').props.value,'CA-3530');
   assert.match(copy,/1,065/); assert.match(copy,/CAD 60.95\/hour/);
   assert.match(copy,/Quality\s+C\s*:\s*Good/); assert.match(copy,/Quality\s+A\s*:\s*Excellent/);
-  assert.match(copy,/employer demand, not available candidates/); assert.match(copy,/not seasonally adjusted/);
-  assert.match(copy,/not Toronto city or its census metropolitan area/);
+  assert.match(copy,/Employer demand estimate/); assert.match(copy,/not seasonally adjusted/);
+  assert.match(copy,/Toronto economic region · Q2 2026 · not seasonally adjusted/); assert.match(text(nodes(tree).find(n=>n.type==='details')),/not Toronto city or its census metropolitan area/);
   assert.doesNotMatch(copy,/Boston|£59|US national/);
   select(tree,'-role').props.onChange({target:{value:'15-1252'}});
   assert.equal(select(render(),'-location').props.value,records[1].id);

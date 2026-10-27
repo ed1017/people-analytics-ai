@@ -26,7 +26,7 @@ import { CHAT_MODEL } from "@/lib/chat-model";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import {openAIProxyTransport} from "@/lib/openai-proxy-transport";
-import {marketCarryEvidence} from "../../../lib/oews-reference.mjs";
+import {marketCarryEvidence} from "../../../lib/market-reference-carry";
 import {goalSummaryInstructions} from "../../../lib/goal-context";
 import { normalizeHomePack, HOME_MAX_BYTES } from "../../../lib/home-pack.mjs";
 import { overviewBriefingPrompt } from "../../../lib/overview-briefing";
@@ -595,7 +595,7 @@ async function handlePOST(
       ? 'Describe the validated capacity calculation using its explicit user-entered workload scope; do not relabel it company-wide. Other evidence retains its own stated population and scope. Global workforce filters do not narrow manual workload assumptions.'
       : 'Use company or company-wide in user-facing explanations; internal scope markers do not change the source population.';
     const chatTools=progress?[...peopleAnalyticsTools,goalProgressReadTool]:peopleAnalyticsTools;
-    const marketReference=marketCarryEvidence(body?.marketReference);
+    const marketReference=marketCarryEvidence(body?.marketReference,goalContext.goal);
     if(summaryOnly&&!goalContext.goal.trim())return NextResponse.json({error:"Select a goal before requesting its page takeaway."},{status:400});
     const relatedGoalEvidence=Array.isArray(body?.goalEvidenceContext)?normalizeHomePack({sources:body.goalEvidenceContext.slice(0,3)}).sources.filter(source=>["T1","T2","A1","S1"].includes(source.id)&&source.facts).slice(0,3):[];
     const developmentSummary=body?.page==="development-planning"?normalizeHomePack({sources:[body?.developmentSummaryContext]}).sources.find(source=>source.id==="D1"):null;

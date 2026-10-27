@@ -3,10 +3,13 @@
 import { useId, useState } from "react"
 import { EXTERNAL_ROLE_SKILL_SOURCES, EXTERNAL_WORKFORCE_EVIDENCE, UK_SOFTWARE_PAY_REFERENCE, TORONTO_SOFTWARE_VACANCY_REFERENCE } from "@/lib/external-workforce-evidence"
 
+import type {MarketCarry} from '@/lib/market-reference-carry'
+
 const control = "min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
 const link = "font-medium text-teal-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
 
-export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252" }: { initialRole?: "15-1252" | "ca-21231" } = {}) {
+export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="", onCarry }: { initialRole?: "15-1252" | "ca-21231"; goal?:string; onCarry?:(carry:MarketCarry)=>void } = {}) {
+  const [carryError,setCarryError]=useState("")
   const id = useId()
   const [role, setRole] = useState<string>(initialRole)
   const [recordId, setRecordId] = useState(EXTERNAL_WORKFORCE_EVIDENCE[0].id)
@@ -43,21 +46,21 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252" }: { in
         <p className="font-semibold">{torontoOnly ? "Toronto vacancies and offered pay · survey estimates" : ukOnly ? "UK annual gross pay · provisional survey estimates" : skillsOnly ? "Role skills reference available" : "Local employment and pay estimates pending"}</p>
         {torontoOnly && <p>{toronto.occupation.title} · {toronto.occupation.taxonomy} {toronto.occupation.code}</p>}
         {ukOnly && <p>{ukPay.occupation.title} · {ukPay.occupation.taxonomy} {ukPay.occupation.code}</p>}
-        <p>{torontoOnly ? "Toronto, Ontario economic region · Q2 2026 (April–June) · not seasonally adjusted. This is not Toronto city or its census metropolitan area." : ukOnly ? "United Kingdom · full-time employee jobs · tax year 6 April 2025–5 April 2026. Employees on adult rates in the same job for more than a year." : skillsOnly ? `For ${record.geography.name}, local estimates are unavailable. Explore the US-wide role requirements below.` : `${record.geography.name}: the source is identified; verified figures are not loaded yet.`}</p>
+        <p>{torontoOnly ? "Toronto economic region · Q2 2026 · not seasonally adjusted" : ukOnly ? "United Kingdom · full-time employee jobs · 6 April 2025-5 April 2026" : skillsOnly ? `For ${record.geography.name}, local estimates are unavailable. Explore the US-wide role requirements below.` : `${record.geography.name}: the source is identified; verified figures are not loaded yet.`}</p>
       </div>
       {torontoOnly && <div className="space-y-2 text-sm">
         <dl className="grid gap-3 sm:grid-cols-2">
           <div><dt>Estimated job vacancies</dt><dd className="text-xl font-semibold">{toronto.vacancies.value === null ? "Unavailable" : toronto.vacancies.value.toLocaleString("en-CA")}</dd><dd>Quality {toronto.vacancies.quality}: {toronto.vacancies.qualityLabel}</dd></div>
           <div><dt>Average offered hourly wage (CAD)</dt><dd className="text-xl font-semibold">{toronto.averageOfferedHourlyWage.value === null ? "Unavailable" : `CAD ${toronto.averageOfferedHourlyWage.value.toFixed(2)}/hour`}</dd><dd>Quality {toronto.averageOfferedHourlyWage.quality}: {toronto.averageOfferedHourlyWage.qualityLabel}</dd></div>
         </dl>
-        <p>Vacancies measure employer demand, not available candidates. Applicant availability and time to fill are not measured. Offered pay is not actual pay or total employer cost.</p>
+        <p>Employer demand estimate.</p>
       </div>}
       {ukOnly && <div className="space-y-2 text-sm">
         <dl className="grid gap-3 sm:grid-cols-2">
           <div><dt>Median annual gross pay (GBP)</dt><dd className="text-xl font-semibold">{payLabel(ukPay.estimates.median)}</dd></div>
           <div><dt>Mean annual gross pay (GBP)</dt><dd className="text-xl font-semibold">{payLabel(ukPay.estimates.mean)}</dd></div>
         </dl>
-        <p>National occupation reference, not a local hiring offer or total employer cost. Available candidates and time to fill are not measured. No automatic mapping to internal roles.</p>
+        <p>National pay estimate.</p>
       </div>}
       {torontoOnly ? (
         <a className={link} href={toronto.source.url} target="_blank" rel="noopener noreferrer">View Statistics Canada vacancy data <span className="sr-only">(opens a new tab)</span></a>
@@ -68,20 +71,21 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252" }: { in
       ) : (
         <a className={link} href={record.source.url} target="_blank" rel="noopener noreferrer">View BLS area sources <span className="sr-only">(opens a new tab)</span></a>
       )}
+      {onCarry&&(ukOnly||torontoOnly)&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Carry reference to Planning</button><p className="mt-1 text-xs">{goal.trim()?'Saves this reference; assumptions stay unchanged.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
       <details className="text-sm text-slate-600">
         <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">Sources and definitions</summary>
         <div className="space-y-2 pt-1">
           {torontoOnly ? <>
             <p>{toronto.source.attribution}</p>
             <p>Released {toronto.releasedAt}; retrieved {toronto.retrievedAt}. Geography: {toronto.geography.taxonomy} {toronto.geography.code}. Quarterly estimates, not a sum of hires or current job listings.</p>
-            <p>{toronto.limitation}</p>
+            <p>{toronto.limitation}</p><p>Applicant availability and time to fill are not measured. Offered pay is not actual pay.</p>
             <p>Quality ratings include sampling variation, non-response, imputation and subject-matter assessment. Missing or suppressed values remain unavailable.</p>
             <a className={link} href={toronto.source.guideUrl} target="_blank" rel="noopener noreferrer">Survey definitions and quality guide <span className="sr-only">(opens a new tab)</span></a>
             <p><a className={link} href={toronto.source.licenseUrl} target="_blank" rel="noopener noreferrer">Statistics Canada Open Licence <span className="sr-only">(opens a new tab)</span></a></p>
           </> : ukOnly ? <>
             <p>{ukPay.source.publisher}, ASHE Table 14.7a, Full-Time sheet. Occupation {ukPay.occupation.code} ({ukPay.occupation.taxonomy}). Released {ukPay.releasedAt}; retrieved {ukPay.retrievedAt}. Provisional figures may be revised.</p>
             <p>Median coefficient of variation: {ukPay.estimates.medianCvPercent}%; mean: {ukPay.estimates.meanCvPercent}%. This describes sampling precision, not a pay range.</p>
-            <p>{ukPay.limitation}</p>
+            <p>{ukPay.limitation}</p><p>Full-time employee jobs on adult rates, in the same job for more than a year.</p>
             <p>{ukPay.source.license}.</p>
             <a className={link} href={ukPay.source.downloadUrl} target="_blank" rel="noopener noreferrer">Download the ONS source workbook archive <span className="sr-only">(opens a new tab)</span></a>
             <p><a className={link} href={ukPay.source.licenseUrl} target="_blank" rel="noopener noreferrer">Open Government Licence <span className="sr-only">(opens a new tab)</span></a></p>

@@ -1,12 +1,13 @@
 "use client";
 import {KeyFindings} from "@/components/key-findings";
 
-import type { ReactNode } from "react";
-import { marketComparisons, marketCarryEvidence, oewsOccupations, oewsAreas, oewsProvenance, defaultMarketSelection } from "@/lib/oews-reference.mjs";
+import {useState,type ReactNode} from "react";
+import { marketComparisons, oewsOccupations, oewsAreas, oewsProvenance, defaultMarketSelection } from "@/lib/oews-reference.mjs";
 import { nationalOutlookComparisons, nationalOutlookEvidence, outlookProvenance } from "@/lib/labor-outlook.mjs";
 
 export type MarketSelection = { soc: string; area: string };
-export type MarketCarry = MarketSelection & { goal: string };
+export type {MarketCarry} from '@/lib/market-reference-carry';
+import {marketCarryEvidence,type MarketCarry} from '@/lib/market-reference-carry';
 const money = (value: number | null | undefined) => typeof value === "number" && Number.isFinite(value)
   ? new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value) : "Unavailable";
 const count = (value: number | null | undefined) => typeof value === "number" && Number.isFinite(value) ? value.toLocaleString("en-US") : "Unavailable";
@@ -22,6 +23,7 @@ function ReferenceTable({ label, children }: { label: string; children: ReactNod
 export function MarketComparison({ selection, onChange, goal, onCarry }: {
   selection: MarketSelection; onChange: (value: MarketSelection) => void; goal: string; onCarry: (value: MarketCarry) => void;
 }) {
+  const [carryError,setCarryError]=useState('');
   const comparisons = marketComparisons(selection);
   const evidence = comparisons?.selected;
   const outlook = nationalOutlookEvidence(selection.soc);
@@ -79,8 +81,8 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
         <a href={outlookProvenance.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>BLS projection table 1.2</a>
       </article>
 
-      <div className="rounded-lg border bg-muted/20 p-4"><button disabled={!goal.trim()} onClick={() => onCarry({ ...selection, goal })} className="min-h-11 rounded bg-primary px-4 py-2 font-semibold text-primary-foreground disabled:opacity-50">Carry reference to Planning</button><p className="mt-2 text-sm text-muted-foreground">{goal.trim() ? "Carries selected pay and employment. Model assumptions stay unchanged." : "Pin a goal above to carry this reference."}</p></div>
-      <details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 font-semibold text-primary">Data details</summary>
+      <div className="rounded-lg border bg-muted/20 p-4"><button disabled={!goal.trim()} onClick={() => {try{onCarry({ ...selection, goal });setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}} className="min-h-11 rounded bg-primary px-4 py-2 font-semibold text-primary-foreground disabled:opacity-50">Carry reference to Planning</button><p className="mt-2 text-sm text-muted-foreground">{goal.trim() ? "Carries selected pay and employment. Model assumptions stay unchanged." : "Pin a goal above to carry this reference."}</p></div>
+      <p role="alert">{carryError}</p><details className="text-sm"><summary className="min-h-11 cursor-pointer py-2 font-semibold text-primary">Data details</summary>
         <h4 className="mt-3 font-semibold">Coverage and sources</h4>
         <p className="mt-2">OEWS May 2025, released May 15, 2026. Three occupations across the U.S., New York State and the full New York–Newark–Jersey City, NY-NJ metro. SOC {selection.soc}; geography code {selection.area}. These public-domain BLS extracts do not refresh automatically.</p>
         <h4 className="mt-4 font-semibold">Pay and employment</h4>
@@ -100,7 +102,14 @@ export function MarketComparison({ selection, onChange, goal, onCarry }: {
 }
 
 export function CarriedMarketReference({ carry, onClear }: { carry: MarketCarry; onClear: () => void }) {
+  const [removeError,setRemoveError]=useState('');
+  const clear=()=>{try{onClear();setRemoveError('');}catch(error){setRemoveError(error instanceof Error?error.message:'Reference could not be removed.');}};
   const evidence = marketCarryEvidence(carry);
   if (!evidence) return null;
-  return <section aria-label="Carried market reference" className="mx-6 mt-5 border-b pb-4 text-sm"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Market reference for your goal</h2><button onClick={onClear} className="min-h-11 rounded border px-2 py-1">Remove market reference</button></div><p className="mt-2">{evidence.selected.OCC_TITLE} · {evidence.selected.AREA_TITLE} · Median annual pay {money(evidence.selected.A_MEDIAN)} · BLS OEWS May 2025</p><p className="mt-1 text-xs text-muted-foreground">Reference only. Model assumptions are unchanged; wages exclude other employer costs.</p><details className="mt-2"><summary className="min-h-11 cursor-pointer py-2 text-primary">Reference details</summary><p className="mt-2">Carried goal: {evidence.goal}</p><p className="mt-1">25th–75th percentile: {money(evidence.selected.A_PCT25)}–{money(evidence.selected.A_PCT75)}. Employment: {count(evidence.selected.TOT_EMP)}, not available candidates. {evidence.selected.AREA === "35620" ? "Metro coverage extends beyond New York City." : ""}</p><a href={evidence.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>Official source · released May 15, 2026</a></details></section>;
+  if ('reference' in evidence) {
+    const reference=evidence.reference;
+    const pay='estimates' in reference?`Median annual gross pay: GBP ${reference.estimates.median?.toLocaleString('en-GB',{minimumFractionDigits:2})??'Unavailable'}`:`Average offered hourly wage: CAD ${reference.averageOfferedHourlyWage.value?.toFixed(2)??'Unavailable'}/hour`;
+    return <section aria-label="Carried market reference" className="mx-6 mt-5 border-b pb-4 text-sm"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Market reference for your goal</h2><button onClick={clear} className="min-h-11 rounded border px-2 py-1">Remove market reference</button></div><p>{reference.occupation.title} · {reference.geography.name}</p><p>{pay} · {reference.periodStart} to {reference.periodEnd}</p><p className="text-xs text-muted-foreground">Reference only. Hiring and development assumptions stay unchanged.</p><details><summary className="min-h-11 cursor-pointer py-2">Reference details</summary><p>Carried goal: {evidence.goal}</p><p>{reference.occupation.taxonomy} {reference.occupation.code} · {reference.geography.type} · Released {reference.releasedAt}</p>{'estimates' in reference?<p>Provisional annual gross pay; full-time employee jobs, adult rates, in the same job more than a year. Median CV: {reference.estimates.medianCvPercent??'Unavailable'}%.</p>:<p>Estimated vacancies: {reference.vacancies.value??'Unavailable'}; quality {reference.vacancies.quality} ({reference.vacancies.qualityLabel}). Offered wage quality {reference.averageOfferedHourlyWage.quality} ({reference.averageOfferedHourlyWage.qualityLabel}). Not seasonally adjusted.</p>}<p>{reference.limitation}</p><p>{evidence.planningStatus}</p><a href={reference.source.url} target="_blank" rel="noreferrer" className={sourceLink}>Official source</a></details><p role="alert">{removeError}</p></section>;
+  }
+  return <section aria-label="Carried market reference" className="mx-6 mt-5 border-b pb-4 text-sm"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-semibold">Market reference for your goal</h2><button onClick={clear} className="min-h-11 rounded border px-2 py-1">Remove market reference</button></div><p className="mt-2">{evidence.selected.OCC_TITLE} · {evidence.selected.AREA_TITLE} · Median annual pay {money(evidence.selected.A_MEDIAN)} · BLS OEWS May 2025</p><p className="mt-1 text-xs text-muted-foreground">Reference only. Model assumptions are unchanged; wages exclude other employer costs.</p><details className="mt-2"><summary className="min-h-11 cursor-pointer py-2 text-primary">Reference details</summary><p className="mt-2">Carried goal: {evidence.goal}</p><p className="mt-1">25th–75th percentile: {money(evidence.selected.A_PCT25)}–{money(evidence.selected.A_PCT75)}. Employment: {count(evidence.selected.TOT_EMP)}, not available candidates. {evidence.selected.AREA === "35620" ? "Metro coverage extends beyond New York City." : ""}</p><a href={evidence.sourceUrl} target="_blank" rel="noreferrer" className={sourceLink}>Official source · released May 15, 2026</a></details><p role="alert">{removeError}</p></section>;
 }

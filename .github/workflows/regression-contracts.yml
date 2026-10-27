@@ -57,7 +57,7 @@ jobs:
         run: node --test tests/home-turnover-investigation.test.mjs tests/external-workforce-evidence.test.mjs tests/synthetic-capacity-risk.test.mjs tests/dashboard-risk-presentation.test.mjs tests/swp-capacity-cost.test.mjs tests/group-capacity-risk.test.mjs
       - name: Verify aggregate wording and missing survey states
         working-directory: releases/2026-10-21/source
-        run: node --test tests/public-home-aggregate.test.mjs tests/urgent-missing-display.test.mjs
+        run: node --test tests/public-home-aggregate.test.mjs tests/urgent-missing-display.test.mjs tests/market-reference-carry.test.mjs tests/decision-brief-market-attribution.test.mjs
       - name: Run regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing
