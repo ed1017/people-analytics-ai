@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "568b064e59ad2001f5137fe4cc8e793893d3d887",
+  "sourceCommit": "47b621645b8de5f53cf43daced86615d6702d423",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -454,8 +454,8 @@
     },
     {
       "path": "components/goal-progress-summary.tsx",
-      "sha256": "235b2680fc004dae855947178c01b6b11c8334cb3da62effb246e79f14071899",
-      "bytes": 9321
+      "sha256": "24bf1e1c87099a8c0d3423c66931155e3102b2b749dc0083b6461773799cc489",
+      "bytes": 9862
     },
     {
       "path": "components/goal-takeaway.tsx",
@@ -1154,13 +1154,13 @@
     },
     {
       "path": "components/workforce-planning/capacity-saved-scenarios.tsx",
-      "sha256": "211a3f00c18277976621bfcb19001b1f56ca329b6946137e92b0f6b01494448e",
-      "bytes": 13409
+      "sha256": "404c735c77500b3609ede4a7027ccb62971f339eba4f963ff884e5fa2782253e",
+      "bytes": 13524
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "885ea088852c335700d2fdcdfd2832fd9452cdb687cf9f09108a804708ce19b9",
-      "bytes": 12968
+      "sha256": "e75aefffcd60e9a949ba2b2e5e9fd0a679e9ec57d8782a7fa5f88dea2da70ab5",
+      "bytes": 12590
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -2269,8 +2269,8 @@
     },
     {
       "path": "lib/home-evidence-recovery.mjs",
-      "sha256": "252195d7af135d2af973dd0cad786f318e59fc989eadad14cc1e12a1f47fa1cf",
-      "bytes": 2180
+      "sha256": "46e0cccef1df3997bc87a50a31a8640851a700a838548f2a6400bb7ac13d5ff4",
+      "bytes": 3490
     },
     {
       "path": "lib/home-exit-reason-chart.ts",
@@ -4651,6 +4651,16 @@
       "path": "tests/decision-brief-market-attribution.test.mjs",
       "bytes": 4408,
       "sha256": "dcc6bbb07b3c4bd19f121a0cb18ffbdbb2cff26cd4c0d346cad216fab1726c6e"
+    },
+    {
+      "path": "tests/home-public-error-reference.test.mjs",
+      "bytes": 3424,
+      "sha256": "d70a16a0d63c725451876506a69178a47574f291f756f1f851b107bda49c9734"
+    },
+    {
+      "path": "tests/planning-empty-progress.test.mjs",
+      "bytes": 3914,
+      "sha256": "22e74903ccf2b1ab893ac8545a78676744a047a376c1049994039d0b77417e78"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

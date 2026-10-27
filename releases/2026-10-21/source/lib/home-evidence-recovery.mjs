@@ -12,6 +12,17 @@ const evidenceMessages={
  evidence_scope_mismatch:'The evidence does not match the selected scope. '+refresh,
  evidence_verification_failed:'Current database evidence could not be verified. '+refresh,
 };
+// These are the public route's fixed messages, not provider exception text.
+// Unknown text for a recognized code uses its fixed fallback instead.
+const publicFailureMessages={
+ home_answer_unavailable:['The AI response could not be verified. This is an app processing failure, not a problem with your question. No completed answer was saved.'],
+ home_request_unverified:['This request or its current evidence could not be checked. Refresh Home, review the selected scope, and try again.'],
+ home_request_interrupted:['This answer took too long or was cancelled. No completed answer was saved. You can review your question and send it again.'],
+ planner_admission_unavailable:[
+  'AI could not start this answer because spending approval is unavailable. Ask the app owner to check the remaining budget or budget service before retrying.',
+  'AI could not finish this answer because spending approval for the next step is unavailable. Ask the app owner to check the budget before retrying.',
+ ],
+};
 /** @param {{trigger:string,readFailure?:string|null}} diagnostic */
 export function solutionEvidenceCode(diagnostic){
  return diagnostic.trigger==='reader_failed'&&diagnostic.readFailure==='source_authentication'?'evidence_source_auth_unavailable':'evidence_'+diagnostic.trigger;
@@ -27,6 +38,11 @@ export function homeConversationErrorMessage(value){
  if(typeof raw.code==='string'&&Object.hasOwn(evidenceMessages,raw.code)){
   const reference=correlationReceipt(raw.correlationId);
   return 'Your latest request was not answered. '+solutionEvidenceMessage(raw.code)+' Your draft and earlier work are kept.'+(reference?' Reference: '+reference+'.':'');
+ }
+ if(typeof raw.code==='string'&&Object.hasOwn(publicFailureMessages,raw.code)){
+  const messages=publicFailureMessages[raw.code],message=messages.includes(raw.error)?raw.error:messages[0];
+  const reference=correlationReceipt(raw.correlationId);
+  return message+(reference?' Reference: '+reference+'.':'');
  }
  return typeof raw.error==='string'?raw.error:'The conversation response is unavailable.';
 }

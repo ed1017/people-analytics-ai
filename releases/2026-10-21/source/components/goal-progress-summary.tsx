@@ -16,7 +16,8 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
  const a=context.assessment,m=context.measurement,baseline=snapshot?snapshot.baseline:a.baseline?.observation,latest=snapshot?snapshot.latest:a.latestComparable?.observation;
  const next=snapshot?.nextAction??'Review the measurement definition and record dated results in chat.';
  const absent=!snapshot?.hasObservations&&!baseline&&!latest,missing=absent?'Not yet measured':'Comparable measurement unavailable';
- return <section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
+ const unconfigured=!!snapshot&&!m&&absent&&!snapshot.stale&&!a.latestReceivedId&&a.currentStatus==='undefined'&&a.gap===null&&!context.history.length&&!context.milestones.length&&!context.planLinks.length&&!pinnedPlanName&&plan?.status!=='available';
+ const content=<section aria-label="Goal progress" className="min-w-0 space-y-1 break-words rounded border p-3 text-sm">
   <h2 className="font-semibold">Goal progress{goal?` · ${goal}`:''}</h2>
   {pinnedPlanName&&<p><strong>Pinned proposal:</strong> {pinnedPlanName}. Selection is not approval or execution.</p>}
   <p aria-label="Saved progress target"><strong>Target:</strong> {m?`${number(m.target.value)} ${m.unit} by ${m.target.date} · ${targetDirection[m.direction]}`:'Not defined. Review a metric, scope, baseline and target before tracking progress.'}</p>
@@ -43,6 +44,7 @@ export function GoalProgressSummary({context,snapshot,plan,goal,pinnedPlanName}:
    </div>
   </details>
  </section>;
+ return unconfigured?<details className="min-w-0 text-sm"><summary className="min-h-11 cursor-pointer rounded py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Goal progress · Not yet measured</summary>{content}</details>:content;
 }
 function SelectedProgress(){
  const state=useDecisionStorage(),[today,setToday]=useState<string|null>(null);
