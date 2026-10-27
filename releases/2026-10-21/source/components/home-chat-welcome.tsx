@@ -50,6 +50,7 @@ export function welcomeScale(values: readonly number[]) {
 }
 
 export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> & {
+  onReviewSyntheticCapacity?:()=>void;
   onQuestion: (question: string) => void;
   onNavigate: (page: AppPage) => void;
   disabled?: boolean;
@@ -65,7 +66,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
 };
 
 export type HomeSnapshotProps = Pick<HomeChatWelcomeProps, 'overview'|'receipt'|'requested'|'scopeLabel'|'loading'|'error'|'trend'>;
-export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string}) {
+export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus,onReviewSyntheticCapacity}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string;onReviewSyntheticCapacity?:()=>void}) {
   const scopeId = useId();
   const {point:tooltipPoint,tooltip}=useChartPointerTooltip(JSON.stringify([requested,receipt,loading,error,overview?.snapshot_date,overview?.headcount,trend,projection,projectionStatus]));
   const verified = isVerifiedDashboardScope(receipt) && (['country', 'org', 'level'] as const).every(key => receipt?.effective?.[key] === requested[key]);
@@ -99,7 +100,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         {current ? <ul>{snapshotFindings(current, scopeLabel, true).items.map(item=><li key={item}>{item}</li>)}</ul> : <p role="status">{loading ? 'Updating findings…' : 'Verified findings unavailable.'}</p>}
       </section>
 
-      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate}/>}
+      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate} onReviewSyntheticCapacity={onReviewSyntheticCapacity}/>}
       <p id={scopeId} className={styles.scope}>{scopeLabel}{current ? ` · As of ${snapshotDate}` : ''} · Recorded workforce history</p>
       <div className={styles.snapshotGrid}><div className={styles.snapshotCharts}>
         <p className={styles.chartHeadcount}>Current headcount <strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong>{known(headcount) ? ' people' : ''}</p>
@@ -143,9 +144,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows,onReviewSyntheticCapacity}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
-    <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
+    <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary onReviewSyntheticCapacity={onReviewSyntheticCapacity} overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <HomeCompanyIntro datasetToken={receipt?.version === 3 && isVerifiedDashboardScope(receipt) ? receipt.datasetToken : undefined} asOf={overview?.snapshot_date}/>
     <h3>What decision are you facing?</h3>
     <HomePromptCategories onQuestion={onQuestion} disabled={disabled} templates={templates}/>

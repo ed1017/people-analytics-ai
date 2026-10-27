@@ -50,7 +50,7 @@ export function CapacityWorkspace(){
  return <section aria-label="Workload capacity planning" className="capacity-workspace @container/capacity space-y-4">
   <KeyFindings findings={!error ? capacityFindings(result, isPreview) : null} />
   <p className="text-sm text-muted-foreground">Enter the work and the team you expect to have. Blank numbers stay unknown.</p>
-  {draft.sourceNote&&<aside aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><strong>Illustrative handoff origin</strong><p>{draft.sourceNote}</p><p>Edit the transferred assumptions below. The original reduction is already included.</p></aside>}
+  {draft.sourceNote&&<details aria-label="Scenario origin" className="rounded border bg-card p-3 text-sm"><summary className="cursor-pointer font-medium">Scenario origin</summary><p>{draft.sourceNote}</p><p>Edit the transferred assumptions below. Transferred values are already included; they are not applied a second time.</p></details>}
   <SkillClientDemand goalKey={goalKey} onStart={draft=>setSession({draft,result:null,cost:null,error:'',scope:null,capture:null,saveName:''})}/>
   <div className="grid min-w-0 items-start gap-5 grid-cols-1 @min-[48rem]/capacity:grid-cols-[minmax(15rem,0.85fr)_minmax(0,1.65fr)]">
   <form noValidate onSubmit={event=>{event.preventDefault();calculate();}} className="min-w-0 space-y-3 rounded-xl border bg-background p-4">

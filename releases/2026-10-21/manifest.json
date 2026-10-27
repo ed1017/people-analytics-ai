@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "6400ea60f01b2c1b8a717cacf3a3247df32ffc0a",
-  "deployment": "https://people-analytics-reygm05bh-ed-56dc.vercel.app",
+  "sourceCommit": "4c6bc839ce4affbfb94157065102f747fd0b4ec9",
+  "deployment": "https://people-analytics-gqijoe6z0-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "291c7480f7dd005576c137782b674f6e1ba2fbe538d6a08beef6fd795168c706",
-      "bytes": 19419
+      "sha256": "c3a0b9b5c8a07f733410884ae8b00d710ef72cbfceb2defc372dd5be2599c33e",
+      "bytes": 19654
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "f3a867e54d0d171d56313efc9ce11860311244259a444d05a859451c927ac537",
-      "bytes": 104648
+      "sha256": "7f375d49a375428445a92b6814efcd14768ef4dbabd4e4518dc57e6c01d4aa7c",
+      "bytes": 105445
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -1159,8 +1159,8 @@
     },
     {
       "path": "components/workforce-planning/capacity-workspace.tsx",
-      "sha256": "7711912b7bcf2ab84c21d16e9974d73c2280788ff6a112a709c286891f2b2af2",
-      "bytes": 12902
+      "sha256": "885ea088852c335700d2fdcdfd2832fd9452cdb687cf9f09108a804708ce19b9",
+      "bytes": 12968
     },
     {
       "path": "components/workforce-planning/carried-planning-goal.tsx",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "6b92915373437bfa08b6c5c5d63201a38397e52545715b2a98dbfcbb04475add",
-      "bytes": 44213
+      "sha256": "f57b7d15d72b1ca261da6e61cc35022f07b6191b737c9664f15d9ed09a2cadc2",
+      "bytes": 44952
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "daa0f90855c9afdee895bd8a502e3d221788ec9af3bfe63e2dccecdfd172c6a2",
-      "bytes": 5454
+      "sha256": "2a4230e124925fe98f8da41854269ed86552ac6709285b95ca728d200d874f93",
+      "bytes": 6894
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 2596,
-      "sha256": "75da138d53a7dd5270d24dfaff4cab7ed2f94720e216a77acfe1accec0d8f94f"
+      "bytes": 3528,
+      "sha256": "66f6f12ef696844a995267f89b01fcd98564d742aef09314668a83d6eb659490"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 4163,
-      "sha256": "0f7599c6ebdd4a5a9a8842a8db07601340d0e39331bea67dc406353262f2ddcb"
+      "bytes": 6706,
+      "sha256": "af0a39b0ee4066c59b175f674c203962a2b10dc1c1a052565040f1a3f43aba85"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4489,8 +4489,8 @@
     },
     {
       "path": "lib/external-workforce-evidence.ts",
-      "bytes": 3337,
-      "sha256": "a067842c63917e5f883a84e55ede2f9cfe7ae490bdf255ccd86ef3c2b389e79c"
+      "bytes": 7602,
+      "sha256": "199b2400c0ff00bf4f0fef0b62154ffdc949833a2bb30ef25531628a19324afb"
     },
     {
       "path": "lib/position-design-scenario.ts",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 6391,
-      "sha256": "d408f0ad5ef51da7bd03b1b3df6e40601a575f95cbb8f7bad23c4eacfe9a9d65"
+      "bytes": 10921,
+      "sha256": "f32e6a9bb98620e6d2dac4decb1def7c6bb77d7f18c54b38967441d959776049"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
@@ -4601,6 +4601,36 @@
       "path": "tests/position-dashboard.test.mjs",
       "bytes": 8667,
       "sha256": "f6bd3238e817f1d2a76f5ea1daef2858de6070b0f62c25562395cc3dbae886f8"
+    },
+    {
+      "path": "components/synthetic-capacity-risk-scenario.tsx",
+      "bytes": 2222,
+      "sha256": "d2116640348801ad7317fbcdd95d72e445da80c8439b7c7c9d3787e895abedd2"
+    },
+    {
+      "path": "lib/home-turnover-investigation.mjs",
+      "bytes": 4043,
+      "sha256": "b6afcab1b9c2024a40d2b8e3893ad0f64872ef03e07bf2d58a83ae66ca281e54"
+    },
+    {
+      "path": "lib/synthetic-capacity-risk.ts",
+      "bytes": 2033,
+      "sha256": "76976c277752f6df1656741158ff0cec9319963f240df580357f3605a00f3bc7"
+    },
+    {
+      "path": "tests/fixtures/external-workforce-evidence/ons-ashe-2026-source-extract.json",
+      "bytes": 4486,
+      "sha256": "bbe470a5479e4398258ccbcbb7be5a25d98493d97c2b2fe30c4fa9b90a68b7bb"
+    },
+    {
+      "path": "tests/home-turnover-investigation.test.mjs",
+      "bytes": 7113,
+      "sha256": "6de3582e36d6ab7a2a4d91f4291be974b15cc0e01fa6b17f24256a26d58fbe02"
+    },
+    {
+      "path": "tests/synthetic-capacity-risk.test.mjs",
+      "bytes": 10333,
+      "sha256": "af781e2cc041d481af4e4a8350d4ff21be3aa891e99d057f85f85b46cb75fd54"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

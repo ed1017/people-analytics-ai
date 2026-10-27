@@ -52,6 +52,9 @@ jobs:
       - name: Verify chart-first positions and intro controls
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-dashboard.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
+      - name: Verify sourced workforce evidence and synthetic workload
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/home-turnover-investigation.test.mjs tests/external-workforce-evidence.test.mjs tests/synthetic-capacity-risk.test.mjs tests/dashboard-risk-presentation.test.mjs tests/swp-capacity-cost.test.mjs tests/group-capacity-risk.test.mjs
       - name: Run regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing

@@ -71,3 +71,59 @@ export const EXTERNAL_ROLE_SKILL_SOURCES = Object.freeze([
     limitation: "Occupational tasks and skill requirements; not an assessment of local workers. Wage and employment references on this profile describe the broader Data Scientists occupation.",
   }),
 ])
+
+/** ONS cells use explicit suppression markers. Never coerce missing cells to zero. */
+export function parseOnsPayCell(value: unknown): number | null {
+  if (value === null || value === undefined || value === "" || value === "." || value === ".." || value === ":" || value === "x") return null
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) throw new Error("Invalid ONS pay cell")
+  return value
+}
+
+/** Only the reviewed annual/full-time/UK/SOC2020 slice is admitted by this importer. */
+export function validateOnsAnnualPaySlice(input: {
+  occupationCode: string; taxonomy: string; geographyCode: string; population: string;
+  currency: string; measure: string; periodStart: string; periodEnd: string;
+  median: unknown; mean: unknown; medianCvPercent: unknown; meanCvPercent: unknown;
+}) {
+  if (input.occupationCode !== "2134" || input.taxonomy !== "UK SOC 2020" || input.geographyCode !== "GB" ||
+      input.population !== "full-time employee jobs; adult rates; same job more than one year" ||
+      input.currency !== "GBP" || input.measure !== "annual gross pay" ||
+      input.periodStart !== "2025-04-06" || input.periodEnd !== "2026-04-05") throw new Error("Unsupported ONS pay scope")
+  const median = parseOnsPayCell(input.median), mean = parseOnsPayCell(input.mean)
+  const medianCvPercent = parseOnsPayCell(input.medianCvPercent), meanCvPercent = parseOnsPayCell(input.meanCvPercent)
+  // Unknown quality, disclosure suppression or CV above 20% must never expose a numeric estimate.
+  return Object.freeze({
+    median: medianCvPercent !== null && medianCvPercent <= 20 ? median : null,
+    mean: meanCvPercent !== null && meanCvPercent <= 20 ? mean : null,
+    medianCvPercent, meanCvPercent,
+  })
+}
+
+/** A separate national pay reference, never a substitute for the selected US metro. */
+export const UK_SOFTWARE_PAY_REFERENCE = Object.freeze({
+  id: "ons-ashe-2026-provisional-2134-full-time-annual-gross-gb",
+  occupation: Object.freeze({ code: "2134", title: "Programmers and software development professionals", taxonomy: "UK SOC 2020" }),
+  geography: Object.freeze({ code: "GB", name: "United Kingdom", type: "national" }),
+  population: "full-time employee jobs; adult rates; same job more than one year",
+  currency: "GBP", measure: "annual gross pay", periodStart: "2025-04-06", periodEnd: "2026-04-05",
+  releasedAt: "2026-10-22", retrievedAt: "2026-10-27", revision: "provisional",
+  estimates: validateOnsAnnualPaySlice({
+    occupationCode: "2134", taxonomy: "UK SOC 2020", geographyCode: "GB",
+    population: "full-time employee jobs; adult rates; same job more than one year",
+    currency: "GBP", measure: "annual gross pay", periodStart: "2025-04-06", periodEnd: "2026-04-05",
+    median: 59862.5, mean: 69120.6, medianCvPercent: 2.4, meanCvPercent: 2,
+  }),
+  availableCandidates: null, timeToFillDays: null, employmentJobs: null,
+  source: Object.freeze({
+    publisher: "Office for National Statistics",
+    url: "https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/occupation4digitsoc2010ashetable14",
+    downloadUrl: "https://www.ons.gov.uk/file?uri=%2Femploymentandlabourmarket%2Fpeopleinwork%2Fearningsandworkinghours%2Fdatasets%2Foccupation4digitsoc2010ashetable14%2F2026provisional%2Fashetable142026provisional.zip",
+    archiveSha256: "4719f364d596739679d1bb492a1fc42e4c8e980a5b93ffc791e350f4ba8f4f1d",
+    workbook: "PROV - Occupation  SOC20 (4) Table 14.7a   Annual pay - Gross 2026.xlsx",
+    qualityWorkbook: "PROV - Occupation  SOC20 (4) Table 14.7b   Annual pay - Gross 2026 CV.xlsx",
+    sheet: "Full-Time", row: 86, medianCell: "D86", meanCell: "F86",
+    license: "Open Government Licence v3.0; contains public sector information licensed under the Open Government Licence v3.0",
+    licenseUrl: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  }),
+  limitation: "UK national occupational pay reference, not an exact mapping to an internal role or a US metro estimate. Gross employee pay is not a hiring offer or total employer cost. No currency conversion. Provisional survey estimates may be revised. Applicant availability and hiring time are not measured. Indicative job-count cells are not imported.",
+})

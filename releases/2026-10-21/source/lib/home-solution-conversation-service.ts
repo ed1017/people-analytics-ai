@@ -8,6 +8,7 @@ import {modelCitationCatalog} from './model-citation-catalog.mjs';
 // @ts-expect-error Native Node tests share application source.
 import {scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
 import {homeAggregateTool} from './home-aggregate-tool.mjs';
+import {turnoverInvestigationReply} from './home-turnover-investigation.mjs';
 import {acceptsPublicHomeReceipt,isPublicHomeReceiptCandidate} from './public-home-receipt.mjs';
 import type {createPublicHomeGrounding} from './public-home-grounding.server.mjs';
 // @ts-expect-error Native fixtures share source.
@@ -116,6 +117,12 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    const result=mismatch?{answer:mismatch}:await compareScenarioForChat(draft,signal);abort(signal);clearTurnoverChat(state);
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:result.answer}].slice(-32);state.questions=[];
   return {requestId:request.requestId,answer:result.answer,charts:[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
+ const investigation=!runtime.staffingScenarioOnly&&!runtime.demand&&!runtime.scenario&&runtime.readDatasetQuestions?await turnoverInvestigationReply(request.message.text,runtime.readDatasetQuestions,signal):null;
+ if(investigation){
+  clearTurnoverChat(state);
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:investigation.answer}].slice(-32);state.questions=[];
+  return {requestId:request.requestId,answer:investigation.answer,charts:investigation.charts??[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
  const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
  clearTurnoverChat(state);
