@@ -1,5 +1,9 @@
 # Active roadmap - October 27
 
+## Active: chart-first position dashboard
+
+User-approved October 27: redesign Position & Workforce Design around a populated chart of budgeted positions, filled/vacant totals and vacant recruiting/frozen/other status. No required written goal or empty-form gate. Inspect and document the distinction between approved budgets, position status and requisition coverage before adding synthetic assumptions. Preserve existing saved scenario revisions and goal isolation; advanced editing remains secondary. Source reconciliation and implementation are in progress alongside the independent introduction-checkbox release. No paid data or model calls.
+
 ## Current release: durable Live AI verification
 
 PR426 is live: position modeling and source-only external workforce references, runtime `7d0496874f5b995f427783488105a58f96fdab6a`, deployment `dpl_4hqgnfh6SN8YdUz5edfvfemYNLUQ`. Public desktop/mobile each passed 11 controlled journeys, including saved goal isolation and current/proposed revisions. External numeric evidence is still unavailable; no talent-pool numbers are invented.

@@ -18,16 +18,16 @@ test('only explicit opt-out suppresses a new load; legacy dismissal and saved st
 function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')return;out.push(n);React.Children.forEach(n.props?.children,walk);}walk(tree);return out;}
 function harness(initial={}){
  let cursor=0,props={busy:false,active:true,ready:true,autoOpen:true,dismissKey:'one',onNavigate:()=>{},onStartDemo:()=>{starts++;},...initial},starts=0,focus='',writes=[],listeners={},current;
- const states=[],refs=[],deps=[],effects=[];
+ const states=[],refs=[],deps=[],effects=[],storage=new Map(initial.storedOptOut?[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]:[]);
  const fallback={focus:()=>{focus='fallback';}},title={focus:()=>{focus='title';}},trigger={getClientRects:()=>[],focus:()=>{focus='trigger';}};
  const native={open:false,shown:0,showModal(){this.open=true;this.shown++;},close(){if(this.open){this.open=false;nodes(current).find(n=>n.type==='dialog').props.onClose();}}};
  const source=ts.transpileModule(fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,exports={};
  const document={body:{},activeElement:null,querySelector:()=>fallback};
- vm.runInNewContext(source,{exports,document,localStorage:{setItem:(...args)=>{if(props.storageFails)throw Error('blocked');writes.push(args);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(effect);}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:require(name)});
+ vm.runInNewContext(source,{exports,document,localStorage:{getItem:key=>storage.get(key)??null,setItem:(...args)=>{if(props.storageFails)throw Error('blocked');storage.set(...args);writes.push(args);},removeItem:key=>{if(props.storageFails)throw Error('blocked');storage.delete(key);writes.push([key,null]);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(effect);}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:require(name)});
  const render=()=>{cursor=0;current=exports.HomeGettingStarted(props);for(const n of nodes(current)){if(n.type==='dialog')n.props.ref.current=native;if(n.type==='h2')n.props.ref.current=title;if(n.type==='button'&&n.props.ref)n.props.ref.current=trigger;}return current;};
  const flush=(next={})=>{props={...props,...next};render();for(const e of effects.splice(0))e();return render();};
  const button=text=>nodes(current).find(n=>n.type==='button'&&n.props.children===text);
- return {document,flush,button,native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
+ return {document,flush,button,checkbox:()=>nodes(current).find(n=>n.type==='input'&&n.props.type==='checkbox'),native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
 }
 test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
@@ -78,14 +78,16 @@ test('explicit intro resume releases only local demo debounce and retains shared
  assert.equal(launches,1);assert.equal(recentSuggestions.current.has('question:other'),true);
  assert.match(source,/queuedSuggestion.current\|\|chatLoading\|\|sending.current/);
  assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
- assert.match(source,/data-orientation-return[\s\S]*?onClick=\{startIntroDemo\}/);
+ assert.doesNotMatch(source,/>Planning Scenario<\/button>/);
+ assert.ok(source.includes('onStartDemo={startIntroDemo}'));
+ const intro=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(intro,/data-orientation-return[\s\S]*?onClick=\{show\}/);
 });
 test('expanded creator introduction keeps keyboard-scrollable content separate from persistent actions',()=>{
  const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');
  assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(header.props.className,/shrink-0/);
  const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
  assert.deepEqual(headings,['Purpose of the project','What you can do','Try a planning decision','How to read the results','Project development','Contact Ed Om']);
- assert.equal(nodes(header).filter(n=>n.type==='button').length,3);
+ assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
 });
 
@@ -106,11 +108,20 @@ test('blocking recovery defers introduction, then opens once without repeated na
  h.button('Explore on my own').props.onClick();h.flush({active:false});h.flush({active:true});assert.equal(h.native.shown,1);
  assert.deepEqual(h.writes,[]);
 });
-test('explicit opt-out alone writes preference and manual reopening remains available',()=>{
- const h=harness();h.flush();h.button('Do not show again').props.onClick();h.flush();assert.equal(h.native.open,false);
+test('checkbox persists both directions without closing and reflects opt-out on reopen',()=>{
+ const h=harness();h.flush();assert.equal(h.checkbox().props.checked,false);
+ h.checkbox().props.onChange({currentTarget:{checked:true}});h.flush();assert.equal(h.native.open,true);assert.equal(h.checkbox().props.checked,true);
  assert.deepEqual(h.writes,[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]);
- h.flush({autoOpen:false});h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.open,true);
- h.dialog().props.onCancel({preventDefault(){}});h.flush();assert.equal(h.writes.length,1);
+ h.button('Explore on my own').props.onClick();h.flush({autoOpen:false});h.button('Introduction').props.onClick();h.flush();assert.equal(h.checkbox().props.checked,true);
+ h.checkbox().props.onChange({currentTarget:{checked:false}});h.flush();assert.equal(h.native.open,true);assert.equal(h.checkbox().props.checked,false);
+ assert.deepEqual(h.writes.at(-1),[onboarding.HOME_INTRO_OPT_OUT_KEY,null]);
+ const opted=harness({autoOpen:false,storedOptOut:true});opted.flush();opted.button('Introduction').props.onClick();opted.flush();assert.equal(opted.checkbox().props.checked,true);
+});
+test('checkbox has a matching label and participates in modal focus; cross-tab preference does not close it',()=>{
+ const h=harness(),all=nodes(h.flush());assert.ok(all.some(n=>n.type==='label'&&n.props.htmlFor===h.checkbox().props.id));
+ const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/input:not\(:disabled\)/);
+ h.listeners.storage({key:onboarding.HOME_INTRO_OPT_OUT_KEY,newValue:'1'});h.flush();assert.equal(h.checkbox().props.checked,true);assert.equal(h.native.open,true);
+ h.listeners.storage({key:onboarding.HOME_INTRO_OPT_OUT_KEY,newValue:null});h.flush();assert.equal(h.checkbox().props.checked,false);assert.equal(h.native.open,true);
 });
 test('ordinary dismissal, Escape, backdrop and demo launch never write an opt-out',()=>{
  for(const action of ['close','escape','backdrop','demo']){
@@ -124,7 +135,7 @@ test('ordinary dismissal, Escape, backdrop and demo launch never write an opt-ou
  }
 });
 test('failed opt-out is reported without trapping ordinary close',()=>{
- const h=harness({storageFails:true});h.flush();h.button('Do not show again').props.onClick();const tree=h.flush();
+ const h=harness({storageFails:true});h.flush();h.checkbox().props.onChange({currentTarget:{checked:true}});const tree=h.flush();assert.equal(h.checkbox().props.checked,false);
  assert.equal(h.native.open,true);assert.ok(nodes(tree).some(n=>n.props?.role==='alert'));assert.deepEqual(h.writes,[]);
  h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
 });
