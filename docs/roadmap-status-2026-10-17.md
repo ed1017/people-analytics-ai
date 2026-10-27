@@ -2,11 +2,11 @@
 
 ## Current live release and active parallel work
 
-### Active candidate: comprehensive editorial cleanup and guided-demo recovery
+### PR440 live - comprehensive editorial cleanup and guided-demo recovery
 
-Runtime `0c8ab9a8b69c2f9b371633828d9385e70fc2f737` is prepared across 101 runtime files. The candidate removes repeated primary caveats/internal QA prose across public surfaces, keeps essential definitions in Details, fixes demonstrated intro background-scroll chaining, calculates the existing recommendation after explicit example adoption, and completes the supported BU FTE-decline answer with evidence and investigation guidance. README is product-first, with operational records moved to docs. Independent review, 901/901 aggregate tests and TypeScript passed; lint has zero errors and one test-only unused-variable warning. Hosted staging, exact-head release CI, promotion and public checks are pending. PR438 remains the last verified live runtime below. [Candidate verification and limitations](release-verification-editorial-2026-10-27.md).
+Runtime `394fedbb6c7162216df1b1c50bd961b364aa4038`, deployment `dpl_Ew6ENEJWrRvPq9HNF41xeSDT4wWe`, source `4b2db3792b30e6763fec81cd2a54b1d9a297f1d2`, merge `b9a4484b644cd2d8d9e5a4b16ce94bee8218ba6c`. Exact-head CI 40535413252 passed, including 3,092 root contracts. Independent review, runtime regressions and protected desktop/mobile checks passed. Direct public desktop verification passed; final mobile evidence is being recorded. Repeated primary caveats/internal QA prose moved into Details across the public modules, planners and answer templates. The red risk preamble is removed; intro background scrolling is contained; explicit example adoption immediately calculates the existing recommendation; supported BU FTE investigation returns dated change, chart and action guidance. README leads with the product and decisions. [Release verification and limits](release-verification-editorial-2026-10-27.md).
 
-The FTE cause lacks a reconciled movement-level decomposition; the original blank-screen report and uncorrelated provider failure are not claimed fixed. No paid model acceptance, financial/access change or new data generation is included. Two old digest expectations were corrected only after the unchanged baseline reproduced the failures and released position-field history explained the difference.
+The original blank-screen trigger and uncorrelated provider failure remain unresolved. FTE observations do not establish a causal movement decomposition. No paid model acceptance or financial/access changes were made.
 
 ### PR438 live — public browser verification passed
 
