@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "8600d5053e0cd5c09430f08c06c3e676ae29d9f9",
-  "deployment": "https://people-analytics-de70jlvm0-ed-56dc.vercel.app",
+  "sourceCommit": "995d96f61dadb6d90d4c5e9056a44bc9fb9530c8",
+  "deployment": "https://people-analytics-eisl1m8lz-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "106d0c16e5b42dc53402cf11d056280c170b79702d09987e5158aebda3c3bb3b",
-      "bytes": 90909
+      "sha256": "fbad998a3585481661f20eb68209b1699f7673c7413c8f8c86fabcb735173176",
+      "bytes": 91046
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "sha256": "4ab48532f78638eb6c0466493409ae6d6da543ca7c3412dce2b272a31b5ffb73",
-      "bytes": 5130
+      "sha256": "5d9585c16193667646e36f20441d3464bdf55e122f7179e70e53228651d94c04",
+      "bytes": 5760
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -4706,6 +4706,56 @@
       "path": "tests/home-bu-turnover-chat.test.mjs",
       "bytes": 12332,
       "sha256": "c4608d10e4086e85ba1a680bf085d749965d5304c3a41c305cad64ba0322acea"
+    },
+    {
+      "path": "components/fow-lab-reference.tsx",
+      "bytes": 4048,
+      "sha256": "5a52de67ae3b5d31e21ace28b4b152ce19f9d875a4e1ee051c875640ac8be3bf"
+    },
+    {
+      "path": "components/fow-lab-workspace.module.css",
+      "bytes": 4668,
+      "sha256": "4a9c2c171d08a54e8b27a3fc9faff192b714d0147474a492b23060522c609496"
+    },
+    {
+      "path": "components/fow-lab-workspace.tsx",
+      "bytes": 13925,
+      "sha256": "97961eb8c8d1eee0f2456e646f5664ffc6288aa249012df547b125fc58912d79"
+    },
+    {
+      "path": "data/fow-lab-reference-catalog.json",
+      "bytes": 7268,
+      "sha256": "2116df725e39f2cd2ed7e0e071be1054b3867c351dd2b7a7e31d9fb54be2cf3d"
+    },
+    {
+      "path": "data/fow-lab-snapshot.json",
+      "bytes": 596570,
+      "sha256": "09b7d64a46689ede86a69e9cfd116e9a9f2d683d05fca48ab2f84a9e95071542"
+    },
+    {
+      "path": "docs/fow-lab-integration.md",
+      "bytes": 2787,
+      "sha256": "70ffcfb6f5a03f281c77a87256e5384b85aa06cf6e68138fbf9f55655cb619b9"
+    },
+    {
+      "path": "lib/fow-lab-reference.ts",
+      "bytes": 4046,
+      "sha256": "b5570f5ae040f66a14bc984d4c362b4d27b7f1cbc8f2c41eb45810f91a527351"
+    },
+    {
+      "path": "lib/fow-lab.ts",
+      "bytes": 19993,
+      "sha256": "a0dcb7c1e7c1b6d44d20fbbd701e5bba5bd0e04f6b89453e2e23613e9b7e09e4"
+    },
+    {
+      "path": "tests/fow-lab-reference.test.mjs",
+      "bytes": 8357,
+      "sha256": "514034e92615fbfaa17d73950b56280babc8c1f62de6903aa02aaa26a84e537d"
+    },
+    {
+      "path": "tests/fow-lab.test.mjs",
+      "bytes": 9464,
+      "sha256": "8d351527314eee2bca429f12b70309c276ef1d4fc3d5a62876ead5c7e338c1f7"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

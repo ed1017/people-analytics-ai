@@ -1,0 +1,315 @@
+{
+  "meta": {
+    "version": "fow-lab-2026-10-28-v1",
+    "sourceCommit": "295fe31e511d708e2261947a17a96f29257a3f65",
+    "exportedAt": "2026-10-28T03:36:50.974657+00:00",
+    "sourceRepository": "https://github.com/ed1017/future-of-work-lab",
+    "sourceDatasetCreatedAt": "2026-10-12T20:38:27.423336+00:00"
+  },
+  "dataset": {
+    "id": "builtin",
+    "name": "Ed’s Organization · Future of Work Lab",
+    "asOf": "2026-09-30",
+    "headcount": 10000,
+    "scopeLabel": "10,000 people · 15 functions · separate Lab dataset"
+  },
+  "functions": [
+    {
+      "function_name": "Consulting"
+    },
+    {
+      "function_name": "Corporate Communications"
+    },
+    {
+      "function_name": "Corporate Technology"
+    },
+    {
+      "function_name": "Customer Success"
+    },
+    {
+      "function_name": "Data & AI"
+    },
+    {
+      "function_name": "Engineering"
+    },
+    {
+      "function_name": "Finance"
+    },
+    {
+      "function_name": "Human Resources"
+    },
+    {
+      "function_name": "Legal"
+    },
+    {
+      "function_name": "Marketing"
+    },
+    {
+      "function_name": "Operations"
+    },
+    {
+      "function_name": "Procurement"
+    },
+    {
+      "function_name": "Product"
+    },
+    {
+      "function_name": "Sales"
+    },
+    {
+      "function_name": "Strategy & Corporate Development"
+    }
+  ],
+  "jobs": [
+    {
+      "job_key": "INFRA-ENG",
+      "title": "Infrastructure Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "QA-ENG",
+      "title": "Quality Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "CYBER-ENG",
+      "title": "Security Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "CYBER-ANA",
+      "title": "Cybersecurity Analyst",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "CLOUD-ARCH",
+      "title": "Cloud Architect",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "CLOUD-ENG",
+      "title": "Cloud Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "SWE-FRONT",
+      "title": "Frontend Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "SWE-BACK",
+      "title": "Backend Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "SWE-FULL",
+      "title": "Full Stack Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "SWE-GEN",
+      "title": "Software Engineer",
+      "function_name": "Engineering"
+    },
+    {
+      "job_key": "ML-ENG",
+      "title": "Machine Learning Engineer",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "BI-DEV",
+      "title": "BI Developer",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "BI-ANA",
+      "title": "Business Intelligence Analyst",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "AI-ARCH",
+      "title": "AI Solutions Architect",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "AI-ENG",
+      "title": "AI Engineer",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "DE-ARCH",
+      "title": "Data Architect",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "DE-ENG",
+      "title": "Data Engineer",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "DS-APPLIED",
+      "title": "Applied Data Scientist",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "DS-SCI",
+      "title": "Data Scientist",
+      "function_name": "Data & AI"
+    },
+    {
+      "job_key": "CONS-TRANS",
+      "title": "Transformation Consultant",
+      "function_name": "Consulting"
+    },
+    {
+      "job_key": "CONS-TECH",
+      "title": "Technology Consultant",
+      "function_name": "Consulting"
+    },
+    {
+      "job_key": "CONS-MGMT",
+      "title": "Management Consultant",
+      "function_name": "Consulting"
+    },
+    {
+      "job_key": "PMO-PGM",
+      "title": "Program Manager",
+      "function_name": "Operations"
+    },
+    {
+      "job_key": "PMO-PM",
+      "title": "Project Manager",
+      "function_name": "Operations"
+    },
+    {
+      "job_key": "OPS-CLIENT",
+      "title": "Client Operations Specialist",
+      "function_name": "Operations"
+    },
+    {
+      "job_key": "OPS-BUS",
+      "title": "Business Operations Analyst",
+      "function_name": "Operations"
+    },
+    {
+      "job_key": "SALES-OPS",
+      "title": "Sales Operations Analyst",
+      "function_name": "Sales"
+    },
+    {
+      "job_key": "SALES-AE",
+      "title": "Account Executive",
+      "function_name": "Sales"
+    },
+    {
+      "job_key": "CSM-GEN",
+      "title": "Customer Success Manager",
+      "function_name": "Customer Success"
+    },
+    {
+      "job_key": "UX-DES",
+      "title": "UX Designer",
+      "function_name": "Product"
+    },
+    {
+      "job_key": "PROD-PM",
+      "title": "Product Manager",
+      "function_name": "Product"
+    },
+    {
+      "job_key": "HR-HRIS",
+      "title": "HR Technology Analyst",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "HR-TM",
+      "title": "Talent Management Partner",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "HR-TR",
+      "title": "Total Rewards Partner",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "HR-TA",
+      "title": "Talent Acquisition Partner",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "HR-PA",
+      "title": "People Analytics Analyst",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "HR-HRBP",
+      "title": "HR Business Partner",
+      "function_name": "Human Resources"
+    },
+    {
+      "job_key": "FIN-TREAS",
+      "title": "Treasury Analyst",
+      "function_name": "Finance"
+    },
+    {
+      "job_key": "FIN-ACC",
+      "title": "Accountant",
+      "function_name": "Finance"
+    },
+    {
+      "job_key": "FIN-FPNA",
+      "title": "FP&A Analyst",
+      "function_name": "Finance"
+    },
+    {
+      "job_key": "MKT-GROWTH",
+      "title": "Growth Marketing Manager",
+      "function_name": "Marketing"
+    },
+    {
+      "job_key": "MKT-BRAND",
+      "title": "Brand Marketing Manager",
+      "function_name": "Marketing"
+    },
+    {
+      "job_key": "LEGAL-PRIV",
+      "title": "Privacy Counsel",
+      "function_name": "Legal"
+    },
+    {
+      "job_key": "LEGAL-COUNSEL",
+      "title": "Corporate Counsel",
+      "function_name": "Legal"
+    },
+    {
+      "job_key": "CORPDEV-ANA",
+      "title": "Corporate Development Analyst",
+      "function_name": "Strategy & Corporate Development"
+    },
+    {
+      "job_key": "STRAT-ANA",
+      "title": "Strategy Analyst",
+      "function_name": "Strategy & Corporate Development"
+    },
+    {
+      "job_key": "INFOSEC-ANA",
+      "title": "Information Security Analyst",
+      "function_name": "Corporate Technology"
+    },
+    {
+      "job_key": "IT-ENG",
+      "title": "Enterprise Systems Engineer",
+      "function_name": "Corporate Technology"
+    },
+    {
+      "job_key": "PROC-SOURCING",
+      "title": "Strategic Sourcing Manager",
+      "function_name": "Procurement"
+    },
+    {
+      "job_key": "COMMS-GEN",
+      "title": "Corporate Communications Manager",
+      "function_name": "Corporate Communications"
+    }
+  ]
+}
