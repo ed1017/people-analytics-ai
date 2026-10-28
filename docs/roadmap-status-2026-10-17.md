@@ -2,9 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR449 live - concise business answers
+### PR451 live - Overview headcount planner restored
 
-Runtime `9d4d109ac8917300eaf2aca977a4ab4421b7d024` is live on deployment `dpl_6Jhrr9Pz5BLnVLD6znJAo1haWry4`, merge `ba776a1e0e59e54ee09bccc82a76b8b51446f137`. Independent review, 974 runtime tests, TypeScript and exact-head CI `40712261342` passed. Protected/public desktop and mobile checks verified Details keyboard operation, visible findings and preserved drafts. One fresh provider response produced a 113-word primary decision brief with correct dated values; four actual follow-up requests used zero model rounds and matched all eight chart values to Attrition. This is bounded acceptance, not universal reliability. [Evidence and remaining limits](answer-acceptance-2026-10-28.md).
+Runtime `ec0606e070c22195020e4b53a4d1db5a35ef63ce` is live on deployment `dpl_51iene1Bk9uZeofy9MMeRzYgS8h2`, merge `1cd8488ac212b422e5afcfe3f27957824bdaf023`. Generic staffing-gap requests expose editable headcount controls; historical headcount results offer **Model headcount** while retaining recorded history. Edits survive Send and evidence refresh. **Back to saved plan** separates the saved editor from a new projection. [Acceptance and regression lesson](overview-headcount-acceptance-2026-10-28.md).
+
+Independent review, 980 runtime tests, TypeScript, exact-head CI `40731748406`, staged build, and public desktop/mobile checks passed. Public browser acceptance used actual readiness and projection-source GETs, calculations and persistence with controlled chat replies; zero paid model calls. FoW draft work remained separate after the screenshot clarified that the affected screen was Overview.
+
+### PR449 - concise business answers (previous release)
+
+Runtime `9d4d109ac8917300eaf2aca977a4ab4421b7d024` was released on deployment `dpl_6Jhrr9Pz5BLnVLD6znJAo1haWry4`, merge `ba776a1e0e59e54ee09bccc82a76b8b51446f137`. Independent review, 974 runtime tests, TypeScript and exact-head CI `40712261342` passed. Protected/public desktop and mobile checks verified Details keyboard operation, visible findings and preserved drafts. One fresh provider response produced a 113-word primary decision brief with correct dated values; four actual follow-up requests used zero model rounds and matched all eight chart values to Attrition. This is bounded acceptance, not universal reliability. [Evidence and remaining limits](answer-acceptance-2026-10-28.md).
 
 ### PR446/447 — verified answer-acceptance fixes
 
