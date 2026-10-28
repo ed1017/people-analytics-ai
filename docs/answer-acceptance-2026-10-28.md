@@ -1,6 +1,6 @@
 # Answer acceptance — October 28
 
-PR446 fixes an incomplete business-unit turnover comparison: seven available values must not be presented as a complete eight-unit ranking. Runtime `3698d2395aa004b498a63a1ad991681de9f7c200` is live on deployment `dpl_6Bq9iGkUAk6yBHV15kf6jQ7SpwWQ`; merge `3cc8b7eb6c9e68e3b0c03908716a203ce99abc8e`, exact-head CI `40702349750` passed. Independent review, 947 runtime tests, TypeScript and protected/public desktop/mobile regression checks passed.
+PR446 fixes an incomplete business-unit turnover comparison: seven available values must not be presented as a complete eight-unit ranking. Runtime `3698d2395aa004b498a63a1ad991681de9f7c200` was released on deployment `dpl_6Bq9iGkUAk6yBHV15kf6jQ7SpwWQ`; merge `3cc8b7eb6c9e68e3b0c03908716a203ce99abc8e`, exact-head CI `40702349750` passed. Independent review, 947 runtime tests, TypeScript and protected/public desktop/mobile regression checks passed.
 
 Four actual public chat requests subsequently passed with zero model rounds: historical-period clarification, explicit acceptance of available YTD data, investigation guidance and an explicit current-period question. All eight chart values matched the public Attrition response. Earlier harness failures were pre-submit timing or omitted response headers; they are not evidence of a provider failure.
 
