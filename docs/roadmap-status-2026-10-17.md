@@ -2,9 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR451 live - Overview headcount planner restored
+### PR453 live - selected-work modeling and reviewed scenario handoff
 
-Runtime `ec0606e070c22195020e4b53a4d1db5a35ef63ce` is live on deployment `dpl_51iene1Bk9uZeofy9MMeRzYgS8h2`, merge `1cd8488ac212b422e5afcfe3f27957824bdaf023`. Generic staffing-gap requests expose editable headcount controls; historical headcount results offer **Model headcount** while retaining recorded history. Edits survive Send and evidence refresh. **Back to saved plan** separates the saved editor from a new projection. [Acceptance and regression lesson](overview-headcount-acceptance-2026-10-28.md).
+Runtime `06a1be300a5ddf74db33b0fae01bcb9e5f244f5a`, deployment `dpl_aAkzh8xviJvQtqYogaKJ9WMaJXiY`, merge `9f6c01f2c4ca91205da2f269d1aebdc9be64ac24`. Model this work opens beside Lab selection using editable example assumptions, not exposure scores. Reviewed transfer requires explicit replacement of an occupied draft; saved capacity scenarios retain provenance and other goals. Independent review, 992 runtime tests, exact-head CI `40766781576`, and staged/public desktop and mobile calculation/save/reload checks passed. No paid provider calls.
+
+Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop/mobile guided scenario -> Action plans -> Track journeys passed nine checks each, including dated reporting, correction and retained history after reload. Some evidence panels remain incomplete; Assess & Evaluate is a placeholder. Career Growth ratings and occupational unavailable-detail response fixes are staged separately, not yet counted as live. [Completeness matrix](app-completeness-2026-10-28.md).
+
+### PR451 - Overview headcount planner restored (previous release)
+
+Runtime `ec0606e070c22195020e4b53a4d1db5a35ef63ce` was released on deployment `dpl_51iene1Bk9uZeofy9MMeRzYgS8h2`, merge `1cd8488ac212b422e5afcfe3f27957824bdaf023`. Generic staffing-gap requests expose editable headcount controls; historical headcount results offer **Model headcount** while retaining recorded history. Edits survive Send and evidence refresh. **Back to saved plan** separates the saved editor from a new projection. [Acceptance and regression lesson](overview-headcount-acceptance-2026-10-28.md).
 
 Independent review, 980 runtime tests, TypeScript, exact-head CI `40731748406`, staged build, and public desktop/mobile checks passed. Public browser acceptance used actual readiness and projection-source GETs, calculations and persistence with controlled chat replies; zero paid model calls. FoW draft work remained separate after the screenshot clarified that the affected screen was Overview.
 

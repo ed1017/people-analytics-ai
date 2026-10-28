@@ -1,4 +1,6 @@
 /** Display contract for the frozen aggregate release; never individual snapshot ratings. */
+// @ts-expect-error Native tests share TypeScript source.
+import {readDashboardScopeReceipt} from './dashboard-scope.ts';
 export type PerformanceFilters = { country: string; org: string; level: string };
 export const PERFORMANCE_VERSION = 'workforce-performance-2026-ytd-bu-v1';
 export const PERFORMANCE_DIGEST = '191ff33a4dd66c0e6484627441928a77fbb3ef883b428261964d768a65e9535c';
@@ -22,6 +24,20 @@ const keys = (value: Record<string, unknown>, expected: string[]) => Object.keys
 const count = (value: unknown): value is number => typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 export function supportsPerformanceFilters(filters: PerformanceFilters) {
   return filters.country === 'all' && filters.level === 'all' && (filters.org === 'all' || PERFORMANCE_BUS.some(bu => bu === filters.org));
+}
+/** Public 9037 source has its own lineage; never relabel it as the legacy 10k release.
+ * The server verifies the complete release. This view checks its current scope and denominator.
+ */
+export function resolvePublicWorkforcePerformance(value:unknown,filters:PerformanceFilters,population:number|null|undefined,scopeReceipt:unknown){
+ const receipt=readDashboardScopeReceipt(scopeReceipt);
+ if(receipt?.status!=='verified_public_aggregate'||receipt.stockStatus!=='positive'||!supportsPerformanceFilters(filters)||Object.entries(filters).some(([key,item])=>receipt.requested[key as keyof PerformanceFilters]!==item||receipt.effective?.[key as keyof PerformanceFilters]!==item)||!count(population)||population<=0)return null;
+ if(!record(value)||!keys(value,['version','source','snapshotDate','reviewPeriod','periodKind','filters','status','availabilityKind','simulatedAvailableAt','originalAvailableAt','provenance','notRatedStatus','counts'])||value.version!=='ratings-9037-2026-09-30-offline-v1'||value.source!=='employee_snapshots JOIN performance_reviews'||value.snapshotDate!=='2026-09-30'||value.reviewPeriod!=='2026 YTD'||value.periodKind!=='ytd'||value.status!=='available'||value.availabilityKind!=='simulated_convention'||value.simulatedAvailableAt!=='2026-09-30T23:59:59.999Z'||value.originalAvailableAt!==null||value.provenance!=='Constructed synthetic workforce; deterministic all-active demo ratings; not observed performance.'||value.notRatedStatus!=='not_collected'||!record(value.filters)||!keys(value.filters,['country','org','level'])||Object.entries(filters).some(([key,item])=>(value.filters as Record<string,unknown>)[key]!==item))return null;
+ const c=value.counts;
+ if(!record(c)||!keys(c,['population','rated','ratings','notRated','unavailable'])||c.population!==population||c.rated!==population||c.notRated!==null||c.unavailable!==0||!Array.isArray(c.ratings)||c.ratings.length!==5||!c.ratings.every(count))return null;
+ const ratings:number[]=c.ratings;
+ if(ratings.some(n=>n<10||population-n<10)||ratings.reduce((a,b)=>a+b,0)!==population)return null;
+ if(filters.org==='all'&&(population!==9037||ratings.some((n,i)=>n!==[396,1071,4634,2409,527][i])))return null;
+ return {version:value.version,snapshotDate:value.snapshotDate,reviewPeriod:value.reviewPeriod,filters:{...filters},counts:{population,rated:population,ratings:[...ratings],notRated:null,notRatedStatus:'not_collected' as const,unavailable:0}};
 }
 /** Reject duplicate/unknown parameters before any aggregate release lookup. */
 export function parsePerformanceFilters(params: URLSearchParams): PerformanceFilters | null {

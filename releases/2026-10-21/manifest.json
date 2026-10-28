@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "06a1be300a5ddf74db33b0fae01bcb9e5f244f5a",
-  "deployment": "https://people-analytics-l76yvw2rq-ed-56dc.vercel.app",
+  "sourceCommit": "862497ccec680ae7a33cfcb46a364ed9c5b2ec9f",
+  "deployment": "https://people-analytics-19m5eogk4-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "fbad998a3585481661f20eb68209b1699f7673c7413c8f8c86fabcb735173176",
-      "bytes": 91046
+      "sha256": "03cee955682d794eb477e623831b98d178c1c60a58d80f302b2dcf49de131b26",
+      "bytes": 91098
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -744,8 +744,8 @@
     },
     {
       "path": "components/pages/career-growth-mobility-page.tsx",
-      "sha256": "813a20bbaf0edb8d679156eb45a8c03e6de8cbff13f046f8a1edd3b53b3d0f41",
-      "bytes": 13473
+      "sha256": "2335f89042c7acdaa4385a9a7e6bfd22ade817b471ddb6511ca98dca9b1740d1",
+      "bytes": 13576
     },
     {
       "path": "components/pages/career-mobility-page.tsx",
@@ -1134,8 +1134,8 @@
     },
     {
       "path": "components/workforce-performance.tsx",
-      "sha256": "5d0e5fb13b36217c76f4ed9bac3890ed292facec48c8232f10a38cc6ed111fb6",
-      "bytes": 3966
+      "sha256": "92fe508b95fe66f272971d8595145a0b21d300fc704da7efba570186d830a0ca",
+      "bytes": 4118
     },
     {
       "path": "components/workforce-planning/business-unit-response-allocation-panel.tsx",
@@ -3124,8 +3124,8 @@
     },
     {
       "path": "lib/public-9037-projection.mjs",
-      "sha256": "e2c52ba87826a77f3b49b66bb1fff39f5c8e3508d0c5751033a6538253051aaf",
-      "bytes": 3487
+      "sha256": "c8999d7ebebc363857e50ede57a012216146f666087047d28c69a1b53cab0409",
+      "bytes": 4691
     },
     {
       "path": "lib/public-9037.server.mjs",
@@ -3669,8 +3669,8 @@
     },
     {
       "path": "lib/workforce-performance.ts",
-      "sha256": "50281881dc053002f825c783dcbf3801b89f2a107016943c75445717d3010aa8",
-      "bytes": 6888
+      "sha256": "554ad79342acc9c1a5493ad3ce9e980982d66b57bec3953fbceafca249159fda",
+      "bytes": 9449
     },
     {
       "path": "lib/workforce-planning-agent.ts",
@@ -4801,6 +4801,16 @@
       "path": "tests/home-cross-domain-acceptance.test.mjs",
       "bytes": 5030,
       "sha256": "2a84200a1593b88f561f3d570cdfd0a12169c8a13575f559fe4dd63884186759"
+    },
+    {
+      "path": "tests/public-occupational-detail.test.mjs",
+      "bytes": 2425,
+      "sha256": "35f80d7f871752002737d7d9b2806af7c42b069fa14c1e332b1b9ba021641e59"
+    },
+    {
+      "path": "tests/public-workforce-performance.test.mjs",
+      "bytes": 4178,
+      "sha256": "e3c257ac077817139929d59e657be6a10d9480b11307082a2252feb51a9951d8"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
