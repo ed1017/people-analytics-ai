@@ -6,11 +6,12 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 |---|---|
 | Freshly verified | 22 desktop and 7 mobile routes rendered without page exceptions or horizontal overflow. Headcount, position drilldown, six-month what-if, UK/Toronto references, intro, About and settings received bounded interaction checks. |
 | Save and Track verified | Both 1440px and 390px completed nine steps: guided example, option selection, reviewed goal/plan save, Action plans, Track, dated 2-role report, correction to 3 roles, and reload retaining current and superseded history. |
+| Review plan results live | PR456 replaces the Assess & Evaluate placeholder with exact saved-target/manual-result comparison and a selected-plan Track link. Public desktop/mobile acceptance passed 10 checks each. |
 | FoW improvement live | PR453 adds selected-work controls and reviewed transfer into a populated capacity scenario. Desktop/mobile edits, selection isolation, cancellation, explicit draft replacement and save/reopen passed. Lab exposure is not converted into staffing savings. |
 | Present, partially tested | Workforce, attrition, recruiting, skills, pay/cost, learning, succession, listening, scenario modeling and labor-cost planning render. Route checks do not prove every filter or end-to-end workflow. |
 | Secondary/prerequisite paths | More evidence and Planning tools expose additional pages. Workforce Response needs a structural scenario; Execution needs reconciled inputs and dates. These are prerequisite states, not demonstrated broken links. |
 | Missing evidence | Full recruiting funnel/recruiter data, several listening survey streams, exit surveys, some promotion/time-in-level and compensation-period data, bound occupational skills/software, and role/location applicant availability/hiring time remain incomplete. Unknowns have not been replaced with zero. |
-| Incomplete/deferred | Assess & Evaluate is coming soon. Video, new findings-to-action pinning, new engines/tornado charts, real-company ingestion and shared enterprise persistence remain deferred. Manual tracking does not execute staffing actions or provide reminders. |
+| Incomplete/deferred | Video, new findings-to-action pinning, new engines/tornado charts, real-company ingestion and shared enterprise persistence remain deferred. Manual tracking does not execute staffing actions or provide reminders. |
 
 ## Additional plan-switch acceptance
 
@@ -22,7 +23,13 @@ Career Growth rejected valid 9,037-person ratings using an older 10,000-person c
 
 ## Current release
 
-PR454 is live at runtime `862497ccec680ae7a33cfcb46a364ed9c5b2ec9f`, deployment `dpl_AGrMfCtBzpsEc3YpKiKUuepxRgL3`. Independent review, 1,011 runtime tests, build/TypeScript and exact-head CI `40769274456` passed. The final public data-panel checks passed six assertions at each width, with all observed data responses HTTP 200 and no page/transport errors. The source manifest contains 960 verified files; private runtime inputs are excluded.
+PR456 is live at runtime `72f7fcac693efacff644f7d7364d83f132ef889b`, deployment `dpl_GvFVFdkHgFhFoG2Qfo7rGnbk4i2A`, merge `03fcdb35209dcebd0ebc082d62b1f95bb48b90e5`. Independent review, 1,016 runtime tests, TypeScript, staged build and exact-head CI `40779164102` passed. Final staged and public 1440px/390px checks passed 10 assertions per width: empty state, no result on another plan, exact comparison, selected-plan Track handoff, correction, plan switching, Back/Forward, reload, Details and unknown latest result. No page errors, horizontal overflow or paid provider calls.
+
+[Results contract and acceptance](plan-result-review-2026-10-28.md). The source manifest contains 964 verified files.
+
+## Previous data-panel release
+
+PR454 was released at runtime `862497ccec680ae7a33cfcb46a364ed9c5b2ec9f`, deployment `dpl_AGrMfCtBzpsEc3YpKiKUuepxRgL3`. Independent review, 1,011 runtime tests, build/TypeScript and exact-head CI `40769274456` passed. The final public data-panel checks passed six assertions at each width, with all observed data responses HTTP 200 and no page/transport errors. The source manifest contains 960 verified files; private runtime inputs are excluded.
 
 ## Evidence and limits
 
