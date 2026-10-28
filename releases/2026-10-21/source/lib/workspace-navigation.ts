@@ -21,6 +21,6 @@ const shortcuts=new Set<AppPage>(['home',...planningJourney.map(i=>i.page),...pl
 export const secondaryNavigationSections=[
  {key:'evidence',title:'More evidence',pages:appNavigationSections.filter(s=>s.key==='analytics'||s.key==='talent').flatMap(s=>s.pages).filter(p=>!shortcuts.has(p))},
  {key:'plan',title:'Planning tools',pages:appNavigationSections.find(s=>s.key==='strategy')!.pages.filter(p=>!shortcuts.has(p))},
- {key:'evaluate',title:'Assess & Evaluate, coming soon',pages:appNavigationSections.find(s=>s.key==='evaluate')!.pages},
+ {key:'evaluate',title:'Assess & Evaluate',pages:appNavigationSections.find(s=>s.key==='evaluate')!.pages},
 ];
 export function secondaryNavigationSection(page:AppPage){return secondaryNavigationSections.find(s=>s.pages.includes(page))?.key??null;}

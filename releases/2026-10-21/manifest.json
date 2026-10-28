@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "sourceCommit": "a6dbd4f75383ae13494f46bc1f7a935d2395e769",
+  "sourceCommit": "72f7fcac693efacff644f7d7364d83f132ef889b",
   "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "81f3ecffb3c47b8235efba293804926facd85ca3ea16a1789425a26014b1cf7d",
-      "bytes": 90839
+      "sha256": "5f5d174b3afaa6bbd678913c92c65f742911617f54e58f5b93e5dedd2a878152",
+      "bytes": 90857
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "sha256": "f9e59ab064f9c44eb4c6179d24715afd4695c1ffa8eba4d36e6c74f56e0b7a4d",
-      "bytes": 6587
+      "sha256": "5510f59adef876f17af3b940209408b9ec64ffdeb720c3f490484b55ec9d0c34",
+      "bytes": 6592
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -3734,8 +3734,8 @@
     },
     {
       "path": "lib/workspace-navigation.ts",
-      "sha256": "ff65efc2ce887fc1ab4472993bfc77bdff1c2adfc0c6f44dc4a3fcedc5864a88",
-      "bytes": 1677
+      "sha256": "6a1e13148b844ed5d0c2330fb210b8fd182475f874df67c13bc9005d3fc839eb",
+      "bytes": 1664
     },
     {
       "path": "next-env.d.ts",
