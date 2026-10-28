@@ -2,11 +2,11 @@
 
 ## Current live release and active parallel work
 
-### Native Future of Work Lab — staging verification
+### PR444 live — native Future of Work Lab
 
 Runtime `995d96f61dadb6d90d4c5e9056a44bc9fb9530c8` adds a separate, read-only Lab workspace: 10,000 people, 15 functions and 50 roles from a versioned aggregate capture. Exposure/adoption charts, task drilldowns, governance and snapshot-matched action evidence do not merge with the app workforce or convert exposure into FTE. Explicit goal-reference carry preserves scenario inputs and revisions. Human validation is 33/100 sampled tasks; no retest is complete. No scoring jobs, new database access or paid calls are included. Existing task-redesign scenario remains available.
 
-Independent review, 940 runtime tests and TypeScript checks passed. Protected build/browser verification is pending; PR442 remains live until promotion. [Source and integration limits](../releases/2026-10-21/source/docs/fow-lab-integration.md).
+Independent review, 940 runtime tests, exact-head CI `40628742623` and protected/public desktop/mobile checks passed. PR444 merge `e860d7a06c3bc4b84b71d597b717e726a4c80332` is live on deployment `dpl_CRXx7xMo7h9azEGZrk3s1aeyBr9j`; canonical public host resolves to that exact tested build. Public save/reload/removal and original scenario/other-goal isolation passed. [Release verification and limits](release-verification-pr444.md).
 
 ### PR442 live — turnover scope and worked-example consistency
 
