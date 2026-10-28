@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "sourceCommit": "72f7fcac693efacff644f7d7364d83f132ef889b",
-  "deployment": "pending-protected-verification",
+  "deployment": "https://people-analytics-n6q9vsv6p-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",

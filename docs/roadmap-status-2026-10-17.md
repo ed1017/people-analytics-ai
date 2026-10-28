@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR454 live - current data panels and completeness audit
+### PR456 live - Review plan results
+
+Runtime `72f7fcac693efacff644f7d7364d83f132ef889b`, deployment `dpl_GvFVFdkHgFhFoG2Qfo7rGnbk4i2A`, merge `03fcdb35209dcebd0ebc082d62b1f95bb48b90e5`. The user-approved bounded Assess & Evaluate view now compares exact saved targets with latest manual results and links to Track with the selected plan. Unknown, interim, late and corrected records remain distinct; no new storage or outcome/ROI engine.
+
+Independent review, 1,016 runtime tests, TypeScript, staged build and exact-head CI `40779164102` passed. Public desktop/mobile acceptance passed 10 checks each, including corrections, switching, reload, Back/Forward and unknown-result handling. No paid calls or accounting/access changes. [Contract and release evidence](plan-result-review-2026-10-28.md). Earlier placeholder references below describe historical scope and are superseded by this approved bounded release; broad scorecards remain outside scope.
+
+### PR454 - current data panels and completeness audit (previous release)
 
 Runtime `862497ccec680ae7a33cfcb46a364ed9c5b2ec9f`, deployment `dpl_AGrMfCtBzpsEc3YpKiKUuepxRgL3`, merge `d8e897e204ae99c12f230d9ed0136748af827dfe`. Career Growth now accepts the current 9,037-person rating source through its own strict receipt/scope contract; legacy checks remain unchanged. Occupational detail returns its verified empty/unavailable state instead of a projection error, without adding external data or expanding the general allowlist.
 
@@ -12,7 +18,7 @@ Independent review, 1,011 runtime tests, production build/TypeScript, 960-file m
 
 Runtime `06a1be300a5ddf74db33b0fae01bcb9e5f244f5a`, deployment `dpl_aAkzh8xviJvQtqYogaKJ9WMaJXiY`, merge `9f6c01f2c4ca91205da2f269d1aebdc9be64ac24`. Model this work opens beside Lab selection using editable example assumptions, not exposure scores. Reviewed transfer requires explicit replacement of an occupied draft; saved capacity scenarios retain provenance and other goals. Independent review, 992 runtime tests, exact-head CI `40766781576`, and staged/public desktop and mobile calculation/save/reload checks passed. No paid provider calls.
 
-Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop/mobile guided scenario -> Action plans -> Track journeys passed nine checks each, including dated reporting, correction and retained history after reload. Some evidence panels remain incomplete; Assess & Evaluate is a placeholder. Career Growth ratings and occupational unavailable-detail response fixes were subsequently delivered in PR454. [Completeness matrix](app-completeness-2026-10-28.md).
+Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop/mobile guided scenario -> Action plans -> Track journeys passed nine checks each, including dated reporting, correction and retained history after reload. Some evidence panels remain incomplete; Assess & Evaluate was a placeholder at that audit and is now delivered in the bounded PR456 scope. Career Growth ratings and occupational unavailable-detail response fixes were subsequently delivered in PR454. [Completeness matrix](app-completeness-2026-10-28.md).
 
 ### PR451 - Overview headcount planner restored (previous release)
 
