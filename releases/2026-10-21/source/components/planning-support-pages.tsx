@@ -1,6 +1,9 @@
 'use client';
 
 import {ManualPlanResults} from './manual-plan-results';
+import dynamic from 'next/dynamic';
+import {useEffect,useRef,useState} from 'react';
+import {FoWLabReferenceHandoff} from './fow-lab-reference';
 import {FutureWorkExample} from './future-work-example';
 import type { AppPage } from '@/lib/types';
 import { decisionStore, useDecisionStorage } from './decision-store';
@@ -11,12 +14,19 @@ import { goalProgressEnabled } from '@/lib/goal-progress';
 import styles from './home-chat-shell.module.css';
 
 type Navigate = {onNavigate: (page: AppPage) => void};
+const FowLabWorkspace=dynamic(()=>import('./fow-lab-workspace').then(module=>module.FowLabWorkspace),{loading:()=> <p role="status" className="p-6">Loading Future of Work Lab…</p>});
 export function FutureOfWorkPage({onNavigate}: Navigate) {
-  return <section className="mx-auto max-w-4xl space-y-5 p-6" aria-label="Future of Work">
-    <header><p className="text-xs text-muted-foreground">Future of Work · Illustrative task example</p><h2 className="mt-2 text-2xl font-semibold">How could the work change?</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">Start with the fictional task example below to explore how task time and adoption affect modeled savings. Your actual workforce impact remains unconfigured.</p></header>
-    <FutureWorkExample onNavigate={onNavigate}/>
-    <div className="flex flex-wrap gap-3"><button type="button" onClick={() => onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" onClick={() => onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Enter manual scenario assumptions</button></div>
-    <p className="text-xs text-muted-foreground">Scenario calculations use your entered assumptions. No AI adjustment is applied automatically.</p>
+  const [handoff,setHandoff]=useState<{jobKey?:string;functionName?:string}|null>(null);
+  const review=useRef<HTMLDivElement>(null);
+  useEffect(()=>{if(handoff)review.current?.focus();},[handoff]);
+  return <section className="mx-auto max-w-7xl space-y-5 p-4 md:p-6" aria-label="Future of Work">
+    <FowLabWorkspace onReference={(jobKey,functionName)=>setHandoff({jobKey,functionName})}/>
+    {handoff&&<div ref={review} tabIndex={-1} className="rounded-xl border p-4 focus-visible:ring-2 focus-visible:ring-ring" aria-label="Review Lab planning reference">
+      <FoWLabReferenceHandoff jobKey={handoff.jobKey} functionName={handoff.functionName} onNavigate={onNavigate}/>
+      <button type="button" className="mt-2 min-h-11 rounded border px-4 text-sm" onClick={()=>setHandoff(null)}>Cancel handoff</button>
+    </div>}
+    <details className="rounded-xl border p-4"><summary className="min-h-11 cursor-pointer font-semibold">Try the task-redesign example</summary><FutureWorkExample onNavigate={onNavigate}/></details>
+    <div className="flex flex-wrap gap-3"><button type="button" onClick={()=>onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" onClick={()=>onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open Scenarios</button></div>
   </section>;
 }
 

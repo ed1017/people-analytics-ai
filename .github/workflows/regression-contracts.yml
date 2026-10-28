@@ -65,6 +65,10 @@ jobs:
         working-directory: releases/2026-10-21/source
         run: node --test tests/home-bu-turnover-chat.test.mjs tests/canonical-worked-example.test.mjs tests/home-fte-investigation.test.mjs tests/market-reference-editorial.test.mjs tests/module-editorial-presentation.test.mjs tests/planner-editorial-presentation.test.mjs tests/projection-save-retry.test.mjs tests/public-recruiting-cohort-recovery.test.mjs tests/home-dataset-query.test.mjs tests/demo-company-profile.test.mjs tests/about-project-profile.test.mjs
       - name: Run regression contracts
+        # The native Lab snapshot is independently scoped and must preserve saved plans.
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/fow-lab.test.mjs tests/fow-lab-reference.test.mjs
+      - name: Run historical regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing
         run: npm run prebuild

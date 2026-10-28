@@ -2,6 +2,12 @@
 
 ## Current live release and active parallel work
 
+### Native Future of Work Lab — staging verification
+
+Runtime `995d96f61dadb6d90d4c5e9056a44bc9fb9530c8` adds a separate, read-only Lab workspace: 10,000 people, 15 functions and 50 roles from a versioned aggregate capture. Exposure/adoption charts, task drilldowns, governance and snapshot-matched action evidence do not merge with the app workforce or convert exposure into FTE. Explicit goal-reference carry preserves scenario inputs and revisions. Human validation is 33/100 sampled tasks; no retest is complete. No scoring jobs, new database access or paid calls are included. Existing task-redesign scenario remains available.
+
+Independent review, 940 runtime tests and TypeScript checks passed. Protected build/browser verification is pending; PR442 remains live until promotion. [Source and integration limits](../releases/2026-10-21/source/docs/fow-lab-integration.md).
+
 ### PR442 live — turnover scope and worked-example consistency
 
 Runtime `8600d5053e0cd5c09430f08c06c3e676ae29d9f9`, source `4de833ee2e9376f5044ab8378e9e7ef18374f4bc`, merge `6206b03a4c90d226b376904e2a2fef848f78ce65`, deployment `dpl_HqHsGQ6qUMKCZEqCE1ibDdtgvAH8`. Exact-head CI `40557803942` passed; canonical public host https://www.ed-ai.app resolves to this deployment. Public desktop/mobile acceptance passed at 1440px and 390px: canonical 5-FTE example, global/filter return, unchanged guided recommendation, compact Attrition states, controlled three-turn turnover flow and preserved legacy saved inputs. Both `ed-ai.app` and `www.ed-ai.app` resolve to this deployment.
