@@ -6,6 +6,7 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 |---|---|
 | Freshly verified | 22 desktop and 7 mobile routes rendered without page exceptions or horizontal overflow. Headcount, position drilldown, six-month what-if, UK/Toronto references, intro, About and settings received bounded interaction checks. |
 | Save and Track verified | Both 1440px and 390px completed nine steps: guided example, option selection, reviewed goal/plan save, Action plans, Track, dated 2-role report, correction to 3 roles, and reload retaining current and superseded history. |
+| Saved-work backup and journey links live | PR458 exports/restores current-dataset goals, plan versions and tracking/correction history with explicit validated replacement. Public desktop/mobile passed seven checks each, including selected-plan Action plans → Track → results. Separate standalone scenarios and unsaved edits are excluded. |
 | Review plan results live | PR456 replaces the Assess & Evaluate placeholder with exact saved-target/manual-result comparison and a selected-plan Track link. Public desktop/mobile acceptance passed 10 checks each. |
 | FoW improvement live | PR453 adds selected-work controls and reviewed transfer into a populated capacity scenario. Desktop/mobile edits, selection isolation, cancellation, explicit draft replacement and save/reopen passed. Lab exposure is not converted into staffing savings. |
 | Present, partially tested | Workforce, attrition, recruiting, skills, pay/cost, learning, succession, listening, scenario modeling and labor-cost planning render. Route checks do not prove every filter or end-to-end workflow. |
@@ -23,7 +24,13 @@ Career Growth rejected valid 9,037-person ratings using an older 10,000-person c
 
 ## Current release
 
-PR456 is live at runtime `72f7fcac693efacff644f7d7364d83f132ef889b`, deployment `dpl_GvFVFdkHgFhFoG2Qfo7rGnbk4i2A`, merge `03fcdb35209dcebd0ebc082d62b1f95bb48b90e5`. Independent review, 1,016 runtime tests, TypeScript, staged build and exact-head CI `40779164102` passed. Final staged and public 1440px/390px checks passed 10 assertions per width: empty state, no result on another plan, exact comparison, selected-plan Track handoff, correction, plan switching, Back/Forward, reload, Details and unknown latest result. No page errors, horizontal overflow or paid provider calls.
+PR458 is live at runtime `7453e9cf151f3888145ac3296824d07a91dd93d4`, deployment `dpl_F9CEh2oocugK6aewDvbebzd3sDcZ`, merge `09fd85f76bfab72a4feac4418ebcdf78693cd083`. Independent review, 1,027 runtime tests, TypeScript, staged build and exact-head CI `40781944810` passed. Final staged/public 1440px and 390px checks passed seven checks each with no page errors, overflow or provider calls. Manifest: 968 files. [Backup contract and scope limits](saved-work-backup-2026-10-28.md).
+
+Remaining backup coverage: standalone risk/trend and separately saved workforce-planning scenarios, unsaved edits, recovery state, preferences and other datasets. This release does not claim a full-browser backup or cross-device synchronization.
+
+## Previous results release
+
+PR456 was released at runtime `72f7fcac693efacff644f7d7364d83f132ef889b`, deployment `dpl_GvFVFdkHgFhFoG2Qfo7rGnbk4i2A`, merge `03fcdb35209dcebd0ebc082d62b1f95bb48b90e5`. Independent review, 1,016 runtime tests, TypeScript, staged build and exact-head CI `40779164102` passed. Final staged and public 1440px/390px checks passed 10 assertions per width: empty state, no result on another plan, exact comparison, selected-plan Track handoff, correction, plan switching, Back/Forward, reload, Details and unknown latest result. No page errors, horizontal overflow or paid provider calls.
 
 [Results contract and acceptance](plan-result-review-2026-10-28.md). The source manifest contains 964 verified files.
 
