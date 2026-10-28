@@ -1,16 +1,16 @@
-# Active roadmap - October 27
+# Active roadmap - October 28
 
 ## Current live release and active parallel work
 
-### Native Future of Work Lab — staging verification
+### PR444 live — native Future of Work Lab
 
 Runtime `995d96f61dadb6d90d4c5e9056a44bc9fb9530c8` adds a separate, read-only Lab workspace: 10,000 people, 15 functions and 50 roles from a versioned aggregate capture. Exposure/adoption charts, task drilldowns, governance and snapshot-matched action evidence do not merge with the app workforce or convert exposure into FTE. Explicit goal-reference carry preserves scenario inputs and revisions. Human validation is 33/100 sampled tasks; no retest is complete. No scoring jobs, new database access or paid calls are included. Existing task-redesign scenario remains available.
 
-Independent review, 940 runtime tests and TypeScript checks passed. Protected build/browser verification is pending; PR442 remains live until promotion. [Source and integration limits](../releases/2026-10-21/source/docs/fow-lab-integration.md).
+Independent review, 940 runtime tests, exact-head CI `40628742623` and protected/public desktop/mobile checks passed. PR444 merge `e860d7a06c3bc4b84b71d597b717e726a4c80332` is live on deployment `dpl_CRXx7xMo7h9azEGZrk3s1aeyBr9j`; canonical public host resolves to that exact tested build. Public save/reload/removal and original scenario/other-goal isolation passed. [Release verification and limits](release-verification-pr444.md).
 
 ### PR442 live — turnover scope and worked-example consistency
 
-Runtime `8600d5053e0cd5c09430f08c06c3e676ae29d9f9`, source `4de833ee2e9376f5044ab8378e9e7ef18374f4bc`, merge `6206b03a4c90d226b376904e2a2fef848f78ce65`, deployment `dpl_HqHsGQ6qUMKCZEqCE1ibDdtgvAH8`. Exact-head CI `40557803942` passed; canonical public host https://www.ed-ai.app resolves to this deployment. Public desktop/mobile acceptance passed at 1440px and 390px: canonical 5-FTE example, global/filter return, unchanged guided recommendation, compact Attrition states, controlled three-turn turnover flow and preserved legacy saved inputs. Both `ed-ai.app` and `www.ed-ai.app` resolve to this deployment.
+Runtime `8600d5053e0cd5c09430f08c06c3e676ae29d9f9`, source `4de833ee2e9376f5044ab8378e9e7ef18374f4bc`, merge `6206b03a4c90d226b376904e2a2fef848f78ce65`, deployment `dpl_HqHsGQ6qUMKCZEqCE1ibDdtgvAH8`. Exact-head CI `40557803942` passed; canonical public host https://www.ed-ai.app resolved to this deployment at PR442 verification. Public desktop/mobile acceptance passed at 1440px and 390px: canonical 5-FTE example, global/filter return, unchanged guided recommendation, compact Attrition states, controlled three-turn turnover flow and preserved legacy saved inputs. Both `ed-ai.app` and `www.ed-ai.app` resolved to this deployment at that verification; PR444 is now current.
 
 BU turnover routing preserves the requested group and supported period; unsupported dates do not substitute current YTD data. New worked examples use the same 5-FTE gap while saved legacy 4-FTE scenarios retain their original inputs. Recorded zero regrettable-exit counts remain in Details, positive counts remain prominent, and unavailable exit-survey evidence is compact. Homepage findings and supported example-risk scope are corrected. The bounded loading check did not reproduce the reported delay; fresh paid-provider acceptance remains unverified. [Verification and limits](release-verification-pr442.md).
 
