@@ -1,4 +1,5 @@
 import {homeSurveyGroups,readHomeSurveyGroups} from './home-survey-groups.mjs';
+import {homeTurnoverGroups,readHomeTurnoverGroups} from './home-turnover-groups.mjs';
 import {validHistoryDate} from './history-date.ts';
 import {HOME_HISTORY_ROWS,selectHomeHistory} from './home-history-selection.ts';
 import {readCandidateHomeContext} from './dataset-home-context.mjs';
@@ -77,6 +78,7 @@ function finish(def, input, scope) {
  const successfulRecruitingCohort=id==='R1'&&context?.datasetToken===PUBLIC_9037.token;
  if(successfulRecruitingCohort)for(const metric of ['application_to_interview_pct','interview_to_offer_pct','offer_to_hire_pct','application_to_hire_pct','offer_acceptance_pct'])facts[metric]=null;
  if(id==="S1"&&raw.businessUnitComparison!==undefined)facts.businessUnitComparison=readHomeSurveyGroups(raw.businessUnitComparison);
+ if(id==="A1"&&raw.turnoverByBusinessUnit!==undefined)facts.turnoverByBusinessUnit=readHomeTurnoverGroups(raw.turnoverByBusinessUnit);
  if(id==="F1")Object.assign(facts,{source:"finance_current_summary",currency:"USD",cost_period:null,source_refreshed_at:null});
  if(id==='R1'&&context){facts.modeled_ta_version=null;facts.modeled_ta_status='not-released';facts.modeled_ta_metric='Constructed recruiting events; no candidate stock forecast or screening stage is released. October–December 2026 is unmodeled. Planning source separate.';}
  const datedHistory=historyDates[id]&&Array.isArray(raw.rows)&&raw.rows.length>0&&raw.rows.every(row=>validHistoryDate(row?.[historyDates[id]]));
@@ -109,6 +111,7 @@ function finish(def, input, scope) {
  const sourceBudget=id==='A1'||datedHistory||facts.businessUnitComparison?HOME_MONTHLY_SOURCE_BYTES:HOME_SOURCE_BYTES;
  let kept=status==="loaded"?(facts.rows?.length??0):0;
  if(facts.businessUnitComparison&&bytes({...facts,rows:[]})>sourceBudget)facts.businessUnitComparison=null;
+ if(facts.turnoverByBusinessUnit&&bytes({...facts,rows:[],monthly:[]})>sourceBudget)facts.turnoverByBusinessUnit=null;
  while(bytes(facts)>sourceBudget && kept){facts.rows.pop();kept--;}
  while(bytes(facts)>sourceBudget && facts.monthly?.length)facts.monthly.pop();
  if(bytes(facts)>sourceBudget) status="budget-excluded";
@@ -185,6 +188,7 @@ export function buildHomePack(results, workforceScope, goal="", session={}, insp
   if(id==="R1"){const extension=resolveTaResponseExtension(data),separate=isSeparateTaDataset(data);root={...root,modeled_ta_version:extension?.version??null,modeled_ta_status:extension?"ready":separate?"not-released":"unavailable",modeled_ta_metric:extension?"Generated month-end active stock; cutoff 2026-09-30; 474 differs from current-status 475. Screening assumed. Planning source separate.":separate?"Constructed recruiting events; no candidate stock forecast or screening stage is released. October–December 2026 is unmodeled. Planning source separate.":"Calibrated TA extension unavailable or stale; no modeled counts or forecasts available. Planning source separate."};}
   root=pick(root,def[7],def[8],def[9]);
   if(id==="S1")root.businessUnitComparison=homeSurveyGroups(data);
+  if(id==="A1")root.turnoverByBusinessUnit=homeTurnoverGroups(data);
   if(id==="A1"&&Array.isArray(data.trend)&&data.trend.length)root.monthly=selectHomeMonthlyRows(data.trend,goal,data.as_of??data.latest_date);
   sourceInputs.push({id,status:["I3","D1"].includes(id)?"loaded":result.status,date:id==="W1"?data.overview?.snapshot_date:id==="T4"?data.source?.last_recorded_date:id==="T5"?data.as_of_date:["P1","I1","I3","D1"].includes(id)?null:data.as_of??data.latest_date,rowsAvailable:available,selection,...(DOMAIN_DEMO_LABELS[id]&&data.data_meta!==undefined?{sourceContext:data.data_meta}:{}),facts:{...root,rows:normalRows(id,rows,history!==null?HOME_HISTORY_ROWS:3)}});
  }
