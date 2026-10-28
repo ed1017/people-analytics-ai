@@ -128,9 +128,9 @@ export function ChatContent({
 }) {
   const references: string[] = [];
   const citationTargets = new Map<string,string>();
-  // Only exact app-authored boilerplate enters a disclosure. Model prose is
-  // kept intact; explicit labels select typography, never semantic omissions.
-  const presentation=collapseCaveats?homeAnswerPresentation(content):{answer:content,details:[]};
+  // Compact answers may explicitly label supporting Details; all other prose
+  // stays visible. User messages and nested disclosures do not use this split.
+  const presentation=collapseCaveats?homeAnswerPresentation(content,{supportingDetails:compact}):{answer:content,details:[]};
   const qualifierLines=new Set(chatCaveatLineNumbers(presentation.answer.trim()));
   const answer = presentation.answer.replace(/\(?\[[A-Z]+\d+\](?:[, ]+\[[A-Z]+\d+\])*\s+See\s+\[[^\]\n]+\]\(app:[a-z-]+\)\.?\)?/gi, reference => {
     const href = reference.match(/\]\((app:[a-z-]+)\)/)?.[1];

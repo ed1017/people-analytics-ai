@@ -6,9 +6,24 @@ const explanations=new Map([
  ['All openings are included, including cancellation, no-show and unresolved outcomes. November and December follow-up extends into 2027. No future opening counts are assumed.','Future opening counts unknown; Nov–Dec follow-up extends into 2027.'],
  ['December is one quarterly wave, not monthly interpolation or a percentage of satisfied employees. It assumes unchanged instrument, items, scoring, eligibility and population; response coverage is not representativeness.','One December quarterly wave; representativeness unverified.'],
 ]);
+/** Only explicitly titled supporting sections move; never classify arbitrary prose. */
+function supportingSections(content:string){
+ const primary:string[]=[],details:string[]=[];let section:{heading:string;level:number;lines:string[]}|null=null,fence='';
+ const flush=()=>{if(!section)return;const text=section.lines.join('\n').trim();if(text)details.push(text);else primary.push(section.heading,...section.lines);section=null;};
+ for(const line of content.split('\n')){
+  const marker=line.match(/^\s{0,3}(`{3,}|~{3,})/)?.[1];
+  const heading=!fence?line.match(/^(#{1,6})\s+(.+?)\s*$/):null;
+  if(section&&heading&&heading[1].length<=section.level)flush();
+  if(!fence&&heading&&heading[1].length<=3&&heading[2]==='Details'){flush();section={heading:line,level:heading[1].length,lines:[]};continue;}
+  if(section)section.lines.push(line);else primary.push(line);
+  if(marker){if(!fence)fence=marker;else if(marker[0]===fence[0]&&marker.length>=fence.length&&/^\s{0,3}(?:`{3,}|~{3,})\s*$/.test(line))fence='';}
+ }
+ flush();const answer=primary.join('\n');return answer.trim()?{answer,details}:{answer:content,details:[]};
+}
 /** Collapse repeated explanation, retaining short decision-critical limits. */
-export function homeAnswerPresentation(content:string) {
- const details:string[]=[],lines=content.split('\n');
+export function homeAnswerPresentation(content:string,{supportingDetails=false}={}) {
+ const sections=supportingDetails?supportingSections(content):{answer:content,details:[]};
+ const details:string[]=[...sections.details],lines=sections.answer.split('\n');
  const answer=lines.flatMap(line=>{
   const brief=explanations.get(line.trim());
   if(brief){if(!details.includes(line.trim()))details.push(line.trim());return [brief];}

@@ -66,7 +66,7 @@ for(const [question,registryId,metric]of [
 test('aggregate scope and date limitations do not silently become current company facts',async()=>{
  for(const overrides of [{scope:'selected-or-other'},{asOf:'last year'}]){
   const f=fixture(spec=>raw(spec,'',[tool('read_aggregate_comparison',{registryId:'workforce.countries',metric:'headcount',order:'descending',limit:1,scope:'company-wide',asOf:'current',...overrides})]));
-  const result=await f.app(http('/api/home-solution-conversation',{...home(),message:{id:'turn1',text:'Which country has the largest workforce?'}}));assert.equal(result.status,200);const answer=await result.json();assert.equal(f.specs.length,1);assert.match(answer.answer,/only|not the requested historical/);assert.doesNotMatch(answer.answer,/highest to lowest/);
+  const result=await f.app(http('/api/home-solution-conversation',{...home(),message:{id:'turn1',text:'Which country has the largest workforce?'}}));assert.equal(result.status,200);const answer=await result.json();assert.equal(f.specs.length,1);if(overrides.asOf){assert.match(answer.answer,/requested historical period comparison is unavailable/);assert.match(answer.answer,/Available data is dated 2026-09-30/);}else assert.match(answer.answer,/only/);assert.doesNotMatch(answer.answer,/highest to lowest/);
  }
 });
 for(const [registryId,metric,path,question]of [
