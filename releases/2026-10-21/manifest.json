@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "3698d2395aa004b498a63a1ad991681de9f7c200",
-  "deployment": "https://people-analytics-88tnc36uv-ed-56dc.vercel.app",
+  "sourceCommit": "d3263b1a6c50398641cc7be7b621109c28b9cb64",
+  "deployment": "https://people-analytics-6is18hf9w-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -2069,8 +2069,8 @@
     },
     {
       "path": "lib/home-action-proposal.ts",
-      "sha256": "a888138594afe38de16d7135157422a7c4ed6a3a49672c12505b48cb890c81a4",
-      "bytes": 8893
+      "sha256": "06f7729e953670e45015283e06870f525d76757ffe780ca79779f789784c9c06",
+      "bytes": 9293
     },
     {
       "path": "lib/home-action-saved-inputs.ts",
@@ -2444,8 +2444,8 @@
     },
     {
       "path": "lib/home-pack.mjs",
-      "sha256": "41483a7faf72ffe5eb14fec87875d2efb33f08f6c10a6cf00826ca69b91a4e4b",
-      "bytes": 29999
+      "sha256": "5e493104e6956e3ab91dc83f7a34e263f02ba917670b47432b68e6df06b1029e",
+      "bytes": 30408
     },
     {
       "path": "lib/home-pay-catalog-aggregates.mjs",
@@ -2609,8 +2609,8 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "30527a1fe04578ddce025e8665a22ff3d0ff0b343410344172a45bde7958c3ea",
-      "bytes": 39301
+      "sha256": "fbb43efe7f2ccfcdf97693eab4ae07019184bed75c6cb615c42c35547fa615e8",
+      "bytes": 40046
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
@@ -4761,6 +4761,16 @@
       "path": "tests/home-answer-acceptance.test.mjs",
       "bytes": 6546,
       "sha256": "5010479501f93cd4f318296e13afa835957428539c062cb440f9a2208beb6dce"
+    },
+    {
+      "path": "lib/home-turnover-groups.mjs",
+      "bytes": 1893,
+      "sha256": "8576174425439eba64bc8f5e6f3a9a01539367593e18190c39ead8cb6c0ba0dc"
+    },
+    {
+      "path": "tests/home-turnover-groups.test.mjs",
+      "bytes": 3721,
+      "sha256": "5b147d3caefdc4ce9fcff0986bf92e25f659038fd454e67b39e69e0b0054af4e"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
