@@ -2119,6 +2119,7 @@ export default function Home() {
           <CareerGrowthMobilityPage
             performance={overviewData?.snapshot_date === "2026-09-30" ? workforcePerformance : null}
             workforceHeadcount={overviewData?.headcount ?? null}
+            performanceScopeReceipt={overviewScope}
             performanceFilters={{ country: selectedCountry, org: selectedOrg, level: selectedLevel }}
             performanceLoading={dashboardLoading}
             data={careerGrowthMobilityData}

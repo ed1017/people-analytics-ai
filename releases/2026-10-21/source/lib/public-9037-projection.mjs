@@ -3,6 +3,14 @@ import {PUBLIC_9037} from './public-9037-contract.mjs';
 const denied=(key)=>['data_meta','recruiters','skill_id','artifactDigest'].includes(key);
 export function projectPublic9037(path,input,digest){
  const allowed=fields[path];if(!allowed)throw Error('Unreviewed public endpoint');
+ // The index allowlist does not authorize occupational detail data. Only the
+ // existing explicitly unavailable, empty detail response can cross this boundary.
+ if(path==='/api/occupational-reference'&&input?.kind==='detail'){
+  const record=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+  const exact=(v,keys)=>record(v)&&Object.keys(v).length===keys.length&&keys.every(k=>Object.hasOwn(v,k));
+  if(!exact(input,['kind','code','essentialSkills','softwareSkills','suppressedRatings','sources','data_meta'])||typeof input.code!=='string'||!/^\d{2}-\d{4}\.\d{2}$/.test(input.code)||!Array.isArray(input.essentialSkills)||input.essentialSkills.length!==0||!Array.isArray(input.softwareSkills)||input.softwareSkills.length!==0||input.suppressedRatings!==0||!exact(input.sources,['essentialSkills','softwareSkills'])||input.sources.essentialSkills!=='unavailable'||input.sources.softwareSkills!=='unavailable'||!record(input.data_meta))throw Error('Unreviewed occupational detail response');
+  return {kind:'detail',code:input.code,essentialSkills:[],softwareSkills:[],suppressedRatings:0,sources:{essentialSkills:'unavailable',softwareSkills:'unavailable'},data_meta:public9037Metadata(digest)};
+ }
  function walk(value,at=''){
   if(Array.isArray(value)){
    const itemPath=at+'[]';

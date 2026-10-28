@@ -36,6 +36,7 @@ type CareerGrowthMobilityPageProps = {
   performanceFilters?: PerformanceFilters;
   performanceLoading?: boolean;
   workforceHeadcount?: number | null;
+  performanceScopeReceipt?: unknown;
 };
 
 function formatDate(value: string | null) {
@@ -76,6 +77,7 @@ export function CareerGrowthMobilityPage({
   performanceFilters = { country: "all", org: "all", level: "all" },
   performanceLoading = false,
   workforceHeadcount = null,
+  performanceScopeReceipt,
 }: CareerGrowthMobilityPageProps) {
   const transitionsByType = (
     type: MovementType
@@ -88,7 +90,7 @@ export function CareerGrowthMobilityPage({
   return (
     <section className="evidence-pane min-w-0 p-4 sm:p-6">
       <KeyFindings findings={!loading && !error && data ? growthFindings(data) : null} />
-      <WorkforcePerformanceField value={performance} population={workforceHeadcount} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
+      <WorkforcePerformanceField value={performance} population={workforceHeadcount} scopeReceipt={performanceScopeReceipt} filters={performanceFilters} selectedContext={selectedContext} loading={performanceLoading} />
       <section className="mt-6" aria-labelledby="recorded-movement-history-heading">
         <h2 id="recorded-movement-history-heading" className="text-sm font-medium">Recorded movement history · company-wide context</h2>
       <div className="mt-4 mb-6 flex items-end justify-between gap-4">

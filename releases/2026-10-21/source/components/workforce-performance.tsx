@@ -1,9 +1,9 @@
-import { resolveWorkforcePerformance, supportsPerformanceFilters, type PerformanceFilters } from '@/lib/workforce-performance';
+import { resolveWorkforcePerformance, resolvePublicWorkforcePerformance, supportsPerformanceFilters, type PerformanceFilters } from '@/lib/workforce-performance';
 import type { SelectedBusinessContext } from '@/lib/talent-evidence-scope';
 
 /** One workforce, the existing top filters, and no fixture data imported at runtime. */
-export function WorkforcePerformanceField({ value, filters, selectedContext, population, loading = false }: { value: unknown; filters: PerformanceFilters; selectedContext: SelectedBusinessContext; population?: number | null; loading?: boolean }) {
-  const result = loading ? null : resolveWorkforcePerformance(value, filters, population);
+export function WorkforcePerformanceField({ value, filters, selectedContext, population, scopeReceipt, loading = false }: { value: unknown; filters: PerformanceFilters; selectedContext: SelectedBusinessContext; population?: number | null; scopeReceipt?: unknown; loading?: boolean }) {
+  const result = loading ? null : resolvePublicWorkforcePerformance(value, filters, population, scopeReceipt) ?? resolveWorkforcePerformance(value, filters, population);
   const counts = result?.counts;
   return <section className="mb-6" aria-label="Workforce career measures">
     <p className="text-sm text-muted-foreground">Workforce at 30 Sep 2026 · 2026 year to date</p>
