@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "72f7fcac693efacff644f7d7364d83f132ef889b",
-  "deployment": "https://people-analytics-n6q9vsv6p-ed-56dc.vercel.app",
+  "sourceCommit": "4f8f9c50450c8b70c94c8807fe39b275a5f66952",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -314,8 +314,8 @@
     },
     {
       "path": "components/app-header.tsx",
-      "sha256": "8397adb4bd0d36af8be5fa38f591e10deaf4598c4234381d3d0b663b5e631ec2",
-      "bytes": 7880
+      "sha256": "92ab6ceac12867f7909ac2e8e5f93378872f5bfbca399ac4d99c05c0c8791434",
+      "bytes": 7795
     },
     {
       "path": "components/app-sidebar.tsx",
@@ -2774,8 +2774,8 @@
     },
     {
       "path": "lib/local-decisions.ts",
-      "sha256": "a6bc6601df009d873e73daaceb6901a6b0faf5e5770cb216f32e8513472d8362",
-      "bytes": 20735
+      "sha256": "414419ab86b2c02895a83d9bb246867761dafe92a3eb75a6f21d9f76be082a9b",
+      "bytes": 21887
     },
     {
       "path": "lib/local-goals.ts",
@@ -4831,6 +4831,26 @@
       "path": "tests/fixtures/manual-plan-results.mjs",
       "bytes": 2564,
       "sha256": "b3472e16ccb094dd593d0da9719212fef2f8eba586a4a5f0132aca64fe434737"
+    },
+    {
+      "path": "components/decision-backup.tsx",
+      "bytes": 5720,
+      "sha256": "76475c62e11337df42f99ef32edd70f35522580579b94c94ebba72aeb5b3c3ba"
+    },
+    {
+      "path": "lib/decision-backup.ts",
+      "bytes": 4884,
+      "sha256": "0a95a7d1dccdc759fb1a6f36bce847471f49dc32a3bed643948e9b2422c208c0"
+    },
+    {
+      "path": "tests/decision-backup-store.test.mjs",
+      "bytes": 3229,
+      "sha256": "f91be701a28f82ce242e4d20ded30b8ed14a3a6648e5617358eebd70994ba77a"
+    },
+    {
+      "path": "tests/decision-backup.test.mjs",
+      "bytes": 4482,
+      "sha256": "de4782ce71953ce60e672ff24de9e498acddfbfff38529002916d4c8c799e1b9"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

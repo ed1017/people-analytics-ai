@@ -1,0 +1,28 @@
+'use client';
+
+import {useEffect,useId,useRef,useState} from 'react';
+import {decisionStore,useDecisionStorage} from './decision-store';
+import {encodeDecisionBackup,parseDecisionBackup,MAX_BACKUP_BYTES} from '@/lib/decision-backup';
+
+const control='min-h-11 rounded-md border bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring';
+export function DecisionBackup(){
+ const storage=useDecisionStorage(),dialog=useRef<HTMLDialogElement>(null),trigger=useRef<HTMLButtonElement>(null),readSequence=useRef(0),uid=useId();
+ const [open,setOpen]=useState(false),[preview,setPreview]=useState<{backup:ReturnType<typeof parseDecisionBackup>;revision:number;snapshot:string}|null>(null),[confirmed,setConfirmed]=useState(false),[error,setError]=useState(''),[status,setStatus]=useState('');
+ const available=storage.ready&&storage.saved&&!storage.recovery;
+ useEffect(()=>{if(open){dialog.current?.showModal();}else dialog.current?.close();},[open]);
+ function close(){readSequence.current++;setOpen(false);setPreview(null);setConfirmed(false);setError('');setStatus('');trigger.current?.focus();}
+ function download(){try{const raw=encodeDecisionBackup(storage.data,decisionStore.getDatasetToken(),new Date().toISOString()),url=URL.createObjectURL(new Blob([raw],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`workforce-saved-goals-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus('Backup download requested. Keep the file somewhere safe.');}catch(e){setError(e instanceof Error?e.message:'Backup could not be created.');}}
+ async function choose(file:File|undefined){const sequence=++readSequence.current;setPreview(null);setConfirmed(false);setError('');setStatus('');if(!file)return;try{if(file.size>MAX_BACKUP_BYTES)throw Error('Backup exceeds the supported file size.');const backup=parseDecisionBackup(await file.text(),decisionStore.getDatasetToken()),current=decisionStore.getSnapshot();if(sequence!==readSequence.current)return;if(!current.ready||!current.saved||current.recovery)throw Error('Resolve saved work before reviewing a backup.');setPreview({backup,revision:current.data.revision,snapshot:JSON.stringify(current.data)});}catch(e){if(sequence===readSequence.current)setError(e instanceof Error?e.message:'This backup could not be read.');}}
+ function restore(){if(!preview||!confirmed)return;try{decisionStore.restoreBackup(preview.backup.data,preview.backup.datasetToken,preview.revision,preview.snapshot);window.location.reload();}catch(e){setError(e instanceof Error?e.message:'Restore failed. Existing work is unchanged.');}}
+ return <><button ref={trigger} type="button" className={`${control} mt-3 w-full`} onClick={()=>setOpen(true)}>Backup and restore saved work</button>
+ <dialog ref={dialog} aria-labelledby={`${uid}-title`} onCancel={e=>{e.preventDefault();close();}} className="m-auto max-h-[85dvh] w-[min(36rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-xl border bg-background p-5 text-foreground shadow-xl backdrop:bg-black/40">
+  <div className="flex items-start justify-between gap-3"><h2 id={`${uid}-title`} className="text-xl font-semibold">Backup and restore</h2><button type="button" className={control} onClick={close}>Close</button></div>
+  <p className="my-3 text-sm">Save this dataset’s goals, plans, notes and tracking history to a local file.</p>
+  <button type="button" className={control} disabled={!available} onClick={download}>Download saved-work backup</button>
+  <details className="my-3 text-sm"><summary className="min-h-11 cursor-pointer">What is included?</summary><p>All saved goal work and exploration in this dataset, including conversations, plan versions, measurements, results and corrections. Standalone risk/trend scenarios, separately saved workforce-planning scenarios, unsaved edits, other datasets and browser preferences are not included. Files stay on your device.</p></details>
+  {!available&&<p role="status" className="text-sm">Resolve unsaved work or recovery before continuing.</p>}
+  <label htmlFor={`${uid}-file`} className="block text-sm font-medium">Choose a saved-work backup</label><input id={`${uid}-file`} type="file" accept=".json,application/json" disabled={!available} className="my-2 w-full min-w-0 text-sm" onChange={e=>{void choose(e.target.files?.[0]);e.target.value='';}}/>
+  {preview&&<section aria-label="Review backup before restoring" className="my-3 space-y-3 rounded-lg border p-3 text-sm"><h3 className="font-semibold">Review replacement</h3><p>{preview.backup.counts.goals} goals · {preview.backup.counts.plans} plans · {preview.backup.counts.results} result entries · Backup dated {new Date(preview.backup.createdAt).toLocaleString()}</p><p>This replaces the {storage.data.goals.goals.length} current goals and their saved work in this dataset. Matching IDs are replaced, not merged. Other datasets are unchanged.</p><p>Download your current work first if you want to keep both versions.</p><label className="flex min-h-11 items-start gap-2 py-2"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)} className="mt-1"/><span>Replace this dataset’s saved work with the reviewed backup.</span></label><div className="flex flex-wrap gap-2"><button type="button" className={control} disabled={!confirmed||!available} onClick={restore}>Restore backup and reload</button><button type="button" className={control} onClick={()=>{setPreview(null);setConfirmed(false);}}>Cancel restore</button></div></section>}
+  {error&&<p role="alert" className="my-2 text-sm">{error}</p>}{status&&<p role="status" className="my-2 text-sm">{status}</p>}
+ </dialog></>;
+}

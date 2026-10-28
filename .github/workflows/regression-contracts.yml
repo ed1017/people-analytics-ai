@@ -67,7 +67,7 @@ jobs:
       - name: Run regression contracts
         # The native Lab snapshot is independently scoped and must preserve saved plans.
         working-directory: releases/2026-10-21/source
-        run: node --test tests/fow-lab.test.mjs tests/fow-lab-reference.test.mjs tests/home-answer-acceptance.test.mjs tests/home-turnover-groups.test.mjs tests/catalog-display.test.mjs tests/business-answer-presentation.test.mjs tests/home-historical-reply-clarity.test.mjs tests/overview-projection-entry.test.mjs tests/fow-work-model.test.mjs tests/home-cross-domain-acceptance.test.mjs tests/public-workforce-performance.test.mjs tests/public-occupational-detail.test.mjs tests/manual-plan-results.test.mjs tests/plan-result-review.test.mjs
+        run: node --test tests/fow-lab.test.mjs tests/fow-lab-reference.test.mjs tests/home-answer-acceptance.test.mjs tests/home-turnover-groups.test.mjs tests/catalog-display.test.mjs tests/business-answer-presentation.test.mjs tests/home-historical-reply-clarity.test.mjs tests/overview-projection-entry.test.mjs tests/fow-work-model.test.mjs tests/home-cross-domain-acceptance.test.mjs tests/public-workforce-performance.test.mjs tests/public-occupational-detail.test.mjs tests/manual-plan-results.test.mjs tests/plan-result-review.test.mjs tests/decision-backup.test.mjs tests/decision-backup-store.test.mjs
       - name: Run historical regression contracts
         run: node --test --test-concurrency=4 tests/*.test.mjs
       - name: Verify generated artifacts without writing
