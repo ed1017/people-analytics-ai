@@ -12,6 +12,10 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 | Missing evidence | Full recruiting funnel/recruiter data, several listening survey streams, exit surveys, some promotion/time-in-level and compensation-period data, bound occupational skills/software, and role/location applicant availability/hiring time remain incomplete. Unknowns have not been replaced with zero. |
 | Incomplete/deferred | Assess & Evaluate is coming soon. Video, new findings-to-action pinning, new engines/tornado charts, real-company ingestion and shared enterprise persistence remain deferred. Manual tracking does not execute staffing actions or provide reminders. |
 
+## Additional plan-switch acceptance
+
+An isolated desktop run saved two distinct plans for the same goal and recorded a result only for Plan 1. Plan 2 correctly showed no result for its exact target; goal-wide history remained explicitly labeled as Plan 1 and offered no Plan 1 correction while Plan 2 was selected. Reload and switching back restored Plan 1's measurement and correction control. All 11 assertions passed with no page/transport errors or provider calls. Evidence: `track-plan-switch-20261028-compared/report.json`. This additional switching check was desktop-only; the full nine-step tracking journey passed at both widths.
+
 ## Verified defects repaired in PR454
 
 Career Growth rejected valid 9,037-person ratings using an older 10,000-person contract. A separate strict current-data adapter passed review, hosted acceptance and public desktop/mobile checks. Occupational unavailable-detail responses also failed their public response shape; an exact empty/unavailable contract repair is live and verified without releasing new data. A separately observed one-time index HTTP 503 did not recur in final public checks; its original cause remains unexplained.
