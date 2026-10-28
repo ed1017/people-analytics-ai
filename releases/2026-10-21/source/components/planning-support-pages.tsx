@@ -1,5 +1,6 @@
 'use client';
 
+import {PlanResultReview} from './plan-result-review';
 import {ManualPlanResults} from './manual-plan-results';
 import dynamic from 'next/dynamic';
 import {useEffect,useRef,useState} from 'react';
@@ -28,18 +29,26 @@ export function FutureOfWorkPage({onNavigate}: Navigate) {
   </section>;
 }
 
-export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'action-plans' | 'plan-track'}) {
+export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'action-plans' | 'plan-track' | 'assess-evaluate'}) {
   const storage = useDecisionStorage();
   const goal = storage.data.goals.goals.find(item => item.id === storage.data.goals.activeId);
   const fields = goal ? storage.data.workspaces[goal.id]?.fields ?? {} : {};
-  return <section aria-label={page === 'action-plans' ? 'Action plans' : 'Track'} className="mx-auto max-w-5xl space-y-4 p-6">
-    <h2 className="text-2xl font-semibold">{page === 'action-plans' ? 'Action plans' : 'Track your plan'}</h2>
+  const [selection,setSelection]=useState<{scope:string;id:string}|null>(null);
+  const scope=`${decisionStore.getDatasetToken()}/${goal?.id??''}`;
+  const selected=selection?.scope===scope?selection.id:'';
+  const select=(id:string)=>setSelection({scope,id});
+  const title=page==='assess-evaluate'?'Review plan results':page==='action-plans'?'Action plans':'Track your plan';
+  return <section aria-label={title} className="mx-auto max-w-5xl space-y-4 p-6">
+    <h2 className="text-2xl font-semibold">{title}</h2>
     {!storage.ready ? <p role="status">Loading saved work…</p> : !storage.saved ? <p role="status">Saved work needs review. Existing records are retained.</p> : !goal ? <p className="text-sm text-muted-foreground">Select a saved goal on Overview to review its {page === 'action-plans' ? 'plans' : 'dated measurements'}. No goal is selected.</p> : page === 'action-plans' ? <>
       <p className="text-sm">{goal.statement}</p>
       {fields.homeSolutionBundlesV1 === undefined && fields.homePlanAlternativesV1 === undefined ? <p className="text-sm text-muted-foreground">No attached Action Plan is recorded for this goal. Review proposals in chat on Overview.</p> : <AttachedActionPlansBrief goalId={goal.id} goal={goal.statement} raw={fields.homeSolutionBundlesV1} alternatives={fields.homePlanAlternativesV1} onReview={() => onNavigate('home')}/>}
     </> : null}
-    {storage.ready&&storage.saved&&goal&&<ManualPlanResults key={`${decisionStore.getDatasetToken()}/${goal.id}/${goal.statement}`} goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()}/>}
+    {storage.ready&&storage.saved&&goal&&page==='assess-evaluate'&&<PlanResultReview goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()} selected={selected} onSelect={select} onTrack={id=>{select(id);onNavigate('plan-track');}}/>}
+    {storage.ready&&storage.saved&&goal&&page!=='assess-evaluate'&&<ManualPlanResults selectedPlanId={selected} onSelectPlan={select} key={`${decisionStore.getDatasetToken()}/${goal.id}/${goal.statement}`} goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()}/>}
     {page==='plan-track'&&storage.ready&&storage.saved&&goal&&goalProgressEnabled&&<details><summary className="min-h-11 cursor-pointer text-sm">Other goal measurements</summary><p className="mb-3 text-sm text-muted-foreground">These goal measurements do not include the manually reported plan results above. They are recorded separately.</p><SelectedGoalProgress/></details>}
+    {page==='assess-evaluate'&&<button type="button" onClick={()=>onNavigate('action-plans')} className="mr-2 min-h-11 rounded border px-4 py-2 text-sm">Open Action plans</button>}
+    {page==='plan-track'&&<button type="button" onClick={()=>onNavigate('assess-evaluate')} className="min-h-11 rounded border px-4 py-2 text-sm">Review plan results</button>}
     <button type="button" onClick={() => onNavigate('home')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Return to Overview</button>
   </section>;
 }
