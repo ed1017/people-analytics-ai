@@ -28,14 +28,15 @@ function ResultDescription({entry,target}:{entry:ManualResult;target:ResultTarge
   <p className="text-muted-foreground">Recorded {entry.recordedAt.replace('T',' ').replace(/\.\d{3}/,'').replace('Z',' UTC')}. Manually reported, unverified.</p>
  </div>;
 }
-export function ManualPlanResults({goalId,goal,fields,datasetToken}:{goalId:string;goal:string;fields:Record<string,unknown>;datasetToken:string}){
+export function ManualPlanResults({goalId,goal,fields,datasetToken,selectedPlanId,onSelectPlan}:{selectedPlanId?:string;onSelectPlan?:(id:string)=>void;goalId:string;goal:string;fields:Record<string,unknown>;datasetToken:string}){
  const uid=useId(),heading=useRef<HTMLHeadingElement>(null);
  const [selected,setSelected]=useState(''),[ticket,setTicket]=useState<ResultTicket|null>(null),[review,setReview]=useState<ResultInput|null>(null);
  const [value,setValue]=useState(''),[unknown,setUnknown]=useState(false),[date,setDate]=useState(''),[note,setNote]=useState(''),[confirmed,setConfirmed]=useState(false),[correction,setCorrection]=useState<string|null>(null);
  const [error,setError]=useState(''),[saved,setSaved]=useState('');
  const catalog=readPlanAlternatives(fields[planAlternativesField],{goalId,goal});
  const plans=catalog?.plans.filter(p=>!p.deleted&&catalog.attachments.some(a=>a.planId===p.id))??[];
- const plan=plans.find(p=>p.id===selected)??plans.at(-1);
+ const selection=selectedPlanId??selected;
+ const plan=selection?plans.find(p=>p.id===selection):plans.at(-1);
  const eligible=plan?resultTarget(plan,fields,datasetToken,goalId):null,target=eligible?.target;
  let ledger:ReturnType<typeof readManualResults>|null=null,readError='';
  try{ledger=readManualResults(fields[manualPlanResultsField],goalId);}catch{readError='Saved result history could not be read safely. Existing records are retained. Recording is unavailable until storage is reviewed.';}
@@ -58,14 +59,14 @@ export function ManualPlanResults({goalId,goal,fields,datasetToken}:{goalId:stri
  return <section aria-label="Recorded plan results" className="min-w-0 space-y-3 rounded-lg border bg-card p-4">
   <h3 ref={heading} tabIndex={-1} className="text-lg font-semibold">Record a result</h3>
   <p className="text-sm text-muted-foreground">Report what was measured against an attached saved plan. Entries stay in this browser; they are not shared across devices or verified by the app.</p>
-  {plans.length>1&&<label className="block space-y-1 text-sm" htmlFor={`${uid}-plan`}><span>Saved plan</span><select id={`${uid}-plan`} className={`${control} w-full`} value={plan?.id??''} disabled={!!ticket} onChange={e=>{setSelected(e.target.value);setSaved('');setError('');}}>{plans.map(p=><option key={p.id} value={p.id}>Plan {p.number} - revision {p.draft.revision}</option>)}</select></label>}
+  {plans.length>1&&<label className="block space-y-1 text-sm" htmlFor={`${uid}-plan`}><span>Saved plan</span><select id={`${uid}-plan`} className={`${control} w-full`} value={plan?.id??''} disabled={!!ticket} onChange={e=>{setSelected(e.target.value);onSelectPlan?.(e.target.value);setSaved('');setError('');}}>{plans.map(p=><option key={p.id} value={p.id}>Plan {p.number} - revision {p.draft.revision}</option>)}</select></label>}
   {plan&&<p className="text-sm font-medium">Plan {plan.number} - saved revision {plan.draft.revision}</p>}
   {plan&&catalog&&<details key={plan.id} className="border-t pt-2">
    <summary className="min-h-11 cursor-pointer text-sm font-medium focus-visible:ring-2 focus-visible:ring-ring">Review selected saved plan</summary>
    <p className="mb-3 text-sm text-muted-foreground">Plan {plan.number}, revision {plan.draft.revision}: saved assumptions and evidence references, not recorded results. Review their population and period against your measurement. Opening this review does not change the plan or report.</p>
    <PlanAlternativeCard plan={plan} catalog={catalog} snapshot/>
   </details>}
-  {!plan&&<p className="text-sm">Attach a numbered plan to this goal to record a result. Older plans and targets without supported measurement details remain available for review.</p>}
+  {!plan&&<><p className="text-sm">{selection?'Selected plan is unavailable. Choose another attached plan.':'Attach a numbered plan to this goal to record a result.'}</p>{selection&&<button type="button" className={control} onClick={()=>{setSelected('');onSelectPlan?.('');}}>Choose another saved plan</button>}</>}
   {target?<>
    {target.illustrative&&<p className="rounded border border-amber-500/40 bg-amber-500/5 p-2 text-sm">Illustrative plan: entries here are practice reports for this scenario, not company outcomes.</p>}
    <TargetDescription target={target} compact={!ticket}/>

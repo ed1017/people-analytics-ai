@@ -8,7 +8,7 @@ export const pageHelp: Record<AppPage, string> = {
   "action-plans":"Saved proposals retain their original assumptions and goal. Saving does not approve or implement an action.",
   "plan-track":"Dated measurements retain their saved scope. A selected plan does not establish execution or achieved results.",
   "decision-brief":"Keep observed evidence, calculations, assumptions, unknowns, proposals and explicitly recorded approvals separate. This brief is saved only in this browser and is not sent to AI automatically.",
-  "assess-evaluate":"Coming soon. This placeholder does not track outcomes, estimate ROI or run a scorecard.",
+  "assess-evaluate":"Select a saved plan to compare its target with recorded results. Open Track to record or correct a result.",
   "occupational-references": "Search internal job profiles and inspect their stored occupation mappings and role requirements. O*NET tasks, skills and preparation describe occupations; they do not measure employee attainment. Public starter references remain available when a stored source cannot load.",
   "labor-market": "Compare published occupation employment and annual wages within the same May 2025 period. Read the separate U.S. 2025–2035 outlook as a national projection. Available coverage is three occupations and three geographies; neither employment nor projected openings measures available candidates.",
   "training-coaching": "Compare fictional simulated training/coaching examples or enter your own unverified quote. Select a quote and enter your goal before explicitly carrying it to Development Planning. Nothing enrolls employees or changes assumptions automatically.",

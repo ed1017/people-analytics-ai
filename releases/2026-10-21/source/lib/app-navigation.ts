@@ -23,7 +23,7 @@ export const appWorkspaceJourneys: Array<{key: AppWorkspaceKey; journeyLabel: st
   {key:"analytics", journeyLabel:"Workforce", subtitle:"Understand Our Workforce", defaultPage:"workforce"},
   {key:"talent", journeyLabel:"Intelligence", subtitle:"Realize your potential", defaultPage:"occupational-references"},
   {key:"strategy", journeyLabel:"Planning", subtitle:"Plan Our Future", defaultPage:"planning-overview"},
-  {key:"evaluate",journeyLabel:"Assess & Evaluate",subtitle:"Coming soon",defaultPage:"assess-evaluate"},
+  {key:"evaluate",journeyLabel:"Assess & Evaluate",subtitle:"Review plan results",defaultPage:"assess-evaluate"},
 ];
 export const appNavigationSections: AppNavigationSection[] = [
   {key:"analytics", title:"Workforce", pages:["workforce","attrition","talent-acquisition","compensation","survey-sentiment","skills","learning-development","career-growth-mobility","succession-planning"]},
@@ -40,7 +40,7 @@ export const appPageMetadata: Record<
   "action-plans": {label:"Action plans",section:"Planning",description:"Review saved proposals for the selected goal; proposals are not completed actions."},
   "plan-track": {label:"Track",section:"Planning",description:"Review saved dated measurements and their scope."},
   "decision-brief":{label:"Decision brief",section:"Planning",description:"Your browser-local evidence, assumptions, proposals and explicit approval notes."},
-  "assess-evaluate":{label:"Assess & Evaluate · Coming soon",section:"Assess & Evaluate",description:"Placeholder only; no outcomes, scorecard or ROI calculation."},
+  "assess-evaluate":{label:"Assess & Evaluate",section:"Assess & Evaluate",description:"Compare saved targets with manually recorded plan results."},
   "occupational-references": {label:"Occupational References",section:"Intelligence",description:"Search job-profile mappings, role requirements and O*NET occupation references."},
   "labor-market": {status:"Limited preview",label:"Labor Market",section:"Intelligence",description:"Compare published occupation wages, employment and separate U.S. projections."},
   "training-coaching": {status:"Limited preview",label:"Training & Coaching",section:"Intelligence",description:"Fictional simulated provider examples and unverified user-provided quotes."},

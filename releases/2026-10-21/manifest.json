@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "862497ccec680ae7a33cfcb46a364ed9c5b2ec9f",
-  "deployment": "https://people-analytics-19m5eogk4-ed-56dc.vercel.app",
+  "sourceCommit": "a6dbd4f75383ae13494f46bc1f7a935d2395e769",
+  "deployment": "pending-protected-verification",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "03cee955682d794eb477e623831b98d178c1c60a58d80f302b2dcf49de131b26",
-      "bytes": 91098
+      "sha256": "81f3ecffb3c47b8235efba293804926facd85ca3ea16a1789425a26014b1cf7d",
+      "bytes": 90839
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -704,8 +704,8 @@
     },
     {
       "path": "components/manual-plan-results.tsx",
-      "sha256": "08529b0a2ceeea0d0405a778964b8126c9851bf66f27d5cc13ed586c6c47a5db",
-      "bytes": 12356
+      "sha256": "994c5ebc74ce8812ff4b92f400fc5ec1ef729a508ad4a1fc062c94d9f55099d8",
+      "bytes": 12654
     },
     {
       "path": "components/market-reference.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "sha256": "589db30f64fd5e7a3c7e1ee364d73b7f999838a0880cedbc5ad1889bc199a5c5",
-      "bytes": 5527
+      "sha256": "f9e59ab064f9c44eb4c6179d24715afd4695c1ffa8eba4d36e6c74f56e0b7a4d",
+      "bytes": 6587
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -1404,8 +1404,8 @@
     },
     {
       "path": "lib/app-navigation.ts",
-      "sha256": "82d38ce2b2fb0f578fceda870a4dcec1ce6eeadc0ffebf488ad2e33e5e5e2647",
-      "bytes": 7385
+      "sha256": "07de0971e75ccb4737650106317b4063b6c59bec3437db5920196cd8724ecf1f",
+      "bytes": 7376
     },
     {
       "path": "lib/app-page-url.ts",
@@ -3039,8 +3039,8 @@
     },
     {
       "path": "lib/page-help.ts",
-      "sha256": "66d39d954c0fd3f29feb9733555cf3129113c67cdea5aad4c1c0898ab47c50fe",
-      "bytes": 6329
+      "sha256": "57fe572f9699c6cdd64f23cc4985ef44b58782a1aa9519e27d953e9860cfe286",
+      "bytes": 6348
     },
     {
       "path": "lib/people-analytics-tool-definitions.ts",
@@ -4811,6 +4811,21 @@
       "path": "tests/public-workforce-performance.test.mjs",
       "bytes": 4178,
       "sha256": "e3c257ac077817139929d59e657be6a10d9480b11307082a2252feb51a9951d8"
+    },
+    {
+      "path": "components/plan-result-review.tsx",
+      "bytes": 4927,
+      "sha256": "1e9b9cae981dc62966f528893a61befb4aa18aa803a0b6df3e3477fc95a04218"
+    },
+    {
+      "path": "lib/plan-result-review.ts",
+      "bytes": 761,
+      "sha256": "035efdac51ca539d1afeca5984f1c94e95a203733085e27699d7017571fc0792"
+    },
+    {
+      "path": "tests/plan-result-review.test.mjs",
+      "bytes": 2856,
+      "sha256": "efcc8624c1364289e09cb9672e14c4f27f3cfa42cc193b356cd270f89a8b0652"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
