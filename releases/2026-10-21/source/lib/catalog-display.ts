@@ -54,7 +54,10 @@ export function catalogSourceLabel(label:string):string {return label.replace(/^
 export function catalogProseDisplay(text: string): string {
   const labels={...demoBusinessUnitNames,...demoRoleNames};
   // Collapse only exact canonical label/code pairs, not arbitrary parenthetical prose.
-  for(const [code,name] of Object.entries(labels)) text=text.split(`${name} (${code})`).join(name);
+  for(const [code,name] of Object.entries(labels)) {
+    text=text.split(`${name} (${code})`).join(name);
+    text=text.split(`${name} (Demo ${code})`).join(name);
+  }
   return text.replace(/(?<![\w-])(?<!Demo )(?:Demo )?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+(?![\w-])/g,
     label => {const code=label.replace(/^Demo /,'');return Object.hasOwn(labels,code)?labels[code]:label;});
 }

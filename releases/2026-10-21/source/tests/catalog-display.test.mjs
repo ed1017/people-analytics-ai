@@ -55,3 +55,15 @@ test('readable multi-role template retains allocation clarification and budget s
  assert.ok(reply);assert.match(reply.answer,/total 12 FTE/);assert.match(reply.answer,/AI Engineer, Business Intelligence Analyst, Business Intelligence Developer/);assert.deepEqual(req,before);
  assert.equal(confirmsBudgetAmount(text,2000000),true);assert.equal(confirmsBudgetAmount(text.replace('AI Engineer (AI-ENG)','Not approved (AI-ENG)'),2000000),false);
 });
+
+test('canonical label plus its demo code collapses without merging different entities or qualifications',()=>{
+ for(const [code,name] of Object.entries({...labels.demoBusinessUnitNames,...labels.demoRoleNames})){
+  assert.equal(labels.catalogProseDisplay(`${name} (Demo ${code})`),name);
+  assert.equal(labels.catalogProseDisplay(`${name} (${code})`),name);
+  assert.equal(labels.catalogProseDisplay(`${name} (provisional)`),`${name} (provisional)`);
+ }
+ assert.equal(labels.catalogProseDisplay('Managed Services (Demo BU-MGSVC) has 13.6% voluntary turnover YTD.'),'Managed Services has 13.6% voluntary turnover YTD.');
+ assert.equal(labels.catalogProseDisplay('Managed Services (Demo BU-CONS)'),'Managed Services (Consulting)');
+ assert.equal(labels.catalogProseDisplay('Managed Services (Demo BU-UNKNOWN)'),'Managed Services (Demo BU-UNKNOWN)');
+ assert.equal(labels.catalogProseDisplay('Managed Services (Demo BU-MGSVC; provisional)'),'Managed Services (Managed Services; provisional)');
+});

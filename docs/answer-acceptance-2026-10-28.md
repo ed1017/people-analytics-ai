@@ -6,11 +6,15 @@ Four actual public chat requests subsequently passed with zero model rounds: his
 
 One authorized fresh provider response completed, but failed answer-quality acceptance: it said a Managed Services turnover baseline was unavailable. The captured packet contained BU engagement comparisons but only company-level turnover evidence. This is a confirmed grounding omission, not proof of a provider outage.
 
-The follow-up candidate `d3263b1a6c50398641cc7be7b621109c28b9cb64` adds complete, dated BU voluntary-turnover rates and exit counts to the shared evidence packet and citation catalogue. It retains missing/suppressed-data and source-verification checks. It does not infer total turnover rates or causes from exit counts. Independent review, 959 runtime tests and TypeScript passed. Fresh provider retesting and final production verification of this candidate remain pending at source publication.
+PR447 runtime `d3263b1a6c50398641cc7be7b621109c28b9cb64` adds complete, dated BU voluntary-turnover rates and exit counts to the shared evidence packet and citation catalogue. It retains missing/suppressed-data and source-verification checks. It does not infer total turnover rates or causes from exit counts. Independent review, 959 runtime tests, TypeScript and exact-head CI `40705752135` passed. Merge `bbc1f0cdf149ebc830cb06c695376df7f702bc8e` was promoted to deployment `dpl_2EEDXoSm994dReBEjx4h3nLyBkqv`.
+
+Protected and public desktop/mobile packet and chart checks passed. A fresh public provider retest returned the correct Managed Services baseline (13.6% voluntary YTD turnover, 205 voluntary exits, versus 8.8% company-wide), pay/workload investigation steps and no claimed cause. A subsequent real provider/tool follow-up retained calendar year 2025 and withheld unavailable historical comparisons rather than substituting current figures. Three paid rounds were used across the original failing answer and two acceptance requests; no additional tests are implied. These checks cover this bounded set, not universal answer reliability.
+
+A display-only follow-up, runtime `a88d0cab2f3a65782dd051e4f9cb4ff733e8969f`, collapses exact canonical names followed by their own Demo codes. Different identities, unknown codes and qualifications remain. It changes neither stored answers nor calculations. Independent review, 27 affected tests and TypeScript passed; the full 959-test suite passed immediately before this two-file display change.
 
 ## Remaining boundaries
 
-Mocks and configured readiness do not establish fresh answer quality. The original reviewer failure has no correlated request/output in the retrieved telemetry. No claim is made that every business question passes.
+Mocks and configured readiness do not establish fresh answer quality. The original reviewer failure has no correlated request/output in the retrieved telemetry. Answer verbosity and the generic unsupported-period response remain editorial limitations; no claim is made that every business question passes.
 
 Official Australian recruitment-outcomes definitions are accessible, but the CSV retrieval timed out before bytes arrived. No new role/location candidate-availability or hiring-duration estimate was verified or added. Existing pay and vacancy references are not available-applicant counts. BLS access restrictions were not bypassed.
 
