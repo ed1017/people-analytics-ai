@@ -40,6 +40,10 @@ export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'actio
   const title=page==='assess-evaluate'?'Review plan results':page==='action-plans'?'Action plans':'Track your plan';
   return <section aria-label={title} className="mx-auto max-w-5xl space-y-4 p-6">
     <h2 className="text-2xl font-semibold">{title}</h2>
+    {page==='action-plans'&&storage.ready&&storage.saved&&goal&&<nav aria-label="Continue saved plan" className="flex flex-wrap gap-2">
+      <button type="button" onClick={()=>onNavigate('plan-track')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Track this plan</button>
+      <button type="button" onClick={()=>onNavigate('assess-evaluate')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Review plan results</button>
+    </nav>}
     {!storage.ready ? <p role="status">Loading saved work…</p> : !storage.saved ? <p role="status">Saved work needs review. Existing records are retained.</p> : !goal ? <p className="text-sm text-muted-foreground">Select a saved goal on Overview to review its {page === 'action-plans' ? 'plans' : 'dated measurements'}. No goal is selected.</p> : page === 'action-plans' ? <>
       <p className="text-sm">{goal.statement}</p>
       {fields.homeSolutionBundlesV1 === undefined && fields.homePlanAlternativesV1 === undefined ? <p className="text-sm text-muted-foreground">No attached Action Plan is recorded for this goal. Review proposals in chat on Overview.</p> : <AttachedActionPlansBrief goalId={goal.id} goal={goal.statement} raw={fields.homeSolutionBundlesV1} alternatives={fields.homePlanAlternativesV1} onReview={() => onNavigate('home')}/>}

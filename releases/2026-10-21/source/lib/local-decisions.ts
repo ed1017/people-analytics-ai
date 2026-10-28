@@ -103,6 +103,18 @@ export class DecisionStore {
  private state:DecisionSnapshot={ready:false,data:empty(),notice:null,saved:false};
  getSnapshot=()=>this.state;
  getDatasetToken=()=>this.datasetToken;
+ /** Explicit reviewed replacement; one storage write, no candidate publication on failure. */
+ restoreBackup(data:DecisionData,datasetToken:string,expectedRevision:number,expectedSnapshot:string){
+  if(datasetToken!==this.datasetToken||!this.state.ready||!this.state.saved||this.blocked||this.recovery||!this.port)throw Error('Resolve saved-work recovery before restoring a backup.');
+  if(this.state.data.revision!==expectedRevision||JSON.stringify(this.state.data)!==expectedSnapshot)throw Error('Saved work changed after review. Choose the backup again.');
+  const original=this.state.data,expected=this.expected;
+  const checked=parseDecisions(encodeDecisions(structuredClone(data)));
+  const next={...checked,revision:Math.max(original.revision,checked.revision)+1};
+  const raw=encodeDecisions(next);parseDecisions(raw);
+  if(this.state.data!==original||this.expected!==expected||this.port.getItem(this.storageKey)!==expected)throw Error('Another tab changed saved work. Reload and review the backup again.');
+  this.port.setItem(this.storageKey,raw);
+  this.expected=raw;this.state={ready:true,data:next,notice:null,saved:true};this.emit();
+ }
  subscribe=(listener:()=>void)=>{this.listeners.add(listener);return()=>{this.listeners.delete(listener)}};
  private emit(){for(const fn of this.listeners)fn()}
  private preserveRecovery(force=false){

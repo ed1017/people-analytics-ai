@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {WorkspacePaletteControl} from "@/components/workspace-palette-control";
 import { PageHelp } from "@/components/page-help";
 import {ProjectCaseStudy} from '@/components/project-case-study';
+import {DecisionBackup} from '@/components/decision-backup';
 
 import {
   getAppPageMetadata,
@@ -114,7 +115,7 @@ export function AppHeader({
           <ProjectCaseStudy/><a href="/about" className="inline-block py-2 text-sm underline underline-offset-4">Open project overview</a>
           {contact}
         </div></details>
-        <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<p className="mt-3 text-xs text-muted-foreground">Plans are stored in this browser. Use the saved-work controls to review storage status and manage local work.</p></div></details>
+        <details className="header-settings calm-header-menu"><summary>Settings</summary><div className="calm-header-popover">{preferences}<DecisionBackup/></div></details>
         </div>
       </div>
       <details id="guided-header-context" className="guided-header-context workspace-context"><summary>Workspace · Action Plan and filters{contextLabel&&<span className="ml-2">— {contextLabel}</span>}</summary>{children}</details>
