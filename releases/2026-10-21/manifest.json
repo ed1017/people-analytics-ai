@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "d3263b1a6c50398641cc7be7b621109c28b9cb64",
-  "deployment": "https://people-analytics-6is18hf9w-ed-56dc.vercel.app",
+  "sourceCommit": "a88d0cab2f3a65782dd051e4f9cb4ff733e8969f",
+  "deployment": "https://people-analytics-m92wtm6ic-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -1449,8 +1449,8 @@
     },
     {
       "path": "lib/catalog-display.ts",
-      "sha256": "cdecd03c5f3c024176d8e01d3310605ab74cd053abf57703572dc46e917daa05",
-      "bytes": 4674
+      "sha256": "30332f5dc8860bf732ec41a1a2359967a3cd8398f6552c936c3de34d08fd6711",
+      "bytes": 4742
     },
     {
       "path": "lib/chat-answer-style.ts",
@@ -3799,8 +3799,8 @@
     },
     {
       "path": "tests/catalog-display.test.mjs",
-      "sha256": "ac70128ebf69d43b429f882fe999d307ad4cbe0a9c9f193e3683720afe211dbe",
-      "bytes": 8467
+      "sha256": "338d45f334d042871b90db6c1b76b6621ca6ea23bc0edebf04b4a681456897b8",
+      "bytes": 9463
     },
     {
       "path": "tests/composer-prompt-helpers.test.mjs",

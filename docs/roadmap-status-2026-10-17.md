@@ -2,6 +2,14 @@
 
 ## Current live release and active parallel work
 
+### PR446/447 — verified answer-acceptance fixes
+
+PR446 rejects incomplete BU turnover rankings instead of presenting seven values as a complete eight-unit comparison. PR447 supplies the model with the complete, dated BU voluntary-turnover baseline and verified citation locations. Runtime `d3263b1a6c50398641cc7be7b621109c28b9cb64`, deployment `dpl_2EEDXoSm994dReBEjx4h3nLyBkqv`, exact-head CI `40705752135`: independent review, 959 runtime tests, TypeScript and protected/public desktop/mobile checks passed. All prior Lab and saved-plan capabilities are retained.
+
+Fresh provider acceptance now covers the previously failing Managed Services pay/workload investigation and an unsupported-2025 follow-up. A separate four-turn actual public route sequence verified date clarification, current-data adoption, driver guidance and exact eight-unit chart values with zero model rounds. This is bounded acceptance, not a claim that all questions pass. A display-only follow-up (`a88d0cab2f3a65782dd051e4f9cb4ff733e8969f`) removes duplicated canonical names without altering saved answers. [Evidence, limits and release identities](answer-acceptance-2026-10-28.md).
+
+Still open: broader answer acceptance and concise unsupported-period wording; uncorrelated original reviewer failure; verified role/location candidate-availability and hiring-time evidence; Lab methodology retest. The official Australian data download timed out, and no unsupported external estimate was added. Video and additional findings-to-action pinning remain deferred. No accounting, access or pricing-policy changes were made in this acceptance work.
+
 ### PR444 live — native Future of Work Lab
 
 Runtime `995d96f61dadb6d90d4c5e9056a44bc9fb9530c8` adds a separate, read-only Lab workspace: 10,000 people, 15 functions and 50 roles from a versioned aggregate capture. Exposure/adoption charts, task drilldowns, governance and snapshot-matched action evidence do not merge with the app workforce or convert exposure into FTE. Explicit goal-reference carry preserves scenario inputs and revisions. Human validation is 33/100 sampled tasks; no retest is complete. No scoring jobs, new database access or paid calls are included. Existing task-redesign scenario remains available.
