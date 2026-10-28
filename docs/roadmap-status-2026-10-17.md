@@ -2,11 +2,17 @@
 
 ## Current live release and active parallel work
 
-### PR453 live - selected-work modeling and reviewed scenario handoff
+### PR454 live - current data panels and completeness audit
+
+Runtime `862497ccec680ae7a33cfcb46a364ed9c5b2ec9f`, deployment `dpl_AGrMfCtBzpsEc3YpKiKUuepxRgL3`, merge `d8e897e204ae99c12f230d9ed0136748af827dfe`. Career Growth now accepts the current 9,037-person rating source through its own strict receipt/scope contract; legacy checks remain unchanged. Occupational detail returns its verified empty/unavailable state instead of a projection error, without adding external data or expanding the general allowlist.
+
+Independent review, 1,011 runtime tests, production build/TypeScript, 960-file manifest, and exact-head CI `40769274456` passed. Public 1440px/390px acceptance passed all six checks per width: company counts, BU denominator, unsupported-filter clearing, reload, occupational index/detail and Back. All observed data responses were HTTP 200 with no page/transport errors. No paid provider calls. The earlier one-time occupational index 503 did not recur; its cause remains unproven. [Whole-app completeness and tracking evidence](app-completeness-2026-10-28.md).
+
+### PR453 - selected-work modeling and reviewed scenario handoff (previous release)
 
 Runtime `06a1be300a5ddf74db33b0fae01bcb9e5f244f5a`, deployment `dpl_aAkzh8xviJvQtqYogaKJ9WMaJXiY`, merge `9f6c01f2c4ca91205da2f269d1aebdc9be64ac24`. Model this work opens beside Lab selection using editable example assumptions, not exposure scores. Reviewed transfer requires explicit replacement of an occupied draft; saved capacity scenarios retain provenance and other goals. Independent review, 992 runtime tests, exact-head CI `40766781576`, and staged/public desktop and mobile calculation/save/reload checks passed. No paid provider calls.
 
-Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop/mobile guided scenario -> Action plans -> Track journeys passed nine checks each, including dated reporting, correction and retained history after reload. Some evidence panels remain incomplete; Assess & Evaluate is a placeholder. Career Growth ratings and occupational unavailable-detail response fixes are staged separately, not yet counted as live. [Completeness matrix](app-completeness-2026-10-28.md).
+Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop/mobile guided scenario -> Action plans -> Track journeys passed nine checks each, including dated reporting, correction and retained history after reload. Some evidence panels remain incomplete; Assess & Evaluate is a placeholder. Career Growth ratings and occupational unavailable-detail response fixes were subsequently delivered in PR454. [Completeness matrix](app-completeness-2026-10-28.md).
 
 ### PR451 - Overview headcount planner restored (previous release)
 
