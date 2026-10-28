@@ -12,14 +12,18 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 | Missing evidence | Full recruiting funnel/recruiter data, several listening survey streams, exit surveys, some promotion/time-in-level and compensation-period data, bound occupational skills/software, and role/location applicant availability/hiring time remain incomplete. Unknowns have not been replaced with zero. |
 | Incomplete/deferred | Assess & Evaluate is coming soon. Video, new findings-to-action pinning, new engines/tornado charts, real-company ingestion and shared enterprise persistence remain deferred. Manual tracking does not execute staffing actions or provide reminders. |
 
-## Verified defects being repaired
+## Verified defects repaired in PR454
 
-Career Growth rejected valid 9,037-person ratings using an older 10,000-person contract. A separate strict current-data adapter is reviewed and tested; hosted/public acceptance is pending. Occupational unavailable-detail responses also failed their public response shape; an exact empty/unavailable contract repair is reviewed and tested without releasing new data. A separately observed one-time index HTTP 503 remains unexplained.
+Career Growth rejected valid 9,037-person ratings using an older 10,000-person contract. A separate strict current-data adapter passed review, hosted acceptance and public desktop/mobile checks. Occupational unavailable-detail responses also failed their public response shape; an exact empty/unavailable contract repair is live and verified without releasing new data. A separately observed one-time index HTTP 503 did not recur in final public checks; its original cause remains unexplained.
+
+## Current release
+
+PR454 is live at runtime `862497ccec680ae7a33cfcb46a364ed9c5b2ec9f`, deployment `dpl_AGrMfCtBzpsEc3YpKiKUuepxRgL3`. Independent review, 1,011 runtime tests, build/TypeScript and exact-head CI `40769274456` passed. The final public data-panel checks passed six assertions at each width, with all observed data responses HTTP 200 and no page/transport errors. The source manifest contains 960 verified files; private runtime inputs are excluded.
 
 ## Evidence and limits
 
-At breadth audit, production was PR451 (`ec0606e070c22195020e4b53a4d1db5a35ef63ce`). PR453 is now live at runtime `06a1be300a5ddf74db33b0fae01bcb9e5f244f5a`, deployment `dpl_aAkzh8xviJvQtqYogaKJ9WMaJXiY`, and passed affected public desktop/mobile checks. Tracking used isolated browser storage and real calculation/persistence. Provider and upstream non-GET requests were blocked; this batch made no paid model calls and adds no fresh provider-answer acceptance.
+At breadth audit, production was PR451 (`ec0606e070c22195020e4b53a4d1db5a35ef63ce`). PR453 was released at runtime `06a1be300a5ddf74db33b0fae01bcb9e5f244f5a`, deployment `dpl_aAkzh8xviJvQtqYogaKJ9WMaJXiY`, and passed affected public desktop/mobile checks. Tracking used isolated browser storage and real calculation/persistence. Provider and upstream non-GET requests were blocked; this batch made no paid model calls and adds no fresh provider-answer acceptance.
 
-Local retained evidence: `WHOLE-APP-BREADTH-AUDIT-20261028-FINAL-REVIEWER.md`, `track-journey-20261028-{desktop,mobile}-clean/report.json`, and `fow-work-model-public.json`. Earlier harness selector failures remain retained and are not classified as app defects.
+Local retained evidence: `WHOLE-APP-BREADTH-AUDIT-20261028-FINAL-REVIEWER.md`, `track-journey-20261028-{desktop,mobile}-clean/report.json`, `fow-work-model-public.json`, and `data-panels-public-862497c-{1440,390}.json`. Earlier harness selector failures remain retained and are not classified as app defects.
 
 Broader AI-answer acceptance, the uncorrelated original visitor failure, and Lab methodology validation/retest remain open. Existing saved plans and browser-local history are preserved; cross-device enterprise storage is not implied.
