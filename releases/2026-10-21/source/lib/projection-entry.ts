@@ -11,6 +11,12 @@ export function projectionEntryValues(question:string):ProjectionEntryValues{
  return {months:unique(/(?<![\w.+-])(\d+)\s+months?\b/g),hires:rate('hires?'),exits:rate('(?:exits?|departures?|separations?)'),transfersIn:'',transfersOut:''};
 }
 export function isHeadcountEntry(q:string){return /\b(?:project|projection|simulate|model)\b/i.test(q)&&/\bheadcount\b/i.test(q);}
+/** Open controls for an actual planning request, never turn a historical question into a forecast. */
+export function overviewProjectionQuestion(draft:string,lastQuestion:string):string|null{
+ const eligible=(q:string)=>isHeadcountEntry(q)||(/\b(?:close|fill|address|solve|plan|manage)\b/i.test(q)&&/\b(?:staffing|capacity|headcount)\s+gap\b/i.test(q));
+ if(eligible(draft))return draft;
+ return eligible(lastQuestion)?lastQuestion:null;
+}
 export async function calculateProjectionEntry(inputs:ProjectionInputs,values:ProjectionEntryValues,id:string,turnId:string){
  const scoped=Object.values(inputs.filters).some(v=>v!=='all');
  const fields=[['monthly_hires',values.hires],['monthly_exits',values.exits],...(scoped?[['monthly_transfers_in',values.transfersIn],['monthly_transfers_out',values.transfersOut]]:[])];

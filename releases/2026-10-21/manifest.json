@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "9d4d109ac8917300eaf2aca977a4ab4421b7d024",
-  "deployment": "https://people-analytics-pwjsd08at-ed-56dc.vercel.app",
+  "sourceCommit": "ec0606e070c22195020e4b53a4d1db5a35ef63ce",
+  "deployment": "https://people-analytics-kqdra56py-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "0d995ab39304db461496b6569a87ef7155c74791cc4d745b562ea0e42b5eae2c",
-      "bytes": 104356
+      "sha256": "be14d40c0ebd3912bfa19936c85f88da2f658062cce8046620a9ae536e44bb25",
+      "bytes": 106581
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4169,8 +4169,8 @@
     },
     {
       "path": "components/headcount-projection-entry.tsx",
-      "sha256": "7429ec35141a740e172941696a6a24ee981981ce7f50fce02840f586bb0e5698",
-      "bytes": 6570
+      "sha256": "155ea84671944190c5741062bcef1f14997bd445eff9bdec14a913ee90456634",
+      "bytes": 7018
     },
     {
       "path": "lib/group-workforce-trend.ts",
@@ -4179,8 +4179,8 @@
     },
     {
       "path": "lib/projection-entry.ts",
-      "sha256": "0bc44ffece8861c72c2765d76893347a6233e6f9bd0ad1ef31da0f417b06d024",
-      "bytes": 2610
+      "sha256": "4617542159d75785a72b0f589dea61897ec7a0dd05407b021304ed367a00c2b2",
+      "bytes": 3051
     },
     {
       "path": "tests/planner-first-use.test.mjs",
@@ -4781,6 +4781,11 @@
       "path": "tests/home-historical-reply-clarity.test.mjs",
       "bytes": 4060,
       "sha256": "f0415bc3305014b7795cfcf5c6fdb0c048a52ff5ff6c25514d7d1d393b0d4bb2"
+    },
+    {
+      "path": "tests/overview-projection-entry.test.mjs",
+      "bytes": 2888,
+      "sha256": "d1e09155d80ef2b8afae39e05fb8969d01adde1d4d5241463529a26580268436"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
