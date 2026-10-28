@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR456 live - Review plan results
+### PR458 live - local saved-work backup and direct plan navigation
+
+Runtime `7453e9cf151f3888145ac3296824d07a91dd93d4`, deployment `dpl_F9CEh2oocugK6aewDvbebzd3sDcZ`, merge `09fd85f76bfab72a4feac4418ebcdf78693cd083`. Settings now downloads and restores current-dataset saved goal work, including plan versions and manual result/correction history. Restore requires a validated preview and explicit replacement confirmation. Action plans links directly to Track and Review plan results with selected-plan continuity.
+
+Independent review, 1,027 runtime tests, TypeScript, staged build and exact-head CI `40781944810` passed. Staged and public desktop/mobile each passed seven checks with no page errors, overflow or paid calls. Standalone risk/trend and separately saved workforce-planning scenarios, unsaved edits, preferences and other datasets remain outside this backup. [Contract, evidence and limits](saved-work-backup-2026-10-28.md). This closes the saved-goal tracking backup slice; comprehensive cross-store backup remains a separate gap, not a claim of all-app protection.
+
+### PR456 - Review plan results (previous release)
 
 Runtime `72f7fcac693efacff644f7d7364d83f132ef889b`, deployment `dpl_GvFVFdkHgFhFoG2Qfo7rGnbk4i2A`, merge `03fcdb35209dcebd0ebc082d62b1f95bb48b90e5`. The user-approved bounded Assess & Evaluate view now compares exact saved targets with latest manual results and links to Track with the selected plan. Unknown, interim, late and corrected records remain distinct; no new storage or outcome/ROI engine.
 
