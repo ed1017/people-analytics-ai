@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "ec0606e070c22195020e4b53a4d1db5a35ef63ce",
-  "deployment": "https://people-analytics-kqdra56py-ed-56dc.vercel.app",
+  "sourceCommit": "06a1be300a5ddf74db33b0fae01bcb9e5f244f5a",
+  "deployment": "https://people-analytics-l76yvw2rq-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -434,8 +434,8 @@
     },
     {
       "path": "components/future-work-example.tsx",
-      "sha256": "f07537ed5a315979b3830971ebaf865fbdf42635608b204482e9546fc2d55fb0",
-      "bytes": 8938
+      "sha256": "7a6b5ea4cdcaf8c7124676204762b360f2a6ca193c49d2a836010eb1a1759cda",
+      "bytes": 9944
     },
     {
       "path": "components/global-workforce-filters.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "sha256": "5d9585c16193667646e36f20441d3464bdf55e122f7179e70e53228651d94c04",
-      "bytes": 5760
+      "sha256": "589db30f64fd5e7a3c7e1ee364d73b7f999838a0880cedbc5ad1889bc199a5c5",
+      "bytes": 5527
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -1219,8 +1219,8 @@
     },
     {
       "path": "components/workforce-planning/planning-session-context.tsx",
-      "sha256": "63d361332389c04e645df187c3e2cc38f04102f0984fa31c6b62b02ab6164f0f",
-      "bytes": 6199
+      "sha256": "325cfc7cebda0995a73dcda1e5be521cd1bbacc1c8b6d8f1a42c56a0ae89ae0a",
+      "bytes": 6793
     },
     {
       "path": "components/workforce-planning/position-action-simulator.tsx",
@@ -4719,8 +4719,8 @@
     },
     {
       "path": "components/fow-lab-workspace.tsx",
-      "bytes": 13925,
-      "sha256": "97961eb8c8d1eee0f2456e646f5664ffc6288aa249012df547b125fc58912d79"
+      "bytes": 15218,
+      "sha256": "fb5c491945193d7c77f0c5083b80b827a181d32c692e532cc0a21f0aab6fca1e"
     },
     {
       "path": "data/fow-lab-reference-catalog.json",
@@ -4786,6 +4786,21 @@
       "path": "tests/overview-projection-entry.test.mjs",
       "bytes": 2888,
       "sha256": "d1e09155d80ef2b8afae39e05fb8969d01adde1d4d5241463529a26580268436"
+    },
+    {
+      "path": "lib/fow-work-model.ts",
+      "bytes": 1790,
+      "sha256": "d4be24177400f11511c61c803b7509f1fb16002dc7f80d2d024d1ea871b71102"
+    },
+    {
+      "path": "tests/fow-work-model.test.mjs",
+      "bytes": 6714,
+      "sha256": "0dfb70b0fdca389c8d6d35ea15b53f90bc0d35693d648a963b8b9bbea41a3887"
+    },
+    {
+      "path": "tests/home-cross-domain-acceptance.test.mjs",
+      "bytes": 5030,
+      "sha256": "2a84200a1593b88f561f3d570cdfd0a12169c8a13575f559fe4dd63884186759"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

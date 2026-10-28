@@ -4,7 +4,6 @@ import {ManualPlanResults} from './manual-plan-results';
 import dynamic from 'next/dynamic';
 import {useEffect,useRef,useState} from 'react';
 import {FoWLabReferenceHandoff} from './fow-lab-reference';
-import {FutureWorkExample} from './future-work-example';
 import type { AppPage } from '@/lib/types';
 import { decisionStore, useDecisionStorage } from './decision-store';
 import { AttachedActionPlansBrief } from './attached-action-plans-brief';
@@ -20,12 +19,11 @@ export function FutureOfWorkPage({onNavigate}: Navigate) {
   const review=useRef<HTMLDivElement>(null);
   useEffect(()=>{if(handoff)review.current?.focus();},[handoff]);
   return <section className="mx-auto max-w-7xl space-y-5 p-4 md:p-6" aria-label="Future of Work">
-    <FowLabWorkspace onReference={(jobKey,functionName)=>setHandoff({jobKey,functionName})}/>
+    <FowLabWorkspace onNavigate={onNavigate} onReference={(jobKey,functionName)=>setHandoff({jobKey,functionName})}/>
     {handoff&&<div ref={review} tabIndex={-1} className="rounded-xl border p-4 focus-visible:ring-2 focus-visible:ring-ring" aria-label="Review Lab planning reference">
       <FoWLabReferenceHandoff jobKey={handoff.jobKey} functionName={handoff.functionName} onNavigate={onNavigate}/>
       <button type="button" className="mt-2 min-h-11 rounded border px-4 text-sm" onClick={()=>setHandoff(null)}>Cancel handoff</button>
     </div>}
-    <details className="rounded-xl border p-4"><summary className="min-h-11 cursor-pointer font-semibold">Try the task-redesign example</summary><FutureWorkExample onNavigate={onNavigate}/></details>
     <div className="flex flex-wrap gap-3"><button type="button" onClick={()=>onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" onClick={()=>onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open Scenarios</button></div>
   </section>;
 }

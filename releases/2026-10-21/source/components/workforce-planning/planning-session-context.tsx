@@ -43,6 +43,8 @@ export type CarriedPlanningGoalActions={businessGoal:string;goals:{id:string;sta
 export type PositionEditorDraft={baselineRows:import("@/lib/position-design-scenario").PositionRecord[];scope:string;asOf:string;scenario:import("@/lib/position-design-scenario").PositionScenario|null;rows:import("@/lib/position-design-scenario").PositionRecord[];editing:import("@/lib/position-design-scenario").PositionRecord|null};
 export type PositionGoalActions={businessGoal?:string;goals:{id:string;statement:string}[];disabled:boolean;onCreate:(statement:string)=>string;onSelect:(id:string)=>string};
 type PlanningSessionContextValue = {
+  futureWorkDrafts:Record<string,import('@/lib/future-work-example').FutureWorkInputs>;
+  setFutureWorkDraft:(key:string,input:import('@/lib/future-work-example').FutureWorkInputs)=>void;
   positionGoalActions?:PositionGoalActions;
   positionDesignDraft?:PositionEditorDraft;
   setPositionDesignDraft:(draft:SetStateAction<PositionEditorDraft|undefined>)=>void;
@@ -81,6 +83,8 @@ export function PlanningSessionProvider({
   const currentCapacityState=capacityState??localCapacityState;
   const [positionDrafts,setPositionDrafts]=useState<Record<string,PositionEditorDraft|undefined>>({});
   const positionKey=JSON.stringify([currentCapacityState.datasetToken,goalKey]);
+  const [futureDrafts,setFutureDrafts]=useState<Record<string,Record<string,import('@/lib/future-work-example').FutureWorkInputs>>>({});
+  const setFutureWorkDraft=(key:string,input:import('@/lib/future-work-example').FutureWorkInputs)=>setFutureDrafts(current=>({...current,[positionKey]:{...current[positionKey],[key]:input}}));
   const setPositionDesignDraft=useCallback((draft:SetStateAction<PositionEditorDraft|undefined>)=>setPositionDrafts(current=>({...current,[positionKey]:typeof draft==="function"?draft(current[positionKey]):draft})),[positionKey]);
   const canCarryPositionDesignDraft=useCallback((id:string)=>{
     const target=goalKey.slice(0,goalKey.indexOf(':')+1)+id;
@@ -97,6 +101,7 @@ export function PlanningSessionProvider({
   return (
     <PlanningSessionContext.Provider
       value={{
+        futureWorkDrafts:futureDrafts[positionKey]??{},setFutureWorkDraft,
         carriedGoalActions,
         positionGoalActions,
         positionDesignDraft:positionDrafts[positionKey],

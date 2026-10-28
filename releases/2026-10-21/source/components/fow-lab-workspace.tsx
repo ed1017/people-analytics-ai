@@ -1,9 +1,12 @@
 'use client';
 
-import {useMemo,useState} from 'react';
+import {useMemo,useState,useRef,useEffect} from 'react';
 import snapshotData from '../data/fow-lab-snapshot.json';
 import {buildFowLabModel,getFowLabView,type FowLabModel,type FowWeighting,type FowJob} from '@/lib/fow-lab';
 import styles from './fow-lab-workspace.module.css';
+import {FutureWorkExample} from './future-work-example';
+import type {AppPage} from '@/lib/types';
+import type {FoWLabSelection} from '@/lib/fow-lab-reference';
 
 const count=(n:number|null)=>n===null?'Unavailable':n.toLocaleString('en-US',{maximumFractionDigits:1});
 const percent=(n:number|null)=>n===null?'Unavailable':`${(n*100).toFixed(1)}%`;
@@ -12,14 +15,17 @@ const dateLabel=(value:string)=>new Date(value).toLocaleDateString('en-US',{mont
 const status=(row:{suppressed:boolean;coverage:string;provenance:string})=>row.suppressed?'Withheld':row.coverage!=='complete'?`${row.coverage==='partial'?'Partial':'Missing'} task coverage`:row.provenance!=='consistent'?`${row.provenance==='mixed'?'Mixed':'Unknown'} scoring provenance`:'Complete task coverage';
 
 /** Independent, read-only Lab snapshot. No app workforce filters, storage or AI calls. */
-export function FowLabWorkspace({onReference,snapshot=snapshotData}:{onReference?:(jobKey?:string,functionName?:string)=>void;snapshot?:unknown}){
+export function FowLabWorkspace({onReference,onNavigate,snapshot=snapshotData}:{onNavigate?:(page:AppPage)=>void;onReference?:(jobKey?:string,functionName?:string)=>void;snapshot?:unknown}){
  const parsed=useMemo(()=>{try{return {model:buildFowLabModel(snapshot),error:null};}catch{return {model:null,error:'The Lab snapshot could not be verified. Exposure, adoption and actions are unavailable.'};}},[snapshot]);
  if(!parsed.model)return <section className={styles.workspace} aria-label="Future of Work Lab"><h2>Future of Work Lab</h2><p role="alert" className={styles.notice}>{parsed.error}</p></section>;
- return <LabView key={`${parsed.model.dataset.id}:${parsed.model.meta.exportedAt}`} model={parsed.model} onReference={onReference}/>;
+ return <LabView key={`${parsed.model.dataset.id}:${parsed.model.meta.exportedAt}`} model={parsed.model} onReference={onReference} onNavigate={onNavigate}/>;
 }
 
-function LabView({model,onReference}:{model:FowLabModel;onReference?:(jobKey?:string,functionName?:string)=>void}){
+function LabView({model,onReference,onNavigate}:{model:FowLabModel;onNavigate?:(page:AppPage)=>void;onReference?:(jobKey?:string,functionName?:string)=>void}){
  const [functionName,setFunctionName]=useState(''),[weighting,setWeighting]=useState<FowWeighting>('cost'),[jobKey,setJobKey]=useState('');
+ const [modelSelection,setModelSelection]=useState<FoWLabSelection|null>(null),modelNode=useRef<HTMLDivElement>(null),modelTrigger=useRef<HTMLButtonElement|null>(null);
+ useEffect(()=>{if(modelSelection){modelNode.current?.focus();modelNode.current?.scrollIntoView({block:'nearest'});}},[modelSelection]);
+ const startModel=(event:React.MouseEvent<HTMLButtonElement>)=>{modelTrigger.current=event.currentTarget;setModelSelection({functionName:functionName||undefined,jobKey:jobKey||undefined});};
  const view=getFowLabView(model,{functionName:functionName||null,weighting});
  const selectedJob=view.jobs.find(job=>job.key===jobKey)??null;
  const adoptionRows=view.adoption.filter(row=>row.level===(functionName?'family':'function'));
@@ -36,8 +42,10 @@ function LabView({model,onReference}:{model:FowLabModel;onReference?:(jobKey?:st
   <div className={styles.controls}>
    <label>Lab function<select value={functionName} onChange={event=>{setFunctionName(event.target.value);setJobKey('');}}><option value="">All functions</option>{functions.map(row=><option key={row.name} value={row.name}>{row.name}</option>)}</select></label>
    <label>Exposure weighting<select value={weighting} onChange={event=>setWeighting(event.target.value as FowWeighting)}><option value="cost">Labor cost</option><option value="headcount">Headcount</option></select></label>
+   {onNavigate&&<button type="button" onClick={startModel}>Model this work</button>}
    {onReference&&<button type="button" onClick={()=>onReference(undefined,functionName||undefined)}>Review planning handoff</button>}
   </div>
+  {modelSelection&&onNavigate&&<div ref={modelNode} tabIndex={-1} className={styles.panel} aria-label="Task redesign planner"><FutureWorkExample key={JSON.stringify(modelSelection)} selection={modelSelection} onNavigate={onNavigate} onClose={()=>{setModelSelection(null);requestAnimationFrame(()=>modelTrigger.current?.focus());}}/></div>}
   <dl className={styles.metrics}>
    <div><dt>{functionName||'Company'} exposure index</dt><dd>{selected?.suppressed?'Withheld':index(selected?.score??null)}<small> / 1</small></dd></div>
    <div><dt>Automate task share</dt><dd>{selected?.suppressed?'Withheld':percent(selected?.automateShare??null)}</dd></div>
@@ -69,7 +77,7 @@ function LabView({model,onReference}:{model:FowLabModel;onReference?:(jobKey?:st
    </figure>
   </div>
   <section className={styles.panel} aria-label="Lab job and task detail">
-   <div className={styles.sectionHeading}><div><h3>Explore the work behind the score</h3><p>Select a job to review its task shares and scoring coverage.</p></div><label>Job<select value={selectedJob?.key??''} onChange={event=>setJobKey(event.target.value)}><option value="">Choose a job</option>{view.jobs.map(job=><option key={job.key} value={job.key}>{job.title} · {job.functionName}</option>)}</select></label></div>
+   <div className={styles.sectionHeading}><div><h3>Explore the work behind the score</h3><p>Select a job to review its task shares and scoring coverage.</p></div><label>Job<select value={selectedJob?.key??''} onChange={event=>setJobKey(event.target.value)}><option value="">Choose a job</option>{view.jobs.map(job=><option key={job.key} value={job.key}>{job.title} · {job.functionName}</option>)}</select></label>{onNavigate&&<button type="button" onClick={startModel}>Model this work</button>}</div>
    {selectedJob?<JobDetail job={selectedJob} onReference={onReference}/>:<p className={styles.note}>{view.jobs.length} jobs in this scope. Task exposure describes the work; it is not a staffing reduction estimate.</p>}
   </section>
   <div className={styles.chartGrid}>
