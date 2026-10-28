@@ -2,6 +2,10 @@
 
 ## Current live release and active parallel work
 
+### PR449 live - concise business answers
+
+Runtime `9d4d109ac8917300eaf2aca977a4ab4421b7d024` is live on deployment `dpl_6Jhrr9Pz5BLnVLD6znJAo1haWry4`, merge `ba776a1e0e59e54ee09bccc82a76b8b51446f137`. Independent review, 974 runtime tests, TypeScript and exact-head CI `40712261342` passed. Protected/public desktop and mobile checks verified Details keyboard operation, visible findings and preserved drafts. One fresh provider response produced a 113-word primary decision brief with correct dated values; four actual follow-up requests used zero model rounds and matched all eight chart values to Attrition. This is bounded acceptance, not universal reliability. [Evidence and remaining limits](answer-acceptance-2026-10-28.md).
+
 ### PR446/447 — verified answer-acceptance fixes
 
 PR446 rejects incomplete BU turnover rankings instead of presenting seven values as a complete eight-unit comparison. PR447 supplies the model with the complete, dated BU voluntary-turnover baseline and verified citation locations. Runtime `d3263b1a6c50398641cc7be7b621109c28b9cb64`, deployment `dpl_2EEDXoSm994dReBEjx4h3nLyBkqv`, exact-head CI `40705752135`: independent review, 959 runtime tests, TypeScript and protected/public desktop/mobile checks passed. All prior Lab and saved-plan capabilities are retained.
