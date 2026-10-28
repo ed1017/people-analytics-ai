@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "a88d0cab2f3a65782dd051e4f9cb4ff733e8969f",
-  "deployment": "https://people-analytics-m92wtm6ic-ed-56dc.vercel.app",
+  "sourceCommit": "9d4d109ac8917300eaf2aca977a4ab4421b7d024",
+  "deployment": "https://people-analytics-pwjsd08at-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -349,8 +349,8 @@
     },
     {
       "path": "components/chat-content.tsx",
-      "sha256": "e6cd81ef7471f291e760b657d99fdebab9d4c5d3c465a9ea3b5aa31e819b316c",
-      "bytes": 12971
+      "sha256": "db014fefe2a81ea4fd91554e7e2892b549398c8515bf8da8e1546168ca57f73d",
+      "bytes": 13001
     },
     {
       "path": "components/chat-evidence-chart.tsx",
@@ -2104,8 +2104,8 @@
     },
     {
       "path": "lib/home-answer-presentation.ts",
-      "sha256": "ef3bb461cf7feb1e25e8d0d819c29a588e676cd4488a69e75863b058a9fb6cf0",
-      "bytes": 2534
+      "sha256": "5ac07b0e0c549005a5c7862db960eee715c36b9ece4184dfd906c5241db8bfdb",
+      "bytes": 3807
     },
     {
       "path": "lib/home-answer-scope.ts",
@@ -2239,8 +2239,8 @@
     },
     {
       "path": "lib/home-dataset-query.mjs",
-      "sha256": "f9fa382a67fe83ade0ed8800665f495f27a5cd7d6de0c3f9ef0da92729f028ed",
-      "bytes": 3673
+      "sha256": "a55ccb796461ef92bc1b83bfbf9b834c745876faab963cda13a1a4a6d2d99014",
+      "bytes": 3707
     },
     {
       "path": "lib/home-decision-journey.ts",
@@ -2609,8 +2609,8 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "fbb43efe7f2ccfcdf97693eab4ae07019184bed75c6cb615c42c35547fa615e8",
-      "bytes": 40046
+      "sha256": "25f08035f1584ea766378c6b7983182995976f2486f781d33158bbbc7b8739a6",
+      "bytes": 40724
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "e85512bd5d8496c50cc3977c2aaf7d50a637b2fa02796558bbb75600d788a6ff",
-      "bytes": 13908
+      "sha256": "ddefba81aa966024f81b589f88d8fd8c6646bed072d9daaa0be10f3828f1caaa",
+      "bytes": 14296
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -3944,13 +3944,13 @@
     },
     {
       "path": "tests/public-ai-application.test.mjs",
-      "bytes": 31832,
-      "sha256": "ff5eaee472b330315494833dae4f9be22d82bf8f3e1c0eb599a6df86a9151d6d"
+      "bytes": 31977,
+      "sha256": "dc512be165e43ee86d9172cd111d0af2e81a9527b1c366d4df6d001f106bcc58"
     },
     {
       "path": "tests/public-home-aggregate.test.mjs",
-      "bytes": 4356,
-      "sha256": "98a19639dccbac55ff3bc749e3c096186863bccdd0fef3c34676963f65e1767a"
+      "bytes": 4392,
+      "sha256": "5dd9f1ddef0c790ff23437c450387a9ba33fbba731216efc455b6e03db8e4991"
     },
     {
       "path": "tests/public-home-association.test.mjs",
@@ -4771,6 +4771,16 @@
       "path": "tests/home-turnover-groups.test.mjs",
       "bytes": 3721,
       "sha256": "5b147d3caefdc4ce9fcff0986bf92e25f659038fd454e67b39e69e0b0054af4e"
+    },
+    {
+      "path": "tests/business-answer-presentation.test.mjs",
+      "bytes": 5074,
+      "sha256": "0c8de2e9030a7ee0a500252bfb24e2684f1dda26da8b81013ca67430130c47a8"
+    },
+    {
+      "path": "tests/home-historical-reply-clarity.test.mjs",
+      "bytes": 4060,
+      "sha256": "f0415bc3305014b7795cfcf5c6fdb0c048a52ff5ff6c25514d7d1d393b0d4bb2"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

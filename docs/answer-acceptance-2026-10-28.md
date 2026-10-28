@@ -14,8 +14,14 @@ A display-only follow-up, runtime `a88d0cab2f3a65782dd051e4f9cb4ff733e8969f`, co
 
 ## Remaining boundaries
 
-Mocks and configured readiness do not establish fresh answer quality. The original reviewer failure has no correlated request/output in the retrieved telemetry. Answer verbosity and the generic unsupported-period response remain editorial limitations; no claim is made that every business question passes.
+Mocks and configured readiness do not establish fresh answer quality. The original reviewer failure has no correlated request/output in the retrieved telemetry. A subsequent concise-answer slice addresses verbosity and unsupported-period next actions; no claim is made that every business question passes.
 
 Official Australian recruitment-outcomes definitions are accessible, but the CSV retrieval timed out before bytes arrived. No new role/location candidate-availability or hiring-duration estimate was verified or added. Existing pay and vacancy references are not available-applicant counts. BLS access restrictions were not bypassed.
 
 No credentials, accounting policy, access, pricing windows or saved-plan formats were changed by these fixes.
+
+## Concise business-answer follow-up
+
+Candidate runtime `9d4d109ac8917300eaf2aca977a4ab4421b7d024` keeps business findings and next actions in the main answer, with explicitly titled supporting Details in an accessible disclosure. User text, code fences, subsequent multipart sections and saved content remain intact. Historical requests retain their requested period, offer the actual available date, and never silently adopt current figures. January–September YTD wording applies only to the supported turnover-rate contract.
+
+Independent review, 974 runtime regression tests and TypeScript passed. Hosted and public acceptance are recorded separately; this candidate record does not itself establish publication or fresh provider quality. No additional provider requests have been made for this slice at source publication.

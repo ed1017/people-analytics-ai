@@ -17,12 +17,12 @@ export async function readDatasetQuestions(args,{history,comparison,signal}){
   let result;
   if(part.kind==='history'&&part.history&&part.comparison===null)result=await history(part.history);
   else if(part.kind==='comparison'&&part.comparison&&part.history===null)result=await comparison(part.comparison);
-  else if(part.kind==='unsupported'&&part.history===null&&part.comparison===null)result={answer:'This comparison is unavailable for the requested measure, group or period. Choose headcount/FTE history or a current company-wide comparison.'};
+  else if(part.kind==='unsupported'&&part.history===null&&part.comparison===null)result={answer:'The requested comparison is unavailable. Choose headcount/FTE history for a specific period, or ask for the latest company-wide comparison.'};
   else throw Error('Dataset question kind and arguments disagree.');
   signal.throwIfAborted();
   if(typeof result?.answer!=='string'||!result.answer.trim()||result.answer.length>8000)throw Error('Dataset answer exceeds its bounds.');
   if(result.chart)charts.push(result.chart);
-  answers.push(`Part ${answers.length+1}\n\n${result.answer}`);
+  answers.push(args.parts.length===1?result.answer:`Part ${answers.length+1}\n\n${result.answer}`);
  }
  const answer=answers.join('\n\n---\n\n');
  if(answer.length>10000)throw Error('Combined dataset answer exceeds its bounds.');

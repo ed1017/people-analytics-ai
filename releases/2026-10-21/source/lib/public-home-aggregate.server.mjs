@@ -100,7 +100,10 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
   if(['recruiting.business_units','recruiting.sources'].includes(definition.id)&&args.metric==='application_to_hire_pct'&&error?.message==='Funnel conversion unavailable: successful-hire journeys only; unsuccessful applications are absent')return {answer:'Application-to-hire conversion is unavailable because the applicant denominator is incomplete. Compare recorded accepted offers or mean time to fill instead.'};
   return {answer:error?.message==='Tie group exceeds20-row bound; request cannot be truncated safely'?'More than 20 groups share this rank. Choose another measure to narrow the comparison.':definition.id==='attrition.business_units'?'I cannot verify this turnover comparison. Choose total or voluntary YTD turnover and the latest recorded period.':'This comparison cannot be verified. Choose a supported measure and the latest recorded period.'};}
  current();
- if(args.asOf!=='current'&&args.asOf!==result.asOf)return {answer:`This collection is dated ${result.asOf}, not the requested ${/^\d{4}-\d{2}-\d{2}$/.test(args.asOf)?args.asOf:'historical period'}. Ask for the latest available comparison.`};
+ if(args.asOf!=='current'&&args.asOf!==result.asOf){
+  const requested=/^\d{4}-\d{2}-\d{2}$/.test(args.asOf)?args.asOf:'historical period';
+  return {answer:definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric)&&result.asOf===P.cutoff?`Business-unit turnover for the requested ${requested} is unavailable. The available comparison covers January–September 2026 (YTD). Ask to use that period to compare business units.`:`The requested ${requested} comparison is unavailable. Available data is dated ${result.asOf}. Ask for the comparison as of that date.`};
+ }
  const turnover=definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric);
  const all=turnover?queryAggregate({registryId:args.registryId,metric:args.metric,order:args.order,limit:20},data):null;
  // The turnover chart contract requires the whole eight-BU partition. A nullable

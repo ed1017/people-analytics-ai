@@ -8,7 +8,7 @@ PR446 rejects incomplete BU turnover rankings instead of presenting seven values
 
 Fresh provider acceptance now covers the previously failing Managed Services pay/workload investigation and an unsupported-2025 follow-up. A separate four-turn actual public route sequence verified date clarification, current-data adoption, driver guidance and exact eight-unit chart values with zero model rounds. This is bounded acceptance, not a claim that all questions pass. A display-only follow-up (`a88d0cab2f3a65782dd051e4f9cb4ff733e8969f`) removes duplicated canonical names without altering saved answers. [Evidence, limits and release identities](answer-acceptance-2026-10-28.md).
 
-Still open: broader answer acceptance and concise unsupported-period wording; uncorrelated original reviewer failure; verified role/location candidate-availability and hiring-time evidence; Lab methodology retest. The official Australian data download timed out, and no unsupported external estimate was added. Video and additional findings-to-action pinning remain deferred. No accounting, access or pricing-policy changes were made in this acceptance work.
+Still open: broader answer acceptance; uncorrelated original reviewer failure; verified role/location candidate-availability and hiring-time evidence; Lab methodology retest. The official Australian data download timed out, and no unsupported external estimate was added. Video and additional findings-to-action pinning remain deferred. No accounting, access or pricing-policy changes were made in this acceptance work.
 
 ### PR444 live — native Future of Work Lab
 
