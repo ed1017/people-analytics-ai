@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "995d96f61dadb6d90d4c5e9056a44bc9fb9530c8",
-  "deployment": "https://people-analytics-eisl1m8lz-ed-56dc.vercel.app",
+  "sourceCommit": "3698d2395aa004b498a63a1ad991681de9f7c200",
+  "deployment": "https://people-analytics-88tnc36uv-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -3169,8 +3169,8 @@
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
-      "sha256": "59ae98feb8225cc3282e54c763ad95c61e670743256204cf71296932557fc1a2",
-      "bytes": 13478
+      "sha256": "e85512bd5d8496c50cc3977c2aaf7d50a637b2fa02796558bbb75600d788a6ff",
+      "bytes": 13908
     },
     {
       "path": "lib/public-home-association.server.mjs",
@@ -4756,6 +4756,11 @@
       "path": "tests/fow-lab.test.mjs",
       "bytes": 9464,
       "sha256": "8d351527314eee2bca429f12b70309c276ef1d4fc3d5a62876ead5c7e338c1f7"
+    },
+    {
+      "path": "tests/home-answer-acceptance.test.mjs",
+      "bytes": 6546,
+      "sha256": "5010479501f93cd4f318296e13afa835957428539c062cb440f9a2208beb6dce"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
