@@ -4826,6 +4826,11 @@
       "path": "tests/plan-result-review.test.mjs",
       "bytes": 2856,
       "sha256": "efcc8624c1364289e09cb9672e14c4f27f3cfa42cc193b356cd270f89a8b0652"
+    },
+    {
+      "path": "tests/fixtures/manual-plan-results.mjs",
+      "bytes": 2564,
+      "sha256": "b3472e16ccb094dd593d0da9719212fef2f8eba586a4a5f0132aca64fe434737"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
