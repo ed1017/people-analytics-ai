@@ -10,7 +10,7 @@ Whole-app breadth audit covered 22 desktop and 7 mobile routes. Separate desktop
 
 ### PR451 - Overview headcount planner restored (previous release)
 
-Runtime `ec0606e070c22195020e4b53a4d1db5a35ef63ce` is live on deployment `dpl_51iene1Bk9uZeofy9MMeRzYgS8h2`, merge `1cd8488ac212b422e5afcfe3f27957824bdaf023`. Generic staffing-gap requests expose editable headcount controls; historical headcount results offer **Model headcount** while retaining recorded history. Edits survive Send and evidence refresh. **Back to saved plan** separates the saved editor from a new projection. [Acceptance and regression lesson](overview-headcount-acceptance-2026-10-28.md).
+Runtime `ec0606e070c22195020e4b53a4d1db5a35ef63ce` was released on deployment `dpl_51iene1Bk9uZeofy9MMeRzYgS8h2`, merge `1cd8488ac212b422e5afcfe3f27957824bdaf023`. Generic staffing-gap requests expose editable headcount controls; historical headcount results offer **Model headcount** while retaining recorded history. Edits survive Send and evidence refresh. **Back to saved plan** separates the saved editor from a new projection. [Acceptance and regression lesson](overview-headcount-acceptance-2026-10-28.md).
 
 Independent review, 980 runtime tests, TypeScript, exact-head CI `40731748406`, staged build, and public desktop/mobile checks passed. Public browser acceptance used actual readiness and projection-source GETs, calculations and persistence with controlled chat replies; zero paid model calls. FoW draft work remained separate after the screenshot clarified that the affected screen was Overview.
 
