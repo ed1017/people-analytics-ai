@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 
 const exports = {};
 const source = fs.readFileSync(new URL('../lib/external-workforce-evidence.ts', import.meta.url), 'utf8');
-vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022}}).outputText, {exports});
+vm.runInNewContext(ts.transpileModule(source, {compilerOptions: {module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022}}).outputText, {exports,require:name=>name==='./oews-reference.mjs'?require('../lib/oews-reference.mjs'):require(name)});
 const {EXTERNAL_WORKFORCE_EVIDENCE: records, findExternalWorkforceEvidence: find} = exports;
 
 test('source selections preserve exact vintage, occupation and metro scope with attribution', () => {
@@ -29,7 +29,11 @@ test('source selections preserve exact vintage, occupation and metro scope with 
 });
 
 test('unretrieved estimates and unknown availability/hiring time never become zero or inferred counts', () => {
-  for (const r of records) {
+  assert.equal(records[0].status,'verified');
+  assert.equal(records[0].employmentJobs,121000);
+  assert.equal(records[0].annualMedianWageUsd,166830);
+  assert.equal(records[0].geography.code,'35620');
+  for (const r of records.filter(r=>r.status==='unavailable')) {
     assert.equal(r.status, 'unavailable');
     assert.equal(r.suppression, 'not-checked');
     for (const key of ['employmentJobs', 'annualMeanWageUsd', 'annualMedianWageUsd', 'availableCandidates', 'timeToFillDays']) assert.equal(r[key], null);
@@ -68,13 +72,13 @@ test('qualitative skills link stays separate from local market estimates', () =>
 function panelHarness() {
   const state = []; let cursor = 0;
   const react = {...require('react'), useId: () => 'evidence-test', useState: initial => {
-    const index = cursor++; if (!(index in state)) state[index] = initial;
+    const index = cursor++; if (!(index in state)) state[index] = typeof initial==='function'?initial():initial;
     return [state[index], value => { state[index] = value; }];
   }};
   const panel = {};
   const code = fs.readFileSync(new URL('../components/external-workforce-evidence-panel.tsx', import.meta.url), 'utf8');
   vm.runInNewContext(ts.transpileModule(code, {compilerOptions: {module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022}}).outputText, {
-    exports: panel, require: name => name === 'react' ? react : name === '@/lib/external-workforce-evidence' ? exports : require(name),
+    exports: panel, require: name => name === 'react' ? react : name === '@/lib/external-workforce-evidence' ? exports : name === '@/components/market-reference' ? {MarketComparison:'market-comparison'} : name === '@/lib/oews-reference.mjs' ? require('../lib/oews-reference.mjs') : require(name),
   });
   return () => { cursor = 0; return panel.ExternalWorkforceEvidencePanel(); };
 }
@@ -88,36 +92,19 @@ function text(tree) {
   if (typeof tree !== 'object') return String(tree);
   return Array.isArray(tree) ? tree.map(text).join(' ') : text(tree.props?.children);
 }
-test('panel uses labelled native controls and truthful empty state without numeric placeholders', () => {
-  const render = panelHarness(), tree = render(), all = nodes(tree);
-  const selects = all.filter(n => n.type === 'select');
-  assert.equal(selects.length, 2);
-  for (const select of selects) assert.ok(all.some(n => n.type === 'label' && n.props.htmlFor === select.props.id));
-  assert.ok(all.some(n => n.props?.role === 'status' && n.props['aria-live'] === 'polite'));
-  assert.ok(all.some(n => n.type === 'details'));
-  assert.match(text(tree), /verified figures are not loaded yet/);
-  assert.doesNotMatch(text(tree), /0 candidates|0 jobs|\$0|Hire now|Adopt/);
-  for (const anchor of all.filter(n => n.type === 'a')) {
-    assert.equal(anchor.props.rel, 'noopener noreferrer');
-    assert.match(text(anchor), /opens a new tab/);
-  }
-});
-test('role/location changes preserve selection and never transfer broader employment into skills', () => {
-  const render = panelHarness();
-  const select = (tree, suffix) => nodes(tree).find(n => n.type === 'select' && n.props.id.endsWith(suffix));
-  select(render(), '-location').props.onChange({target: {value: records[1].id}});
-  assert.match(text(render()), /Boston-Cambridge-Newton/);
-  select(render(), '-role').props.onChange({target: {value: '15-2051.01'}});
-  let tree = render();
-  assert.match(text(tree), /Role skills reference available/);
-  assert.match(text(tree), /US-wide role requirements/);
-  assert.match(text(tree), /broader Data Scientists/);
-  assert.equal(select(tree, '-location').props.value, records[1].id);
-  assert.ok(nodes(tree).some(n => n.type === 'a' && n.props.href === exports.EXTERNAL_ROLE_SKILL_SOURCES[0].url));
-  select(tree, '-role').props.onChange({target: {value: '15-1252'}});
-  tree = render();
-  assert.equal(select(tree, '-location').props.value, records[1].id);
-  assert.match(text(tree), /Local employment and pay estimates pending/);
+test('panel consolidates reviewed US explorer and preserves selection across market switches', () => {
+  const render=panelHarness();
+  const select=tree=>nodes(tree).find(n=>n.type==='select');
+  let tree=render();
+  assert.equal(select(tree).props['aria-label'],'Market');
+  const explorer=()=>nodes(render()).find(n=>n.type==='market-comparison');
+  assert.equal(explorer().props.selection.area,'35620');
+  explorer().props.onChange({soc:'29-1141',area:'36'});
+  select(tree).props.onChange({target:{value:'ca-21231'}});
+  assert.match(text(render()),/1,065/);
+  select(render()).props.onChange({target:{value:'15-1252'}});
+  assert.equal(explorer().props.selection.soc,'29-1141');
+  assert.equal(explorer().props.selection.area,'36');
 });
 
 test('ONS numbers match independently extracted workbook cells and exact national scope', () => {
@@ -167,23 +154,15 @@ test('ONS missing, suppressed and unknown-quality estimates never become numbers
   assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),medianCvPercent:20.1}).median, null);
   assert.equal(exports.validateOnsAnnualPaySlice({...onsInput(),medianCvPercent:20}).median, 59862.5);
 });
-test('UK selection displays distinct pay and scope, and preserves US location on return', () => {
-  const render = panelHarness();
-  const select = (tree, suffix) => nodes(tree).find(n => n.type === 'select' && n.props.id.endsWith(suffix));
-  select(render(), '-location').props.onChange({target:{value:records[1].id}});
-  select(render(), '-role').props.onChange({target:{value:'uk-2134'}});
-  const tree=render(), copy=text(tree);
-  assert.equal(select(tree,'-location').props.value,'GB');
-  assert.equal(select(tree,'-location').props.disabled,true);
-  assert.match(copy,/£59,862.50/); assert.match(copy,/£69,120.60/);
-  assert.match(copy,/6 April 2025-5 April 2026/); assert.match(copy,/provisional survey estimates/);
-  assert.match(copy,/National pay estimate/); assert.match(text(nodes(tree).find(n=>n.type==='details')),/not a hiring offer or total employer cost/);
-  assert.match(text(nodes(tree).find(n=>n.type==='details')),/Applicant availability and hiring time are not measured/);
-  assert.doesNotMatch(copy,/Boston|New York|\$59|362,000/);
-  select(tree,'-role').props.onChange({target:{value:'15-1252'}});
-  assert.equal(select(render(),'-location').props.value,records[1].id);
-  assert.match(text(render()),/verified figures are not loaded yet/);
-  assert.doesNotMatch(text(render()),/£59/);
+test('UK selection retains native pay and exact national scope', () => {
+ const render=panelHarness();
+ nodes(render()).find(n=>n.type==='select').props.onChange({target:{value:'uk-2134'}});
+ const tree=render(),copy=text(tree);
+ assert.match(copy,/£59,862.50/);assert.match(copy,/£69,120.60/);
+ assert.match(copy,/6 April 2025-5 April 2026/);assert.match(copy,/provisional survey estimates/);
+ assert.match(copy,/Regional workforce size and vacancy trends are unavailable/);
+ assert.match(text(nodes(tree).find(n=>n.type==='details')),/not a hiring offer or total employer cost/);
+ assert.doesNotMatch(copy,/Boston|New York|\$59|362,000/);
 });
 
 const torontoFixture = JSON.parse(fs.readFileSync(new URL('./fixtures/external-workforce-evidence/statcan-toronto-source-extract.json', import.meta.url), 'utf8'));
@@ -222,20 +201,16 @@ test('Toronto suppression and missing values stay unavailable, retaining quality
   assert.equal(exports.parseTorontoVacancyRow({...row,VALUE:'0'}).value,0);
   assert.equal(exports.parseTorontoVacancyRow({...row,STATUS:'E'}).qualityLabel,'Use with caution');
 });
-test('Toronto display keeps candidate availability distinct and US selection intact', () => {
-  const render=panelHarness();
-  const select=(tree,suffix)=>nodes(tree).find(n=>n.type==='select'&&n.props.id.endsWith(suffix));
-  select(render(),'-location').props.onChange({target:{value:records[1].id}});
-  select(render(),'-role').props.onChange({target:{value:'ca-21231'}});
-  const tree=render(),copy=text(tree);
-  assert.equal(select(tree,'-location').props.value,'CA-3530');
-  assert.match(copy,/1,065/); assert.match(copy,/CAD 60.95\/hour/);
-  assert.match(copy,/Quality\s+C\s*:\s*Good/); assert.match(copy,/Quality\s+A\s*:\s*Excellent/);
-  assert.match(copy,/Employer demand estimate/); assert.match(copy,/not seasonally adjusted/);
-  assert.match(copy,/Toronto economic region · Q2 2026 · not seasonally adjusted/); assert.match(text(nodes(tree).find(n=>n.type==='details')),/not Toronto city or its census metropolitan area/);
-  assert.doesNotMatch(copy,/Boston|£59|US national/);
-  select(tree,'-role').props.onChange({target:{value:'15-1252'}});
-  assert.equal(select(render(),'-location').props.value,records[1].id);
+test('Toronto display preserves quality and marks trend and workforce evidence gaps', () => {
+ const render=panelHarness();
+ nodes(render()).find(n=>n.type==='select').props.onChange({target:{value:'ca-21231'}});
+ const tree=render(),copy=text(tree);
+ assert.match(copy,/1,065/);assert.match(copy,/CAD 60.95\/hour/);
+ assert.match(copy,/Quality\s+C\s*:\s*Good/);assert.match(copy,/Quality\s+A\s*:\s*Excellent/);
+ assert.match(copy,/Vacancy trend unavailable: one reviewed quarter/);
+ assert.match(copy,/Toronto economic region · Q2 2026 · not seasonally adjusted/);
+ assert.match(text(nodes(tree).find(n=>n.type==='details')),/not Toronto city or its census metropolitan area/);
+ assert.doesNotMatch(copy,/Boston|£59|US national/);
 });
 test('existing Labor market route mounts real local reference ahead of unchanged market controls', () => {
   const output={},Reference=()=>null,Findings=()=>null;
@@ -244,7 +219,7 @@ test('existing Labor market route mounts real local reference ahead of unchanged
   const props={page:'labor-market',bls:null,blsLoading:false,blsError:null,market:'EXISTING MARKET CONTROLS',catalog:'CATALOG',occupational:'OCCUPATIONAL'};
   const tree=output.IntelligencePage(props),all=nodes(tree);
   const panel=all.find(n=>n.type===Reference);
-  assert.ok(panel); assert.equal(panel.props.initialRole,'ca-21231'); assert.match(text(tree),/EXISTING MARKET CONTROLS/);
+  assert.ok(panel); assert.equal(panel.props.usMarket,'EXISTING MARKET CONTROLS'); assert.equal(all.filter(n=>n.type===Reference).length,1);
   assert.equal(nodes(output.IntelligencePage({...props,page:'training-coaching'})).some(n=>n.type===Reference),false);
   assert.equal(nodes(output.IntelligencePage({...props,page:'occupational-references'})).some(n=>n.type===Reference),false);
 });

@@ -1,0 +1,23 @@
+{
+  "kind": "reviewed-official-profile-extract-not-synthetic",
+  "checkedAt": "2026-10-29",
+  "databaseVersion": "31.0",
+  "taxonomy": "O*NET-SOC 2019",
+  "licenseUrl": "https://www.onetonline.org/help/license",
+  "modifications": "Transferable skill names selected from official profiles; groups computed by exact name intersection/difference. No ratings imported.",
+  "target": {
+    "code": "15-1252.00",
+    "title": "Software Developers",
+    "sourceUrl": "https://www.onetonline.org/link/summary/15-1252.00",
+    "section": "Transferable Skills",
+    "skillNames": ["Programming", "Judgment and Decision Making", "Systems Analysis", "Complex Problem Solving", "Systems Evaluation", "Technology Design", "Operations Analysis", "Time Management", "Coordination"],
+    "relatedOccupationReviewed": "15-1211.00 Computer Systems Analysts"
+  },
+  "source": {
+    "code": "15-1211.00",
+    "title": "Computer Systems Analysts",
+    "sourceUrl": "https://www.onetonline.org/link/summary/15-1211.00",
+    "section": "Transferable Skills",
+    "skillNames": ["Systems Analysis", "Systems Evaluation", "Judgment and Decision Making", "Complex Problem Solving", "Programming", "Coordination", "Social Perceptiveness", "Time Management", "Troubleshooting", "Operations Analysis", "Operations Monitoring", "Quality Control Analysis", "Service Orientation"]
+  }
+}

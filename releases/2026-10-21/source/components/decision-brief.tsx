@@ -24,9 +24,9 @@ export function laborMarketReferencePresentation(input:unknown){
  }
  if(source.kind!==undefined||source.version!==undefined)return generic;
  const selected=source.selected as Record<string,unknown>|undefined;
- const resolved=marketCarryEvidence({soc:selected?.OCC_CODE,area:selected?.AREA,goal:source.goal});
+ const resolved=marketCarryEvidence({soc:selected?.OCC_CODE,area:selected?.AREA,goal:source.goal,...(source.skillComparison&&typeof source.skillComparison==='object'?{skillComparisonId:(source.skillComparison as Record<string,unknown>).id}:{})});
  if(!resolved||'reference' in resolved||source.source!==resolved.source)return generic;
- return {label:'Real public BLS reference; periods and geography retained',period:resolved.period,releaseDate:resolved.releaseDate,geography:resolved.selected.AREA_TITLE};
+ return {label:resolved.skillComparison?'Real public BLS reference + O*NET qualitative skills reference; periods and geography retained':'Real public BLS reference; periods and geography retained',period:resolved.period,releaseDate:resolved.releaseDate,geography:resolved.selected.AREA_TITLE};
 }
 export function DecisionBrief({conversation,onNavigate}:{conversation:ProblemConversation;onNavigate:(p:AppPage)=>void}){
  const storage=useDecisionStorage(),id=conversation.activeGoalId;

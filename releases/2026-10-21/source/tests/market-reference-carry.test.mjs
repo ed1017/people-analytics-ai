@@ -63,7 +63,7 @@ import * as oews from '../lib/oews-reference.mjs';import * as outlook from '../l
 const require=createRequire(import.meta.url);
 test('carried reference presentation retains native pay units, period, scope and quality without editable model controls',()=>{
  const exports={},code=ts.transpileModule(fs.readFileSync(new URL('../components/market-reference.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(code,{exports,require:name=>name==='@/components/key-findings'?{KeyFindings:()=>null}:name==='@/lib/oews-reference.mjs'?oews:name==='@/lib/labor-outlook.mjs'?outlook:name==='@/lib/market-reference-carry'?{marketCarryEvidence}:require(name)});
+ vm.runInNewContext(code,{exports,require:name=>name==='@/components/market-evidence-bars'?{MarketEvidenceBars:()=>null,SkillNames:()=>null}:name==='@/lib/market-skills-reference'?{}:name==='@/components/key-findings'?{KeyFindings:()=>null}:name==='@/lib/oews-reference.mjs'?oews:name==='@/lib/labor-outlook.mjs'?outlook:name==='@/lib/market-reference-carry'?{marketCarryEvidence}:require(name)});
  const render=value=>renderToStaticMarkup(React.createElement(exports.CarriedMarketReference,{carry:value,onClear:()=>{}}));
  const ukHtml=render(carry(uk.id)),caHtml=render(carry(toronto.id)),legacy=render({soc:'15-1252',area:'99',goal});
  assert.match(ukHtml,/Median annual gross pay: GBP 59,862.50/);assert.match(ukHtml,/2025-04-06 to 2026-04-05/);assert.match(ukHtml,/UK SOC 2020/);assert.match(ukHtml,/Median CV: 2.4%/);
