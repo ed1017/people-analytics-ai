@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 7898,
-      "sha256": "6e44d27a16ba59ccf0937189fbd3ef346575e7dd56e1f935f811eece6ff6ce11"
+      "bytes": 7879,
+      "sha256": "1a4d3afae90f361ef4899a3018e34fd8a6090899be2992450e317ace1693b8d5"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",

@@ -7,8 +7,8 @@ import {MarketComparison} from "@/components/market-reference"
 import {defaultMarketSelection} from "@/lib/oews-reference.mjs"
 import type {MarketCarry} from '@/lib/market-reference-carry'
 
-const control = "min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-const link = "font-medium text-teal-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+const control = "min-h-11 w-full min-w-0 rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+const link = "font-medium text-primary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 
 export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="", onCarry, usMarket, marketSource, onMarketChange }: { initialRole?: "15-1252" | "ca-21231"; goal?:string; onCarry?:(carry:MarketCarry)=>void; usMarket?:ReactNode; marketSource?:string; onMarketChange?:(source:string)=>void } = {}) {
   const [carryError,setCarryError]=useState("")
@@ -23,8 +23,8 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
   const payLabel = (value: number | null) => value === null ? "Unavailable" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }).format(value)
 
   return (
-    <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-3 rounded-xl border border-slate-200 bg-white p-4 text-slate-900">
-      <h2 id={`${id}-title`} className="text-lg font-bold text-[#04342C]">Workforce market explorer</h2>
+    <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-3 rounded-xl border bg-card p-4 text-card-foreground">
+      <h2 id={`${id}-title`} className="text-lg font-bold text-foreground">Workforce market explorer</h2>
       <label htmlFor={`${id}-market`} className="block max-w-xl space-y-1 text-sm font-semibold">
         <span>Market</span>
         <select aria-label="Market" id={`${id}-market`} className={control} value={selectedRole} onChange={event=>{setRole(event.target.value);onMarketChange?.(event.target.value);setCarryError('')}}>
@@ -56,8 +56,8 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
       </div>}
       <a className={link} href={torontoOnly?toronto.source.url:ukPay.source.url} target="_blank" rel="noopener noreferrer">Official source <span className="sr-only">(opens a new tab)</span></a>
       {onCarry&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Use in plan</button><p className="mt-1 text-xs">{goal.trim()?'Carry the reference with your goal.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
-      <details className="text-sm text-slate-600">
-        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">Details</summary>
+      <details className="text-sm text-muted-foreground">
+        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Details</summary>
         <div className="space-y-2 pt-1">
           {torontoOnly ? <>
             <p>{toronto.source.attribution}</p>
