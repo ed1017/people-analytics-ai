@@ -20,7 +20,7 @@ test('source selections preserve exact vintage, occupation and metro scope with 
     assert.equal(r.geography.type, 'metropolitan');
     assert.equal(r.referencePeriod, '2025-05');
     assert.equal(r.releasedAt, '2026-05-15');
-    assert.equal(r.retrievedAt, '2026-10-26');
+    assert.equal(r.retrievedAt, r.status==='verified'?'2026-10-02':'2026-10-26');
     for (const key of ['url', 'releaseUrl', 'licenseUrl']) assert.equal(new URL(r.source[key]).hostname, 'www.bls.gov');
     assert.match(r.source.license, /Public domain/);
   }

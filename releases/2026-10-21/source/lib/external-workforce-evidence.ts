@@ -1,4 +1,4 @@
-import {marketEvidence} from "./oews-reference.mjs"
+import {marketEvidence,oewsProvenance} from "./oews-reference.mjs"
 
 /** Versioned external references, separate from the synthetic workforce baseline. */
 export type ExternalWorkforceEvidence = Readonly<{
@@ -53,7 +53,7 @@ function reviewedNewYork(): ExternalWorkforceEvidence {
   const evidence = marketEvidence({soc: "15-1252", area: "35620"})!
   const pending = pendingMetro("oews-2025-05-software-developers-new-york", "New York-Newark-Jersey City, NY-NJ")
   return Object.freeze({...pending, geography: Object.freeze({...pending.geography, code: "35620"}),
-    status: "verified", suppression: "none", employmentJobs: evidence.selected.TOT_EMP,
+    retrievedAt: oewsProvenance.retrievedAt, status: "verified", suppression: "none", employmentJobs: evidence.selected.TOT_EMP,
     annualMeanWageUsd: evidence.selected.A_MEAN, annualMedianWageUsd: evidence.selected.A_MEDIAN,
     source: Object.freeze({...source, downloadUrl: evidence.sourceUrl}),
     limitation: "Reviewed May 2025 extract. Employment measures jobs held, not available candidates. Wages exclude employer benefit costs. Hiring time is not supplied by this source.",

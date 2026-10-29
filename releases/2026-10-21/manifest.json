@@ -3019,8 +3019,8 @@
     },
     {
       "path": "lib/oews-reference.mjs",
-      "sha256": "f9ab9bc91291a5fdbe2c9bc5fd5a87d6064fdec547f42a003ed1e751fd012ca4",
-      "bytes": 2892
+      "sha256": "b623288d586165feaedf3317636bb000e37ea571f4aa28e2899c5aadf5dfb453",
+      "bytes": 2925
     },
     {
       "path": "lib/openai-proxy-transport.ts",
@@ -4489,8 +4489,8 @@
     },
     {
       "path": "lib/external-workforce-evidence.ts",
-      "bytes": 12707,
-      "sha256": "217bea39d427a2a421d5aa1712bb175939d9135000a50485a7a782e2e1187e9c"
+      "bytes": 12763,
+      "sha256": "59eb9f8a0dc80870a89c4f1c446ce5bfb2a1a2bd17faebb4bb7b15015970fef5"
     },
     {
       "path": "lib/position-design-scenario.ts",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 14520,
-      "sha256": "20be74999f3659db5094172c05f7322a9c2471502186bd48653858ae0025e6ed"
+      "bytes": 14555,
+      "sha256": "c200e971c1a5567b502480275b6a43d5a49e7042f63f42c91ca48e42e599698a"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
