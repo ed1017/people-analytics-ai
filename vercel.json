@@ -90,7 +90,8 @@
       "fix/discrete-month-sliders": false,
       "feat/action-plan-scenarios": false,
       "feat/shared-planner-inputs": false,
-      "fix/home-tool-replay-template": false
+      "fix/home-tool-replay-template": false,
+      "feat/market-intelligence-explorer": false
     }
   }
 }

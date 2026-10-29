@@ -1,79 +1,63 @@
 "use client"
 
-import { useId, useState } from "react"
-import { EXTERNAL_ROLE_SKILL_SOURCES, EXTERNAL_WORKFORCE_EVIDENCE, UK_SOFTWARE_PAY_REFERENCE, TORONTO_SOFTWARE_VACANCY_REFERENCE } from "@/lib/external-workforce-evidence"
+import { useId, useState, type ReactNode } from "react"
+import { UK_SOFTWARE_PAY_REFERENCE, TORONTO_SOFTWARE_VACANCY_REFERENCE } from "@/lib/external-workforce-evidence"
 
+import {MarketComparison} from "@/components/market-reference"
+import {defaultMarketSelection} from "@/lib/oews-reference.mjs"
 import type {MarketCarry} from '@/lib/market-reference-carry'
 
-const control = "min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
-const link = "font-medium text-teal-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700"
+const control = "min-h-11 w-full min-w-0 rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+const link = "font-medium text-primary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 
-export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="", onCarry }: { initialRole?: "15-1252" | "ca-21231"; goal?:string; onCarry?:(carry:MarketCarry)=>void } = {}) {
+export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="", onCarry, usMarket, marketSource, onMarketChange }: { initialRole?: "15-1252" | "ca-21231"; goal?:string; onCarry?:(carry:MarketCarry)=>void; usMarket?:ReactNode; marketSource?:string; onMarketChange?:(source:string)=>void } = {}) {
   const [carryError,setCarryError]=useState("")
+  const [selection,setSelection]=useState(()=>({...defaultMarketSelection(),area:"35620"}))
   const id = useId()
   const [role, setRole] = useState<string>(initialRole)
-  const [recordId, setRecordId] = useState(EXTERNAL_WORKFORCE_EVIDENCE[0].id)
-  const record = EXTERNAL_WORKFORCE_EVIDENCE.find((item) => item.id === recordId) ?? EXTERNAL_WORKFORCE_EVIDENCE[0]
-  const skills = EXTERNAL_ROLE_SKILL_SOURCES[0]
-  const skillsOnly = role === skills.occupationCode
+  const selectedRole=marketSource??role
   const ukPay = UK_SOFTWARE_PAY_REFERENCE
-  const ukOnly = role === "uk-2134"
+  const ukOnly = selectedRole === "uk-2134"
   const toronto = TORONTO_SOFTWARE_VACANCY_REFERENCE
-  const torontoOnly = role === "ca-21231"
+  const torontoOnly = selectedRole === "ca-21231"
   const payLabel = (value: number | null) => value === null ? "Unavailable" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", minimumFractionDigits: 2 }).format(value)
 
   return (
-    <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-3 rounded-xl border border-slate-200 bg-white p-4 text-slate-900">
-      <h2 id={`${id}-title`} className="text-lg font-bold text-[#04342C]">External workforce evidence</h2>
-      <div className="grid min-w-0 gap-3 sm:grid-cols-2">
-        <label htmlFor={`${id}-role`} className="min-w-0 space-y-1 text-sm font-semibold">
-          <span>Role</span>
-          <select aria-label="Role" id={`${id}-role`} className={control} value={role} onChange={(event) => setRole(event.target.value)}>
-            <option value="15-1252">Software Developers</option>
-            <option value={skills.occupationCode}>{skills.occupationTitle}</option>
-            <option value="uk-2134">Programmers and software development professionals (UK)</option>
-            <option value="ca-21231">Software engineers and designers (Toronto)</option>
-          </select>
-        </label>
-        <label htmlFor={`${id}-location`} className="min-w-0 space-y-1 text-sm font-semibold">
-          <span>Location</span>
-          <select aria-label="Location" id={`${id}-location`} className={control} value={torontoOnly ? "CA-3530" : ukOnly ? "GB" : recordId} disabled={ukOnly || torontoOnly} onChange={(event) => setRecordId(event.target.value)}>
-            {torontoOnly ? <option value="CA-3530">Toronto, Ontario (economic region)</option> : ukOnly ? <option value="GB">United Kingdom (national)</option> : EXTERNAL_WORKFORCE_EVIDENCE.map((item) => <option key={item.id} value={item.id}>{item.geography.name}</option>)}
-          </select>
-        </label>
-      </div>
+    <section aria-labelledby={`${id}-title`} className="min-w-0 space-y-3 rounded-xl border bg-card p-4 text-card-foreground">
+      <h2 id={`${id}-title`} className="text-lg font-bold text-foreground">Workforce market explorer</h2>
+      <label htmlFor={`${id}-market`} className="block max-w-xl space-y-1 text-sm font-semibold">
+        <span>Market</span>
+        <select aria-label="Market" id={`${id}-market`} className={control} value={selectedRole} onChange={event=>{setRole(event.target.value);onMarketChange?.(event.target.value);setCarryError('')}}>
+          <option value="15-1252">United States · workforce and pay</option>
+          <option value="ca-21231">Canada · vacancies and offered pay</option>
+          <option value="uk-2134">United Kingdom · annual pay</option>
+        </select>
+      </label>
+      {!ukOnly&&!torontoOnly ? (usMarket??<MarketComparison selection={selection} onChange={setSelection} goal={goal} onCarry={onCarry??(()=>{})}/>) : <>
       <div role="status" aria-live="polite" aria-atomic="true" className="space-y-1 text-sm">
-        <p className="font-semibold">{torontoOnly ? "Toronto vacancies and offered pay · survey estimates" : ukOnly ? "UK annual gross pay · provisional survey estimates" : skillsOnly ? "Role skills reference available" : "Local employment and pay estimates pending"}</p>
+        <p className="font-semibold">{torontoOnly ? "Toronto vacancies and offered pay · survey estimates" : ukOnly ? "UK annual gross pay · provisional survey estimates" : ""}</p>
         {torontoOnly && <p>{toronto.occupation.title} · {toronto.occupation.taxonomy} {toronto.occupation.code}</p>}
         {ukOnly && <p>{ukPay.occupation.title} · {ukPay.occupation.taxonomy} {ukPay.occupation.code}</p>}
-        <p>{torontoOnly ? "Toronto economic region · Q2 2026 · not seasonally adjusted" : ukOnly ? "United Kingdom · full-time employee jobs · 6 April 2025-5 April 2026" : skillsOnly ? `For ${record.geography.name}, local estimates are unavailable. Explore the US-wide role requirements below.` : `${record.geography.name}: the source is identified; verified figures are not loaded yet.`}</p>
+        <p>{torontoOnly ? "Toronto economic region · Q2 2026 · not seasonally adjusted" : ukOnly ? "United Kingdom · full-time employee jobs · 6 April 2025-5 April 2026" : ""}</p>
       </div>
       {torontoOnly && <div className="space-y-2 text-sm">
         <dl className="grid gap-3 sm:grid-cols-2">
           <div><dt>Estimated job vacancies</dt><dd className="text-xl font-semibold">{toronto.vacancies.value === null ? "Unavailable" : toronto.vacancies.value.toLocaleString("en-CA")}</dd><dd>Quality {toronto.vacancies.quality}: {toronto.vacancies.qualityLabel}</dd></div>
           <div><dt>Average offered hourly wage (CAD)</dt><dd className="text-xl font-semibold">{toronto.averageOfferedHourlyWage.value === null ? "Unavailable" : `CAD ${toronto.averageOfferedHourlyWage.value.toFixed(2)}/hour`}</dd><dd>Quality {toronto.averageOfferedHourlyWage.quality}: {toronto.averageOfferedHourlyWage.qualityLabel}</dd></div>
         </dl>
-        <p>Employer demand estimate.</p>
+<p>Employer demand estimate.</p><p>Vacancy trend unavailable: one reviewed quarter. Workforce size is not loaded for this economic region.</p>
       </div>}
       {ukOnly && <div className="space-y-2 text-sm">
         <dl className="grid gap-3 sm:grid-cols-2">
           <div><dt>Median annual gross pay (GBP)</dt><dd className="text-xl font-semibold">{payLabel(ukPay.estimates.median)}</dd></div>
           <div><dt>Mean annual gross pay (GBP)</dt><dd className="text-xl font-semibold">{payLabel(ukPay.estimates.mean)}</dd></div>
         </dl>
-        <p>National pay estimate.</p>
+<p>National pay estimate.</p><p>Regional workforce size and vacancy trends are unavailable in this release.</p>
       </div>}
-      {torontoOnly ? (
-        <a className={link} href={toronto.source.url} target="_blank" rel="noopener noreferrer">View Statistics Canada vacancy data <span className="sr-only">(opens a new tab)</span></a>
-      ) : ukOnly ? (
-        <a className={link} href={ukPay.source.url} target="_blank" rel="noopener noreferrer">View ONS occupational pay data <span className="sr-only">(opens a new tab)</span></a>
-      ) : skillsOnly ? (
-        <a className={link} href={skills.url} target="_blank" rel="noopener noreferrer">Explore Business Intelligence Analyst skills <span className="sr-only">(opens a new tab)</span></a>
-      ) : (
-        <a className={link} href={record.source.url} target="_blank" rel="noopener noreferrer">View BLS area sources <span className="sr-only">(opens a new tab)</span></a>
-      )}
-      {onCarry&&(ukOnly||torontoOnly)&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Carry reference to Planning</button><p className="mt-1 text-xs">{goal.trim()?'Carry the reference with your goal.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
-      <details className="text-sm text-slate-600">
-        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700">Details</summary>
+      <a className={link} href={torontoOnly?toronto.source.url:ukPay.source.url} target="_blank" rel="noopener noreferrer">Official source <span className="sr-only">(opens a new tab)</span></a>
+      {onCarry&&<div><button type="button" disabled={!goal.trim()} className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" onClick={()=>{try{onCarry({version:1,kind:'external-workforce-reference',referenceId:ukOnly?ukPay.id:toronto.id,goal});setCarryError('');}catch(error){setCarryError(error instanceof Error?error.message:'Reference could not be saved.');}}}>Use in plan</button><p className="mt-1 text-xs">{goal.trim()?'Carry the reference with your goal.':'Select a goal to carry this reference.'}</p><p role="alert">{carryError}</p></div>}
+      <details className="text-sm text-muted-foreground">
+        <summary className="w-fit cursor-pointer py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">Details</summary>
         <div className="space-y-2 pt-1">
           {torontoOnly ? <>
             <p>{toronto.source.attribution}</p>
@@ -89,17 +73,10 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
             <p>{ukPay.source.license}.</p>
             <a className={link} href={ukPay.source.downloadUrl} target="_blank" rel="noopener noreferrer">Download the ONS source workbook archive <span className="sr-only">(opens a new tab)</span></a>
             <p><a className={link} href={ukPay.source.licenseUrl} target="_blank" rel="noopener noreferrer">Open Government Licence <span className="sr-only">(opens a new tab)</span></a></p>
-          </> : skillsOnly ? <>
-            <p>{skills.publisher}. Profile updated {skills.profileUpdatedYear}; checked {skills.verifiedAt}. Geography: {skills.geography}.</p>
-            <p>{skills.limitation}</p>
-          </> : <>
-            <p>{record.source.publisher}. May 2025 reference period; released May 15, 2026. Source catalog checked {record.retrievedAt}. Occupation: {record.occupation.code} ({record.occupation.taxonomy}).</p>
-            <p>{record.limitation}</p>
-            <p>Mean and median annual wages are distinct USD measures. Missing or suppressed estimates remain unavailable.</p>
-            <a className={link} href={record.source.licenseUrl} target="_blank" rel="noopener noreferrer">BLS reuse terms <span className="sr-only">(opens a new tab)</span></a>
-          </>}
+          </> : null}
         </div>
       </details>
+      </>}
     </section>
   )
 }

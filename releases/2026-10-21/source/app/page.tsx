@@ -44,7 +44,7 @@ import {HomeChatWelcome,HomeChatShell} from "@/components/home-chat-welcome";
 import {FutureOfWorkPage,PlanningSupportPage,HomePlanPane} from "@/components/planning-support-pages";
 import {HomePlanningOverview} from "@/components/home-overview-summary";
 import { buildHomePack } from "@/lib/home-pack.mjs";
-import {MarketComparison,CarriedMarketReference,type MarketCarry} from "@/components/market-reference";
+import {MarketComparison,CarriedMarketReference,type MarketCarry,type MarketSelection} from "@/components/market-reference";
 import {defaultMarketSelection} from "@/lib/oews-reference.mjs";
 import {saveMarketReference} from '@/lib/market-reference-carry';
 import {SavedFoWLabReference} from '@/components/fow-lab-reference';
@@ -159,7 +159,7 @@ export default function Home() {
   const [demoActive, setDemoActive] = useState(false);
   const [developmentSession, setDevelopmentSession] = useGoalWorkspace(conversation.workspaceKey, goalWorkspaceKeys, emptyDevelopmentSession,"development");
   const [occupationalEvidence, setOccupationalEvidence] = useState<unknown>(null);
-  const [marketSelection,setMarketSelection]=useGoalWorkspace(conversation.workspaceKey,goalWorkspaceKeys,defaultMarketSelection,"marketSelection");
+  const [marketSelection,setMarketSelection]=useGoalWorkspace<MarketSelection>(conversation.workspaceKey,goalWorkspaceKeys,defaultMarketSelection,"marketSelection");
   const [marketCarry]=useGoalWorkspace<MarketCarry|null>(conversation.workspaceKey,goalWorkspaceKeys,emptyMarketCarry,"marketCarry");
   function updateMarketReference(carry:MarketCarry|null){
     const snapshot=decisionStore.getSnapshot();
@@ -2012,7 +2012,7 @@ export default function Home() {
         {activePage==="planning-overview"&&<details className="mx-5 my-3 rounded border"><summary className="min-h-11 cursor-pointer px-4 py-3 text-sm font-medium">Current scenario summary</summary><HomePlanningOverview overview={overviewData} receipt={overviewScope} requested={{country:selectedCountry,org:selectedOrg,level:selectedLevel}} scopeLabel={`${selectedCountryLabel} · ${selectedOrgLabel} · ${selectedLevelLabel}`} loading={dashboardLoading} error={dashboardError} onNavigate={setActivePage}/></details>}
         {(planningWorkspaceActive||activePage==="development-planning") && marketCarry && <CarriedMarketReference carry={marketCarry} onClear={()=>updateMarketReference(null)}/>}
         {activePage==="planning-overview"&&<SavedFoWLabReference/>}
-        {activePage === "future-of-work" ? <FutureOfWorkPage onNavigate={setActivePage}/> : activePage === "action-plans" || activePage === "plan-track" || activePage === "assess-evaluate" ? <PlanningSupportPage page={activePage} onNavigate={setActivePage}/> : activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "home" ? null : intelligencePage ? <IntelligencePage goal={conversation.focusedIssue} onCarryReference={updateMarketReference} page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={updateMarketReference} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
+        {activePage === "future-of-work" ? <FutureOfWorkPage onNavigate={setActivePage}/> : activePage === "action-plans" || activePage === "plan-track" || activePage === "assess-evaluate" ? <PlanningSupportPage page={activePage} onNavigate={setActivePage}/> : activePage === "decision-brief" ? <DecisionBrief key={conversation.workspaceKey} conversation={conversation} onNavigate={setActivePage}/> : activePage === "home" ? null : intelligencePage ? <IntelligencePage marketSource={marketSelection.marketSource??"15-1252"} onMarketSourceChange={marketSource=>setMarketSelection({...marketSelection,marketSource})} goal={conversation.focusedIssue} onCarryReference={updateMarketReference} page={activePage as "occupational-references" | "labor-market" | "training-coaching"} occupational={<OccupationalReference onEvidenceChange={setOccupationalEvidence} />} bls={blsData} blsLoading={blsLoading} blsError={blsError} market={<MarketComparison selection={marketSelection} onChange={setMarketSelection} goal={conversation.focusedIssue} onCarry={updateMarketReference} />} catalog={<DevelopmentCatalog session={developmentSession} onChange={setDevelopmentSession} onOpen={() => setActivePage("development-planning")} />} /> : activePage === "compensation" ? (
           <CompensationPage scope={{country: selectedCountry, org: selectedOrg, level: selectedLevel}} />
         ) : activePage === "development-planning" ? (
           <DevelopmentPlanning session={developmentSession} onChange={setDevelopmentSession} onCatalog={() => setActivePage("training-coaching")} />

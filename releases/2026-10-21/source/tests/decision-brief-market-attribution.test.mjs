@@ -29,3 +29,12 @@ test('rendered unknown market history never falls back to unverified saved dates
  const html=renderToStaticMarkup(React.createElement(component.DecisionBrief,{conversation:{activeGoalId:'a',focusedIssue:goal},onNavigate:()=>{}}));
  assert.match(html,/Saved labor-market reference; source details unavailable/);assert.doesNotMatch(html,/forged-period-2099|2099-12-31/);assert.match(html,/saved reference 1/);
 });
+
+import {SOFTWARE_TRAINING_REFERENCE as training} from '../lib/market-skills-reference.ts';
+test('decision brief attributes canonical optional skills evidence without accepting forged profile IDs',()=>{
+ const {laborMarketReferencePresentation:present}=load();
+ const evidence=marketCarryEvidence({soc:'15-1252',area:'35620',goal,skillComparisonId:training.id});
+ assert.match(present(evidence).label,/BLS reference \+ O\*NET qualitative skills/);
+ assert.equal(present({...evidence,skillComparison:{id:'forged'}}).label,'Saved labor-market reference; source details unavailable');
+ assert.doesNotMatch(present(marketCarryEvidence({soc:'15-1252',area:'35620',goal})).label,/O\*NET/);
+});

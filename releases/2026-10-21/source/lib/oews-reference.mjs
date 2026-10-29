@@ -2,7 +2,7 @@ import fixture from "./data/bls-oews-may2025.json" with {type:"json"};
 export const oewsOccupations = [...new Map(fixture.records.map(row=>[row.OCC_CODE,{value:row.OCC_CODE,label:row.OCC_TITLE}])).values()];
 export const oewsAreas = [{value:"99",label:"U.S.",kind:"national"},{value:"36",label:"New York State",kind:"state"},{value:"35620",label:"New York-Newark-Jersey City, NY-NJ",kind:"metro"}];
 export const defaultMarketSelection = ()=>({soc:"15-1252",area:"99"});
-export const oewsProvenance = Object.freeze({period:fixture.source_period,releaseDate:fixture.release_date,sourceUrl:"https://www.bls.gov/oes/tables.htm",technicalNotesUrl:"https://www.bls.gov/oes/2025/may/oes_tec.htm"});
+export const oewsProvenance = Object.freeze({period:fixture.source_period,releaseDate:fixture.release_date,retrievedAt:fixture.retrieved_at,sourceUrl:"https://www.bls.gov/oes/tables.htm",technicalNotesUrl:"https://www.bls.gov/oes/2025/may/oes_tec.htm"});
 export function marketEvidence(input) {
  const selection=input&&typeof input==="object"?input:{};
  const row=fixture.records.find(row=>row.OCC_CODE===selection.soc&&row.AREA===selection.area);

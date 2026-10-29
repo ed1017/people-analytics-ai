@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "5f5d174b3afaa6bbd678913c92c65f742911617f54e58f5b93e5dedd2a878152",
-      "bytes": 90857
+      "sha256": "598cf4c49b9f5467b55d78d9c4e10baeec70d089231ed6d224cba0111f5e9864",
+      "bytes": 91041
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -384,8 +384,8 @@
     },
     {
       "path": "components/decision-brief.tsx",
-      "sha256": "dfb7c097d4a499106514042e2e63a92f819803571b24e08a5bd3a595a39fd0b8",
-      "bytes": 12039
+      "sha256": "07f4cadd5d7d4dd780c07993c66a036a3e73ff5c3658be48cb31ca3ee19e567e",
+      "bytes": 12308
     },
     {
       "path": "components/decision-landing.module.css",
@@ -709,8 +709,8 @@
     },
     {
       "path": "components/market-reference.tsx",
-      "sha256": "99cd066daac031523c52590c11ed2747b6869af5d3262a62dc353275647304d8",
-      "bytes": 17766
+      "sha256": "f6514fceccba7893313cd2317ca6cc6cdb4ce9319e9f58717834154f20e7df05",
+      "bytes": 22370
     },
     {
       "path": "components/model-capability-planner.tsx",
@@ -764,8 +764,8 @@
     },
     {
       "path": "components/pages/intelligence-page.tsx",
-      "sha256": "04d3d35b0b832328b08fe43c8cc351afd47a4b40daa592a2b3b7a766c9aa9831",
-      "bytes": 2849
+      "sha256": "a89a0c94ed1835dc5e5182f36ec631fafcecc979023484287c0d4943240c335c",
+      "bytes": 2990
     },
     {
       "path": "components/pages/learning-development-page.tsx",
@@ -3019,8 +3019,8 @@
     },
     {
       "path": "lib/oews-reference.mjs",
-      "sha256": "f9ab9bc91291a5fdbe2c9bc5fd5a87d6064fdec547f42a003ed1e751fd012ca4",
-      "bytes": 2892
+      "sha256": "b623288d586165feaedf3317636bb000e37ea571f4aa28e2899c5aadf5dfb453",
+      "bytes": 2925
     },
     {
       "path": "lib/openai-proxy-transport.ts",
@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 10026,
-      "sha256": "09d30d4bf7a8953bc08a76bef549f15f2f132066d40732d4b551d5023cfb34b9"
+      "bytes": 7879,
+      "sha256": "1a4d3afae90f361ef4899a3018e34fd8a6090899be2992450e317ace1693b8d5"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4489,8 +4489,8 @@
     },
     {
       "path": "lib/external-workforce-evidence.ts",
-      "bytes": 11941,
-      "sha256": "7ad0e7d803c44e793fd50026e9f544429fc5fbb7892b03656ef86200c0a9886e"
+      "bytes": 12763,
+      "sha256": "59eb9f8a0dc80870a89c4f1c446ce5bfb2a1a2bd17faebb4bb7b15015970fef5"
     },
     {
       "path": "lib/position-design-scenario.ts",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 16225,
-      "sha256": "142e2c60626141111688154852d0cd1572910bba54166d00f57feea566441393"
+      "bytes": 14555,
+      "sha256": "c200e971c1a5567b502480275b6a43d5a49e7042f63f42c91ca48e42e599698a"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
@@ -4639,18 +4639,18 @@
     },
     {
       "path": "lib/market-reference-carry.ts",
-      "bytes": 3582,
-      "sha256": "161d9a5f8628f186856523c7c4a709f9482cddf4cf6130a93378daad90395c4b"
+      "bytes": 4236,
+      "sha256": "db0fe249fd87ff471e77202a50ed01cccfd2d05d6bdc86fa985d91cc1058bb0d"
     },
     {
       "path": "tests/market-reference-carry.test.mjs",
-      "bytes": 8444,
-      "sha256": "8eb58030d4c5aa9d7dace6081288f9d47a21a4580fb1677bec8dc458c3cd7689"
+      "bytes": 8579,
+      "sha256": "40fa6426a2061baa1bb27f70f01bee60cdeb6008ae72c67b8131661486660330"
     },
     {
       "path": "tests/decision-brief-market-attribution.test.mjs",
-      "bytes": 4408,
-      "sha256": "dcc6bbb07b3c4bd19f121a0cb18ffbdbb2cff26cd4c0d346cad216fab1726c6e"
+      "bytes": 5096,
+      "sha256": "a55b4d50d08896949236a957d744cd8d5701e8678691414d4568878703f12a3d"
     },
     {
       "path": "tests/home-public-error-reference.test.mjs",
@@ -4689,8 +4689,8 @@
     },
     {
       "path": "tests/market-reference-editorial.test.mjs",
-      "bytes": 1914,
-      "sha256": "1e202599639945c980aea25a0c49de094a5780da57c3848adb65758f5c3a5278"
+      "bytes": 2070,
+      "sha256": "f80469a17cab499b107e4d7870b5c338eda1025737721583bf6219cf0ba766ec"
     },
     {
       "path": "lib/home-bu-turnover-chat.mjs",
@@ -4851,8 +4851,39 @@
       "path": "tests/decision-backup.test.mjs",
       "bytes": 4482,
       "sha256": "de4782ce71953ce60e672ff24de9e498acddfbfff38529002916d4c8c799e1b9"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "63f2c50380ed6303237cce215ce27af1d620d094c215e28d1b1538a3c070e3bb",
+      "bytes": 678
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "bytes": 11
+    },
+    {
+      "path": "components/market-evidence-bars.tsx",
+      "sha256": "49da8e072401ab3fbc8e49a1f5649555f5efb559b402d9826476c8f0e92ce6a2",
+      "bytes": 1629
+    },
+    {
+      "path": "lib/market-skills-reference.ts",
+      "sha256": "1f14078221876cb59d7f88f6636f6b85a4ea5f0709551cb60408058b5a0d8a5a",
+      "bytes": 2298
+    },
+    {
+      "path": "tests/fixtures/external-workforce-evidence/onet-software-systems-source-extract.json",
+      "sha256": "2ec25b88f71183dd1eb249fc939b4fd1ca1fbb876e2b0683e2f12c1e93ab70b7",
+      "bytes": 1355
+    },
+    {
+      "path": "tests/market-explorer.test.mjs",
+      "sha256": "94faff4cd2c26f0c1bba42e1cc7dd28e2a000243dbc56ee3f5bc33e7151ebca0",
+      "bytes": 5696
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
-  "verifiedDeployedArchiveSha256": "37afb09d30b6a4ea130a44e71260547c09224d6ea735b7d50f42a33f5877aca0"
+  "verifiedDeployedArchiveSha256": "37afb09d30b6a4ea130a44e71260547c09224d6ea735b7d50f42a33f5877aca0",
+  "overlayBasePublicCommit": "388906336efb501f0dc9ebc595880fe2468c1676"
 }

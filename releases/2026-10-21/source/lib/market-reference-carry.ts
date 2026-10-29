@@ -1,9 +1,11 @@
+// @ts-expect-error Native tests share this canonical source.
+import {findMarketSkillsReference} from './market-skills-reference.ts';
 import {marketCarryEvidence as oewsCarryEvidence} from './oews-reference.mjs';
 // @ts-expect-error Native tests share this canonical source.
 import {UK_SOFTWARE_PAY_REFERENCE,TORONTO_SOFTWARE_VACANCY_REFERENCE} from './external-workforce-evidence.ts';
 import type {DecisionStore,Json} from './local-decisions';
 
-export type MarketCarry = {soc:string;area:string;goal:string} | {version:1;kind:'external-workforce-reference';referenceId:string;goal:string};
+export type MarketCarry = {soc:string;area:string;goal:string;skillComparisonId?:string} | {version:1;kind:'external-workforce-reference';referenceId:string;goal:string};
 export const marketReferenceLimitations='Reference only; no model assumptions changed. Keep currencies, periods, populations and occupation taxonomies separate. Do not convert currency, annualize hourly pay, map internal roles, infer available candidates or hiring time, or treat wages as total employer cost. This evidence alone cannot establish whether hiring or development is preferable.';
 /** Resolve only known identifiers. Client values, labels and URLs never become source evidence. */
 export function marketCarryEvidence(input:unknown,expectedGoal?:string){
@@ -11,7 +13,12 @@ export function marketCarryEvidence(input:unknown,expectedGoal?:string){
  const value=input as Record<string,unknown>;
  if(typeof value.goal!=='string'||!value.goal.trim()||value.goal.length>240)return null;
  if(expectedGoal!==undefined&&value.goal!==expectedGoal)return null;
- if(value.kind===undefined&&value.version===undefined)return oewsCarryEvidence(input);
+ if(value.kind===undefined&&value.version===undefined){
+  const base=oewsCarryEvidence(input);if(!base)return null;
+  const skillComparison=value.skillComparisonId===undefined?null:findMarketSkillsReference(value.skillComparisonId,value.soc);
+  if(value.skillComparisonId!==undefined&&!skillComparison)return null;
+  return {...base,...(skillComparison?{skillComparison:structuredClone(skillComparison)}:{})} as typeof base & {skillComparison?:NonNullable<typeof skillComparison>};
+ }
  if(value.kind!=='external-workforce-reference'||value.version!==1)return null;
  const reference=value.referenceId===UK_SOFTWARE_PAY_REFERENCE.id?UK_SOFTWARE_PAY_REFERENCE:value.referenceId===TORONTO_SOFTWARE_VACANCY_REFERENCE.id?TORONTO_SOFTWARE_VACANCY_REFERENCE:null;
  return reference?{kind:'external-workforce-reference' as const,version:1,goal:value.goal,reference:structuredClone(reference),planningStatus:marketReferenceLimitations}:null;
@@ -19,7 +26,7 @@ export function marketCarryEvidence(input:unknown,expectedGoal?:string){
 export function canonicalMarketCarry(input:unknown):MarketCarry|null{
  const evidence=marketCarryEvidence(input);if(!evidence)return null;
  const value=input as Record<string,unknown>;
- return value.kind==='external-workforce-reference'?{version:1,kind:'external-workforce-reference',referenceId:String(value.referenceId),goal:String(value.goal)}:{soc:String(value.soc),area:String(value.area),goal:String(value.goal)};
+ return value.kind==='external-workforce-reference'?{version:1,kind:'external-workforce-reference',referenceId:String(value.referenceId),goal:String(value.goal)}:{soc:String(value.soc),area:String(value.area),goal:String(value.goal),...(value.skillComparisonId!==undefined?{skillComparisonId:String(value.skillComparisonId)}:{})};
 }
 /** Same goal envelope and revision transaction as scenario saves; no new storage channel. */
 export function saveMarketReference({store,datasetToken,goalId,goal,revision,carry,at}:{store:DecisionStore;datasetToken:string;goalId:string;goal:string;revision:number;carry:unknown;at:string}){
