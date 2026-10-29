@@ -91,7 +91,8 @@
       "feat/action-plan-scenarios": false,
       "feat/shared-planner-inputs": false,
       "fix/home-tool-replay-template": false,
-      "feat/market-intelligence-explorer": false
+      "feat/market-intelligence-explorer": false,
+      "feat/talent-inventory-position-scenarios": false
     }
   }
 }

@@ -1,3 +1,4 @@
+import {TalentInventoryScenarios} from "./talent-inventory-scenarios";
 import {PositionDashboard} from "./position-dashboard";
 import {ExternalWorkforceEvidencePanel} from "@/components/external-workforce-evidence-panel";
 import {PositionScenarioEditor} from "./position-scenario-editor";
@@ -55,17 +56,18 @@ export function PositionWorkforceDesignDestination({
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h3 className="font-semibold">
-            Position & Workforce Design
+            Talent Inventory &amp; position scenarios
           </h3>
           <p className="text-sm text-muted-foreground">
-            Compare current and proposed positions.
+            Select positions and compare hiring, redesign and training allocations.
           </p>
         </div>
 
 
       </div>
 
-      <PositionDashboard catalog={structuralActionProps.catalog} loading={positionCatalogLoading} error={positionCatalogError} />
+      <TalentInventoryScenarios />
+      <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-semibold">Grouped company position reference</summary><div className="pt-3"><PositionDashboard catalog={structuralActionProps.catalog} loading={positionCatalogLoading} error={positionCatalogError} /></div></details>
       <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-semibold focus-visible:ring-2 focus-visible:ring-ring">Edit individual positions &amp; saved revisions</summary><div className="pt-3"><PositionScenarioEditor /></div></details>
       <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">External role &amp; location evidence</summary><div className="pt-3"><ExternalWorkforceEvidencePanel /></div></details>
 

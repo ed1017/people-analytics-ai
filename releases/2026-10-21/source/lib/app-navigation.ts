@@ -119,10 +119,10 @@ export const appPageMetadata: Record<
       "Model company and business-unit workforce demand and compare scenarios.",
   },
   "position-workforce-design": {
-    label: "Position & Workforce Design",
+    label: "Talent Inventory",
     section: "Planning",
     description:
-      "Translate scenarios into authorized-position, recruiting, and skill-demand changes.",
+      "Select positions, allocate vacancy responses and compare saved position scenarios.",
   },
   "workforce-response": {
     label: "Workforce Response",
