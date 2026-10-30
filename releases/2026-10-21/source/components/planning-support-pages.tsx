@@ -19,7 +19,7 @@ export function FutureOfWorkPage({onNavigate}: Navigate) {
   const [handoff,setHandoff]=useState<{jobKey?:string;functionName?:string}|null>(null);
   const review=useRef<HTMLDivElement>(null);
   useEffect(()=>{if(handoff)review.current?.focus();},[handoff]);
-  return <section className="mx-auto max-w-7xl space-y-5 p-4 md:p-6" aria-label="Future of Work">
+  return <section className="mx-auto max-w-7xl space-y-3 p-3 md:p-4" aria-label="Future of Work">
     <FowLabWorkspace onNavigate={onNavigate} onReference={(jobKey,functionName)=>setHandoff({jobKey,functionName})}/>
     {handoff&&<div ref={review} tabIndex={-1} className="rounded-xl border p-4 focus-visible:ring-2 focus-visible:ring-ring" aria-label="Review Lab planning reference">
       <FoWLabReferenceHandoff jobKey={handoff.jobKey} functionName={handoff.functionName} onNavigate={onNavigate}/>
@@ -38,7 +38,7 @@ export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'actio
   const selected=selection?.scope===scope?selection.id:'';
   const select=(id:string)=>setSelection({scope,id});
   const title=page==='assess-evaluate'?'Review plan results':page==='action-plans'?'Action plans':'Track your plan';
-  return <section aria-label={title} className="mx-auto max-w-5xl space-y-4 p-6">
+  return <section aria-label={title} className="mx-auto max-w-5xl space-y-3 p-3 md:p-4">
     <h2 className="text-2xl font-semibold">{title}</h2>
     {page==='action-plans'&&storage.ready&&storage.saved&&goal&&<nav aria-label="Continue saved plan" className="flex flex-wrap gap-2">
       <button type="button" onClick={()=>onNavigate('plan-track')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Track this plan</button>

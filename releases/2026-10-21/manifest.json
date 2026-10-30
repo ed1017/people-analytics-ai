@@ -19,8 +19,8 @@
     },
     {
       "path": "app/about/page.tsx",
-      "sha256": "1bd29b410e5a990cc4774e27ed1532f0d575afa601169f1132dcef3d31e54f22",
-      "bytes": 1947
+      "bytes": 1947,
+      "sha256": "4d40b857c0af94242a720ca9fc000541242662d267350445697edcf00b60190b"
     },
     {
       "path": "app/api/attrition/route.ts",
@@ -249,8 +249,8 @@
     },
     {
       "path": "app/globals.css",
-      "sha256": "c5a1302570992420933e18ee119e1a16598a8915ce7ea3495931531854641a28",
-      "bytes": 53952
+      "bytes": 54552,
+      "sha256": "5fc7d3d5dfd949c719365fff50ec5c3cd12ec96b61f2122457e1c4ae2b7dadcd"
     },
     {
       "path": "app/layout.tsx",
@@ -624,8 +624,8 @@
     },
     {
       "path": "components/home-overview-summary.module.css",
-      "sha256": "50ad44dbbfdaaf0910b3f3157e62e641a8941cd1def3e60ea51a5a9d80bbbed1",
-      "bytes": 4840
+      "bytes": 5366,
+      "sha256": "0129c206525a7b16744fc972c70663ad5af5f301081aeff281d6af11bf68c7d4"
     },
     {
       "path": "components/home-overview-summary.tsx",
@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "sha256": "9c3f7ff3055b17e76205b08e82f096067c6306a72964f80fba1e430cebbca896",
-      "bytes": 7131
+      "bytes": 7138,
+      "sha256": "b6d9d5accfc11878e66cbcadaa1e1c5610c9a02c29e0ebbdf5b39cfc388bbb1a"
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -1204,8 +1204,8 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.module.css",
-      "sha256": "8a61c237301c3dfdcdb532e01d273da32172d9a6bae5e5442f1273fe6bf75f7f",
-      "bytes": 6163
+      "bytes": 6684,
+      "sha256": "2090467d5f8f8afa28c6ee892d85210c0fa80df6bcff2505395224bff7b371eb"
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
@@ -4124,8 +4124,8 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "sha256": "fd1b5ef9322b575d397c2e89c003f0afb4196d4c62c027d1e98c052e4c33ff2c",
-      "bytes": 2367
+      "bytes": 2815,
+      "sha256": "6384898d3d953b1defb0e701c5625036dc526f89f7fc900c5d155feafb76c8ab"
     },
     {
       "path": "components/interactive-planner.tsx",
@@ -4714,8 +4714,8 @@
     },
     {
       "path": "components/fow-lab-workspace.module.css",
-      "bytes": 4668,
-      "sha256": "4a9c2c171d08a54e8b27a3fc9faff192b714d0147474a492b23060522c609496"
+      "bytes": 5091,
+      "sha256": "a7bb6584a678511e0bb7c185c0e60a12914b280ff2ada40c0ab7ce96df9e179c"
     },
     {
       "path": "components/fow-lab-workspace.tsx",
@@ -4815,7 +4815,7 @@
     {
       "path": "components/plan-result-review.tsx",
       "bytes": 4927,
-      "sha256": "1e9b9cae981dc62966f528893a61befb4aa18aa803a0b6df3e3477fc95a04218"
+      "sha256": "fd589917c19b7e57565babfafd2cccf1c51c2edc3c0a3d7535a63f2095835afe"
     },
     {
       "path": "lib/plan-result-review.ts",
@@ -4889,8 +4889,8 @@
     },
     {
       "path": "components/workforce-planning/talent-inventory-scenarios.tsx",
-      "sha256": "52cdc62be6c534676990e48305a5107c7aac43582dcd685fefc29c2a3bb64daa",
-      "bytes": 31907
+      "bytes": 35360,
+      "sha256": "6991cd2e6cde6a27f1c976e2d12222b0e7cb952d3a7abd853f4bbf71e0750074"
     },
     {
       "path": "lib/data/position-inventory-constraints-v1.json",
@@ -4926,6 +4926,11 @@
       "path": "tests/position-allocation.test.mjs",
       "sha256": "6e30772d35c149979e326c7fc6c85fcaed44855f1a32030b1c46468a64f95a1f",
       "bytes": 9802
+    },
+    {
+      "path": "tests/talent-inventory-draft-replacement.test.mjs",
+      "bytes": 7729,
+      "sha256": "0f292096035f430c52ab69501d3c9d7d79a1bc565fd35882354d52a5c84612e7"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

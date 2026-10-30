@@ -992,3 +992,14 @@ html[data-workspace-preference="light"] [data-workspace-palette]:not([data-works
   color: var(--foreground);
 }
 .app-sidebar [data-nav-destination][aria-current="page"] > .absolute { background: var(--primary); }
+
+/* Consistent page density: reduce layout whitespace, not chart or control sizes. */
+.app-dashboard .evidence-pane { padding: 1rem; }
+.evidence-pane .evidence-panel-grid { gap: 1rem; margin-top: 1rem; }
+.evidence-pane .evidence-metric-grid { gap: .75rem; }
+.evidence-pane .evidence-panel-grid > :is(section, article, div, figure) { padding: .875rem; }
+.evidence-pane .evidence-panel-grid > :is(section, article, div, figure) > h3 + p { margin-bottom: .75rem; }
+@media (max-width: 639px) {
+  .app-dashboard .evidence-pane { padding: .75rem; }
+  .evidence-pane .evidence-panel-grid { gap: .75rem; }
+}
