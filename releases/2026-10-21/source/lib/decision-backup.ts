@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share canonical TypeScript source.
+import {listPositionResultTargets} from './position-result-targets.ts';
 // @ts-expect-error Native tests share this canonical TypeScript source.
 import {POSITION_FINANCE_LEDGER_FIELD,readPositionFinanceLedger} from './position-finance-store.ts';
 // @ts-expect-error Native tests share this canonical TypeScript source.
@@ -30,7 +32,8 @@ function validated(envelope:string,datasetToken:string):{data:DecisionData;count
   if(Object.hasOwn(f,POSITION_FINANCE_LEDGER_FIELD))requireValue(readPositionFinanceLedger(f[POSITION_FINANCE_LEDGER_FIELD],datasetToken,id,f[POSITION_ALLOCATION_LEDGER_FIELD]),'Saved position funding comparisons cannot be verified.');
   if(Object.hasOwn(f,planAlternativesField)){const value=readPlanAlternatives(f[planAlternativesField],{goalId:id,goal});requireValue(value,'Saved plans cannot be verified.');counts.plans+=value.plans.length;}
   if(Object.hasOwn(f,bundleWorkspaceField)){const value=readBundleWorkspace(f[bundleWorkspaceField],id);requireValue(value,'Saved bundles cannot be verified.');counts.bundles+=value.attachments.length;}
-  if(Object.hasOwn(f,manualPlanResultsField)){const value=readManualResults(f[manualPlanResultsField],id);requireValue(value.targets.every(item=>item.target.datasetToken===datasetToken),'Saved result history belongs to a different dataset.');counts.results+=value.entries.length;}
+  const positionTargets=listPositionResultTargets(f,datasetToken,id);
+  if(Object.hasOwn(f,manualPlanResultsField)){const value=readManualResults(f[manualPlanResultsField],id);requireValue(value.targets.every(item=>item.target.datasetToken===datasetToken),'Saved result history belongs to a different dataset.');requireValue(value.targets.every(item=>item.target.metric!=='position-ready-fte'||positionTargets.some(target=>JSON.stringify(target)===JSON.stringify(item.target))),'Saved position results do not match an exact tracked scenario.');counts.results+=value.entries.length;}
   if(Object.hasOwn(f,goalProgressField)){const value=readGoalProgressLedger(f[goalProgressField],id);counts.progressEvents+=value.events.length;}
  }
  return {data,counts};

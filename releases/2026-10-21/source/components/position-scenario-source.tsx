@@ -5,7 +5,7 @@ import {requirePositionAllocationDraft,calculatePositionAllocation,type Position
 import {POSITION_ALLOCATION_DRAFT_FIELD,POSITION_ALLOCATION_LEDGER_FIELD,readPositionScenarioLedger} from '@/lib/position-allocation-store';
 import {POSITION_FINANCE_LEDGER_FIELD,readPositionFinanceLedger,positionAllocationSignature} from '@/lib/position-finance-store';
 import {PositionAllocationPlanner,type PositionPlannerHandoffRequest} from './workforce-planning/position-allocation-planner';
-export function PositionScenarioSource({datasetToken,goalId,onOpenInventory,active=true}:{datasetToken:string;goalId:string;onOpenInventory:()=>void;active?:boolean}){
+export function PositionScenarioSource({datasetToken,goalId,onOpenInventory,onTrackPositions,active=true}:{datasetToken:string;goalId:string;onOpenInventory:()=>void;onTrackPositions?:()=>void;active?:boolean}){
  const uid=useId(),storage=useDecisionStorage(),scope=JSON.stringify([datasetToken,goalId]);
  const [selection,setSelection]=useState({scope,key:''}),[request,setRequest]=useState<{scope:string;value:PositionPlannerHandoffRequest}|null>(null);
  if(selection.scope!==scope){setSelection({scope,key:''});setRequest(null);}
@@ -19,7 +19,7 @@ export function PositionScenarioSource({datasetToken,goalId,onOpenInventory,acti
  const choice=selection.scope===scope?choices.find(c=>c.key===selection.key):undefined;
  return <section aria-label="Position scenario inputs" className="min-w-0 space-y-3">
   {!storage.ready?<p role="status">Loading saved scenarios.</p>:!allocations||!finance?<p role="alert">Saved position revisions could not be verified. Existing work is retained.</p>:choices.length>0&&<div className="flex flex-wrap items-end gap-2"><label htmlFor={uid} className="min-w-0 flex-1 text-sm font-semibold">Use saved position inputs<select id={uid} className="mt-1 min-h-11 w-full rounded-lg border bg-background px-3 text-sm" value={choice?.key??''} onChange={e=>setSelection({scope,key:e.target.value})}><option value="">Choose an allocation and funding revision</option>{choices.map(c=><option key={c.key} value={c.key}>{c.label}</option>)}</select></label><button type="button" className="min-h-11 rounded-lg border px-3 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring" disabled={!choice||!storage.saved} onClick={()=>{if(!choice)return;setRequest({scope,value:{requestId:crypto.randomUUID(),scenarioId:choice.row.scenarioId,revision:choice.row.revision,allocationSignature:choice.signature,financeRevision:choice.financeRevision}});}}>Use selected revision</button></div>}
-  <PositionAllocationPlanner key={scope} datasetToken={datasetToken} goalId={goalId} embedded active={active} onOpenInventory={onOpenInventory} handoffRequest={request?.scope===scope?request.value:undefined}/>
+  <PositionAllocationPlanner key={scope} datasetToken={datasetToken} goalId={goalId} embedded active={active} onOpenInventory={onOpenInventory} onTrackPositions={onTrackPositions} handoffRequest={request?.scope===scope?request.value:undefined}/>
  </section>;
 }
 

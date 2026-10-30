@@ -2140,7 +2140,7 @@ export default function Home() {
             }
           />
         ) : (
-          <WorkforcePlanningPage key={conversation.workspaceKey}
+          <WorkforcePlanningPage key={conversation.workspaceKey} onTrackPositions={()=>setActivePage("action-plans")}
             planningScenarios={planningScenarios}
             planningLoading={planningLoading}
             planningError={planningError}

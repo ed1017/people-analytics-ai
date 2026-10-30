@@ -1,5 +1,6 @@
 'use client';
 
+import {PositionResultSetup} from './position-result-setup';
 import {PlanResultReview} from './plan-result-review';
 import {ManualPlanResults} from './manual-plan-results';
 import dynamic from 'next/dynamic';
@@ -46,8 +47,9 @@ export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'actio
     </nav>}
     {!storage.ready ? <p role="status">Loading saved work…</p> : !storage.saved ? <p role="status">Saved work needs review. Existing records are retained.</p> : !goal ? <p className="text-sm text-muted-foreground">Select a saved goal on Overview to review its {page === 'action-plans' ? 'plans' : 'dated measurements'}. No goal is selected.</p> : page === 'action-plans' ? <>
       <p className="text-sm">{goal.statement}</p>
-      {fields.homeSolutionBundlesV1 === undefined && fields.homePlanAlternativesV1 === undefined ? <p className="text-sm text-muted-foreground">No attached Action Plan is recorded for this goal. Review proposals in chat on Overview.</p> : <AttachedActionPlansBrief goalId={goal.id} goal={goal.statement} raw={fields.homeSolutionBundlesV1} alternatives={fields.homePlanAlternativesV1} onReview={() => onNavigate('home')}/>}
+      {fields.homeSolutionBundlesV1 === undefined && fields.homePlanAlternativesV1 === undefined ? <p className="text-sm text-muted-foreground">{fields['planning.positionAllocationScenariosV1']?'Choose a saved position revision below to track its result.':'No attached Action Plan is recorded for this goal. Review proposals in chat on Overview.'}</p> : <AttachedActionPlansBrief goalId={goal.id} goal={goal.statement} raw={fields.homeSolutionBundlesV1} alternatives={fields.homePlanAlternativesV1} onReview={() => onNavigate('home')}/>}
     </> : null}
+    {storage.ready&&storage.saved&&goal&&page==='action-plans'&&<PositionResultSetup key={scope} goalId={goal.id} datasetToken={decisionStore.getDatasetToken()} fields={fields} onLinked={id=>{select(id);onNavigate('plan-track');}}/>}
     {storage.ready&&storage.saved&&goal&&page==='assess-evaluate'&&<PlanResultReview goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()} selected={selected} onSelect={select} onTrack={id=>{select(id);onNavigate('plan-track');}}/>}
     {storage.ready&&storage.saved&&goal&&page!=='assess-evaluate'&&<ManualPlanResults selectedPlanId={selected} onSelectPlan={select} key={`${decisionStore.getDatasetToken()}/${goal.id}/${goal.statement}`} goalId={goal.id} goal={goal.statement} fields={fields} datasetToken={decisionStore.getDatasetToken()}/>}
     {page==='plan-track'&&storage.ready&&storage.saved&&goal&&goalProgressEnabled&&<details><summary className="min-h-11 cursor-pointer text-sm">Other goal measurements</summary><p className="mb-3 text-sm text-muted-foreground">These goal measurements do not include the manually reported plan results above. They are recorded separately.</p><SelectedGoalProgress/></details>}
