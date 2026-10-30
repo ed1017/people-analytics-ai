@@ -65,6 +65,8 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
    }
    must(!url.search&&request.headers.get('content-type')?.split(';')[0].trim().toLowerCase()==='application/json');
    const raw=await boundedJson(request.body,900000,signal);current();
+   // Selected position explanations use /api/chat; never silently drop their Finance binding here.
+   must(raw?.positionContext===undefined&&raw?.request?.positionContext===undefined);
    const envelope=raw&&Object.hasOwn(raw,'request');if(envelope)must(exact(raw,['request','current','previous']));
    const original=envelope?raw.request:raw,parsed=readSolutionRequest(structuredClone(original));
    must(same(original.evidence,parsed.evidence));

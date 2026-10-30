@@ -1,13 +1,29 @@
 "use client";
-import {applicablePlanComponents} from '@/lib/guided-plan-summary';
+import {applicablePlanComponents,guidedPlanSummary} from '@/lib/guided-plan-summary';
+import {GuidedPlanSummary} from '@/components/guided-plan-summary';
+import {ActionPlanQuickSummary} from '@/components/action-plan-quick-summary';
+import {planBudgetText} from '@/lib/home-plan-revisions';
+import type {BundleDraft,BundleResult} from '@/lib/home-bundle-reconciliation';
 import {planContextDiagnosticText,type PlanContextDiagnostic} from '@/lib/home-evidence-identity';
 import {PlanDirections} from '@/components/plan-directions';
 import {HomePlanSummary} from '@/components/home-plan-summary';
 import {PlanAssumptions} from '@/components/home-bundle-plans';
 import type {PlanAlternative,PlanAlternatives} from '@/lib/home-plan-alternatives';
 import {actionEvidenceCatalog} from '@/lib/home-action-proposal';
-import {bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleAssumptionCopy} from '@/lib/home-bundle-display';
+import {bundleDisplayText,bundleComponentLabels,bundleDisplayName,bundleAssumptionText,bundleAssumptionCopy,bundleHorizonEnd} from '@/lib/home-bundle-display';
 const money=(value:number|null|undefined)=>value==null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})} USD`;
+/** Saved-plan essentials remain visible; full narrative is available in the disclosure below. */
+export function SavedPlanHighlights({draft,result}:{draft:BundleDraft;result:BundleResult}){
+ const guided=guidedPlanSummary(draft),measure=draft.inputs.successMeasure;
+ const end=bundleHorizonEnd(draft.inputs.scope).value,lastFinish=draft.inputs.timing.map(item=>item.finish.value).filter((date):date is string=>!!date).sort().at(-1);
+ return <section aria-label="Saved plan highlights" className="space-y-2">
+  {guided?<GuidedPlanSummary draft={draft}/>:<ActionPlanQuickSummary draft={draft} result={result}/> }
+  {!guided?.target&&measure&&<p><strong>{measure.name} target:</strong> {measure.target.value??'Unknown'}.</p>}
+  {result.budget&&<p aria-label="Saved plan budget check">{planBudgetText(result)}</p>}
+  {lastFinish&&end&&lastFinish>end&&<p role="alert">Component dates extend beyond the planning horizon. Review the dates in Plan details.</p>}
+  {!!result.issues.length&&<p role="status">{result.issues.length} unresolved calculation input(s). Review Plan details.</p>}
+ </section>;
+}
 export function PlanAlternativeCard({plan,catalog,compact=false,snapshot=false,contextCurrent=true,measurePack,contextDiagnostic}:{contextDiagnostic?:PlanContextDiagnostic|null;measurePack?:unknown;plan:PlanAlternative;catalog:PlanAlternatives;compact?:boolean;snapshot?:boolean;contextCurrent?:boolean}){
  const {draft,result}=plan,currentResult=result,key=plan.id,selected=plan.id;
  const referenceCatalog=contextCurrent&&!snapshot?actionEvidenceCatalog(measurePack):[];
@@ -18,10 +34,13 @@ export function PlanAlternativeCard({plan,catalog,compact=false,snapshot=false,c
  <p>{snapshot?'Attached snapshot':catalog.attachments.some(item=>item.planId===plan.id&&item.purpose==='proposal-selection')&&!plan.applied?'Selected proposal attached to goal · not operationally applied':!plan.operation?'Original plan snapshot':plan.applied?'Applied alternative':'Proposed alternative · not yet applied'} · revision {draft.revision}{plan.sourceRefs.length?` · based on ${plan.sourceRefs.map(ref=>'Action Plan #'+catalog.plans.find(item=>item.id===ref.id)!.number).join(' and ')}`:''}.</p>
  {(!contextCurrent||snapshot)&&<p>Historical assumptions; review current evidence before acting.</p>}
  {draft.inputs.hiringPlan?.version===2&&<details><summary className="min-h-11 cursor-pointer py-2">Saved hiring assumptions and provenance</summary>{Object.entries(draft.inputs.hiringPlan.review.inputs).map(([field,value])=><p key={field}>{field}: {value===null?'Unknown':String(value)} · {draft.inputs.hiringPlan?.review.origins[field as keyof typeof draft.inputs.hiringPlan.review.origins]?.kind??'unknown'}</p>)}<p>Edit the native hiring estimate and review a new revision; this saved snapshot stays unchanged.</p></details>}
+ <SavedPlanHighlights draft={draft} result={currentResult}/>
+ <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Plan details</summary><div className="space-y-2 pb-2">
  {plan.notes.length>0&&<p aria-label="Saved plan notes">{plan.notes.join(' ')}</p>}
    <HomePlanSummary draft={draft} result={currentResult} measurePack={measurePack}>
     {result.calculationStatus!=='awaiting-scope'&&<PlanAssumptions key={key+selected} draft={draft} result={currentResult} contextCurrent={contextCurrent}/>}
    </HomePlanSummary>
+ </div></details>
    <PlanDirections draft={draft} snapshot={snapshot}/>
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Why these plans</summary><div className="space-y-3">{draft.inputs.requiredStaffingPlan&&<section><h4 className="font-semibold">Saved staffing assumptions and provenance</h4>{Object.entries(draft.inputs.requiredStaffingPlan.review.inputs).map(([field,value])=><p key={field}>{field}: {value===null?'Unknown':String(value)} · {draft.inputs.requiredStaffingPlan?.review.origins[field as keyof typeof draft.inputs.requiredStaffingPlan.review.origins]?.kind??'unknown'} · {draft.inputs.requiredStaffingPlan?.review.origins[field as keyof typeof draft.inputs.requiredStaffingPlan.review.origins]?.explanation} {draft.inputs.requiredStaffingPlan?.review.origins[field as keyof typeof draft.inputs.requiredStaffingPlan.review.origins]?.quote}</p>)}<p>Delivery target: {draft.inputs.requiredStaffingPlan.deliveryTarget?.months??'Unknown'} months. {draft.inputs.requiredStaffingPlan.deliveryTarget?.quote}</p><p>Edit the native comparison before pinning a new revision.</p></section>}<p className="text-xs">Review population, period and unresolved assumptions before comparing. These proposals are not ranked by effectiveness. Edits create separate numbered alternatives. Apply and Attach are explicit; earlier plans and attachments stay unchanged.</p>{contextDiagnostic&&<p aria-label="Action Plan context check" className="text-xs">{planContextDiagnosticText(contextDiagnostic)}</p>}<p className="text-xs">{draft.bundle.origin==='local-demo-v1'?'This example was prepared locally from fictional assumptions; no model ran.':draft.bundle.origin==='conversation-v1'?'This proposal was developed in conversation; its mechanism and effectiveness are unproven.':'Plans start with one preparation response and can include reviewed local edits.'} The staffing section reports only combinations actually evaluated for the current assumptions. Attach checks the selected draft and preserves any executed search with it.</p><p className="text-xs">References describe observed context; they do not establish causes, effectiveness or a ranking. Availability and combined retention impact are not established. Proposed roles are not assigned people or operational approvals.</p><ul className="list-disc space-y-2 pl-5">
     <li><strong>Working together:</strong> {applicablePlanComponents(draft).map(item=>item.name).join('; ')}. Dependencies below show which steps can run in parallel.</li>

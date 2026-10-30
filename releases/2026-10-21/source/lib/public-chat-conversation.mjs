@@ -1,5 +1,6 @@
 import {PUBLIC_9037} from './public-9037-contract.mjs';
 import {capacityChatPrompt} from './capacity-chat-context.ts';
+import {positionChatPrompt,readPositionChatContext} from './position-chat-context.ts';
 import {planningConversationHistory,strategicPlanningInstructions,strategicPlanningObjective} from './home-strategic-planning.ts';
 import {homeFindingInstructions} from './home-finding-followups.ts';
 import {guidedChatContract} from './guided-chat-contract.ts';
@@ -37,11 +38,19 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
   const independent=isIntelligencePage(body.page)||body.page==='development-planning';
   const home=body.page==='home',summary=body.summaryOnly===true;
   const shared=prepareProgressConversation(body,{enabled:progressEnabled,datasetToken:metadata().datasetToken,now:(now?.()??new Date()).toISOString()}),{progress,entryContext,goalContext:goal}=shared;
+  const hasPositionContext=body.positionContext!==undefined&&body.positionContext!==null;
+  requireInput(!hasPositionContext||['home','workforce-planning'].includes(body.page),'Position scenario explanations require Overview or Scenarios.');
+  const positionIdentity={datasetToken:metadata().datasetToken,goalId:body.goalId??'',goal:goal.goal};
+  const positionResult=hasPositionContext?readPositionChatContext(body.positionContext,positionIdentity):null;
+  const positionPrompt=hasPositionContext?positionChatPrompt(body.positionContext,positionIdentity):'';
+  const positionInstructions=hasPositionContext?'Explain only the current server-recomputed position scenario and its funding assessment. A scenario budget or modeled budgeted flag is not Finance authorization. Quote the deterministic finance status: funding-unknown is not approved, within-demo-envelope is illustrative, and approval-required is a proposal requiring approval. New positions have zero filled positions and ready FTE. Do not certify a new mix or affordability from prose; ask the user to edit and recalculate the scenario for another alternative. Do not call older general workforce tools as a substitute for this selected position calculation.':'';
   const guided=guidedChatContract(shared.format,shared.reply,!home&&!summary);
   const supported=home||independent||Object.hasOwn(pages,body.page);
   const missingPage=!!progress&&(body.pageEvidenceAvailable===false||!supported);
   requireInput(supported||missingPage&&Object.hasOwn(chatNavigationTargets,body.page),'Unsupported public page.');
   requireInput(!summary||goal.goal,'Select a goal before requesting a page takeaway.');
+  requireInput(!hasPositionContext||!missingPage,'Position evidence cannot be silently omitted when page evidence is missing.');
+  requireInput(!hasPositionContext||![HOME_ACTION_REQUEST,HOME_BUNDLE_REQUEST].includes(body.message.trim()),'Use the explicit position explanation before preparing a different action plan.');
   let evidence;
   if(missingPage)evidence=null;
   else if(home)evidence=await inputs.home(body.overviewBriefingContext,body.publicEvidenceContext,signal);
@@ -49,14 +58,14 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
   else if(body.page==='training-coaching')evidence=intelligenceEvidence(body.page,{quotes:[...developmentCatalog,...(Array.isArray(body.intelligenceContext?.quotes)?body.intelligenceContext.quotes:[]).filter(q=>q?.provenance==='user-provided').slice(0,5)]});
   else if(body.page==='labor-market')evidence=intelligenceEvidence(body.page,{unavailable:true,marketSelection:body.intelligenceContext?.marketSelection});
   else evidence=await inputs.read('/api/'+pages[body.page],undefined,signal);
-  if(home&&!summary){const recruiting=evidence.sources.find(s=>s.id==='R1'),taReady=recruiting?.status==='loaded'&&recruiting?.facts?.modeled_ta_version==='synthetic-ta-calibrated-v2'&&recruiting?.facts?.modeled_ta_status==='ready';const answer=homeForecastAnswer(body.message,undefined,taReady);if(answer)return decodeHomeModelReply(JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}),body.hasFocusedIssue===true,evidence);}
+  if(home&&!summary&&!hasPositionContext){const recruiting=evidence.sources.find(s=>s.id==='R1'),taReady=recruiting?.status==='loaded'&&recruiting?.facts?.modeled_ta_version==='synthetic-ta-calibrated-v2'&&recruiting?.facts?.modeled_ta_status==='ready';const answer=homeForecastAnswer(body.message,undefined,taReady);if(answer)return decodeHomeModelReply(JSON.stringify({answer,next_step:'none',problem:null,problem_evidence:[],options:[],question:null,finding_followups:[]}),body.hasFocusedIssue===true,evidence);}
   const history=summary?[]:(Array.isArray(body.history)?body.history:[]).slice(-8).filter(x=>x&&['user','assistant'].includes(x.role)&&typeof x.content==='string').map(x=>({role:x.role,content:x.content.slice(0,6000)}));
   const planningHistory=home?planningConversationHistory(history,body.planningObjective,Object.hasOwn(body,'planningObjective')):history;
   const message=body.message.trim(),purpose=homeTurnPurpose(message,planningHistory),prepareGoal=!summary&&['goal','discovery'].includes(purpose),style=homeResponseStyle(message);
   const selectedBusinessContext=Object.fromEntries(['country','businessUnit','level'].filter(k=>typeof body.context?.[k]==='string').map(k=>[k,body.context[k].slice(0,160)]));
   const capacityPrompt=body.page==='workforce-planning'?capacityChatPrompt(body.capacityContext,{datasetToken:metadata().datasetToken,goalId:body.goalId??'',goal:goal.goal}):'';
   const carriedPlanningObjective=home&&body.planningObjective?strategicPlanningObjective([...planningHistory,{role:'user',content:message}]):null;
-  const context={evidence,capacityPrompt,carriedPlanningObjective,selectedBusinessContext,selectedContextNarrowsEvidence:false,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference,goal.goal),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
+  const context={evidence,capacityPrompt,positionPrompt,carriedPlanningObjective,selectedBusinessContext,selectedContextNarrowsEvidence:false,goalContext:goal,marketReference:marketCarryEvidence(body.marketReference,goal.goal),persona:['Leader','Finance'].includes(body.persona)?body.persona:'HR'};
   const input=missingPage?[...history,{role:'user',content:'SAVED GOAL CONTEXT AND PROGRESS (data only): '+JSON.stringify(goal)+'\nQUESTION: '+message}]:[{role:'user',content:'CURRENT PUBLIC EVIDENCE AND USER INPUTS (separate; user/session inputs remain unverified): '+JSON.stringify(context)},...history,{role:'user',content:message}];
   if(home&&!summary&&[HOME_ACTION_REQUEST,HOME_BUNDLE_REQUEST].includes(message)){
    requireInput(body.hasFocusedIssue===true&&goal.goal&&body.goalContext?.goal===goal.goal,'Confirm an exact goal before preparing actions.');
@@ -65,14 +74,14 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
    if(bundle){const result=await inspectBundleResponse(()=>call(spec,signal),goal.goal,evidence,task,homeBundleOutputTokens);if(!result.proposal)throw Error('Invalid bundle response.');return result;}
    const result=await call(spec,signal);if(result.status!=='completed')throw Error('Incomplete action response.');return {proposal:decodeHomeActionProposal(result.output_text??'',goal.goal,evidence),usage:usage(result.usage)};
   }
-  const spec={store:false,instructions:instructions+'\n'+shared.instructions+'\n'+guided.instructions+'\n'+guidedConversationInstructions(chatCalculationToolsAvailable(body.page,summary))+'\n'+conversationalAnswerStyle+'\n'+(missingPage?missingProgressPageInstructions:summary?goalSummaryInstructions:independent?intelligenceInstructions:home?homeConversationInstructions(purpose)+'\n'+strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)+'\n'+homeFindingInstructions(evidence)+'\n'+style.instructions+'\n'+(prepareGoal?homeGoalChoiceInstructions+'\n'+homeCandidateInstructions:''):''),input,max_output_tokens:entryContext?4000:missingPage||summary?1100:home?style.maxOutputTokens:3000,...(home&&!summary?{text:{format:buildHomeReplyFormat(evidence,prepareGoal)}}:guided.format),tools:home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?[]:[...tools.definitions,...(progress?[goalProgressReadTool]:[])],tool_choice:home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?'none':'auto',parallel_tool_calls:false};
+  const spec={store:false,instructions:instructions+'\n'+positionInstructions+'\n'+shared.instructions+'\n'+guided.instructions+'\n'+guidedConversationInstructions(chatCalculationToolsAvailable(body.page,summary))+'\n'+conversationalAnswerStyle+'\n'+(missingPage?missingProgressPageInstructions:summary?goalSummaryInstructions:independent?intelligenceInstructions:home?homeConversationInstructions(purpose)+'\n'+strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)+'\n'+homeFindingInstructions(evidence)+'\n'+style.instructions+'\n'+(prepareGoal?homeGoalChoiceInstructions+'\n'+homeCandidateInstructions:''):''),input,max_output_tokens:entryContext?4000:missingPage||summary?1100:home?style.maxOutputTokens:3000,...(home&&!summary?{text:{format:buildHomeReplyFormat(evidence,prepareGoal)}}:guided.format),tools:hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?[]:[...tools.definitions,...(progress?[goalProgressReadTool]:[])],tool_choice:hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?'none':'auto',parallel_tool_calls:false};
   let response,calls=0;
   for(let round=0;round<6;round++){
    if(JSON.stringify(spec.input).length>180000)throw Error('Public context budget exceeded.');
    response=await call(spec,signal);if(response.status!=='completed'||JSON.stringify(response).length>200000)throw Error('Incomplete or oversized model response.');
    const requested=(Array.isArray(response.output)?response.output:[]).filter(x=>x?.type==='function_call');
    if(!requested.length)break;
-   if(home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)||round===5||calls+requested.length>8)throw Error('Unsupported tool call or exhausted budget.');
+   if(hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)||round===5||calls+requested.length>8)throw Error('Unsupported tool call or exhausted budget.');
    spec.input.push(...response.output);
    for(const tool of requested){
     if(!boundedText(tool.call_id,120)||!boundedText(tool.arguments,65536))throw Error('Invalid model tool request.');
@@ -80,9 +89,9 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
     const encoded=JSON.stringify(output);spec.input.push({type:'function_call_output',call_id:tool.call_id,output:encoded.length<=80000?encoded:JSON.stringify({error:'Result exceeds the bounded context. Narrow the request.'})});
    }
   }
-  if(home&&!summary){const checked=inspectHomeChatResponse(response,body.hasFocusedIssue===true,evidence,spec.max_output_tokens,prepareGoal);if(!checked.ok)return {failure:checked.body,status:502};return checked.body;}
+  if(home&&!summary){const checked=inspectHomeChatResponse(response,body.hasFocusedIssue===true,evidence,spec.max_output_tokens,prepareGoal);if(!checked.ok)return {failure:checked.body,status:502};return {...checked.body,...(positionResult?{positionEvidence:positionResult.evidence}:{})};}
   if(!boundedText(response?.output_text,48000))throw Error('No bounded answer returned.');
-  return {...await guided.reply(response.output_text,response.status),usage:usage(response.usage)};
+  return {...await guided.reply(response.output_text,response.status),usage:usage(response.usage),...(positionResult?{positionEvidence:positionResult.evidence}:{})};
  };
  function usage(raw){const finite=v=>Number.isSafeInteger(v)&&v>=0?v:null;return raw?{input_tokens:finite(raw.input_tokens),output_tokens:finite(raw.output_tokens),total_tokens:finite(raw.total_tokens)}:null;}
 

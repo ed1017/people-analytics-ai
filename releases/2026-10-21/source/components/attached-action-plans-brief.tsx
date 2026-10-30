@@ -3,7 +3,7 @@ import {HomePlanSummary} from './home-plan-summary';
 import {PilotLifecycleExample} from './pilot-lifecycle-example';
 import {planBudgetText} from '@/lib/home-plan-revisions';
 import {readPlanAlternatives} from '@/lib/home-plan-alternatives';
-import {PlanAlternativeCard} from '@/components/plan-alternative-card';
+import {PlanAlternativeCard,SavedPlanHighlights} from '@/components/plan-alternative-card';
 import {PlanDirections} from '@/components/plan-directions';
 import {readBundleWorkspace,type BundleAttachment} from '@/lib/home-bundle-records';
 import {bundleInputKey} from '@/lib/home-bundle-reconciliation';
@@ -20,9 +20,9 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
    <p>Attached {item.attachedAt.slice(0,10)} · {superseded.has(item.id)?'Previous attached version':'Latest attached version'}</p>
    {draft.binding.goal!==goal&&<p className="font-medium">Goal wording has changed since this attachment.</p>}
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
-   <HomePlanSummary draft={draft} result={result} savedBudgetText={result.budget?planBudgetText(result):undefined}/>
+   <SavedPlanHighlights draft={draft} result={result}/>
+   <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Plan details</summary><div className="space-y-2 pb-2"><HomePlanSummary draft={draft} result={result} savedBudgetText={result.budget?planBudgetText(result):undefined}/>{measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}</div></details>
    <PlanDirections draft={draft} snapshot/>
-   {measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Saved assumptions, activities and unknowns</summary><div className="space-y-3 pt-2">
     <p>Population — {bundleAssumptionText(draft.inputs.scope.population)}. Start — {bundleAssumptionText(draft.inputs.scope.startMonth)}. Duration — {bundleAssumptionText(draft.inputs.scope.months)} months.</p>
     <p>{bundleDisplayText(draft.bundle.coordination,draft.bundle)}</p>
