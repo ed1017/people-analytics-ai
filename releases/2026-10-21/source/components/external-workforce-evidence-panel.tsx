@@ -3,6 +3,7 @@
 import { useId, useState, type ReactNode } from "react"
 import { UK_SOFTWARE_PAY_REFERENCE, TORONTO_SOFTWARE_VACANCY_REFERENCE } from "@/lib/external-workforce-evidence"
 
+import {UkHiringDifficulty} from "@/components/uk-hiring-difficulty"
 import {MarketComparison} from "@/components/market-reference"
 import {defaultMarketSelection} from "@/lib/oews-reference.mjs"
 import type {MarketCarry} from '@/lib/market-reference-carry'
@@ -30,7 +31,7 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
         <select aria-label="Market" id={`${id}-market`} className={control} value={selectedRole} onChange={event=>{setRole(event.target.value);onMarketChange?.(event.target.value);setCarryError('')}}>
           <option value="15-1252">United States · workforce and pay</option>
           <option value="ca-21231">Canada · vacancies and offered pay</option>
-          <option value="uk-2134">United Kingdom · annual pay</option>
+          <option value="uk-2134">United Kingdom · pay and hiring difficulty</option>
         </select>
       </label>
       {!ukOnly&&!torontoOnly ? (usMarket??<MarketComparison selection={selection} onChange={setSelection} goal={goal} onCarry={onCarry??(()=>{})}/>) : <>
@@ -77,6 +78,7 @@ export function ExternalWorkforceEvidencePanel({ initialRole = "15-1252", goal="
         </div>
       </details>
       </>}
+      {ukOnly && <UkHiringDifficulty />}
     </section>
   )
 }
