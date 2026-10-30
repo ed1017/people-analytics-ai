@@ -2,7 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR472 live - position scenarios through Track and Review
+### PR475 current - compact Workforce ratings; PR474 recovery
+
+PR475 is live at runtime `fc181d20ad4c716b7dcdeb8ae2d8fb8f5fd6d6c6`, merge `bda92ab81fab222da76e70aafe543728a6220e4f`, deployment `dpl_6tE2Hna459BDrvQXpSh8pBpEfeFo`. Exact-head CI `41110227539` passed. Public desktop (1440px) and mobile (390px) each passed eight affected-flow checks with no page or bridge errors and no provider attempts. Workforce now includes compact ratings using the existing 2026 YTD source and matching population/scope; Career Growth remains compatible. [Release evidence and limits](recovery-ratings-2026-10-30.md).
+
+PR474 is included at runtime `c07f5d4ba57b036865a8f9a38b27806860c549c8`, merge `2ccc6c8827e0ac52c8e83bef63748cea69fc7d22`, deployment `dpl_F4vPVP5KfbLSNcU3Lt3fsR8M9kD4`; CI `41108847759` passed. Separate capacity-risk and workforce-trend backups require reviewed, explicit replacement and preserve active edits until Reopen. Staged/public desktop/mobile each passed nine checks: 36 executions of nine cases, with no page/transport errors or provider requests.
+
+Verified ratings support the September 30, 2026 snapshot and 2026 YTD company or one supported business unit, with all countries and levels. Counts require matching source receipt and population. Historical-year selection, global multiselect and unfavorable-survey employee filtering still require reviewed source/aggregation contracts; answer-share aggregates are not employee cohort filters.
+
+### PR472 previous release - position scenarios through Track and Review
 
 PR472 is live at runtime `ea458ff6ecf28d3fa82b9f98f0b4d31abedd6fc7`, merge `9622a7b074b70a770bf5764620b4b3b353cbaaa7`, deployment `dpl_9DZmU9f4xStw8uZTZGdA2YnRYDCo`. Independent review, focused regression, isolated production build/TypeScript and exact-head CI `41102562384` passed. Both staged and public desktop (1440px) and mobile (390px) passed seven acceptance checks each. [Release evidence and limits](position-results-2026-10-30.md).
 
@@ -14,7 +22,7 @@ The actual Vercel scheduled renewal returned HTTP 200 on October 30 at 06:00:08 
 
 Saved position and optional funding revisions now bind to an explicit target date in Action plans. Track accepts fractional ready FTE in existing vacancies; corrections append history and Review compares only compatible dates and scope. Proposed additional positions remain separate. The existing saved-work backup preserves these relationships. No paid provider calls or guard changes.
 
-Remaining priorities: cross-store backup coverage; authoritative role/location applicant availability and hiring-time evidence; fresh provider-answer acceptance when separately authorized; Lab validation/retest. Historical performance/survey filter requests require current-contract reconciliation before implementation. Canadian archive access remains evidence-gated; do not bypass the prior 403. Target overlays, video and new findings pinning remain deferred or awaiting owner choice.
+Active recovery work: older separately saved workforce comparison snapshots need a strict validated export/restore contract and explicit save-failure path; that separate branch is not live. Standalone risk/trend saved scenarios are covered by PR474. Unsaved drafts, recovery state, preferences, other datasets and full database reconstruction remain outside these backups. Authoritative role/location applicant availability and completed hiring-time evidence remain incomplete; employment stock, vacancies and jobseekers are different measures. Denied BLS, Canadian and German archive routes must not be bypassed. Fresh provider-answer acceptance remains separate. FoW/Lab methodology validation and handoff retesting are user-owned, not an agent backlog. Target overlays remain preview-only; video and new findings pinning remain deferred.
 
 ### PR470 live - issue exploration and populated position model v2
 
