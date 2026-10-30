@@ -1134,8 +1134,8 @@
     },
     {
       "path": "components/workforce-performance.tsx",
-      "sha256": "046004325662ee3d4b627307d46c38989fac367225b2b59e0ba7f214a82cb3e3",
-      "bytes": 4421
+      "sha256": "7a3f540109239a975b7679e4166e4c09411eb9b692efdc51a0f75b26aed891d2",
+      "bytes": 4712
     },
     {
       "path": "components/workforce-planning/business-unit-response-allocation-panel.tsx",
@@ -5134,8 +5134,8 @@
     },
     {
       "path": "tests/workforce-ratings-placement.test.mjs",
-      "sha256": "0b20681063f67fe6a68358cf1d0e6f4d8ea040e357502f53f522cca98c796ccf",
-      "bytes": 4199
+      "sha256": "b5fcaaf35228d3448ef1ba60a86c04a8c8b8e89dd377159a377a1a59b8a5fa4a",
+      "bytes": 4878
     },
     {
       "path": "components/workforce-snapshot-backup.tsx",
@@ -5176,6 +5176,36 @@
       "path": "tests/uk-hiring-difficulty.test.mjs",
       "bytes": 5796,
       "sha256": "fa6d697fad0b07b06c1b5590d1002520f650d2eff7d0bea0f32a953807e82b46"
+    },
+    {
+      "path": "components/synthetic-workforce-history.tsx",
+      "bytes": 12349,
+      "sha256": "3363326bb043c4c1dfb48b97f0141c1b038a1891be24e80c65174720c7b1ff22"
+    },
+    {
+      "path": "lib/data/synthetic-workforce-history-v1.json",
+      "bytes": 1761,
+      "sha256": "ba51d6219ac81919f1a9a0bfb0c6be191365fcd17f42765c1fac68ebc5eb1b24"
+    },
+    {
+      "path": "lib/synthetic-workforce-history.ts",
+      "bytes": 13732,
+      "sha256": "1ec10863642b4ede5c3ea4e4a65f7185cf190826f02ec9b91d76ddf6cd8a639c"
+    },
+    {
+      "path": "tests/manual/generate-synthetic-workforce-history.mjs",
+      "bytes": 1568,
+      "sha256": "8ca4465bc5493ca788685235636f7b1ba45bf9239bec95c5e05ea37ff419e69b"
+    },
+    {
+      "path": "tests/synthetic-workforce-history-ui.test.mjs",
+      "bytes": 10681,
+      "sha256": "ef78fc5b9715c550495f7288a1e1060925a5098acb21016f3d8b47063cb6a43c"
+    },
+    {
+      "path": "tests/synthetic-workforce-history.test.mjs",
+      "bytes": 10250,
+      "sha256": "1b5343dbd1e74a95eb38da51820f405b268dfab9996bbd38fcf8c3644eed4b0e"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
