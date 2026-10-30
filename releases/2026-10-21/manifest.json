@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "9cd99b8297ee935823396b2dad192349e04acf9dcc71c79640012fa7985373a5",
-      "bytes": 73313
+      "sha256": "db352fbb3208d967a1042612c7e78bee3908d07b22962e62817aaf0ce3c59b2d",
+      "bytes": 74521
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -5136,6 +5136,26 @@
       "path": "tests/workforce-ratings-placement.test.mjs",
       "sha256": "0b20681063f67fe6a68358cf1d0e6f4d8ea040e357502f53f522cca98c796ccf",
       "bytes": 4199
+    },
+    {
+      "path": "components/workforce-snapshot-backup.tsx",
+      "bytes": 4668,
+      "sha256": "fbf1612772d225f67a216c4e3e2e7e6062d9973069180a8a94ebd9d620e99246"
+    },
+    {
+      "path": "lib/workforce-snapshot-backup.ts",
+      "bytes": 11178,
+      "sha256": "054b63fb68ada78a30c40732ea206c5f35ef0c0606204426bfabf6f1a9cceae0"
+    },
+    {
+      "path": "tests/fixtures/workforce-snapshot-current.json",
+      "bytes": 17246,
+      "sha256": "d52568b92063ee8f944f01fd202a36c48057d6327d3bbebd2c216958dc894fc4"
+    },
+    {
+      "path": "tests/workforce-snapshot-backup.test.mjs",
+      "bytes": 7632,
+      "sha256": "1495dd5abf79cbb23d7871bac392ff271bdc2f22479ea865a950bada902566d6"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

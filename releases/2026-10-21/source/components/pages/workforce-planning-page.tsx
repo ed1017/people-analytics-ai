@@ -1,5 +1,7 @@
 "use client";
 import type { ScenarioDefaultSource } from "@/lib/legacy-source-contracts";
+import { WorkforceSnapshotBackup } from '@/components/workforce-snapshot-backup';
+import { readWorkforceSnapshots, persistWorkforceSnapshots, workforceSnapshotKey, type SavedWorkforceSnapshot } from '@/lib/workforce-snapshot-backup';
 import { datasetFetch, datasetSession } from "@/lib/dataset-client.mjs";
 
 import {usePlanningDecisionState} from "@/components/workforce-planning/use-planning-decision-state";
@@ -7,6 +9,7 @@ import { PlanningGuide } from "@/components/planning-guide";
 
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { WorkforcePlanningWorkflowNavigation } from "@/components/workforce-planning/workflow-navigation";
@@ -91,12 +94,7 @@ type WorkforcePlanningPageProps = {
   onRefreshEvidenceHandoff: () => void;
 };
 
-type SavedScenarioEntry = {
-  id: string;
-  name: string;
-  saved_at: string;
-  scenario: ScenarioModelResponse;
-};
+type SavedScenarioEntry = SavedWorkforceSnapshot;
 
 type ResponseExecutionDraft = {
   id: string;
@@ -122,8 +120,7 @@ type ResponseConstraintDraft = {
   require_all_approved_capacity_scheduled: boolean;
 };
 
-const SAVED_SCENARIOS_STORAGE_KEY =
-  "people-analytics.saved-workforce-scenarios.v1";
+
 
 function createStructuralPositionAction():
   StructuralPositionAction {
@@ -277,6 +274,9 @@ export function WorkforcePlanningPage({
     usePlanningDecisionState("scenarioName","");
   const [savedScenarios, setSavedScenarios] =
     usePlanningDecisionState<SavedScenarioEntry[]>("savedScenarios",[]);
+  const snapshotDatasetToken = datasetSession.snapshot();
+  const savedSnapshotContext = useRef<{token:string;raw:string|null}|null>(null);
+  const [snapshotError,setSnapshotError] = useState('');
   const [comparisonScenarioIds, setComparisonScenarioIds] =
     usePlanningDecisionState<string[]>("comparisonScenarioIds",[]);
   const [segmentView, setSegmentView] =
@@ -502,39 +502,22 @@ export function WorkforcePlanningPage({
     setConstraintAwareScheduleError,
   ] = useState<string | null>(null);
 
-  useEffect(() => {
-    if(goalKey.slice(goalKey.indexOf(":")+1))return; // Legacy global scenarios stay unassigned.
+  function reloadSavedComparisons() {
+    if(goalKey.slice(goalKey.indexOf(":")+1))return;
     try {
-      const stored = window.localStorage.getItem(
-        datasetSession.current()==="legacy-v1:0"?SAVED_SCENARIOS_STORAGE_KEY:`${SAVED_SCENARIOS_STORAGE_KEY}.dataset.${datasetSession.current()}`
-      );
-
-      if (!stored) return;
-
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) {
-        const validEntries = parsed.filter(
-          (item): item is SavedScenarioEntry =>
-            Boolean(
-              item &&
-                typeof item.id === "string" &&
-                typeof item.name === "string" &&
-                item.scenario?.summary &&
-                item.scenario?.assumptions
-            )
-        );
-
-        setSavedScenarios(validEntries);
-        setComparisonScenarioIds(
-          validEntries
-            .slice(0, 3)
-            .map((entry) => entry.id)
-        );
-      }
-    } catch {
-      // Ignore invalid or unavailable browser storage.
-    }
-  }, [goalKey, setSavedScenarios, setComparisonScenarioIds]);
+      if(datasetSession.snapshot()!==snapshotDatasetToken)throw Error('Dataset changed. Reopen this workspace before loading comparisons.');
+      const raw=window.localStorage.getItem(workforceSnapshotKey(snapshotDatasetToken));
+      const entries=raw===null?[]:readWorkforceSnapshots(raw,snapshotDatasetToken);
+      savedSnapshotContext.current={token:snapshotDatasetToken,raw};
+      setSavedScenarios(entries);
+      setComparisonScenarioIds(entries.slice(0,3).map(entry=>entry.id));
+      setSnapshotError('');
+    } catch(error) {setSnapshotError(error instanceof Error?error.message:'Saved comparisons could not be read.');}
+  }
+  useEffect(() => {
+    savedSnapshotContext.current=null;setSnapshotError('');
+    reloadSavedComparisons();
+  }, [goalKey, snapshotDatasetToken, setSavedScenarios, setComparisonScenarioIds]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1930,20 +1913,14 @@ export function WorkforcePlanningPage({
     setConstraintAwareScheduleError(null);
   }
 
-  function persistSavedScenarios(
-    next: SavedScenarioEntry[]
-  ) {
-    setSavedScenarios(next);
-    if(goalKey.slice(goalKey.indexOf(":")+1))return;
-
+  function persistSavedScenarios(next: SavedScenarioEntry[]) {
+    if(goalKey.slice(goalKey.indexOf(":")+1)){setSavedScenarios(next);return true;}
     try {
-      window.localStorage.setItem(
-        datasetSession.current()==="legacy-v1:0"?SAVED_SCENARIOS_STORAGE_KEY:`${SAVED_SCENARIOS_STORAGE_KEY}.dataset.${datasetSession.current()}`,
-        JSON.stringify(next)
-      );
-    } catch {
-      // Keep the in-session copy if browser storage is unavailable.
-    }
+      const loaded=savedSnapshotContext.current;
+      if(!loaded||loaded.token!==snapshotDatasetToken||datasetSession.snapshot()!==loaded.token)throw Error('Dataset changed or saved comparisons have not loaded. Reopen this workspace before saving.');
+      const raw=persistWorkforceSnapshots(next,loaded.token,window.localStorage,loaded.raw);
+      savedSnapshotContext.current={token:snapshotDatasetToken,raw};setSavedScenarios(next);setSnapshotError('');return true;
+    } catch(error) {setSnapshotError((error instanceof Error?error.message:'Browser storage is unavailable.')+' Your current scenario and name are retained. Retry Save after resolving storage, or reload saved comparisons.');return false;}
   }
 
   function saveCustomScenario() {
@@ -1965,7 +1942,7 @@ export function WorkforcePlanningPage({
     };
 
     const next = [entry, ...savedScenarios];
-    persistSavedScenarios(next);
+    if(!persistSavedScenarios(next))return;
     setScenarioName("");
 
     setComparisonScenarioIds((current) =>
@@ -1976,11 +1953,11 @@ export function WorkforcePlanningPage({
   }
 
   function deleteSavedScenario(id: string) {
-    persistSavedScenarios(
+    if(!persistSavedScenarios(
       savedScenarios.filter(
         (entry) => entry.id !== id
       )
-    );
+    ))return;
     setComparisonScenarioIds((current) =>
       current.filter(
         (scenarioId) => scenarioId !== id
@@ -2105,6 +2082,10 @@ export function WorkforcePlanningPage({
 
 
 
+          {!goalKey.slice(goalKey.indexOf(":")+1)&&<>
+            {snapshotError&&<div role="alert" className="mb-3 rounded-md border p-3 text-sm"><p>{snapshotError}</p><button type="button" className="mt-2 min-h-11 rounded-md border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={reloadSavedComparisons}>Reload saved comparisons</button></div>}
+            <WorkforceSnapshotBackup key={goalKey} datasetToken={snapshotDatasetToken} onRestored={(entries,raw)=>{savedSnapshotContext.current={token:snapshotDatasetToken,raw};setSavedScenarios(entries);setComparisonScenarioIds(entries.slice(0,3).map(e=>e.id));setSnapshotError('');}}/>
+          </>}
           <ScenarioModelingDestination
             visible={workflowView === "plan" || workflowView === "overview"}
             planningLoading={planningLoading}
