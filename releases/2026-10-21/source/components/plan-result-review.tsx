@@ -18,7 +18,7 @@ export function PlanResultReview({goalId,goal,fields,datasetToken,selected,onSel
  const latest=review?.latest;
  const rows=target?[{label:'Saved target',value:target.value,date:target.date},...(latest?.value!==null&&latest?.value!==undefined?[{label:'Reported result',value:latest.value,date:latest.measuredOn}]:[])]:[];
  const max=Math.max(1,...rows.map(row=>row.value));
- return <section aria-label="Plan result comparison" className="space-y-4 rounded-xl border bg-card p-4 md:p-6">
+ return <section aria-label="Plan result comparison" className="space-y-3 rounded-xl border bg-card p-3 md:p-4">
   {!plan?<><h3 className="text-lg font-semibold">{selected?'Selected plan is unavailable':'Choose a saved plan to begin'}</h3><p>Review attached plans in Action plans.</p>{selected&&<button type="button" className={button} onClick={()=>onSelect('')}>Choose another saved plan</button>}</>:<>
    <label htmlFor={uid} className="block text-sm font-medium">Saved plan</label>
    <select id={uid} className={`${button} w-full`} value={plan.id} onChange={e=>onSelect(e.target.value)}>{plans.map(p=><option key={p.id} value={p.id}>Plan {p.number} — revision {p.draft.revision}</option>)}</select>
