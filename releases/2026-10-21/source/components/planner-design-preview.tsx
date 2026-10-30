@@ -23,7 +23,7 @@ export function PlannerDesignPreview({baseline}:{baseline:BusinessPlanning}){
  function apply(){try{const next=editPreviewAssumptions(workingBase,assumptions,'preview-edit-'+crypto.randomUUID());selectBusinessPlanningMix(next,mix);setWorkingBase(next);setEditor(false);setEditError('');setNotice('Budget and readiness updated. The original remains unchanged.');}catch(error){setEditError((error as Error).message);}}
  const state=selectBusinessPlanningMix(workingBase,mix),option=state.staffing!.result.options[0],spec=state.review.spec,result=state.review.result;
  const total=result.additionalRoles!,existing=result.availableFte!,target=existing+total,points=option.monthly;
- if(!points.length||points.some(p=>p.roles===null))return <main className={styles.page}>This worked example needs complete readiness inputs before it can be drawn.</main>;
+ if(!points.length||points.some(p=>p.roles===null))return <main className={styles.page}>Enter readiness inputs to draw this scenario.</main>;
  const first=points[0],short=Math.max(0,total-first.roles!),unchanged=workingBase===baseline&&JSON.stringify(mix)===JSON.stringify(initial);
  const alternative=selectBusinessPlanningMix(baseline,initial).staffing!.result.options[0];
  const x=(index:number)=>50+index*(chartWidth-80)/Math.max(1,points.length-1),y=(value:number)=>240-value/target*195;
@@ -32,7 +32,7 @@ export function PlannerDesignPreview({baseline}:{baseline:BusinessPlanning}){
  const gap=available.map((v,i)=>`M${x(i)} ${y(target)}H${x(Math.min(i+1,points.length-1))}V${y(Math.min(v,target))}H${x(i)}Z`).join(' ');
  function edit(key:'build'|'move',text:string){if(!/^\d+$/.test(text))return;const next={...mix,[key]:Number(text)};next.buy=total-next.build-next.move;try{selectBusinessPlanningMix(workingBase,next);setMix(next);setNotice('');}catch{setNotice('Keep the mix within the available pools and five-role target.');}}
  return <main className={styles.page}>
-  <nav className={styles.top} aria-label="Preview navigation"><Link href="/">Workforce Intelligence<span>Scenario studio</span></Link><span className={styles.preview}>Design preview · fictional worked example</span></nav>
+  <nav className={styles.top} aria-label="Preview navigation"><Link href="/">Workforce Intelligence<span>Scenario studio</span></Link><span className={styles.preview}>Scenario design preview</span></nav>
   <div className={styles.intro}><span>SCENARIO PLANNING</span><span>{spec.scope} · {month(spec.startMonth!)}–{month(points.at(-1)!.month)}</span></div>
   <header className={styles.hero}>
    <div><p className={styles.eyebrow}>{unchanged?'Less uncovered work within the entered limits':'Your adjusted staffing option'}</p><h1>{mix.build>0?`Develop ${mix.build}. `:''}{mix.move>0?`Redeploy ${mix.move}. `:''}{mix.buy>0?`Hire ${mix.buy}.`:''}</h1><p>{option.shortfallHours!>0?`${n(option.shortfallHours)} hours still need cover before everyone is ready.`:'No uncovered hours under these assumptions.'} {result.budgetUsd===null?'No budget set; affordability is unknown.':option.cash!==null&&option.cash>result.budgetUsd?`${cash(option.cash-result.budgetUsd)} over the entered budget.`:option.status!=='met'?'Some entered limits are unmet or unverified.':'Readiness and release remain assumptions.'}</p></div>

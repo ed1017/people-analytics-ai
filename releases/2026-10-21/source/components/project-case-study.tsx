@@ -24,7 +24,7 @@ export function ProjectCaseStudy({expanded=false}:{expanded?:boolean}={}){
   <details className="border-t pt-2">
    <summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Details</summary>
    <div className="space-y-2">
-    <p>The workforce snapshot is dated September 30, 2026. Worked examples use explicit scenario inputs; public references retain their own sources and dates.</p>
+    <p>The workforce snapshot is dated September 30, 2026. Scenarios use explicit inputs; public references retain their own sources and dates.</p>
     <p>Workload and productive hours determine required effort and available capacity. Staffing comparisons use action, timing and cost assumptions. Headcount projections use opening people + external hires - exits.</p>
     <p>The app uses Next.js, React, TypeScript, Tailwind CSS and Recharts, hosted on Vercel. Workforce AI uses the OpenAI integration when available. Scenario controls recalculate through shared calculation code; saved proposals are stored in the visitor&apos;s browser.</p>
    </div>
