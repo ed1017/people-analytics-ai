@@ -4814,8 +4814,8 @@
     },
     {
       "path": "components/plan-result-review.tsx",
-      "bytes": 6124,
-      "sha256": "a9d8a32fb741ab58fe4b52c984cdc47e7aa5f5bf6e588b40628cde272dc288b9"
+      "bytes": 6717,
+      "sha256": "e459491b65129eb570cac7f6b3a59e4641225760eef74beac40414000c236e6b"
     },
     {
       "path": "lib/plan-result-review.ts",
@@ -5114,8 +5114,8 @@
     },
     {
       "path": "tests/position-result-ui.test.mjs",
-      "sha256": "212183c759ca98cf1db70e3396cd045ffd2a60856871ca951dd6d39884f5cd8d",
-      "bytes": 6675
+      "sha256": "9216bc786e032a2155d6f46332d0f08ac3ea6a1881ffd5b9027649fae0c5c674",
+      "bytes": 10265
     },
     {
       "path": "components/standalone-scenario-backup.tsx",

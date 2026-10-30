@@ -12,6 +12,8 @@ An explicit review and confirmation creates a tracking goal from validated saved
 
 Cancellation writes nothing. Stale state, malformed records, limits and identity conflicts reject confirmation. Existing storage-failure and cross-tab recovery behavior remains in force. Existing Track and Review handle dated targets and manually recorded results; proposed positions remain distinct from ready capacity in existing vacancies.
 
+The staged journey also exposed a presentation ambiguity: a comparable position-ready-capacity shortfall used the green result treatment. Position results now distinguish below-target capacity from met/above targets and use a neutral state when no compatible comparison exists. Other metric semantics and all calculations remain unchanged.
+
 ## Acceptance
 
 Candidate implementation. Required verification includes independent review, focused and aggregate tests, exact-head CI, isolated production staging, and public desktop/mobile introduction, risk/navigation, compare/save, confirmation/cancel, Track/Review, reload and returning-visitor checks. No paid provider requests. Lab validation remains owner-owned; chart overlays remain preview-only.
