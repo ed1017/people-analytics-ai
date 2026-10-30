@@ -23,3 +23,7 @@ The root aggregate passes 3,093 tests; root generated-artifact checks and TypeSc
 Browser acceptance used the actual React components in an isolated local harness (1440px and 390px). Fourteen assertions per viewport passed: exact New York values, optional skill inclusion, source links, repeated carries, reload, occupation changes excluding incompatible skills, US location persistence, Canada/UK native-unit carries, source selection persistence and no errors/overflow. This is component-flow evidence; public application navigation and publication are checked separately.
 
 Standalone hosted-source TypeScript also reports five existing errors from excluded `experiments/swp-headcount` inputs. The new chart nullability errors identified during implementation were fixed. Root TypeScript passes; the exact production-package build will verify the complete runtime.
+
+## Publication
+
+Published with PR461 after complete-runtime staging and public desktop/mobile acceptance. US/Canada/UK carries, reload, optional skills reference and saved position/plan preservation passed. The internal live BLS route remains unavailable on the baseline and release; reviewed references are independent. [Release evidence](talent-market-publication-2026-10-30.md).

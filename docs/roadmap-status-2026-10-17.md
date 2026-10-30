@@ -1,8 +1,14 @@
-# Active roadmap - October 28
+# Active roadmap - October 30
 
 ## Current live release and active parallel work
 
-### PR458 live - local saved-work backup and direct plan navigation
+### PR460/461 live - market explorer and Talent Inventory
+
+Candidate `8d3c6d212f25e5ce3c9c9f186578e8649f24bede`, deployment `dpl_CZ9qXzZoDfJNgHtsWmZnaqrzj5Pq`, merge `65fa9c5881d986104da8e5a14364d896d9f79726`. Company-scale modeled position inventory and editable vacancy allocations now save immutable goal-scoped revisions and compare/reopen them. The separate 12-vacancy worked example supports hire 3 / repurpose 6 / train 3. Market references retain dated/native-unit evidence and an optional qualitative training comparison.
+
+Independent review, exact-head CI `40970994357`, complete-runtime build/TypeScript and staged/public desktop/mobile acceptance passed (14 checks per width). The earlier failed PR460 deployment was rolled back; this release staged the complete verified package with exact organization metadata before promotion. Scoped Live-AI readiness is unavailable: read-only inspection confirms expired pricing verification, with scheduled renewal returning HTTP503. The initial unscoped capability response was only a middleware rejection. Diagnosis continues without provider calls or policy changes. The internal live BLS route remains unavailable. [Release, recovery evidence and limits](talent-market-publication-2026-10-30.md). No paid calls or persistent guard/access changes.
+
+### PR458 - local saved-work backup and direct plan navigation (previous release)
 
 Runtime `7453e9cf151f3888145ac3296824d07a91dd93d4`, deployment `dpl_F9CEh2oocugK6aewDvbebzd3sDcZ`, merge `09fd85f76bfab72a4feac4418ebcdf78693cd083`. Settings now downloads and restores current-dataset saved goal work, including plan versions and manual result/correction history. Restore requires a validated preview and explicit replacement confirmation. Action plans links directly to Track and Review plan results with selected-plan continuity.
 
