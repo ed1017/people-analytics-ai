@@ -58,6 +58,9 @@ jobs:
       - name: Verify unified planner revisions and cost basis
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-planner-handoff.test.mjs tests/position-scenario-source.test.mjs tests/required-staffing-cost-basis.test.mjs tests/required-staffing-card-presentation.test.mjs tests/current-required-staffing-summary.test.mjs
+      - name: Verify issue prompts and modeled inventory version compatibility
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/exploration-issue-starters.test.mjs tests/exploration-issue-routing.test.mjs tests/company-position-model-v2.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

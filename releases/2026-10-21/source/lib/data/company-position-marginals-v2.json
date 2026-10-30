@@ -1,0 +1,175 @@
+{
+  "kind": "reviewed-public-synthetic-workforce-marginals",
+  "sourceUrl": "https://www.ed-ai.app/api/workforce",
+  "retrievedAt": "2026-10-30",
+  "responseArtifactSha256": "8332bc8f5fed6582eb288ea4f44379790f8e395462dd1d0e8a03c9221a46297e",
+  "metadata": {
+    "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+    "datasetId": "workforce-demo-9037-public-aggregates-v4",
+    "bundleDigest": "2ffb177d4343276608d06ae320b8c0c5891ebd39f64c3b4a59e14b0eb416f94b",
+    "cutoff": "2026-09-30",
+    "dataClass": "constructed-synthetic",
+    "publicationApproved": true,
+    "contract": "public-synthetic-aggregates-and-calculations-v1",
+    "publicationReceiptId": "edwin-coordinated-synthetic-realism-2026-10-23",
+    "sourceLabel": "Public fictional synthetic workforce; not observed employee outcomes. Conditional calculations, not approved actions."
+  },
+  "asOf": "2026-09-30",
+  "summary": {
+    "headcount": 9037,
+    "fte": 8851.4,
+    "full_time_headcount": 8109,
+    "non_full_time_headcount": 928
+  },
+  "business_units": [
+    {
+      "org_code": "BU-TECH",
+      "headcount": 1511,
+      "fte": 1477.6
+    },
+    {
+      "org_code": "BU-MGSVC",
+      "headcount": 1455,
+      "fte": 1423.8
+    },
+    {
+      "org_code": "BU-CLIENTOPS",
+      "headcount": 1308,
+      "fte": 1283.4
+    },
+    {
+      "org_code": "BU-DIGITAL",
+      "headcount": 1136,
+      "fte": 1113.2
+    },
+    {
+      "org_code": "BU-DATAAI",
+      "headcount": 1030,
+      "fte": 1007.8
+    },
+    {
+      "org_code": "BU-CONS",
+      "headcount": 970,
+      "fte": 948.8
+    },
+    {
+      "org_code": "BU-SALES",
+      "headcount": 847,
+      "fte": 830.6
+    },
+    {
+      "org_code": "BU-CORP",
+      "headcount": 780,
+      "fte": 766.2
+    }
+  ],
+  "countries": [
+    {
+      "country_code": "IN",
+      "headcount": 2713,
+      "fte": 2657.4
+    },
+    {
+      "country_code": "US",
+      "headcount": 2311,
+      "fte": 2262.4
+    },
+    {
+      "country_code": "GB",
+      "headcount": 931,
+      "fte": 912.8
+    },
+    {
+      "country_code": "CA",
+      "headcount": 705,
+      "fte": 691
+    },
+    {
+      "country_code": "SG",
+      "headcount": 478,
+      "fte": 468
+    },
+    {
+      "country_code": "DE",
+      "headcount": 470,
+      "fte": 460.8
+    },
+    {
+      "country_code": "AU",
+      "headcount": 391,
+      "fte": 381.4
+    },
+    {
+      "country_code": "JP",
+      "headcount": 382,
+      "fte": 374
+    },
+    {
+      "country_code": "FR",
+      "headcount": 337,
+      "fte": 328.4
+    },
+    {
+      "country_code": "BR",
+      "headcount": 319,
+      "fte": 315.2
+    }
+  ],
+  "levels": [
+    {
+      "level_code": "L1",
+      "headcount": 715,
+      "fte": 701.6
+    },
+    {
+      "level_code": "L2",
+      "headcount": 1311,
+      "fte": 1283.2
+    },
+    {
+      "level_code": "L3",
+      "headcount": 1988,
+      "fte": 1950
+    },
+    {
+      "level_code": "L4",
+      "headcount": 2004,
+      "fte": 1964.2
+    },
+    {
+      "level_code": "L5",
+      "headcount": 1363,
+      "fte": 1334.2
+    },
+    {
+      "level_code": "L6",
+      "headcount": 762,
+      "fte": 744.8
+    },
+    {
+      "level_code": "L7",
+      "headcount": 431,
+      "fte": 420.6
+    },
+    {
+      "level_code": "L8",
+      "headcount": 274,
+      "fte": 268
+    },
+    {
+      "level_code": "L9",
+      "headcount": 114,
+      "fte": 111.8
+    },
+    {
+      "level_code": "L10",
+      "headcount": 71,
+      "fte": 69.2
+    },
+    {
+      "level_code": "L11",
+      "headcount": 4,
+      "fte": 3.8
+    }
+  ]
+}

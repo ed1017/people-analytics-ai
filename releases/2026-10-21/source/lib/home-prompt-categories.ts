@@ -3,10 +3,9 @@
 import {capacityRiskPrompt} from './group-capacity-risk.ts';
 export const homePromptCategories = [
   {id:'explore',label:'Explore',prompts:[
-    'How has our headcount changed?',
-    'What was turnover last year?',
-    'What are our recorded workforce costs?',
     capacityRiskPrompt,
+    'Which business unit has the highest voluntary turnover, and what should we investigate?',
+    'Which business units have the most open positions and the longest average time to fill?',
   ]},
   {id:'capacity',label:'Capacity Planning',prompts:[
     'How can we close a staffing gap?',

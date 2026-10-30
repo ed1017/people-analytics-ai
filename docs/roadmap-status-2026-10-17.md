@@ -2,7 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR466 live - explicit Overview position planning
+### PR469 live - shared position and staffing planner
+
+Runtime `0b34ef6af2f428fb4c39988c633c65bf379ad287`, merge `cf0d7d5a4d6c3dff108477606b6809d153d6593c`, deployment `dpl_8iqrnJGfmD29Eve1pE9ik16njfat` (https://people-analytics-5r7nzwuen-ed-56dc.vercel.app). Exact-head CI `40996636006`, independent review, isolated build/TypeScript, staged acceptance and 32 direct public browser checks passed across desktop/mobile. No paid provider requests.
+
+Inventory positions now use the shared Overview Scenario Planner with native allocation/funding calculations. Switching editors preserves drafts; exact saved revision adoption requires replacement confirmation. Reusable annual/monthly/one-time rates survive horizon edits, whole-period quotes require confirmation, and current answer presentation follows edits while preserving original history. PR468 wording/template changes are included. Units, unknown funding and immutable original revisions remain protected.
+
+Active follow-ons: risk-first exploration prompts; explicit existing-vacancy/additional-position explanation breakdown; new immutable modeled country/FTE register; canonical editable KPI targets feeding red statuses into Workforce Risks. These follow-ons are not yet live. Existing v1 saves remain unchanged. Authenticated Finance evidence, fresh paid-model acceptance and scheduled renewal observation remain separate.
+
+### PR466 - explicit Overview position planning (superseded entry)
 
 Runtime `8542b077484ba44df39d556a7a44c8cb8b2b7805`, merge `f211f0962599fd70b79d6631e1aa2a305d4e9c95`, deployment `dpl_3jSAS1C2NWu1ibwPC4g9tBuDYjbo` (https://people-analytics-3lk9yk9fd-ed-56dc.vercel.app). Exact-head CI `40988996177`, 37 focused tests, full isolated runtime build/TypeScript and independent review passed. Public desktop/mobile each passed six checks: fresh keyboard-accessible entry, draft-preserving navigation, explicit saved-revision calculation, bound mocked explanation, goal isolation and reload without automatic selection or horizontal overflow. No paid calls; generated explanation quality was not tested.
 
