@@ -329,8 +329,8 @@
     },
     {
       "path": "components/attached-action-plans-brief.tsx",
-      "sha256": "5185207fac25cb527fe06a1eab4c7d1458bd8908811ba19aa2a0339ce57f7036",
-      "bytes": 5148
+      "sha256": "487399e0c4aebf799c8a13c787c0555d911377670d2a84ca3db35cf7d3071103",
+      "bytes": 5406
     },
     {
       "path": "components/calibrated-ta-panels.tsx",
@@ -824,8 +824,8 @@
     },
     {
       "path": "components/plan-alternative-card.tsx",
-      "sha256": "f03d195bcc6ededaa8578f8b1f251e133ef9d2314678bdcd07fada943ae199cf",
-      "bytes": 9188
+      "sha256": "cc7d2b0284dd4540038dc7fb70fcfea28d5d4b624997806038a7c44d853e4659",
+      "bytes": 10855
     },
     {
       "path": "components/plan-directions.tsx",
@@ -3164,8 +3164,8 @@
     },
     {
       "path": "lib/public-chat-conversation.mjs",
-      "sha256": "574cef762c5d2ac45d50e34bad03279205b77c1c76d83d3315722242c86de225",
-      "bytes": 11652
+      "sha256": "5c3d9dffbfcf7547ff90cef901717bd69bb4a269d80684b2ab1056b73b3e6f53",
+      "bytes": 13546
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
@@ -3189,8 +3189,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "8c16c7f13e671b7d40159c842da84c6d04e3c28d1a3db00af24cb694abe97c3a",
-      "bytes": 14039
+      "sha256": "d0a7bdbc99a26ae621881c55354fe43156940b494b23029d9dc8817018982ef4",
+      "bytes": 14225
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -4839,8 +4839,8 @@
     },
     {
       "path": "lib/decision-backup.ts",
-      "bytes": 5260,
-      "sha256": "873570aa4dea140af52f90bdabd7a6fb14e38264add25f194ba86602613bef91"
+      "bytes": 5670,
+      "sha256": "3ea4b076d163c690fe551b417e0c44e161890b5c6de4e07b9718fc114ff2dd35"
     },
     {
       "path": "tests/decision-backup-store.test.mjs",
@@ -4889,8 +4889,8 @@
     },
     {
       "path": "components/workforce-planning/talent-inventory-scenarios.tsx",
-      "bytes": 35360,
-      "sha256": "6991cd2e6cde6a27f1c976e2d12222b0e7cb952d3a7abd853f4bbf71e0750074"
+      "bytes": 35697,
+      "sha256": "5f43041e8de02f722032c72d8448bbcee014a5b2cef59d12043b9bd812784054"
     },
     {
       "path": "lib/data/position-inventory-constraints-v1.json",
@@ -4929,8 +4929,63 @@
     },
     {
       "path": "tests/talent-inventory-draft-replacement.test.mjs",
-      "bytes": 7729,
-      "sha256": "0f292096035f430c52ab69501d3c9d7d79a1bc565fd35882354d52a5c84612e7"
+      "bytes": 7822,
+      "sha256": "0a26c572a1fc831d7f43eb9902b3489298b114fedba50619c9128ba11e6b932f"
+    },
+    {
+      "path": "components/workforce-planning/position-finance-panel.tsx",
+      "bytes": 12045,
+      "sha256": "915c51c0c1fc318d69b7b08eaa6fb8b5636431c78c9348b14fd272e04d052c34"
+    },
+    {
+      "path": "components/workforce-planning/position-scenario-explanation.tsx",
+      "bytes": 5289,
+      "sha256": "19ec13a19a7fb348d586dc2f85aa129e404064b27c28197f58f73d0d279d2d22"
+    },
+    {
+      "path": "lib/position-chat-context.ts",
+      "bytes": 8464,
+      "sha256": "6994874dfc33129ffea75d66098244c39aeff599875680709699cdb3d9207951"
+    },
+    {
+      "path": "lib/position-finance-assessment.ts",
+      "bytes": 8457,
+      "sha256": "26ed9212748285a9163a3411374f16d6b645865fef7cac4d17acabfb87878bbb"
+    },
+    {
+      "path": "lib/position-finance-store.ts",
+      "bytes": 8481,
+      "sha256": "bba9a51f26c4f7adc715c0e451cbea9d1860d7ba0362268807f0932fd3234a06"
+    },
+    {
+      "path": "tests/position-chat-context.test.mjs",
+      "bytes": 7046,
+      "sha256": "d4a98c937e50ba90ce9d43bda7289080fc2889f4a5a7b58d8c4a06f50899a5b9"
+    },
+    {
+      "path": "tests/position-chat-routing.test.mjs",
+      "bytes": 7906,
+      "sha256": "c02fb3e3a2e5642262f11cd9de9665712c7bff524654fade78320bb359725ac4"
+    },
+    {
+      "path": "tests/position-finance-assessment.test.mjs",
+      "bytes": 8629,
+      "sha256": "2d431bbcd06892d71c53f038f9a806f12b16738c1341d3232cfb57ca55314ff8"
+    },
+    {
+      "path": "tests/position-finance-panel.test.mjs",
+      "bytes": 8680,
+      "sha256": "0b1ca850b8b7bcd0894f3cefbbc5cc0b4879c2570e12496242fb66f0bdfe4ba0"
+    },
+    {
+      "path": "tests/position-finance-store.test.mjs",
+      "bytes": 12733,
+      "sha256": "7fcac9ea09ebd0c19a59db46bc9a3edd865ad7b78529bf7571b2cbea1db209cc"
+    },
+    {
+      "path": "tests/position-scenario-explanation.test.mjs",
+      "bytes": 7798,
+      "sha256": "0c2e9a573a29f08ec20299705c723b123048742a6c4832115bd018e3b9aea378"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

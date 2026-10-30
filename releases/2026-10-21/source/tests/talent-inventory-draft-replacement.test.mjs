@@ -39,6 +39,7 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger()){
   if(name==='@/lib/position-inventory')return inventory;
   if(name==='@/lib/position-allocation')return allocation;
   if(name==='@/lib/position-allocation-store')return ledger;
+  if(name==='./position-finance-panel')return {PositionFinancePanel:'PositionFinancePanel'};
   if(name==='./position-allocation-visuals')return {InventoryCharts:'InventoryCharts',AllocationVisuals:'AllocationVisuals'};
   return require(name);
  },requestAnimationFrame:fn=>callbacks.push(fn),structuredClone,Intl,crypto,console});
