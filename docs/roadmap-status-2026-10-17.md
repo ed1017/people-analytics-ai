@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR481 current - historical workforce filters
+### PR483 current - visitor position-to-results journey
+
+PR483 is live at runtime `021fa8f0f14cc24dc12ad899182785dab217b082`, merge `2a4fc1e46bb3dd32789dff9764a86257a426b183`, deployment `dpl_FCRHwgs8dy8gcV9WwW9Q8AxhvbzG`. Independent review, 47 affected tests, full build/TypeScript and exact-head CI `41139814806` passed. Public desktop/mobile each passed seven complete journey checks plus three introduction checks, with clean final reports. [Release evidence](visitor-position-journey-2026-10-30.md).
+
+Saved General exploration position scenarios now have an explicit no-typing tracking-goal handoff. Original exploration and immutable allocation/funding histories remain unchanged. Position-ready-capacity shortfalls display amber and explicit below-target wording; unavailable comparisons stay neutral. The bounded visitor pass is complete. No paid model requests, calculation changes or new modules. Lab validation remains user-owned and the chart overlay remains preview-only.
+
+### PR481 included - historical workforce filters
 
 PR481 is live at runtime `ac9a9e0f42b5c39492abe186d09730aed77a87ba`, merge `de251f6b148657362face16960d68d0d34da52fd`, deployment `dpl_6iWsKLhVK5LYthgC87VQBgvsCVJq`. Independent review, 26 affected tests, generation certificates, full build/TypeScript and exact-head CI `41127219822` passed. Final public desktop/mobile each passed ten checks with clean reports. [Contract and release evidence](synthetic-workforce-history-2026-10-30.md).
 
