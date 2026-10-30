@@ -21,6 +21,12 @@ export function PlanResultReview({goalId,goal,fields,datasetToken,selected,onSel
  let review:ReturnType<typeof reviewPlanResult>|null=null;
  try{const ledger=readManualResults(fields[manualPlanResultsField],goalId);if(ledger.targets.some(item=>item.target.metric==='position-ready-fte'&&!positionTargets.some(t=>JSON.stringify(t)===JSON.stringify(item.target))))throw Error('Position target binding mismatch');if(target)review=reviewPlanResult(ledger,target);}catch{error='Saved results could not be read. Review saved work before recording another result.';}
  const latest=review?.latest;
+ const positionResult=target?.metric==='position-ready-fte';
+ const difference=review?.difference??null;
+ const resultTone=positionResult
+  ? difference===null?'bg-muted text-foreground':difference<0?'border border-amber-700 bg-amber-50 text-amber-950':'border border-teal-700 bg-teal-50 text-teal-950'
+  : 'bg-primary text-primary-foreground';
+ const positionHeadline=difference===null?null:difference<0?`${Math.abs(difference).toLocaleString()} FTE below target`:difference>0?`${difference.toLocaleString()} FTE above target`:'Target met · 0 FTE difference';
  const rows=target?[{label:'Saved target',value:target.value,date:target.date},...(latest?.value!==null&&latest?.value!==undefined?[{label:'Reported result',value:latest.value,date:latest.measuredOn}]:[])]:[];
  const max=Math.max(1,...rows.map(row=>row.value));
  return <section aria-label="Plan result comparison" className="space-y-3 rounded-xl border bg-card p-3 md:p-4">
@@ -28,7 +34,7 @@ export function PlanResultReview({goalId,goal,fields,datasetToken,selected,onSel
    <label htmlFor={uid} className="block text-sm font-medium">Saved plan</label>
    <select id={uid} className={`${button} w-full`} value={choice.id} onChange={e=>onSelect(e.target.value)}>{choices.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}</select>
    {target&&review?<>
-    <div className="rounded-lg bg-primary p-4 text-primary-foreground"><p className="text-sm">{review.status}{review.corrected?' · Corrected':''}</p><h3 className="mt-1 text-2xl font-semibold">{review.difference!==null?`${review.difference>0?'+':''}${review.difference.toLocaleString()} ${target.unit} versus target`:latest?.value!==null&&latest?.value!==undefined?`${latest.value.toLocaleString()} ${target.unit} reported`:'Record a result to compare'}</h3><p className="mt-1 text-sm">Target: {target.value.toLocaleString()} {target.unit} · {day(target.date)}</p></div>
+    <div className={`rounded-lg p-4 ${resultTone}`}><p className="text-sm">{review.status}{review.corrected?' · Corrected':''}</p><h3 className="mt-1 text-2xl font-semibold">{positionResult&&positionHeadline?positionHeadline:review.difference!==null?`${review.difference>0?'+':''}${review.difference.toLocaleString()} ${target.unit} versus target`:latest?.value!==null&&latest?.value!==undefined?`${latest.value.toLocaleString()} ${target.unit} reported`:'Record a result to compare'}</h3><p className="mt-1 text-sm">Target: {target.value.toLocaleString()} {target.unit} · {day(target.date)}</p></div>
     <p className="text-sm text-muted-foreground">{target.illustrative&&target.metric!=='position-ready-fte'?'Scenario practice · ':''}Manually reported, unverified</p>
     <figure aria-label={`Saved target and manually reported result in ${target.unit}`} className="space-y-4">
      <figcaption className="text-sm font-medium">{target.metric==='position-ready-fte'?'Ready capacity in selected vacancies':target.metric==='headcount'?'Headcount':'Additional role coverage'} · {target.unit}</figcaption>

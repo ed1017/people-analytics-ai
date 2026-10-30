@@ -874,8 +874,8 @@
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "bytes": 7548,
-      "sha256": "a608aaf4303d49e78b741ce059905d14859c0f48e827cc1ba718da7c246acc9f"
+      "bytes": 7941,
+      "sha256": "2c0a8e63f49c0dc7cf75337ec25359e345900be01d3d6aa36168fc8dd5a39ee1"
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -4814,8 +4814,8 @@
     },
     {
       "path": "components/plan-result-review.tsx",
-      "bytes": 6124,
-      "sha256": "a9d8a32fb741ab58fe4b52c984cdc47e7aa5f5bf6e588b40628cde272dc288b9"
+      "bytes": 6717,
+      "sha256": "e459491b65129eb570cac7f6b3a59e4641225760eef74beac40414000c236e6b"
     },
     {
       "path": "lib/plan-result-review.ts",
@@ -5114,8 +5114,8 @@
     },
     {
       "path": "tests/position-result-ui.test.mjs",
-      "sha256": "212183c759ca98cf1db70e3396cd045ffd2a60856871ca951dd6d39884f5cd8d",
-      "bytes": 6675
+      "sha256": "9216bc786e032a2155d6f46332d0f08ac3ea6a1881ffd5b9027649fae0c5c674",
+      "bytes": 10265
     },
     {
       "path": "components/standalone-scenario-backup.tsx",
@@ -5206,6 +5206,26 @@
       "path": "tests/synthetic-workforce-history.test.mjs",
       "bytes": 10250,
       "sha256": "1b5343dbd1e74a95eb38da51820f405b268dfab9996bbd38fcf8c3644eed4b0e"
+    },
+    {
+      "path": "components/position-tracking-goal.tsx",
+      "bytes": 3896,
+      "sha256": "451ccfaaebbe3603e679337c8a1aa47d8217181a02b0e0e8a8418dd76f74a27c"
+    },
+    {
+      "path": "lib/position-tracking-goal.ts",
+      "bytes": 4815,
+      "sha256": "a49fec5e2d90f7f78e7d3b935abe348880d77b48df5d79cd5eaa9ac5be795ee6"
+    },
+    {
+      "path": "tests/position-tracking-goal-ui.test.mjs",
+      "bytes": 5862,
+      "sha256": "49d098bf6f078925f79c8f3ebcf3797499cfbc4883c3a9d8a5f001deb5ac2606"
+    },
+    {
+      "path": "tests/position-tracking-goal.test.mjs",
+      "bytes": 7897,
+      "sha256": "2e8a16378ccdb1e2cbcf8a18cb39a9cc93bc20c6d3b78ac71d5f7dd88b75d9a1"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
