@@ -63,11 +63,13 @@ test('closing an edited demo confirms discard, cancel preserves draft and succes
  accepted=true;button.props.onClick();assert.equal(closed,1);
 });
 
-test('overview reset closes the demo before resetting conversation and returns focus',()=>{
+test('overview reset closes the demo and planner before resetting conversation and returns focus',()=>{
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
- const body=source.match(/function resetHomeConversation\(\)\{([\s\S]*?)\n  \}/)[1],events=[];
- vm.runInNewContext(body,{setSyntheticRiskContext:value=>events.push(['demo',value]),setRiskRequest:value=>events.push(['risk',value]),conversation:{resetConversation:()=>events.push(['reset'])},requestAnimationFrame:fn=>fn(),composer:{current:{focus:()=>events.push(['focus'])}}});
- assert.deepEqual(events,[['demo',null],['risk',null],['reset'],['focus']]);
+ const body=source.match(/function resetHomeConversation\(\)\{([\s\S]*?)\n  \}/)[1],events=[],plannerScope='test-dataset:test-goal';
+ let plannerMode={scope:plannerScope,opened:true,source:'positions'};
+ vm.runInNewContext(body,{plannerScope,setPlannerMode:value=>{plannerMode={...value};events.push(['planner',plannerMode]);},setSyntheticRiskContext:value=>events.push(['demo',value]),setRiskRequest:value=>events.push(['risk',value]),conversation:{resetConversation:()=>events.push(['reset'])},requestAnimationFrame:fn=>fn(),composer:{current:{focus:()=>events.push(['focus'])}}});
+ assert.deepEqual(plannerMode,{scope:plannerScope,opened:false,source:'inputs'});
+ assert.deepEqual(events,[['demo',null],['risk',null],['planner',{scope:plannerScope,opened:false,source:'inputs'}],['reset'],['focus']]);
 });
 
 test('demo close focuses the risk heading before falling back to the workspace',()=>{

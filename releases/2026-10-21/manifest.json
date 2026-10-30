@@ -4629,8 +4629,8 @@
     },
     {
       "path": "tests/synthetic-capacity-risk.test.mjs",
-      "bytes": 10471,
-      "sha256": "b36c5ed81f0f04423e1ce69e7042d84ea891bada4a70a94b36235ce4b7347025"
+      "bytes": 10833,
+      "sha256": "2b27c3fdba89757582954a8fe298df6d5cd54932e5f0dc9dd26aa6ce784c8900"
     },
     {
       "path": "tests/fixtures/external-workforce-evidence/statcan-toronto-source-extract.json",
