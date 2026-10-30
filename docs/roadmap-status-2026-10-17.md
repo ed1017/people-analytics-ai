@@ -2,13 +2,19 @@
 
 ## Current live release and active parallel work
 
-### PR479 current - UK hiring-difficulty reference
+### PR481 current - historical workforce filters
+
+PR481 is live at runtime `ac9a9e0f42b5c39492abe186d09730aed77a87ba`, merge `de251f6b148657362face16960d68d0d34da52fd`, deployment `dpl_6iWsKLhVK5LYthgC87VQBgvsCVJq`. Independent review, 26 affected tests, generation certificates, full build/TypeScript and exact-head CI `41127219822` passed. Final public desktop/mobile each passed ten checks with clean reports. [Contract and release evidence](synthetic-workforce-history-2026-10-30.md).
+
+Workforce now offers a compact separate history view: matched year, respondent group and BU/country/level multiselect, minimum-10 display suppression, reset and original ratings return. Generated records are reproducible fictional cohorts; methodology is in Details. Saved plans and original published results are unchanged. No paid calls or access changes.
+
+### PR479 included - UK hiring-difficulty reference
 
 PR479 is live at runtime `ce8c80050e8ed159a7550cee3ac17cf7c17917b9`, merge `f25aee0567919f7a1026cd1b2a82ede0bcac1af2`, deployment `dpl_CiTD9aZNJinH3U3KVNVHpW6SBTqP`. Independent review, 37 affected tests, full build/TypeScript and exact-head CI `41121620996` passed. Final direct public desktop/mobile each passed eight checks with zero page/bridge errors and clean teardown. [Release evidence](uk-hiring-difficulty-2026-10-30.md).
 
 Labor Market now compares published 2024 hard-to-fill and skill-shortage vacancy shares for Professional occupations across UK nations, with samples and OGL provenance in Details. This is broad occupation-group hiring difficulty, not available applicants or completed hiring time; existing software-pay carries and planner assumptions are unchanged. Denied BLS/Canada/Germany routes were not retried. No paid provider calls or guard changes.
 
-The historical filter audit found current ratings limited to 2026 YTD company/single BU, while survey company history already contains 11 quarterly waves from March 2024 through September 2026. Historical rating distributions and neutral/unfavorable response partitions are not released for the current company. The next decision is a coherent versioned synthetic aggregate release or an approved historical aggregate with eligibility/scoring/suppression definitions; no raw-record access is needed. [Exact missing contracts](filter-contract-audit-2026-10-30.md). Lab validation remains user-owned and chart overlays preview-only.
+The owner approved the generated-data option from the [historical filter audit](filter-contract-audit-2026-10-30.md); PR481 delivers it as a separately versioned explorer. Original 11-wave survey history is unchanged. Lab validation remains user-owned and chart overlays preview-only.
 
 ### PR477 previous - comparison snapshot recovery
 
@@ -22,7 +28,7 @@ PR475 is live at runtime `fc181d20ad4c716b7dcdeb8ae2d8fb8f5fd6d6c6`, merge `bda9
 
 PR474 is included at runtime `c07f5d4ba57b036865a8f9a38b27806860c549c8`, merge `2ccc6c8827e0ac52c8e83bef63748cea69fc7d22`, deployment `dpl_F4vPVP5KfbLSNcU3Lt3fsR8M9kD4`; CI `41108847759` passed. Separate capacity-risk and workforce-trend backups require reviewed, explicit replacement and preserve active edits until Reopen. Staged/public desktop/mobile each passed nine checks: 36 executions of nine cases, with no page/transport errors or provider requests.
 
-Verified ratings support the September 30, 2026 snapshot and 2026 YTD company or one supported business unit, with all countries and levels. Counts require matching source receipt and population. Historical-year selection, global multiselect and unfavorable-survey employee filtering still require reviewed source/aggregation contracts; answer-share aggregates are not employee cohort filters.
+Original published ratings support September 30, 2026 / 2026 YTD company or one supported business unit and remain unchanged. PR481 adds a separate generated history explorer with matched 2024/2025 annual and 2026 YTD cohorts, respondent classifications and local BU/country/level multiselect. It does not turn answer-share aggregates into employee attributes or change global filter/API contracts.
 
 ### PR472 previous release - position scenarios through Track and Review
 
