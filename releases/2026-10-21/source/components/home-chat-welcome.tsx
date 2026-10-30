@@ -1,6 +1,7 @@
 'use client';
 import decision from './decision-style.module.css';
 import {useChartPointerTooltip} from './chart-pointer-tooltip';
+import {useHomeWorkforceKpis,HomeKpiTargetEditor,KpiStatus} from './home-workforce-kpi-targets';
 import {HomeRiskSummary} from './home-risk-summary';
 import {HomeCompanyIntro} from './home-company-intro';
 import {snapshotFindings} from '@/lib/key-findings';
@@ -66,7 +67,7 @@ export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> 
 };
 
 export type HomeSnapshotProps = Pick<HomeChatWelcomeProps, 'overview'|'receipt'|'requested'|'scopeLabel'|'loading'|'error'|'trend'>;
-export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus,onReviewSyntheticCapacity}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string;onReviewSyntheticCapacity?:()=>void}) {
+export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,loading,error,trend=[],recruitingKpi=null,recruitingPending=false,flows=null,projection=null,projectionStatus,onReviewSyntheticCapacity,onNavigate}:HomeSnapshotProps & {recruitingKpi?:HomeRecruitingKpi|null;recruitingPending?:boolean;flows?:WorkforceFlow[]|null;projection?:CheckedHomeProjection|null;projectionStatus?:string;onReviewSyntheticCapacity?:()=>void;onNavigate?:(page:AppPage)=>void}) {
   const scopeId = useId();
   const {point:tooltipPoint,tooltip}=useChartPointerTooltip(JSON.stringify([requested,receipt,loading,error,overview?.snapshot_date,overview?.headcount,trend,projection,projectionStatus]));
   const verified = isVerifiedDashboardScope(receipt) && (['country', 'org', 'level'] as const).every(key => receipt?.effective?.[key] === requested[key]);
@@ -74,6 +75,8 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const current = !loading && !error && verified && validDate(snapshotDate) ? overview : null;
   const headcount = current?.headcount;
   const recruiting = current && recruitingKpi?.asOf===snapshotDate ? recruitingKpi : null;
+  const kpis=useHomeWorkforceKpis({filters:requested,asOf:snapshotDate,state:loading?'loading':current?'current':'unavailable',turnover:known(current?.voluntary_turnover_ytd_pct)?current.voluntary_turnover_ytd_pct:null,fte:known(current?.fte)?current.fte:null,timeToFill:known(recruiting?.timeToFillDays)?recruiting.timeToFillDays:null,recruitingCurrent:!recruitingPending&&!!recruiting,recruitingDefinition:recruiting?.timeToFillCohort??null});
+  const kpi=(id:string)=>kpis.evaluation.indicators.find(row=>row.id===id);
   const recordedHistory = current && known(headcount) ? welcomeHistory(trend, snapshotDate, headcount) : [];
   const history = recordedHistory.filter(point=>point.snapshot_date.slice(0,4)===snapshotDate.slice(0,4));
   const pointDescription=(point:HeadcountTrendPoint)=>{const previous=recordedHistory.find(p=>monthIndex(p.snapshot_date)===monthIndex(point.snapshot_date)-1);const delta=previous?point.headcount-previous.headcount:null;return point.snapshot_date+' · '+point.headcount.toLocaleString()+' people'+(delta===null?'':' · Net change '+(delta>0?'+':'')+delta.toLocaleString()+' people from previous month');};
@@ -100,7 +103,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
         {current ? <ul>{snapshotFindings(current, scopeLabel, true).items.map(item=><li key={item}>{item}</li>)}</ul> : <p role="status">{loading ? 'Updating findings…' : 'Verified findings unavailable.'}</p>}
       </section>
 
-      {current&&<HomeRiskSummary key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate} onReviewSyntheticCapacity={onReviewSyntheticCapacity}/>}
+      {current&&<HomeRiskSummary onNavigate={onNavigate} key={JSON.stringify([requested,snapshotDate,receipt])} filters={requested} asOf={snapshotDate} kpiRisks={kpis.evaluation.risks} onReviewSyntheticCapacity={onReviewSyntheticCapacity}/>}
       <p id={scopeId} className={styles.scope}>{scopeLabel}{current ? ` · As of ${snapshotDate}` : ''} · Recorded workforce history</p>
       <div className={styles.snapshotGrid}><div className={styles.snapshotCharts}>
         <p className={styles.chartHeadcount}>Current headcount <strong>{known(headcount) ? headcount.toLocaleString() : loading ? 'Updating…' : 'Unavailable'}</strong>{known(headcount) ? ' people' : ''}</p>
@@ -121,13 +124,14 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
       {current&&<HomeWorkforceFlows rows={flows} asOf={snapshotDate}/>}</div>
       <ul className={styles.kpiRow} aria-label="Recorded workforce indicators">
         <li><span>Recruiting hires</span><b>{recruitingPending ? 'Loading…' : current&&recruitingKpi?.asOf===snapshotDate ? recruitingKpi.hires.toLocaleString() : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting hires scope and definition">ⓘ</summary><small>Company-wide · monthly</small></details></li>
-        <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="Voluntary turnover YTD scope and definition">ⓘ</summary><small>Source-reported · not annualized</small></details></li>
-        <li><span>Average time to fill</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.timeToFillDays) ? format(recruiting.timeToFillDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average time to fill scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.timeToFillCohort==='filled-requisitions-opening-to-closure' ? 'arithmetic mean, opening to closure for filled requisitions with both dates; internal and external fills' : 'source-reported arithmetic mean'} · through {snapshotDate || 'unavailable date'}</small></details></li>
-        <li><span>FTE capacity</span><b>{loading ? 'Loading.' : known(current?.fte) ? format(current.fte)+' FTE' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="FTE capacity scope and definition">ⓘ</summary><small>Full-time-equivalent capacity · {current ? snapshotDate : 'Snapshot unavailable'}</small></details></li>
+        <li><span>Voluntary turnover YTD</span><b>{loading ? 'Loading.' : known(current?.voluntary_turnover_ytd_pct) ? format(current.voluntary_turnover_ytd_pct)+'%' : 'Unavailable'}</b><KpiStatus row={kpi('turnover-ytd')}/><details className={styles.kpiDetail}><summary aria-label="Voluntary turnover YTD scope and definition">ⓘ</summary><small>Source-reported · not annualized</small></details></li>
+        <li><span>Average time to fill</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.timeToFillDays) ? format(recruiting.timeToFillDays)+' days' : 'Unavailable'}</b><KpiStatus row={kpi('time-to-fill')}/><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average time to fill scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.timeToFillCohort==='filled-requisitions-opening-to-closure' ? 'arithmetic mean, opening to closure for filled requisitions with both dates; internal and external fills' : 'source-reported arithmetic mean'} · through {snapshotDate || 'unavailable date'}</small></details></li>
+        <li><span>FTE staffing</span><b>{loading ? 'Loading.' : known(current?.fte) ? format(current.fte)+' FTE' : 'Unavailable'}</b><KpiStatus row={kpi('fte-stock')}/><details className={styles.kpiDetail}><summary aria-label="FTE capacity scope and definition">ⓘ</summary><small>Full-time-equivalent capacity · {current ? snapshotDate : 'Snapshot unavailable'}</small></details></li>
         <li><span>Open positions</span><b>{loading ? 'Loading.' : Number.isSafeInteger(current?.open_positions)&&known(current?.open_positions) ? format(current.open_positions)+' positions' : 'Unavailable'}</b><details className={styles.kpiDetail}><summary aria-label="Open positions scope and definition">ⓘ</summary><small>Recorded vacancies · {current ? snapshotDate : 'Snapshot unavailable'}</small></details></li>
         <li><span>Average open requisition age</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.openReqAgeDays) ? format(recruiting.openReqAgeDays)+' days' : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Average open requisition age scope and definition">ⓘ</summary><small>Company-wide · as of {snapshotDate || 'unavailable date'}</small></details></li>
         <li><span>Recruiting offers</span><b>{recruitingPending ? 'Loading.' : known(recruiting?.offers) ? format(recruiting.offers) : 'Unavailable'}</b><em className={styles.kpiScope}>Company-wide</em><details className={styles.kpiDetail}><summary aria-label="Recruiting offers scope and definition">ⓘ</summary><small>Company-wide · {recruiting?.month ?? 'month unavailable'}</small></details></li>
       </ul></div>
+      <HomeKpiTargetEditor inputs={kpis.inputs} raw={kpis.raw} ready={kpis.ready} saved={kpis.saved} datasetToken={kpis.datasetToken}/>
       <details className={styles.evidenceDetails}><summary>Sources and exact cost · {checked?"Conditional projection":projectionStatus==="checking"?"Checking projection":projectionStatus?"Projection unavailable":"No projection selected"}</summary>
         <p>{axisLabel} Recorded charts share the snapshot year; conditional projections are separately labeled.</p>
         {known(current?.labor_cost_usd)&&<details className={styles.exactCost}><summary>Labor cost: period unspecified</summary><p>{welcomeCurrency(current.labor_cost_usd).exact}. Cost period unspecified; no monthly or annual basis is inferred.</p></details>}
@@ -144,9 +148,9 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows,onReviewSyntheticCapacity}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, onNavigate, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows,onReviewSyntheticCapacity}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
-    <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary onReviewSyntheticCapacity={onReviewSyntheticCapacity} overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
+    <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary onNavigate={onNavigate} onReviewSyntheticCapacity={onReviewSyntheticCapacity} overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <HomeCompanyIntro datasetToken={receipt?.version === 3 && isVerifiedDashboardScope(receipt) ? receipt.datasetToken : undefined} asOf={overview?.snapshot_date}/>
     <h3>What decision are you facing?</h3>
     <HomePromptCategories onQuestion={onQuestion} disabled={disabled} templates={templates}/>

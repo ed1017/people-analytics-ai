@@ -11,10 +11,12 @@ import {PUBLIC_9037} from '../lib/public-9037-contract.mjs';
 import {loadPublic9037Binding} from '../lib/public-9037.server.mjs';
 const require=createRequire(import.meta.url),cache=new Map();
 function loadModule(url){
+ if(url.pathname.endsWith('.json'))return JSON.parse(fs.readFileSync(url,'utf8'));
  const key=url.href;if(cache.has(key))return cache.get(key);
  const exports={};cache.set(key,exports);
- const js=ts.transpileModule(fs.readFileSync(url,'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
- vm.runInNewContext(js,{exports,require:name=>{
+ const js=ts.transpileModule(fs.readFileSync(url,'utf8'),{fileName:url.pathname.replace(/\.mjs$/i,'.ts'),compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ vm.runInNewContext(js,{exports,structuredClone,require:name=>{
+  if(name==='./decision-store')return {decisionStore:{getDatasetToken:()=>PUBLIC_9037.token},useDecisionStorage:()=>({ready:false,saved:true,data:{exploration:{fields:{}}}})};
   if(name==='./home-answer-visuals')return {HomeConversationSplit:({children,visuals})=>React.createElement('div',null,children,visuals),HomeSplitProvider:({children})=>children};
   if(name==='@/lib/dashboard-scope')return scope;
   if(name==='@/lib/swp-demo')return {swpDemoPrompt:'Start the workforce demo'};
@@ -36,7 +38,7 @@ test('compact landing shows workforce evidence without a duplicate scenario open
  const requested={country:'all',org:'all',level:'all'},d=await read(requested);
  const html=renderToStaticMarkup(React.createElement(exports.HomeChatWelcome,{overview:d.overview,receipt:scope.readDashboardScopeReceipt(d.workforce_filter_scope),requested,scopeLabel:'Global workforce',loading:false,error:null,trend:d.trend,onQuestion:()=>{}}));
  assert.doesNotMatch(html,/Plan the workforce your business needs|Try the worked example|Explore the full app|Worked example: adjust staffing/);assert.match(html,/What decision are you facing/);assert.match(html,/9,037/);assert.match(html,/9 monthly snapshots/);
- assert.doesNotMatch(html,/Try a planning scenario/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE capacity gap|\$325,000|Choose a staffing option|Develop and move your team/);
+ assert.doesNotMatch(html,/Try a planning scenario/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);assert.doesNotMatch(html,/A 5 FTE staffing gap|\$325,000|Choose a staffing option|Develop and move your team/);
 });
 test('public filtered Home keeps exact requested/effective scope; malformed and stale receipts stay unavailable',async()=>{
  const filters={country:'US',org:'all',level:'L1'},d=await read(filters);assert.ok(scope.readDashboardScopeReceipt(d.workforce_filter_scope));assert.match(render(d,filters),/9 monthly snapshots/);
@@ -115,11 +117,11 @@ test('second metric row uses only the same verified dashboard scope and exact da
  for(const filters of [{country:'all',org:'all',level:'all'},{country:'US',org:'all',level:'L1'}]){
   const data=await read(filters),html=render(data,filters),first=data.trend.slice().sort((a,b)=>a.snapshot_date.localeCompare(b.snapshot_date))[0];
   const format=n=>n.toLocaleString(undefined,{maximumFractionDigits:2});
-  assert.equal(card(html,'FTE capacity')[0],format(data.overview.fte)+' FTE');
-  assert.match(card(html,'FTE capacity')[1],new RegExp(data.overview.snapshot_date));
+  assert.equal(card(html,'FTE staffing')[0],format(data.overview.fte)+' FTE');
+  assert.match(card(html,'FTE staffing')[1],new RegExp(data.overview.snapshot_date));
   assert.equal(card(html,'Open positions')[0],format(data.overview.open_positions)+' positions');
   assert.match(html,/Start:/);
-  for(const label of ['FTE capacity','Open positions']){
+  for(const label of ['FTE staffing','Open positions']){
    assert.equal(card(render(data,filters,true),label)[0],'Loading.');
    assert.equal(card(render(data,filters,false,'Failed'),label)[0],'Unavailable');
    assert.equal(card(render({...data,workforce_filter_scope:null},filters),label)[0],'Unavailable');
@@ -131,8 +133,8 @@ test('second metric row uses only the same verified dashboard scope and exact da
 test('second metric row distinguishes zero from invalid values and missing history',async()=>{
  const filters={country:'all',org:'all',level:'all'},data=await read(filters);
  const html=render({...data,overview:{...data.overview,fte:0,open_positions:0},trend:[]},filters);
- assert.match(html,/FTE capacity<\/span><b>0 FTE/);assert.match(html,/Open positions<\/span><b>0 positions/);assert.doesNotMatch(html,/Period-start headcount/);
- for(const value of [undefined,null,-1,NaN,Infinity]){const invalid=render({...data,overview:{...data.overview,fte:value,open_positions:value}},filters);assert.match(invalid,/FTE capacity<\/span><b>Unavailable/);assert.match(invalid,/Open positions<\/span><b>Unavailable/);}
+ assert.match(html,/FTE staffing<\/span><b>0 FTE/);assert.match(html,/Open positions<\/span><b>0 positions/);assert.doesNotMatch(html,/Period-start headcount/);
+ for(const value of [undefined,null,-1,NaN,Infinity]){const invalid=render({...data,overview:{...data.overview,fte:value,open_positions:value}},filters);assert.match(invalid,/FTE staffing<\/span><b>Unavailable/);assert.match(invalid,/Open positions<\/span><b>Unavailable/);}
  assert.match(render({...data,overview:{...data.overview,open_positions:1.5}},filters),/Open positions<\/span><b>Unavailable/);
 });
 

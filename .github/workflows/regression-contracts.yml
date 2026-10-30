@@ -61,6 +61,9 @@ jobs:
       - name: Verify issue prompts and modeled inventory version compatibility
         working-directory: releases/2026-10-21/source
         run: node --test tests/exploration-issue-starters.test.mjs tests/exploration-issue-routing.test.mjs tests/company-position-model-v2.test.mjs
+      - name: Verify shared workforce KPI targets and risks
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/workforce-kpi-status.test.mjs tests/home-workforce-kpi-targets.test.mjs tests/home-workforce-kpi-editor.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

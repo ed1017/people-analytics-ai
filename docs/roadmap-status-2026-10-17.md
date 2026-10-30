@@ -2,13 +2,21 @@
 
 ## Current live release and active parallel work
 
+### PR470 live - issue exploration and populated position model v2
+
+Runtime `78d90d51b2fb35a607a81add7733a4c9b379ce21`, merge `21c2d9069fea11097d8eea978fa217081e22e5fd`, deployment `dpl_HRvMAx9MCigaU6zmcHt9LQB5XYjx` (https://people-analytics-nihtnmd29-ed-56dc.vercel.app). Exact-head CI `40999008409`, independent review, isolated build and 14 staged plus 14 public desktop/mobile checks passed. The first register locator was corrected; a sandbox network failure was resolved through authorized authenticated transport. No paid calls.
+
+Explore now has three issue prompts with risk first. Position explanation contracts separate existing-vacancy costs from proposed additional positions. Fresh inventory v2 uses deterministic modeled country/FTE constrained to published aggregate marginals; v1 drafts, revisions and backup relationships remain immutable and reopen unchanged. Public verification covered explicit replacement/cancel, 3/6/3 save, actual backup download, reload and original-version restoration. Fresh provider explanation quality remains untested.
+
+Active: editable KPI targets with one evaluator for rail status and all red risk entries. Target-line overlay is a separate preview, not approved for production defaults.
+
 ### PR469 live - shared position and staffing planner
 
 Runtime `0b34ef6af2f428fb4c39988c633c65bf379ad287`, merge `cf0d7d5a4d6c3dff108477606b6809d153d6593c`, deployment `dpl_8iqrnJGfmD29Eve1pE9ik16njfat` (https://people-analytics-5r7nzwuen-ed-56dc.vercel.app). Exact-head CI `40996636006`, independent review, isolated build/TypeScript, staged acceptance and 32 direct public browser checks passed across desktop/mobile. No paid provider requests.
 
 Inventory positions now use the shared Overview Scenario Planner with native allocation/funding calculations. Switching editors preserves drafts; exact saved revision adoption requires replacement confirmation. Reusable annual/monthly/one-time rates survive horizon edits, whole-period quotes require confirmation, and current answer presentation follows edits while preserving original history. PR468 wording/template changes are included. Units, unknown funding and immutable original revisions remain protected.
 
-Active follow-ons: risk-first exploration prompts; explicit existing-vacancy/additional-position explanation breakdown; new immutable modeled country/FTE register; canonical editable KPI targets feeding red statuses into Workforce Risks. These follow-ons are not yet live. Existing v1 saves remain unchanged. Authenticated Finance evidence, fresh paid-model acceptance and scheduled renewal observation remain separate.
+PR470 delivered the issue prompts, explanation breakdown and modeled register. Canonical editable KPI targets feeding red statuses into Workforce Risks remain active. Existing v1 saves remain unchanged. Authenticated Finance evidence, fresh paid-model acceptance and scheduled renewal observation remain separate.
 
 ### PR466 - explicit Overview position planning (superseded entry)
 
