@@ -55,6 +55,7 @@ import type {
 } from "@/lib/types";
 
 type WorkforcePlanningPageProps = {
+  onTrackPositions?:()=>void;
   planningScenarios: PlanningScenario[];
   planningLoading: boolean;
   planningError: string | null;
@@ -204,6 +205,7 @@ function createResponseExecutionDrafts(
 }
 
 export function WorkforcePlanningPage({
+  onTrackPositions,
   planningScenarios,
   planningLoading,
   planningError,
@@ -2155,6 +2157,7 @@ export function WorkforcePlanningPage({
             activePlanningEnd && (
             <>
               <PositionWorkforceDesignDestination
+                onTrackPositions={onTrackPositions}
                 visible={workflowView === "design"}
                 selectedPlanningScenario={selectedPlanningScenario}
                 positionModelingLoading={positionModelingLoading}

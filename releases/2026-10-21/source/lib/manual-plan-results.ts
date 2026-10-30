@@ -9,15 +9,18 @@ import {guidedPlanTarget} from './guided-plan-summary.ts';
 import {goalProgressField,readGoalProgressLedger,HEADCOUNT_DEFINITION,progressDay} from './goal-progress.ts';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {prepareGoalProgressWrite,type ProgressWriteTicket} from './goal-progress-store.ts';
+// @ts-expect-error Native tests share canonical TypeScript source.
+import {listPositionResultTargets,requirePositionResultTarget,positionFteAmount,type PositionResultTarget} from './position-result-targets.ts';
 import {validDatasetToken} from './dataset-identity.mjs';
 
 export const manualPlanResultsField='manualPlanResultsV1';
 export const roleResultDefinition='Additional whole roles beyond the starting workforce, each with 1 qualified, allocated FTE in this unit and role. Count only roles supported by dated proficiency, allocation and release or hire-start evidence. Training completion alone does not count.';
-export type ResultTarget={
+export type LegacyResultTarget={
  planId:string;planNumber:number;revision:number;inputKey:string;evidenceDigest:string;datasetToken:string;
  metric:'headcount'|'additional-role-coverage';definition:string;unit:'people'|'roles';population:string;
  value:number;date:string;startDate:string|null;measurementId:string|null;illustrative:boolean;provenance:string;
 };
+export type ResultTarget=LegacyResultTarget|PositionResultTarget;
 export type ManualResult={id:string;targetId:string;recordedAt:string;measuredOn:string;value:number|null;sourceNote:string;supersedes:string|null;scopeConfirmed:true};
 export type ManualResults={version:1;goalId:string;targets:Array<{id:string;target:ResultTarget}>;entries:ManualResult[]};
 export type ResultInput={measuredOn:string;value:number|null;sourceNote:string;supersedes:string|null;scopeConfirmed:boolean};
@@ -30,6 +33,7 @@ const amount=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0&&v<
 const instant=(v:unknown):v is string=>typeof v==='string'&&/^20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v.slice(0,10);
 function exact(v:unknown,keys:string[]):asserts v is Record<string,unknown>{must(!!v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join()===keys.sort().join(),'Unsupported saved result fields.');}
 function validateTarget(v:unknown):asserts v is ResultTarget{
+ if(v&&typeof v==='object'&&'metric' in v&&v.metric==='position-ready-fte'){requirePositionResultTarget(v);return;}
  exact(v,['planId','planNumber','revision','inputKey','evidenceDigest','datasetToken','metric','definition','unit','population','value','date','startDate','measurementId','illustrative','provenance']);
  must(id(v.planId)&&Number.isSafeInteger(v.planNumber)&&Number(v.planNumber)>0&&Number.isSafeInteger(v.revision)&&Number(v.revision)>0&&text(v.inputKey,50000)&&typeof v.evidenceDigest==='string'&&/^[a-f0-9]{64}$/.test(v.evidenceDigest)&&validDatasetToken(v.datasetToken),'Exact saved plan identity required.');
  must(text(v.population,1000)&&amount(v.value)&&progressDay(v.date)&&(v.startDate===null||progressDay(v.startDate)&&v.startDate<=v.date)&&typeof v.illustrative==='boolean'&&text(v.provenance,500),'Incomplete target scope, value or date.');
@@ -60,7 +64,8 @@ export function resultTarget(plan:PlanAlternative,fields:Record<string,unknown>,
 
 function validateEntry(entry:unknown,ledger:ManualResults){
  exact(entry,['id','targetId','recordedAt','measuredOn','value','sourceNote','supersedes','scopeConfirmed']);
- must(id(entry.id)&&id(entry.targetId)&&instant(entry.recordedAt)&&progressDay(entry.measuredOn)&&entry.measuredOn<=String(entry.recordedAt).slice(0,10)&&(entry.value===null||amount(entry.value))&&text(entry.sourceNote,600)&&entry.scopeConfirmed===true&&(entry.supersedes===null||id(entry.supersedes)),'Enter a whole-number result (or explicitly unknown), a non-future measurement date, a source note, and confirm the definition and population.');
+ const target=ledger.targets.find(t=>t.id===entry.targetId)?.target;
+ must(id(entry.id)&&id(entry.targetId)&&instant(entry.recordedAt)&&progressDay(entry.measuredOn)&&entry.measuredOn<=String(entry.recordedAt).slice(0,10)&&(entry.value===null||(target?.metric==='position-ready-fte'?positionFteAmount(entry.value):amount(entry.value)))&&text(entry.sourceNote,600)&&entry.scopeConfirmed===true&&(entry.supersedes===null||id(entry.supersedes)),'Enter a valid result (whole counts or FTE with up to two decimals), a non-future date and source note, and confirm the measurement scope.');
  must(ledger.targets.some(t=>t.id===entry.targetId)&&!ledger.entries.some(e=>e.id===entry.id),'Result target is missing or entry identity is duplicated.');
  must(!ledger.entries.length||Date.parse(String(entry.recordedAt))>=Date.parse(ledger.entries.at(-1)!.recordedAt),'Recording times must append in order.');
  const active=ledger.entries.filter(e=>!ledger.entries.some(next=>next.supersedes===e.id));
@@ -83,14 +88,18 @@ export function activeResults(ledger:ManualResults,target:ResultTarget){
 /** Only a matching point-in-time date gets a difference. Missing is never zero. */
 export function resultDifference(target:ResultTarget,entry:Pick<ManualResult,'value'|'measuredOn'>){
  validateTarget(target);
- must(progressDay(entry.measuredOn)&&(entry.value===null||amount(entry.value)),'Invalid point-in-time result.');
+ must(progressDay(entry.measuredOn)&&(entry.value===null||(target.metric==='position-ready-fte'?positionFteAmount(entry.value):amount(entry.value))),'Invalid point-in-time result.');
  if(entry.value===null)return {difference:null,note:'Result is unknown; no difference calculated.'};
  if(entry.measuredOn<target.date)return {difference:null,note:'Interim measurement. The target date has not been measured; no end-date difference calculated.'};
  if(entry.measuredOn>target.date)return {difference:null,note:'Measured after the target date; no end-date difference calculated.'};
- return {difference:entry.value-target.value,note:'Reported result minus saved target. This does not verify delivery, completion or the effect of the plan.'};
+ return {difference:target.metric==='position-ready-fte'?Math.round((entry.value-target.value)*100)/100:entry.value-target.value,note:'Reported result minus saved target. This does not verify delivery, completion or the effect of the plan.'};
 }
 export function prepareManualResult(store:DecisionStore,planId:string):ResultTicket{
  const write=prepareGoalProgressWrite(store,store.getDatasetToken()),fields=store.getSnapshot().data.workspaces[write.goalId]?.fields??{};
+ const positions=listPositionResultTargets(fields,write.datasetToken,write.goalId),saved=readManualResults(fields[manualPlanResultsField],write.goalId);
+ must(saved.targets.every(item=>item.target.metric!=='position-ready-fte'||positions.some(target=>same(target,item.target))),'Saved position results do not match an exact tracked scenario.');
+ const position=positions.find(target=>target.planId===planId);
+ if(position)return {write,target:position};
  const catalog=readPlanAlternatives(fields[planAlternativesField],{goalId:write.goalId,goal:write.goal});
  const plan=catalog?.plans.find(p=>p.id===planId&&!p.deleted&&catalog.attachments.some(a=>a.planId===p.id));
  if(!plan)throw Error('Select an attached saved plan before recording a result.');

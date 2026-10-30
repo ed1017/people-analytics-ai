@@ -2,13 +2,23 @@
 
 ## Current live release and active parallel work
 
+### PR471 live; position-result handoff in progress
+
+PR471 runtime `cbbb4abd63f3b5bfbe023f0f783a2875e61b48c9`, merge `dc60cd78672256c42add0aa431f7f24c31e442ca`, deployment `dpl_A58qjcD99nmQ3HBLhf2U58UcNcHf`. Exact-head CI `41002546750`, independent review, isolated build, 20 staged and 20 public desktop/mobile checks passed. One evaluator now connects editable, scope/period-matched KPI targets to all red Workforce Risks. Raw counts and missing/mismatched comparisons remain neutral. Target-line overlay is delivered as a preview only and awaits user approval.
+
+PR468 business labels/template (runtime `6c09a9a7fb90054ac67c3bbe08f68403e3601a7f`, deployment `dpl_FpXZyAxXfw2WbMaoZy6vXkMgnTsY`), PR469 shared planner and PR470 populated register/exploration prompts are all included and publicly verified. Their earlier release records below remain historical evidence.
+
+The actual Vercel scheduled renewal returned HTTP 200 on October 30 at 06:00:08 UTC (`vercel-cron/1.0`); immutable verification 9 was observed at 06:00:09.263 UTC, valid through October 31 at 06:00:09.263 UTC. Prices, cap and permission boundary were unchanged. Public readiness returned configured. This supersedes the pending scheduled-observation entries below; no model call was made.
+
+Active bounded gap: position allocations save correctly but do not appear in Track/Review, whose contracts only recognize headcount and whole-role plans. Add an explicit target-date handoff for an exact saved position/funding revision, tracking calculated ready FTE in existing vacancies through the existing manual-result/correction and backup model. Proposed additional positions remain separate and contribute zero ready FTE. No automatic date, Finance approval, completed hire, or outcome inference. Implementation/acceptance pending; not live.
+
 ### PR470 live - issue exploration and populated position model v2
 
 Runtime `78d90d51b2fb35a607a81add7733a4c9b379ce21`, merge `21c2d9069fea11097d8eea978fa217081e22e5fd`, deployment `dpl_HRvMAx9MCigaU6zmcHt9LQB5XYjx` (https://people-analytics-nihtnmd29-ed-56dc.vercel.app). Exact-head CI `40999008409`, independent review, isolated build and 14 staged plus 14 public desktop/mobile checks passed. The first register locator was corrected; a sandbox network failure was resolved through authorized authenticated transport. No paid calls.
 
 Explore now has three issue prompts with risk first. Position explanation contracts separate existing-vacancy costs from proposed additional positions. Fresh inventory v2 uses deterministic modeled country/FTE constrained to published aggregate marginals; v1 drafts, revisions and backup relationships remain immutable and reopen unchanged. Public verification covered explicit replacement/cancel, 3/6/3 save, actual backup download, reload and original-version restoration. Fresh provider explanation quality remains untested.
 
-Active: editable KPI targets with one evaluator for rail status and all red risk entries. Target-line overlay is a separate preview, not approved for production defaults.
+Delivered by PR471: editable KPI targets with one evaluator for rail status and all red risk entries. Target-line overlay is a separate preview, not approved for production defaults.
 
 ### PR469 live - shared position and staffing planner
 
@@ -16,7 +26,7 @@ Runtime `0b34ef6af2f428fb4c39988c633c65bf379ad287`, merge `cf0d7d5a4d6c3dff10847
 
 Inventory positions now use the shared Overview Scenario Planner with native allocation/funding calculations. Switching editors preserves drafts; exact saved revision adoption requires replacement confirmation. Reusable annual/monthly/one-time rates survive horizon edits, whole-period quotes require confirmation, and current answer presentation follows edits while preserving original history. PR468 wording/template changes are included. Units, unknown funding and immutable original revisions remain protected.
 
-PR470 delivered the issue prompts, explanation breakdown and modeled register. Canonical editable KPI targets feeding red statuses into Workforce Risks remain active. Existing v1 saves remain unchanged. Authenticated Finance evidence, fresh paid-model acceptance and scheduled renewal observation remain separate.
+PR470 delivered the issue prompts, explanation breakdown and modeled register. Canonical editable KPI targets feeding red statuses into Workforce Risks shipped in PR471. Existing v1 saves remain unchanged. Authenticated Finance evidence, fresh paid-model acceptance and scheduled renewal observation remain separate.
 
 ### PR466 - explicit Overview position planning (superseded entry)
 
