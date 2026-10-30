@@ -1,6 +1,6 @@
 # Talent Inventory and vacancy scenarios
 
-This change is prepared for review, not published. Production aliases and settings remain unchanged.
+Published in PR461 after complete-runtime staging and public desktop/mobile acceptance. [Release evidence and limits](talent-market-publication-2026-10-30.md).
 
 ## Inventory scope and provenance
 
@@ -36,4 +36,4 @@ The new optional fields participate in existing backup/restore. Old plans and ba
 - ESLint passed for changed TypeScript/TSX files.
 - Local browser verification used the actual new components and DecisionStore in an isolated harness: 30 checks at 1440px and 390px, no browser errors or page overflow. Coverage includes company inventory and selection, 12=3+6+3, budget/backfill/unknown costs, invalid training timing, actual-status preservation, immutable revisions, comparison, reopen/reload, real goal switching, source-scope retention, old-plan preservation, text-free General exploration and explicit thaw.
 
-Authenticated production-like staging remains a separate deployment prerequisite following the earlier runtime-configuration incident. These checks do not prove production runtime settings are configured. This feature must not be described as live.
+The earlier local-only acceptance was followed by complete-runtime staging and direct public acceptance: 14 checks at each viewport, successful build/TypeScript and verified organization guard. See the linked release record for the rollback incident and remaining readiness limits.
