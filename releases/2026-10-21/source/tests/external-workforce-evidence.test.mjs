@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 import {createRequire} from 'node:module';
+import * as hiringModel from '../lib/uk-hiring-difficulty.ts';
 const require = createRequire(import.meta.url);
 
 const exports = {};
@@ -69,6 +70,11 @@ test('qualitative skills link stays separate from local market estimates', () =>
   assert.equal('skillScores' in refs[0], false);
 });
 
+const hiringPanel = {};
+const hiringCode = fs.readFileSync(new URL('../components/uk-hiring-difficulty.tsx', import.meta.url), 'utf8');
+vm.runInNewContext(ts.transpileModule(hiringCode, {compilerOptions: {module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022}}).outputText, {
+  exports: hiringPanel, require: name => name === '@/lib/uk-hiring-difficulty' ? hiringModel : require(name),
+});
 function panelHarness() {
   const state = []; let cursor = 0;
   const react = {...require('react'), useId: () => 'evidence-test', useState: initial => {
@@ -78,7 +84,7 @@ function panelHarness() {
   const panel = {};
   const code = fs.readFileSync(new URL('../components/external-workforce-evidence-panel.tsx', import.meta.url), 'utf8');
   vm.runInNewContext(ts.transpileModule(code, {compilerOptions: {module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022}}).outputText, {
-    exports: panel, require: name => name === 'react' ? react : name === '@/lib/external-workforce-evidence' ? exports : name === '@/components/market-reference' ? {MarketComparison:'market-comparison'} : name === '@/lib/oews-reference.mjs' ? require('../lib/oews-reference.mjs') : require(name),
+    exports: panel, require: name => name === 'react' ? react : name === '@/lib/external-workforce-evidence' ? exports : name === '@/components/uk-hiring-difficulty' ? hiringPanel : name === '@/components/market-reference' ? {MarketComparison:'market-comparison'} : name === '@/lib/oews-reference.mjs' ? require('../lib/oews-reference.mjs') : require(name),
   });
   return () => { cursor = 0; return panel.ExternalWorkforceEvidencePanel(); };
 }

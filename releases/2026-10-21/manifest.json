@@ -4479,8 +4479,8 @@
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
-      "bytes": 7879,
-      "sha256": "1a4d3afae90f361ef4899a3018e34fd8a6090899be2992450e317ace1693b8d5"
+      "bytes": 8004,
+      "sha256": "cd20aeb8250965b34d0e842d0e5ea213a3e5e82e90572240ed1be4e8d7d65500"
     },
     {
       "path": "components/workforce-planning/position-scenario-editor.tsx",
@@ -4504,8 +4504,8 @@
     },
     {
       "path": "tests/external-workforce-evidence.test.mjs",
-      "bytes": 14555,
-      "sha256": "c200e971c1a5567b502480275b6a43d5a49e7042f63f42c91ca48e42e599698a"
+      "bytes": 15104,
+      "sha256": "4ed9c331e49f26fc3740be92a29f9e30e549ba2d7aff00eedb8297b092c88d95"
     },
     {
       "path": "tests/position-design-scenario.test.mjs",
@@ -5156,6 +5156,26 @@
       "path": "tests/workforce-snapshot-backup.test.mjs",
       "bytes": 7632,
       "sha256": "1495dd5abf79cbb23d7871bac392ff271bdc2f22479ea865a950bada902566d6"
+    },
+    {
+      "path": "components/uk-hiring-difficulty.tsx",
+      "bytes": 4719,
+      "sha256": "1c2e6c6cbeee08bb309e7725c75093cb39a70838b6070140be2d1cdc536316ef"
+    },
+    {
+      "path": "lib/uk-hiring-difficulty.ts",
+      "bytes": 5993,
+      "sha256": "073586915e490f547b011201c7e698d001e5c7c40650462db6d9a6cfd961651e"
+    },
+    {
+      "path": "tests/fixtures/uk-ess-2024-professional-occupations.json",
+      "bytes": 2878,
+      "sha256": "184b670013bb3cd06a3043a07165f1d0e3ec6847fbc8ced7ecf6c879b2b651e7"
+    },
+    {
+      "path": "tests/uk-hiring-difficulty.test.mjs",
+      "bytes": 5796,
+      "sha256": "fa6d697fad0b07b06c1b5590d1002520f650d2eff7d0bea0f32a953807e82b46"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
