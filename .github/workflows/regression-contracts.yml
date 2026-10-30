@@ -72,7 +72,7 @@ jobs:
         run: node tests/manual/check-position-feature-types.mjs
       - name: Verify sourced workforce evidence and synthetic workload
         working-directory: releases/2026-10-21/source
-        run: node --test tests/home-turnover-investigation.test.mjs tests/external-workforce-evidence.test.mjs tests/market-explorer.test.mjs tests/synthetic-capacity-risk.test.mjs tests/dashboard-risk-presentation.test.mjs tests/swp-capacity-cost.test.mjs tests/group-capacity-risk.test.mjs
+        run: node --test tests/home-turnover-investigation.test.mjs tests/external-workforce-evidence.test.mjs tests/market-explorer.test.mjs tests/uk-hiring-difficulty.test.mjs tests/synthetic-capacity-risk.test.mjs tests/dashboard-risk-presentation.test.mjs tests/swp-capacity-cost.test.mjs tests/group-capacity-risk.test.mjs
       - name: Verify aggregate wording and missing survey states
         working-directory: releases/2026-10-21/source
         run: node --test tests/public-home-aggregate.test.mjs tests/urgent-missing-display.test.mjs tests/market-reference-carry.test.mjs tests/decision-brief-market-attribution.test.mjs
