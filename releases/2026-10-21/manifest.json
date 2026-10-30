@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "0b34ef6af2f428fb4c39988c633c65bf379ad287",
-  "deployment": "https://people-analytics-5r7nzwuen-ed-56dc.vercel.app",
+  "sourceCommit": "78d90d51b2fb35a607a81add7733a4c9b379ce21",
+  "deployment": "https://people-analytics-nihtnmd29-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "061843ea056a4f1f8351aa7f36a76e203f54602f88319917f4972db0a446ac6b",
-      "bytes": 19584
+      "sha256": "d661618230ed47e33c4eb5a4c15f44c37a50b05b9066e8882fc7783571a6599b",
+      "bytes": 20483
     },
     {
       "path": "components/home-data-status.tsx",
@@ -3969,8 +3969,8 @@
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "9a57bd335a683de0ffac20c364418a944a8c951b98f15a407d8e43c6659406c5",
-      "bytes": 20486
+      "sha256": "99621d12ea9560f7ed0e736834b1cbc5eb0eb86709c50df5170629b957dec766",
+      "bytes": 20808
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "c7654c0568ce3b51683e789997a09221ffd87cda3b8edb722b0b4b349727c4bd",
-      "bytes": 7048
+      "sha256": "e5793ce550377281a2b6f89128c084c267e621f0a62d8cae62b836ddce08f775",
+      "bytes": 8305
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 3874,
-      "sha256": "76fea65757951972ea74df0228ccc8d39b259b3022331eea801f796cd3dc52b7"
+      "bytes": 4972,
+      "sha256": "c7b88b0bae0107d0f8d23f2ff6fc9923e603bff4b3364069a80c3df0a88a7cce"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
@@ -5066,6 +5066,36 @@
       "path": "tests/exploration-issue-starters.test.mjs",
       "sha256": "1ec61adf0a4e1778411c74281df86ae1ad1fe948c1bcccd522d76beb6c43dec7",
       "bytes": 2231
+    },
+    {
+      "path": "components/home-workforce-kpi-targets.tsx",
+      "sha256": "dfeaf62194065c1be6780c50f7d3d9062d9f98fae0f1f5dee93a12ce876c8898",
+      "bytes": 4354
+    },
+    {
+      "path": "lib/home-workforce-kpi-targets.ts",
+      "sha256": "bdbfed3b2a06805578e798d25fcdb01b9992ee78de569d954f85fa5a394d711f",
+      "bytes": 5304
+    },
+    {
+      "path": "lib/workforce-kpi-status.ts",
+      "sha256": "5efa12c3020461f69a2bebd26aeb20da9aa6e566e7d0b0c9bc8fa6a254d706b1",
+      "bytes": 6046
+    },
+    {
+      "path": "tests/home-workforce-kpi-editor.test.mjs",
+      "sha256": "80737babf3f98b9a9f406b667eca8e8a13f9236f3e848cddab8a2e221e4318fd",
+      "bytes": 5153
+    },
+    {
+      "path": "tests/home-workforce-kpi-targets.test.mjs",
+      "sha256": "877390a8107daed46ef1f024c5878c398d82242d0f09807d2e763ce0750f1d3a",
+      "bytes": 4270
+    },
+    {
+      "path": "tests/workforce-kpi-status.test.mjs",
+      "sha256": "96c290a4c0876bf04ca7493b302208f3c5d2b31cd3952b0d27df605700337188",
+      "bytes": 6307
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
