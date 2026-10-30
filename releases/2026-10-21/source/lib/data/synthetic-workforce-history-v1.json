@@ -1,0 +1,74 @@
+{
+  "version": "synthetic-workforce-history-v1",
+  "seed": "ed-workforce-history-2026-10-30-v1",
+  "datasetToken": "workforce-demo-9037-public-aggregates-v4:5",
+  "bundleDigest": "2ffb177d4343276608d06ae320b8c0c5891ebd39f64c3b4a59e14b0eb416f94b",
+  "periods": [
+    {
+      "id": "2024",
+      "label": "2024 Annual",
+      "snapshotDate": "2024-12-31",
+      "surveyDate": "2024-12-31",
+      "population": 8636,
+      "respondents": 6687,
+      "recordDigest": "c26a7318096bfdf00bf439a1b48c19244822c83155ddb6fc009fc3b7706fecd5",
+      "rated": 8026,
+      "ratings": [
+        326,
+        1066,
+        4091,
+        2110,
+        433
+      ],
+      "classes": {
+        "unfavorable": 2457,
+        "neutral": 1979,
+        "favorable": 2251
+      }
+    },
+    {
+      "id": "2025",
+      "label": "2025 Annual",
+      "snapshotDate": "2025-12-31",
+      "surveyDate": "2025-12-31",
+      "population": 8831,
+      "respondents": 6987,
+      "recordDigest": "367ef7d0079fa78f25bddd71f8c372c9d53185061a85d487e5043dba34391075",
+      "rated": 8194,
+      "ratings": [
+        338,
+        1044,
+        4190,
+        2103,
+        519
+      ],
+      "classes": {
+        "unfavorable": 2446,
+        "neutral": 2125,
+        "favorable": 2416
+      }
+    },
+    {
+      "id": "2026",
+      "label": "2026 YTD",
+      "snapshotDate": "2026-09-30",
+      "surveyDate": "2026-09-30",
+      "population": 9037,
+      "respondents": 7028,
+      "recordDigest": "21fa080c227a194d270eb2351cbd60b5d47a72a0d906b428281f81468a7b1730",
+      "rated": 8430,
+      "ratings": [
+        378,
+        1065,
+        4287,
+        2195,
+        505
+      ],
+      "classes": {
+        "unfavorable": 2454,
+        "neutral": 2169,
+        "favorable": 2405
+      }
+    }
+  ]
+}
