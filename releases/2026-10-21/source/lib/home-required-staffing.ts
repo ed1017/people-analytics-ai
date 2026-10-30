@@ -3,8 +3,8 @@ import {currentHiringBudget} from './home-hiring-budget.ts';
 import type {SolutionRequest} from './home-solution-conversation';
 import type {HiringInputBasis} from './home-hiring-budget';
 // @ts-expect-error Native Node tests share application source.
-import {calculateRequiredStaffing,emptyRequiredStaffing,readRequiredStaffingInput,requiredStaffingFields,staffingFlagFields,staffingCashFields,type RequiredStaffingInput,type RequiredStaffingOption,type StaffingInputField} from './required-staffing.ts';
-export type RequiredStaffingReview={version:1;revision:number;datasetToken:string;scopeKey:string;inputs:RequiredStaffingInput;origins:Partial<Record<StaffingInputField,HiringInputBasis>>;basisTurns:{id:string;text:string}[]};
+import {calculateRequiredStaffing,emptyRequiredStaffing,readRequiredStaffingInput,requiredStaffingFields,staffingFlagFields,staffingCashFields,staffingRateFields,defaultRequiredStaffingCostBasis,readRequiredStaffingCostBasis,resolveRequiredStaffingCostBasis,type RequiredStaffingCostBasis,type RequiredStaffingInput,type RequiredStaffingOption,type StaffingInputField} from './required-staffing.ts';
+export type RequiredStaffingReview={version:1;revision:number;datasetToken:string;scopeKey:string;inputs:RequiredStaffingInput;origins:Partial<Record<StaffingInputField,HiringInputBasis>>;basisTurns:{id:string;text:string}[];costBasis?:RequiredStaffingCostBasis};
 const basis={type:'object',properties:{kind:{type:'string',enum:['user-supplied','model-proposed']},turnId:{type:['string','null'],maxLength:80},quote:{type:['string','null'],maxLength:4000},explanation:{type:'string',minLength:1,maxLength:400}},required:['kind','turnId','quote','explanation'],additionalProperties:false};
 export const requiredStaffingTool={type:'function' as const,name:'compare_required_staffing',strict:true,description:'Compare ways to fill an explicitly required count of people without workload or a company-population lookup. Use for direct hire/train/redeploy comparisons. Inputs are scenario assumptions with provenance; no source read, save or operational action. requiredRoles/trainablePeople/redeployablePeople are whole counts up to 20; months is 1–24; hireCostPerPerson is cash for the ENTIRE stated horizon, not annual salary; trainingCostPerPerson/trainingHoursPerPerson are PER TRAINEE; redeploymentCostPerPerson and backfillCostPerInternalPerson are incremental cash PER INTERNAL PERSON for the period. hireTrainingHoursPerPerson is unknown unless explicitly specified; do not infer zero from an all-hire option. ReadyAfterMonths are whole offsets from period start, zero means ready at start. Unknown fields are null; zero and cost completeness must be explicit. An initial requiredRoles/role may reference the exact user-supplied count/role and original quote in the current scoped hiring estimate. This does not transfer salary, cash, period, availability or pool assumptions. Omit unchanged fields; existing premises change only with a current-user quote. Empty changes recalculates the current comparison for a numerical follow-up. No candidate/projection metric IDs are generated.',parameters:{type:'object',properties:{changes:{type:'array',maxItems:requiredStaffingFields.length,items:{anyOf:requiredStaffingFields.map(field=>({type:'object',properties:{field:{type:'string',enum:[field]},value:{type:[['role','currency'].includes(field)?'string':staffingFlagFields.includes(field as typeof staffingFlagFields[number])?'boolean':'number','null']},basis},required:['field','value','basis'],additionalProperties:false}))}}},required:['changes'],additionalProperties:false}};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
@@ -17,8 +17,9 @@ function checkBasis(b:HiringInputBasis,turns:RequiredStaffingReview['basisTurns'
 export function readRequiredStaffingReview(raw:unknown):RequiredStaffingReview|null{
  if(raw===undefined||raw===null)return null;
  const s=raw as RequiredStaffingReview;
- if(!s||typeof s!=='object'||Object.keys(s).sort().join()!=='basisTurns,datasetToken,inputs,origins,revision,scopeKey,version'||s.version!==1||!Number.isSafeInteger(s.revision)||s.revision<1||typeof s.datasetToken!=='string'||!s.datasetToken||s.datasetToken.length>200||typeof s.scopeKey!=='string'||s.scopeKey.length>3000||!s.origins||typeof s.origins!=='object'||Array.isArray(s.origins)||!Array.isArray(s.basisTurns)||s.basisTurns.length>64||s.basisTurns.some(t=>!t||typeof t.id!=='string'||typeof t.text!=='string'||t.text.length>10000)||new Set(s.basisTurns.map(t=>t.id)).size!==s.basisTurns.length)throw Error('The fixed-role comparison cannot be verified.');
+ if(!s||typeof s!=='object'||Object.keys(s).sort().join()!==(Object.hasOwn(s,'costBasis')?'basisTurns,costBasis,datasetToken,inputs,origins,revision,scopeKey,version':'basisTurns,datasetToken,inputs,origins,revision,scopeKey,version')||s.version!==1||!Number.isSafeInteger(s.revision)||s.revision<1||typeof s.datasetToken!=='string'||!s.datasetToken||s.datasetToken.length>200||typeof s.scopeKey!=='string'||s.scopeKey.length>3000||!s.origins||typeof s.origins!=='object'||Array.isArray(s.origins)||!Array.isArray(s.basisTurns)||s.basisTurns.length>64||s.basisTurns.some(t=>!t||typeof t.id!=='string'||typeof t.text!=='string'||t.text.length>10000)||new Set(s.basisTurns.map(t=>t.id)).size!==s.basisTurns.length)throw Error('The fixed-role comparison cannot be verified.');
  readRequiredStaffingInput(s.inputs);
+ if(s.costBasis!==undefined&&JSON.stringify(resolveRequiredStaffingCostBasis(s.inputs,readRequiredStaffingCostBasis(s.costBasis)))!==JSON.stringify(s.inputs))throw Error('Saved costs do not match their explicit rate basis and horizon.');
  for(const field of Object.keys(s.origins)){if(!requiredStaffingFields.includes(field as StaffingInputField))throw Error('Unknown staffing field.');checkBasis(s.origins[field as StaffingInputField]!,s.basisTurns);}
  for(const field of requiredStaffingFields)if(s.inputs[field]!==null&&!s.origins[field])throw Error('Every staffing input needs provenance.');
  return structuredClone(s);
@@ -125,8 +126,21 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
  for(const t of [...(hiring?.basisTurns??[]),...request.state.turns.filter(t=>t.role==='user'),request.message]){if(turns.has(t.id)&&turns.get(t.id)!.text!==t.text)throw Error('A staffing source turn changed.');turns.set(t.id,{id:t.id,text:t.text});}s.basisTurns=[...turns.values()];
  const roleChange=list.find(change=>change.field==='role'),targetRole=roleChange?roleChange.value:before.role;
  for(const c of list){checkBasis(c.basis,s.basisTurns);const sourceField=c.field==='requiredRoles'?'hires':c.field==='role'?'role':null,origin=sourceField?hiring?.origins[sourceField]:null;const inherited=!!sourceField&&!!hiring&&!s.origins[c.field]&&before[c.field]===null&&same(c.value,hiring.inputs[sourceField])&&origin?.kind==='user-supplied'&&c.basis.kind==='user-supplied'&&origin.turnId===c.basis.turnId&&origin.quote===c.basis.quote&&(c.field!=='requiredRoles'||targetRole===hiring.inputs.role);if(c.basis.kind==='user-supplied'&&c.basis.turnId!==request.message.id&&!inherited)throw Error('Staffing corrections require the current user turn.');if(s.origins[c.field]&&!same(s.inputs[c.field],c.value)&&c.basis.kind!=='user-supplied')throw Error('Existing staffing premises require an explicit user correction.');if(same(s.inputs[c.field],c.value)&&s.origins[c.field])continue;s.inputs={...s.inputs,[c.field]:c.value};s.origins={...s.origins,[c.field]:structuredClone(c.basis)};}
+ const automaticallyRebased=new Set<StaffingInputField>();
+ if(s.costBasis){
+  if(before.currency!==s.inputs.currency||before.role!==s.inputs.role)delete s.costBasis;
+  else{
+   const b=readRequiredStaffingCostBasis(s.costBasis);
+   for(const field of staffingRateFields){const change=list.find(c=>c.field===field);if(change)b.rates[field]={kind:field==='trainingCostPerPerson'?'one-time':'whole-period',amount:change.value as number|null,quotedMonths:s.inputs.months,fullPeriod:false};}
+   if(list.some(c=>c.field==='budget'))b.budget={amount:s.inputs.budget,quotedMonths:s.inputs.months};
+   const resolved=resolveRequiredStaffingCostBasis(s.inputs,b);
+   for(const field of [...staffingRateFields,'budget' as const])if(!list.some(c=>c.field===field)){s.inputs[field]=resolved[field];automaticallyRebased.add(field);}
+   s.costBasis=b;
+  }
+ }
+ if(before.months!==s.inputs.months&&!list.some(c=>c.field==='costsComplete'))s.inputs.costsComplete=null;
  const requireRestated=(fields:readonly StaffingInputField[])=>{
-  for(const field of fields)if(before[field]!==null&&s.inputs[field]!==null){
+  for(const field of fields)if(before[field]!==null&&s.inputs[field]!==null&&!automaticallyRebased.has(field)){
    const restatement=list.find(c=>c.field===field&&c.basis.kind==='user-supplied');
    if(!restatement)throw Error('Changing the role, currency or cost horizon requires explicitly restating or clearing its affected rates and pools.');
    // An unchanged amount can describe a different currency, period or role.
@@ -142,14 +156,22 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
 export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: staffingDeliveryTarget in the supplied context is the explicit user delivery deadline, captured separately from cost months. Preserve it; months in this calculator is only the cost horizon. Never replace that deadline with an annual cost period or claim readiness from a target alone. When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
 
 /** Explicit local controls use the same provenance and scope checks as interpreted edits. */
-export function editRequiredStaffingLocally(request:SolutionRequest,datasetToken:string,expected:string,input:RequiredStaffingInput){
+export function editRequiredStaffingLocally(request:SolutionRequest,datasetToken:string,expected:string,input:RequiredStaffingInput,costBasis?:RequiredStaffingCostBasis){
  const previous=currentRequiredStaffing(request,datasetToken);
  if(!previous||JSON.stringify(previous)!==expected)throw Error('The staffing comparison changed. Reopen its current inputs.');
- const next=readRequiredStaffingInput(input);
+ const next=costBasis?resolveRequiredStaffingCostBasis(input,costBasis):readRequiredStaffingInput(input);
  if(next.role!==previous.inputs.role||next.currency!==previous.inputs.currency)throw Error('Change role or currency in the conversation so its scope can be reviewed.');
- const fields=requiredStaffingFields.filter(field=>!same(next[field],previous.inputs[field]));
- if(!fields.length)return previous;
- const text='Adjust staffing assumptions: '+fields.map(field=>`${field} = ${next[field]??'Unknown'}`).join('; ');
+ const priorBasis=previous.costBasis??defaultRequiredStaffingCostBasis(previous.inputs),basis=costBasis?readRequiredStaffingCostBasis(costBasis):undefined;
+ const restated=new Set<StaffingInputField>();
+ if(basis){
+  for(const field of staffingRateFields)if(!same(basis.rates[field],priorBasis.rates[field])||next.months!==previous.inputs.months&&next[field]!==null)restated.add(field);
+  if(!same(basis.budget,priorBasis.budget)||next.months!==previous.inputs.months&&next.budget!==null)restated.add('budget');
+ }
+ const fields=requiredStaffingFields.filter(field=>!same(next[field],previous.inputs[field])||restated.has(field));
+ if(!fields.length&&(!basis||same(basis,previous.costBasis)))return previous;
+ const text='Adjust staffing assumptions: '+fields.map(field=>`${field} = ${next[field]??'Unknown'}`).join('; ')+(basis?' Cost bases: '+JSON.stringify(basis):'');
  const edited={...request,message:{...request.message,text}};
- return editRequiredStaffing(edited,datasetToken,fields.map(field=>({field,value:next[field],basis:{kind:'user-supplied',turnId:edited.message.id,quote:text,explanation:'Explicitly edited in the staffing scenario controls; not operational verification.'}})));
+ const result=editRequiredStaffing(edited,datasetToken,fields.map(field=>({field,value:next[field],basis:{kind:'user-supplied',turnId:edited.message.id,quote:text,explanation:'Explicitly edited in the staffing scenario controls; not operational verification.'}})));
+ if(basis){result.costBasis=basis;for(const field of restated)result.origins[field]={kind:'user-supplied',turnId:edited.message.id,quote:text,explanation:'Explicit per-person cost basis or budget period reviewed in scenario controls.'};}
+ return readRequiredStaffingReview(result)!;
 }

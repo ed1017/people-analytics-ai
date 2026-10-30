@@ -8,8 +8,8 @@ const button='min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold focus-v
 const fundingLabels:Record<string,string>={'funding-unknown':'Funding not verified','within-demo-envelope':'Within demo allowance','approval-required':'Approval required'};
 type View={signature:string;pending:boolean;answer:string;error:string;notice:string};
 /** Explicit explanation only. No request on mount, edits, restore, or retry without a click. */
-export function PositionScenarioExplanation({packet}:{packet:PositionChatContext|null}){
- const signature=useMemo(()=>{try{return packet?JSON.stringify(packet):'';}catch{return '';}},[packet]);
+export function PositionScenarioExplanation({packet,active=true}:{packet:PositionChatContext|null;active?:boolean}){
+ const signature=useMemo(()=>{try{return active&&packet?JSON.stringify(packet):'';}catch{return '';}},[packet,active]);
  const checked=useMemo(()=>{try{return packet&&signature?readPositionChatContext(packet,{datasetToken:packet.datasetToken,goalId:packet.goalId,goal:packet.goal}):null;}catch{return null;}},[signature,packet]);
  const currentSignature=useRef(signature),request=useRef<AbortController|null>(null);
  currentSignature.current=signature;
@@ -19,7 +19,7 @@ export function PositionScenarioExplanation({packet}:{packet:PositionChatContext
  useEffect(()=>()=>{request.current?.abort();request.current=null;},[signature]);
  const visible=view.signature===signature?view:null;
  async function explain(){
-  if(!packet||!checked||request.current)return;
+  if(!active||!packet||!checked||request.current)return;
   const captured=structuredClone(packet),capturedSignature=signature,expected=JSON.stringify(checked.evidence),controller=new AbortController();
   request.current=controller;setView({signature:capturedSignature,pending:true,answer:'',error:'',notice:''});
   const current=()=>!controller.signal.aborted&&request.current===controller&&currentSignature.current===capturedSignature;
@@ -42,7 +42,7 @@ export function PositionScenarioExplanation({packet}:{packet:PositionChatContext
  function cancel(){request.current?.abort();request.current=null;setView({signature,pending:false,answer:'',error:'',notice:'Explanation cancelled. Your scenario is unchanged.'});}
  return <section aria-label="Position scenario explanation" className="min-w-0 space-y-2 rounded-xl border p-3">
   <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-base font-semibold">Scenario explanation</h3>{checked&&<p className="text-sm font-semibold" data-position-funding-status={checked.evidence.finance.status}>{fundingLabels[checked.evidence.finance.status]??'Review funding'}</p>}</div>
-  <div className="flex flex-wrap gap-2"><button type="button" className={button} disabled={!checked||visible?.pending===true} onClick={()=>void explain()}>{visible?.pending?'Explaining…':visible?.error?'Retry explanation':'Explain this scenario'}</button>{visible?.pending&&<button type="button" className={button} onClick={cancel}>Cancel explanation</button>}</div>
+  <div className="flex flex-wrap gap-2"><button type="button" className={button} disabled={!active||!checked||visible?.pending===true} onClick={()=>void explain()}>{visible?.pending?'Explaining…':visible?.error?'Retry explanation':'Explain this scenario'}</button>{visible?.pending&&<button type="button" className={button} onClick={cancel}>Cancel explanation</button>}</div>
   {!checked&&<p className="text-sm text-muted-foreground">Choose a valid position scenario to explain.</p>}
   {visible?.error&&<p role="alert" className="text-sm text-destructive">{visible.error}</p>}
   <div role="status" aria-live="polite" className="text-sm">{visible?.pending?'Preparing an explanation of this scenario.':visible?.notice}</div>

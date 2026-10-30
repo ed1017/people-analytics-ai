@@ -78,3 +78,28 @@ export function calculateRequiredStaffing(raw:RequiredStaffingInput){
   'At most three representative comparisons are displayed from the bounded enumeration. A listed-cash ranking does not establish complete cost or operational feasibility.',
  ]};
 }
+
+/** Explicit cost cadence. Annual/monthly values apply to one person for every
+ * month of the selected horizon only after that staffing assumption is checked. */
+export const staffingRateFields=['hireCostPerPerson','trainingCostPerPerson','redeploymentCostPerPerson','backfillCostPerInternalPerson'] as const;
+export type StaffingRateField=typeof staffingRateFields[number];
+export type StaffingRateBasis={kind:'whole-period'|'one-time'|'monthly'|'annual';amount:number|null;quotedMonths:number|null;fullPeriod:boolean};
+export type RequiredStaffingCostBasis={version:1;rates:Record<StaffingRateField,StaffingRateBasis>;budget:{amount:number|null;quotedMonths:number|null}};
+export function defaultRequiredStaffingCostBasis(input:RequiredStaffingInput):RequiredStaffingCostBasis{
+ const checked=readRequiredStaffingInput(input);
+ return {version:1,rates:Object.fromEntries(staffingRateFields.map(field=>[field,{kind:field==='trainingCostPerPerson'?'one-time':'whole-period',amount:checked[field],quotedMonths:checked.months,fullPeriod:false}])) as RequiredStaffingCostBasis['rates'],budget:{amount:checked.budget,quotedMonths:checked.months}};
+}
+export function readRequiredStaffingCostBasis(raw:unknown):RequiredStaffingCostBasis{
+ const exact=(v:unknown,keys:string[]):v is Record<string,unknown>=>v!==null&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join()===keys.sort().join();
+ const amount=(n:unknown)=>n===null||typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<=1e9&&Math.abs(n*100-Math.round(n*100))<=1e-5;
+ const months=(n:unknown)=>n===null||typeof n==='number'&&Number.isInteger(n)&&n>=1&&n<=24;
+ if(!exact(raw,['version','rates','budget'])||raw.version!==1||!exact(raw.rates,[...staffingRateFields])||!exact(raw.budget,['amount','quotedMonths'])||!amount(raw.budget.amount)||!months(raw.budget.quotedMonths))throw Error('Review the cost basis and budget period.');
+ for(const value of Object.values(raw.rates))if(!exact(value,['kind','amount','quotedMonths','fullPeriod'])||!['whole-period','one-time','monthly','annual'].includes(value.kind as string)||!amount(value.amount)||!months(value.quotedMonths)||typeof value.fullPeriod!=='boolean')throw Error('Review each per-person cost rate and its basis.');
+ return structuredClone(raw) as unknown as RequiredStaffingCostBasis;
+}
+export function resolveRequiredStaffingCostBasis(input:RequiredStaffingInput,raw:RequiredStaffingCostBasis):RequiredStaffingInput{
+ const next=readRequiredStaffingInput(input),basis=readRequiredStaffingCostBasis(raw);
+ for(const field of staffingRateFields){const rate=basis.rates[field];next[field]=rate.amount===null?null:rate.kind==='one-time'?rate.amount:rate.kind==='whole-period'?(next.months!==null&&rate.quotedMonths===next.months?rate.amount:null):!rate.fullPeriod||next.months===null?null:money(rate.amount*next.months/(rate.kind==='annual'?12:1));}
+ next.budget=next.months!==null&&basis.budget.quotedMonths===next.months?basis.budget.amount:null;
+ return readRequiredStaffingInput(next);
+}

@@ -23,7 +23,7 @@ function harness(initial=packet()){
  function render(next){if(next!==undefined)props={packet:next};cursor=0;const nodes=[];const tree=exports.PositionScenarioExplanation(props);function walk(node){if(!node||typeof node!=='object')return;nodes.push(node);React.Children.forEach(node.props?.children,walk);}walk(tree);pendingEffects.splice(0).forEach(fn=>fn());return nodes;}
  function click(label){const node=render().find(n=>n.type==='button'&&n.props.children===label);assert.ok(node,`Missing ${label}`);node.props.onClick();}
  function resolve(index,patch={},status=200){const req=requests[index],input=JSON.parse(req.init.body),p=input.positionContext,evidence=context.readPositionChatContext(p,{datasetToken:p.datasetToken,goalId:p.goalId,goal:p.goal}).evidence;req.resolve(new Response(JSON.stringify({answer:'Six FTE are ready under these assumptions.',positionEvidence:evidence,...patch}),{status}));}
- return {render,click,requests,resolve,unmount:()=>effects.forEach(e=>e?.cleanup?.())};
+ return {render,click,requests,resolve,setActive:value=>{props={...props,active:value};},unmount:()=>effects.forEach(e=>e?.cleanup?.())};
 }
 const chat=h=>h.render().find(n=>n.type==='ChatContent');
 
@@ -72,4 +72,14 @@ test('invalid client approval is disabled, and unmount aborts pending requests',
  const p=packet();p.finance={version:1,modelVersion:POSITION_FINANCE_MODEL,envelope:{...unknownPositionFinance(p.draft),basis:'approved-source',reference:'Claimed approval',fundedPositionIds:ids,incrementalFundingUsd:150000},addition:noPositionAddition()};
  const invalid=harness(p);assert.equal(invalid.render().find(n=>n.type==='button').props.disabled,true);invalid.click('Explain this scenario');assert.equal(invalid.requests.length,0);
  const h=harness();h.click('Explain this scenario');h.unmount();assert.equal(h.requests[0].init.signal.aborted,true);h.resolve(0);await tick();assert.equal(chat(h),undefined);
+});
+
+
+test('inactive shared planner aborts pending explanation, ignores late response and clears prior answers',async()=>{
+ const h=harness();h.click('Explain this scenario');h.setActive(false);let nodes=h.render();
+ assert.equal(h.requests[0].init.signal.aborted,true);assert.equal(nodes.find(n=>n.type==='button').props.disabled,true);
+ h.click('Explain this scenario');assert.equal(h.requests.length,1);h.resolve(0);await tick();assert.equal(chat(h),undefined);
+ h.setActive(true);h.render();assert.equal(chat(h),undefined);assert.equal(h.requests.length,1);
+ h.click('Explain this scenario');h.resolve(1);await tick();assert.ok(chat(h));
+ h.setActive(false);h.render();assert.equal(chat(h),undefined);h.setActive(true);h.render();assert.equal(chat(h),undefined);assert.equal(h.requests.length,2);
 });

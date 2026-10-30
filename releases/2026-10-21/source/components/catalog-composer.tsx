@@ -28,12 +28,13 @@ export function CatalogComposer({value,onChange,textareaRef,rows,workforce,datas
  </div>;
 }
 
-export function PromptTemplates({value,onChange,textareaRef}:{value:string;onChange:(v:string)=>void;textareaRef:RefObject<HTMLTextAreaElement|null>}){
+export function PromptTemplates({value,onChange,textareaRef,onPlanFromPositions}:{value:string;onChange:(v:string)=>void;textareaRef:RefObject<HTMLTextAreaElement|null>;onPlanFromPositions?:()=>void}){
  const insertHelper=(helperId:string)=>{const next=insertPromptHelper(value,helperId);if(!next)return;onChange(next.value);requestAnimationFrame(()=>{textareaRef.current?.focus();textareaRef.current?.setSelectionRange(next.start,next.end);});};
  return <section aria-label="Prompt templates" className="space-y-1">
   <div role="group" aria-label="Templates" className="mb-2 grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-4">
 
    {composerPromptHelpers.map(helper=><button key={helper.id} type="button" onClick={()=>insertHelper(helper.id)} title={value.length?'Add an editable starter after your current draft':'Insert an editable starter'} className="flex min-h-24 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border bg-card px-4 py-3 text-center text-sm leading-5 sm:col-span-2 sm:[&:last-child:nth-child(odd)]:col-start-2 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="font-medium">{helper.label}</span><span className="text-xs leading-4 text-muted-foreground">Edit prompt</span></button>)}
+   {onPlanFromPositions&&<button type="button" onClick={onPlanFromPositions} className="flex min-h-24 min-w-0 flex-col items-center justify-center gap-1 rounded-lg border bg-card px-4 py-3 text-center text-sm leading-5 sm:col-span-2 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="font-medium">[Template] Plan staffing from positions.</span><span className="text-xs leading-4 text-muted-foreground">Select positions</span></button>}
   </div>
 
  </section>;

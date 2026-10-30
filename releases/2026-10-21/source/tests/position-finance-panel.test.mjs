@@ -57,3 +57,20 @@ test('explanation remains disabled until current allocation is saved and clears 
  const next={...props,goalId:'b',allocationLedger:{...props.allocationLedger,goalId:'b'}};h.state.data.goals.activeId='b';h.render(next);assert.equal(h.packet().goal,'Goal B');assert.equal(h.packet().finance.envelope.basis,'unknown');
  h.state.saved=false;assert.equal(h.packet(),null);
 });
+
+
+test('explicit handoff binds old funding revision and never substitutes latest or explicit none',()=>{
+ const props=fixture(),fields={[POSITION_ALLOCATION_LEDGER_FIELD]:props.allocationLedger};
+ const input={version:1,modelVersion:POSITION_FINANCE_MODEL,allocation:props.allocation,finance:unknownPositionFinance(props.allocation),addition:{count:1,ftePerPosition:1,incrementalCashAllowanceUsd:10000,availableFromMonth:3}};
+ const options={datasetToken:token,goalId:'a',at,scenarioId:'one',allocationRevision:1,allocationSignature:positionAllocationSignature(props.allocation),input};
+ Object.assign(fields,buildPositionFinanceCapture(fields,options).patch);
+ input.addition={count:2,ftePerPosition:1,incrementalCashAllowanceUsd:20000,availableFromMonth:4};
+ Object.assign(fields,buildPositionFinanceCapture(fields,{...options,baseFinanceRevision:1}).patch);
+ assert.match(render({...props,initialFinanceRevision:1},fields),/1 proposed/);
+ assert.doesNotMatch(render({...props,initialFinanceRevision:1},fields),/2 proposed/);
+ assert.match(render({...props,initialFinanceRevision:2},fields),/2 proposed/);
+ assert.match(render({...props,initialFinanceRevision:null},fields),/0 proposed/);
+ assert.match(render({...props,initialFinanceRevision:null},fields),/Funding not verified/);
+ const missing=render({...props,initialFinanceRevision:99},fields);
+ assert.match(missing,/selected funding revision is unavailable/);assert.match(missing,/<fieldset disabled=/);
+});
