@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "a51ad4d51fbfc732ff8d4eef05f0d7d5647a5f7a2d50ddaed0af5cd4be393d05",
-      "bytes": 107537
+      "sha256": "cf08b6a119cf2ea95d867b46e8bedd2eda67b45d03d3fffd373b87c51b1c0fb3",
+      "bytes": 107564
     },
     {
       "path": "components/pages/overview-page.tsx",
