@@ -11,7 +11,7 @@ export function GlobalWorkforceFilters({ page, options, country, org, level, loa
   const scopeNote = page === "home" || page === "overview"
     ? "Filters select the workforce snapshot; other evidence keeps its own scope."
     : page === "workforce"
-    ? "Filters select the workforce snapshot; workforce detail below stays company-wide."
+    ? "Filters select the workforce snapshot and supported ratings; composition detail stays company-wide."
     : page === "career-growth-mobility"
     ? "Filters select the performance scope; unsupported selections are unavailable and movement history stays company-wide."
     : page === "compensation"

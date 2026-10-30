@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "bfc5e979942f8f3c4794186089d188dbadf95f9d3f7c55a18f83c1c6891a663e",
-      "bytes": 91094
+      "sha256": "0d9a12b75f6e563aaa8e01738eff784f7a0e2ea95f13a357bd56dce97e9baaf5",
+      "bytes": 91657
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -439,8 +439,8 @@
     },
     {
       "path": "components/global-workforce-filters.tsx",
-      "sha256": "017ade9e6470c667c1ff4dc45bebcce5dbf35799e59e914ed8befe490ba6a0fe",
-      "bytes": 5246
+      "sha256": "14971067e9c36df3004ad43a96bb162243a24b3141f92f16347aae63201abbbd",
+      "bytes": 5264
     },
     {
       "path": "components/goal-conversation-messages.tsx",
@@ -804,8 +804,8 @@
     },
     {
       "path": "components/pages/workforce-page.tsx",
-      "sha256": "b6a36e8f28472355bfbf789ad13c6174de772697cc92cb708d1234d6c9df0ec0",
-      "bytes": 11789
+      "sha256": "27b6ffdd77981fddce96f349ce8b9150c1f499aa0df94b52d6c3315aa564302b",
+      "bytes": 11975
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
@@ -1134,8 +1134,8 @@
     },
     {
       "path": "components/workforce-performance.tsx",
-      "sha256": "92fe508b95fe66f272971d8595145a0b21d300fc704da7efba570186d830a0ca",
-      "bytes": 4118
+      "sha256": "046004325662ee3d4b627307d46c38989fac367225b2b59e0ba7f214a82cb3e3",
+      "bytes": 4421
     },
     {
       "path": "components/workforce-planning/business-unit-response-allocation-panel.tsx",
@@ -5131,6 +5131,11 @@
       "path": "tests/standalone-scenario-backup.test.mjs",
       "sha256": "c8c8b6827886be12b68f9b01ce897d354045e3527d610c99dee1ae3fa8aa5dbc",
       "bytes": 6222
+    },
+    {
+      "path": "tests/workforce-ratings-placement.test.mjs",
+      "sha256": "0b20681063f67fe6a68358cf1d0e6f4d8ea040e357502f53f522cca98c796ccf",
+      "bytes": 4199
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

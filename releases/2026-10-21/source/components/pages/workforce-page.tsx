@@ -1,5 +1,6 @@
 "use client";
 import {evidenceAsOfLabel, evidenceMonthWindow} from '@/lib/evidence-period-label';
+import type { ReactNode } from "react";
 import {KeyFindings} from "@/components/key-findings";
 import {workforceFindings} from "@/lib/key-findings";
 import {catalogDisplayLabel, countryDisplayLabel} from "@/lib/catalog-display";
@@ -25,6 +26,7 @@ type Props = {
   data: WorkforceResponse | null;
   loading: boolean;
   error: string | null;
+  performance?: ReactNode;
 };
 
 function monthLabel(value: string) {
@@ -33,7 +35,7 @@ function monthLabel(value: string) {
     year: "2-digit",
   });
 }
-export function WorkforcePage({ data: sourceData, loading, error }: Props) {
+export function WorkforcePage({ data: sourceData, loading, error, performance }: Props) {
   const data = !loading && !error ? sourceData : null;
   const summary = data?.summary;
   const publicConstruction = data?.data_meta?.datasetId === PUBLIC_9037.datasetId && data.data_meta.datasetToken === PUBLIC_9037.token && data.data_meta.contract === PUBLIC_9037.contract;
@@ -157,6 +159,7 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
               </EvidenceTableRegion>
             </div>
 
+            <div className="evidence-panel-grid grid gap-6">
             <div className="rounded-lg border p-4">
               <h3 className="font-semibold">Tenure Distribution</h3>
               <p className="mb-4 text-sm text-muted-foreground">Current workforce by employee tenure</p>
@@ -177,6 +180,8 @@ export function WorkforcePage({ data: sourceData, loading, error }: Props) {
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Transfer events</p><p className="text-xl font-semibold">{movementTotals.transfer ?? 0}</p></div>
                 <div className="rounded-md border p-3"><p className="text-muted-foreground">Lateral move events</p><p className="text-xl font-semibold">{movementTotals.lateral_move ?? 0}</p></div>
               </div>
+            </div>
+            {performance}
             </div>
           </div>
           <div className="mt-6 rounded-lg border p-4">

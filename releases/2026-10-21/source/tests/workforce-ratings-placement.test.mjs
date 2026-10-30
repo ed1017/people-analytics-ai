@@ -1,0 +1,32 @@
+import fs from 'node:fs';
+import {createRequire} from 'node:module';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url);
+const ts=require('typescript'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const root=new URL('../',import.meta.url);
+const candidate=root;
+const files=['app/page.tsx','components/workforce-performance.tsx','components/pages/workforce-page.tsx','components/global-workforce-filters.tsx'];
+let compiled;
+for(const file of files){const r=ts.transpileModule(fs.readFileSync(new URL(file,candidate),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020},reportDiagnostics:true,fileName:file});assert.equal(r.diagnostics.length,0,file);if(file==='components/workforce-performance.tsx')compiled=r.outputText;}
+const model=await import(new URL('lib/workforce-performance.ts',root));
+const {PUBLIC_9037:P}=await import(new URL('lib/public-9037-contract.mjs',root));
+const module={exports:{}};vm.runInNewContext(compiled,{module,exports:module.exports,require:name=>name==='@/lib/workforce-performance'?model:require(name)});
+const filters={country:'all',org:'all',level:'all'};
+const receipt={version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:'All',basis:'Verified public synthetic aggregate',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'};
+const value={version:'ratings-9037-2026-09-30-offline-v1',source:'employee_snapshots JOIN performance_reviews',snapshotDate:P.cutoff,reviewPeriod:'2026 YTD',periodKind:'ytd',filters,status:'available',availabilityKind:'simulated_convention',simulatedAvailableAt:'2026-09-30T23:59:59.999Z',originalAvailableAt:null,provenance:'Constructed synthetic workforce; deterministic all-active demo ratings; not observed performance.',notRatedStatus:'not_collected',counts:{population:9037,rated:9037,ratings:[396,1071,4634,2409,527],notRated:null,unavailable:0}};
+const props={value,filters,scopeReceipt:receipt,population:9037,selectedContext:{country:'All countries',businessUnit:'All business units',level:'All levels'},ratingsOnly:true};
+const render=extra=>renderToStaticMarkup(React.createElement(module.exports.WorkforcePerformanceField,{...props,...extra}));
+const compact=render({});assert.match(compact,/Ratings distribution/);assert.match(compact,/9,037 rated/);assert.match(compact,/2026 year to date/);assert.match(compact,/All business units/);assert.match(compact,/Ratings scope:/);assert.doesNotMatch(compact,/Promotion rate|Median time in prior level/);assert.equal((compact.match(/<li /g)||[]).length,5);assert.match(compact,/not-rated status are unavailable/);
+const normal=render({ratingsOnly:false});assert.match(normal,/Promotion rate/);assert.match(normal,/Median time in prior level/);
+const loading=render({loading:true});assert.match(loading,/Loading ratings/);assert.doesNotMatch(loading,/9,037 rated/);
+const unsupported=render({filters:{...filters,country:'US'}});assert.match(unsupported,/Unavailable for this selection/);assert.doesNotMatch(unsupported,/9,037 rated/);
+const stale=render({scopeReceipt:{...receipt,datasetToken:'old'}});assert.match(stale,/Ratings unavailable/);assert.doesNotMatch(stale,/9,037 rated/);
+console.log('PASS: four TSX syntax checks; rendered compact/full, scoped date, five rating counts, unavailable not-rated, loading, unsupported filter and stale receipt states.');
+
+const workforce=fs.readFileSync(new URL('components/pages/workforce-page.tsx',candidate),'utf8');
+assert.equal(workforce.split('{performance}').length-1,1);
+assert.ok(workforce.indexOf('{performance}')>workforce.indexOf('Tenure Distribution'));
+assert.ok(workforce.indexOf('{performance}')<workforce.indexOf('Geographic Footprint'));
+assert.match(workforce,/<div className="evidence-panel-grid grid gap-6">\s*<div className="rounded-lg border p-4">\s*<h3 className="font-semibold">Tenure Distribution/);
+console.log('PASS: ratings share the Tenure grid after summary metrics; no top-of-page ratings insertion.');
