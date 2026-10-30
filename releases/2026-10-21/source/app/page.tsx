@@ -63,6 +63,7 @@ import { AppHeader } from "@/components/app-header";
 import { OverviewPage } from "@/components/pages/overview-page";
 import { OverallOverviewPage } from "@/components/pages/overall-overview-page";
 import { WorkforcePage } from "@/components/pages/workforce-page";
+import { WorkforcePerformanceField } from "@/components/workforce-performance";
 import { AttritionPage } from "@/components/pages/attrition-page";
 import { CompensationPage } from "@/components/pages/compensation-page";
 import { FinancePage } from "@/components/pages/finance-page";
@@ -2038,6 +2039,15 @@ export default function Home() {
             onResetFilters={resetFilters}
           />
           <WorkforcePage
+            performance={<WorkforcePerformanceField
+              ratingsOnly
+              value={overviewData?.snapshot_date === "2026-09-30" ? workforcePerformance : null}
+              population={overviewData?.headcount ?? null}
+              scopeReceipt={overviewScope}
+              filters={{ country: selectedCountry, org: selectedOrg, level: selectedLevel }}
+              selectedContext={selectedBusinessContext}
+              loading={dashboardLoading}
+            />}
             data={workforceData}
             loading={workforceLoading}
             error={workforceError}
