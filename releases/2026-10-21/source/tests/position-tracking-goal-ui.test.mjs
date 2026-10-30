@@ -1,0 +1,29 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url),ts=require('typescript'),React=require('react');
+const source=fs.readFileSync(new URL('../components/position-tracking-goal.tsx',import.meta.url),'utf8');
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
+assert.equal(compiled.diagnostics.length,0);
+function harness({empty=false,invalid=false,fail=false,prepareFail=false}={}){
+ let states=[],refs=[],cursor=0,refCursor=0,prepares=0,commits=0,created=0;
+ const react={...React,useEffect:()=>{},useState:initial=>{let i=cursor++;if(!(i in states))states[i]=initial;return[states[i],value=>states[i]=value];},useRef:value=>{let i=refCursor++;return refs[i]??(refs[i]={current:value});}};
+ const ticket={goal:'Track position scenarios',scenarioCount:2,revisionCount:3,financeRevisionCount:1};
+ const api={preparePositionTrackingGoal:()=>{prepares++;if(prepareFail)throw Error('Resolve saved-work recovery before starting tracking.');return ticket;},confirmPositionTrackingGoal:args=>{commits++;assert.equal(args.ticket,ticket);assert.match(args.goalId,/qa-goal/);if(fail)throw Error('Storage full. Existing work is retained.');}};
+ const module={exports:{}};
+ vm.runInNewContext(compiled.outputText,{module,exports:module.exports,Error,crypto:{randomUUID:()=> 'qa-goal'},requestAnimationFrame:fn=>fn(),require:name=>name==='react'?react:name==='./decision-store'?{decisionStore:{}}:name==='@/lib/position-tracking-goal'?api:name==='@/lib/position-allocation-store'?{POSITION_ALLOCATION_LEDGER_FIELD:'allocation',readPositionScenarioLedger:()=>invalid?null:{records:empty?[]:[{}]}}:name==='@/lib/position-finance-store'?{POSITION_FINANCE_LEDGER_FIELD:'finance',readPositionFinanceLedger:()=>({records:[]})}:require(name)});
+ return {render(){cursor=0;refCursor=0;return module.exports.PositionTrackingGoal({fields:{},datasetToken:'qa',onCreated:()=>created++});},stats:()=>({prepares,commits,created}),refs,states,setFail:value=>fail=value};
+}
+function text(node){if(node==null||typeof node==='boolean')return '';if(typeof node!=='object')return String(node);if(Array.isArray(node))return node.map(text).join('');return text(node.props?.children);}
+function nodes(node){if(!node||typeof node!=='object')return [];if(Array.isArray(node))return node.flatMap(nodes);return[node,...nodes(node.props?.children)];}
+function button(tree,label){const result=nodes(tree).find(n=>n.type==='button'&&text(n)===label);assert.ok(result,label);return result;}
+const click=(tree,label)=>button(tree,label).props.onClick();
+test('review is explicit, summarizes saved revisions and requires confirmation',()=>{const h=harness();let tree=h.render();assert.deepEqual(h.stats(),{prepares:0,commits:0,created:0});click(tree,'Create tracking goal');tree=h.render();assert.match(text(tree),/2 saved scenarios · 3 allocation revisions · 1 funding revision/);assert.match(text(tree),/General exploration stays unchanged/);assert.equal(nodes(tree).some(n=>n.type==='input'),false);assert.deepEqual(h.stats(),{prepares:1,commits:0,created:0});});
+test('cancel does not commit and restores focus to launch control',()=>{const h=harness();let tree=h.render();click(tree,'Create tracking goal');tree=h.render();let focused=0;h.refs[1].current={focus:()=>focused++};click(tree,'Cancel');tree=h.render();assert.ok(button(tree,'Create tracking goal'));assert.equal(focused,1);assert.equal(h.stats().commits,0);});
+test('confirmation commits once even on repeated old handlers and signals destination',()=>{const h=harness();let tree=h.render();click(tree,'Create tracking goal');tree=h.render();const confirm=button(tree,'Create and continue');confirm.props.onClick();confirm.props.onClick();tree=h.render();assert.deepEqual(h.stats(),{prepares:1,commits:1,created:1});assert.equal(button(tree,'Creating goal…').props.disabled,true);});
+test('failed save retains review, unlocks controls and supports explicit re-review',()=>{const h=harness({fail:true});let tree=h.render();click(tree,'Create tracking goal');tree=h.render();click(tree,'Create and continue');tree=h.render();assert.match(text(tree),/Storage full/);assert.equal(h.stats().created,0);assert.equal(button(tree,'Cancel').props.disabled,false);click(tree,'Review again');h.setFail(false);tree=h.render();click(tree,'Create and continue');assert.equal(h.stats().created,1);assert.equal(h.stats().prepares,2);});
+test('missing saves remains ordinary empty state, corrupt saves are recovery state',()=>{assert.match(text(harness({empty:true}).render()),/No goal is selected/);const malformed=harness({invalid:true}).render();assert.match(text(malformed),/Saved position scenarios need review/);assert.equal(nodes(malformed).some(n=>n.props?.role==='alert'),true);assert.doesNotMatch(text(malformed),/No goal is selected/);});
+test('preparation failure preserves source and provides error without confirmation',()=>{const h=harness({prepareFail:true});let tree=h.render();click(tree,'Create tracking goal');tree=h.render();assert.match(text(tree),/Resolve saved-work recovery/);assert.equal(h.stats().commits,0);assert.ok(button(tree,'Create tracking goal'));});
+test('integration only adds explicit action-plan no-goal bridge and destination focus',()=>{const page=fs.readFileSync(new URL('../components/planning-support-pages.tsx',import.meta.url),'utf8');assert.match(page,/!goal \? page==='action-plans' \? <PositionTrackingGoal/);assert.match(page,/onCreated=\{\(\)=>requestAnimationFrame/);assert.match(page,/<PositionResultSetup key=\{scope\}/);assert.doesNotMatch(source,/localStorage|sessionStorage|fetch\(/);assert.match(source,/min-h-11/);});
