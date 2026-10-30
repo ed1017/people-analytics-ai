@@ -16,3 +16,11 @@
 @container(min-width:500px){.layout{grid-template-columns:minmax(170px,.68fr) minmax(0,1.32fr)}}
 
 .focusLayout{display:flex;flex-direction:column;gap:12px;min-width:0}.focusLayout>.visual{order:-1;width:100%}.focusLayout>.levers{width:100%}.focusLayout>details.levers{display:block}
+
+/* Compact shared frame; interactive targets and chart geometry stay unchanged. */
+.planner{gap:.75rem;padding:.75rem}
+.planner header{padding:14px 16px}
+.metrics{gap:.5rem}.metrics>div{padding:.65rem}
+.layout{gap:.75rem}.levers,.visual{padding:12px}.levers{gap:10px}
+.compact{padding:.65rem;gap:.6rem}.compact .layout{gap:.65rem}
+@container(max-width:499px){.planner header{padding:12px}.metrics>div{padding:.55rem}.levers,.visual{padding:10px}}

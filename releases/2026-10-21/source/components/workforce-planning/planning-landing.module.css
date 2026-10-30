@@ -65,3 +65,12 @@
   .insight h4 { font-size: 21px; }
   .steps { margin: 12px 0; }
 }
+
+/* Shared spacing rhythm keeps the decision and controls close together. */
+.landing{padding:12px}.header{gap:12px;margin-bottom:12px}
+.context{margin-bottom:12px}.columns{gap:12px}
+.levers,.guidance{padding:12px}.muted{margin:6px 0 10px}
+.field{margin:8px 0}.inputWrap{margin-top:5px}.primary{margin-top:12px}
+.status{margin:8px 0 10px}.insight{margin-top:10px;padding:12px}
+.steps{margin:10px 0}.steps li{margin:8px 0}.guidanceLabel{margin:8px 0 10px}
+@media(max-width:700px){.landing{padding:10px}.columns{gap:10px}}

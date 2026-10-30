@@ -55,3 +55,12 @@
   .primary { min-height: 44px; margin-top: 16px; padding: 10px 14px; }
   .saved { margin-top: 18px; }
 }
+
+/* Condense the summary shell without changing the separate risk banner. */
+.surface{padding:16px 20px}.heading{gap:12px}
+.boxes{gap:10px;margin:12px 0}.boxes>div{padding:12px 14px}
+.boxes dd{margin-top:5px}.boxes p{margin-top:6px}
+.layout{gap:12px}.snapshot,.brief{padding:14px}
+.cost{margin-top:12px;padding-top:10px}.primary{margin-top:12px}
+.saved{margin-top:14px}
+@media(max-width:600px){.surface{padding:12px}.boxes{gap:8px}.boxes>div{padding:10px 8px}.snapshot,.brief{padding:12px}.brief .primary{margin-bottom:12px}}
