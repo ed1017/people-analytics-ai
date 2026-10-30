@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "be14d40c0ebd3912bfa19936c85f88da2f658062cce8046620a9ae536e44bb25",
-      "bytes": 106581
+      "sha256": "50be43dbe2af0002ddc3727330e16f137f0e336920a533f44b570889c9503d87",
+      "bytes": 107198
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4986,6 +4986,16 @@
       "path": "tests/position-scenario-explanation.test.mjs",
       "bytes": 7798,
       "sha256": "0c2e9a573a29f08ec20299705c723b123048742a6c4832115bd018e3b9aea378"
+    },
+    {
+      "path": "components/workforce-planning/overview-position-scenarios.tsx",
+      "bytes": 5809,
+      "sha256": "c6ba8065d435f5b555d84b7286a123fee5922433ba1e634501a183d9009febf3"
+    },
+    {
+      "path": "tests/overview-position-scenarios.test.mjs",
+      "bytes": 7471,
+      "sha256": "b59081abfb236d545241ed637f5a2cf95056d28729e8c9dc0b537949c78eaecb"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
