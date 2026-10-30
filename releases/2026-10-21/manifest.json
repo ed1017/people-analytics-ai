@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "693cce5c164c05980137b7c039a392756d24bbe92643b30539a11a07ba683e91",
-      "bytes": 14841
+      "sha256": "79f3189310cbb077b4cf234a0a73955240cc88a5db94f638b047497615da7b61",
+      "bytes": 14802
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "36a90929c9a2dec1bad67c90605ae1bab12bbde6a6c7d7bd3ad95a95ddcae0c1",
-      "bytes": 8498
+      "sha256": "e71d1459914302b6b2d49498b7a2a0c5774051798f99d7bc8687177c92f8396e",
+      "bytes": 8329
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -4834,8 +4834,8 @@
     },
     {
       "path": "components/decision-backup.tsx",
-      "bytes": 5720,
-      "sha256": "76475c62e11337df42f99ef32edd70f35522580579b94c94ebba72aeb5b3c3ba"
+      "bytes": 5772,
+      "sha256": "9d549312dee3d1ffec53d2c6d04f85cfbb61fcb97a224bc99c38d3ed7ce7729d"
     },
     {
       "path": "lib/decision-backup.ts",
@@ -5116,6 +5116,21 @@
       "path": "tests/position-result-ui.test.mjs",
       "sha256": "212183c759ca98cf1db70e3396cd045ffd2a60856871ca951dd6d39884f5cd8d",
       "bytes": 6675
+    },
+    {
+      "path": "components/standalone-scenario-backup.tsx",
+      "sha256": "3da2c0b36d3966054cef4fee0046f55382b71ee0a82a0893874057ee3ddf68df",
+      "bytes": 4784
+    },
+    {
+      "path": "lib/standalone-scenario-backup.ts",
+      "sha256": "e66506a46f835fd7d08fb1b29b4daa12b6a1c92e2f0004d3e4610bd455959d1e",
+      "bytes": 7255
+    },
+    {
+      "path": "tests/standalone-scenario-backup.test.mjs",
+      "sha256": "c8c8b6827886be12b68f9b01ce897d354045e3527d610c99dee1ae3fa8aa5dbc",
+      "bytes": 6222
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
