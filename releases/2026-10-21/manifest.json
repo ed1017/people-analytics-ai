@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "sourceCommit": "8542b077484ba44df39d556a7a44c8cb8b2b7805",
-  "deployment": "https://people-analytics-3lk9yk9fd-ed-56dc.vercel.app",
+  "sourceCommit": "0b34ef6af2f428fb4c39988c633c65bf379ad287",
+  "deployment": "https://people-analytics-5r7nzwuen-ed-56dc.vercel.app",
   "scope": "Exact application source subset; not a complete runtime package",
   "excludedCategories": [
     "private runtime aggregates",
@@ -559,8 +559,8 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "10455bb66b45d538a196fb25f85ae42bf9d9914c7a9bef2b2cea62a982963f7f",
-      "bytes": 23895
+      "sha256": "85f5863347236f6bc94e3e79e509a8a1d6db195b5b32449648aff9f748697e60",
+      "bytes": 24087
     },
     {
       "path": "components/home-chat-welcome.tsx",
@@ -4104,13 +4104,13 @@
     },
     {
       "path": "lib/home-prompt-categories.ts",
-      "sha256": "7cbf19ba0a0775ccf4b3f9f6267f4059a1688d1fee80933f17856d4070b6dfe1",
-      "bytes": 840
+      "sha256": "3cb0a9b02c031f8e133c35e706325fed78ce641bb6bd9425c2bc27fb43047af6",
+      "bytes": 909
     },
     {
       "path": "tests/home-prompt-categories.test.mjs",
-      "sha256": "0c895e06125c2e1c451196d0995bccd1b40a9bff830a9cedec134413458911af",
-      "bytes": 2472
+      "sha256": "384ca132ba2edee260980f6452e6ac31fe1c4eacceb562f036282ed6d7494817",
+      "bytes": 2471
     },
     {
       "path": "components/chart-pointer-tooltip.tsx",
@@ -4909,8 +4909,8 @@
     },
     {
       "path": "lib/position-inventory.ts",
-      "sha256": "036e6eba61fdb858feebc136ada4e4e94f45487c3fd8cd19461a36850f595df2",
-      "bytes": 7720
+      "sha256": "572cf5a64381d8dbe381ece23e134aa756cc6f1ee9108efc92f7aedde78bbc38",
+      "bytes": 7978
     },
     {
       "path": "tests/manual/check-position-feature-types.mjs",
@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "bytes": 8464,
-      "sha256": "6994874dfc33129ffea75d66098244c39aeff599875680709699cdb3d9207951"
+      "bytes": 9972,
+      "sha256": "1633075a02f907f6cce31ed5261ed948b1e943fb7d47650fa73b80be3af2ad09"
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -4959,8 +4959,8 @@
     },
     {
       "path": "tests/position-chat-context.test.mjs",
-      "bytes": 7046,
-      "sha256": "d4a98c937e50ba90ce9d43bda7289080fc2889f4a5a7b58d8c4a06f50899a5b9"
+      "bytes": 10265,
+      "sha256": "162b4769d71e3587adffaf0b75ab6620e360a123948fc1b073775b8502a41f02"
     },
     {
       "path": "tests/position-chat-routing.test.mjs",
@@ -5009,8 +5009,8 @@
     },
     {
       "path": "components/workforce-planning/position-allocation-planner.tsx",
-      "sha256": "2ff2ac41490619f04f23cb1a9a71311aecb908f86a394e8e450cab0c243dbf1d",
-      "bytes": 40799
+      "sha256": "e704dcf46ce23e81798ff9a89adb606be0da86853e50e18971b66ed55802a865",
+      "bytes": 41185
     },
     {
       "path": "lib/current-required-staffing-summary.ts",
@@ -5041,6 +5041,31 @@
       "path": "tests/required-staffing-cost-basis.test.mjs",
       "sha256": "d9a40ea6a06ad1371b7e4a136df7acafbff9f93c4cb1351381442ffe4760d640",
       "bytes": 6051
+    },
+    {
+      "path": "lib/company-position-model-v2.ts",
+      "sha256": "db58e2ebf09eb7c1bb728e5a3e2f3c3f060f78e4ca38566d5be805286cc248be",
+      "bytes": 8847
+    },
+    {
+      "path": "lib/data/company-position-marginals-v2.json",
+      "sha256": "edd5783ea5b381d97a73f746a6856fa5939733d5759c4f6200e174b0e6d9b51c",
+      "bytes": 3702
+    },
+    {
+      "path": "tests/company-position-model-v2.test.mjs",
+      "sha256": "28161b56463214e8030942286209766f96e3f1f4172b2da18ed09525fba9da08",
+      "bytes": 5621
+    },
+    {
+      "path": "tests/exploration-issue-routing.test.mjs",
+      "sha256": "946aa5786c441b8f811b7be5f639e392004e1141531842ec355f09d1c6ae2957",
+      "bytes": 5311
+    },
+    {
+      "path": "tests/exploration-issue-starters.test.mjs",
+      "sha256": "1ec61adf0a4e1778411c74281df86ae1ad1fe948c1bcccd522d76beb6c43dec7",
+      "bytes": 2231
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
