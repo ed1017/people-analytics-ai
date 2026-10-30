@@ -2,7 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR477 current - comparison snapshot recovery
+### PR479 current - UK hiring-difficulty reference
+
+PR479 is live at runtime `ce8c80050e8ed159a7550cee3ac17cf7c17917b9`, merge `f25aee0567919f7a1026cd1b2a82ede0bcac1af2`, deployment `dpl_CiTD9aZNJinH3U3KVNVHpW6SBTqP`. Independent review, 37 affected tests, full build/TypeScript and exact-head CI `41121620996` passed. Final direct public desktop/mobile each passed eight checks with zero page/bridge errors and clean teardown. [Release evidence](uk-hiring-difficulty-2026-10-30.md).
+
+Labor Market now compares published 2024 hard-to-fill and skill-shortage vacancy shares for Professional occupations across UK nations, with samples and OGL provenance in Details. This is broad occupation-group hiring difficulty, not available applicants or completed hiring time; existing software-pay carries and planner assumptions are unchanged. Denied BLS/Canada/Germany routes were not retried. No paid provider calls or guard changes.
+
+The historical filter audit found current ratings limited to 2026 YTD company/single BU, while survey company history already contains 11 quarterly waves from March 2024 through September 2026. Historical rating distributions and neutral/unfavorable response partitions are not released for the current company. The next decision is a coherent versioned synthetic aggregate release or an approved historical aggregate with eligibility/scoring/suppression definitions; no raw-record access is needed. [Exact missing contracts](filter-contract-audit-2026-10-30.md). Lab validation remains user-owned and chart overlays preview-only.
+
+### PR477 previous - comparison snapshot recovery
 
 PR477 has been promoted at runtime `0e1136ea573090dabdbc67b17c8f6876aa9a43db`, merge `6c9b2440a9c15bab72e3b03a7eda26766c0efe7a`, deployment `dpl_CkEfXmvoh2XFinv3KKUavzx5jbUb`. Exact-head CI `41113203658` passed. Staged desktop and mobile each completed 13 functional checks; desktop teardown stalled with a partial report, and mobile recorded close/route-handled test-peer transport errors. Public desktop and mobile each passed 13 functional checks with zero page errors, blocked requests or bridge errors and drained teardown. Each run used one locally fulfilled captured calculator response; no upstream calculator or model POST was made during browser acceptance. [Release evidence and limits](comparison-snapshot-recovery-2026-10-30.md).
 
