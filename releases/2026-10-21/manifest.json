@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "d661618230ed47e33c4eb5a4c15f44c37a50b05b9066e8882fc7783571a6599b",
-      "bytes": 20483
+      "sha256": "a4be13806e37c8e4c126d0786109444bf6ed69b38a5a1550888753306bc5641d",
+      "bytes": 20587
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "390fa2d06844fe13bf19681640fc7f1886ea2c2a19bb525d4dc41c8a4a6fb39d",
-      "bytes": 109079
+      "sha256": "7766213b298c2d9661251219367c1286d412f225f13ec2720dd1795f018fbdbf",
+      "bytes": 109103
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "e5793ce550377281a2b6f89128c084c267e621f0a62d8cae62b836ddce08f775",
-      "bytes": 8305
+      "sha256": "e1f47c468205f673f12045a33c48b5ed19ca1415b38b0bc38cdbb46a7ea3e09c",
+      "bytes": 8436
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 4972,
-      "sha256": "c7b88b0bae0107d0f8d23f2ff6fc9923e603bff4b3364069a80c3df0a88a7cce"
+      "bytes": 6161,
+      "sha256": "d6d88d442371c870bfb96a1b127450db0d942c2bf24a5bac4ec625775592eb65"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
