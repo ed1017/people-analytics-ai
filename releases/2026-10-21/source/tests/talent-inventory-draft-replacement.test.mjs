@@ -8,9 +8,10 @@ import ts from 'typescript';
 import * as inventory from '../lib/position-inventory.ts';
 import * as allocation from '../lib/position-allocation.ts';
 import * as ledger from '../lib/position-allocation-store.ts';
+import * as finance from '../lib/position-finance-store.ts';
 
 const require=createRequire(import.meta.url);
-const source=ts.transpileModule(fs.readFileSync(new URL('../components/workforce-planning/talent-inventory-scenarios.tsx',import.meta.url),'utf8'),{
+const source=ts.transpileModule(fs.readFileSync(new URL('../components/workforce-planning/position-allocation-planner.tsx',import.meta.url),'utf8'),{
  compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022},
 }).outputText;
 const ids=inventory.DEMO_POSITION_INVENTORY.positions.filter(p=>p.status==='vacant'&&p.vacancyStatus!=='frozen').map(p=>p.id);
@@ -22,15 +23,15 @@ const storedLedger=()=>({version:1,datasetToken:'test',goalId:'',records:[{
 
 // Same transpiled-component hook harness used by position-dashboard.test.mjs.
 // Actual allocation validators run; only browser storage and DOM focus are isolated.
-function renderHarness(initialDraft=null,initialLedger=storedLedger()){
- let hooks=[],cursor=0,writes=0,focused=null;
+function renderHarness(initialDraft=null,initialLedger=storedLedger(),initialProps={}){
+ let hooks=[],cursor=0,writes=0,focused=null,props=initialProps;const effects=[];
  const callbacks=[],exports={};
  const fields={...(initialDraft?{[ledger.POSITION_ALLOCATION_DRAFT_FIELD]:structuredClone(initialDraft)}:{}),[ledger.POSITION_ALLOCATION_LEDGER_FIELD]:structuredClone(initialLedger)};
  const data={workspaces:{},exploration:{fields},goals:{goals:[],activeId:''},revision:0};
  const snapshot={data,ready:true,saved:true};
  const store={getDatasetToken:()=> 'test',getSnapshot:()=>snapshot,setField:(_goal,key,value)=>{writes++;fields[key]=value;}};
  const useState=initial=>{const i=cursor++;if(!(i in hooks))hooks[i]=typeof initial==='function'?initial():initial;return [hooks[i],value=>{hooks[i]=typeof value==='function'?value(hooks[i]):value;}];};
- const react={...React,useState,useMemo:fn=>fn(),useId:()=>':inventory:',useRef:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]={current:initial};return hooks[i];}};
+ const react={...React,useEffect:(fn,deps)=>{const i=cursor++,previous=hooks[i];if(!previous||deps.some((v,j)=>v!==previous[j]))effects.push(fn);hooks[i]=deps;},useState,useMemo:fn=>fn(),useId:()=>':inventory:',useRef:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]={current:initial};return hooks[i];}};
  vm.runInNewContext(source,{exports,require:name=>{
   if(name==='react')return react;
   if(name==='@/components/interactive-planner')return {InteractivePlanner:'Planner'};
@@ -39,6 +40,7 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger()){
   if(name==='@/lib/position-inventory')return inventory;
   if(name==='@/lib/position-allocation')return allocation;
   if(name==='@/lib/position-allocation-store')return ledger;
+  if(name==='@/lib/position-finance-store')return finance;
   if(name==='./position-finance-panel')return {PositionFinancePanel:'PositionFinancePanel'};
   if(name==='./position-allocation-visuals')return {InventoryCharts:'InventoryCharts',AllocationVisuals:'AllocationVisuals'};
   return require(name);
@@ -52,11 +54,11 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger()){
    React.Children.forEach(node.props?.children,walk);
    if(node.type==='Planner')for(const key of ['levers','visual','actions','supplement'])walk(node.props[key]);
   }
-  walk(exports.PositionInventoryWorkspace({goalId:'',datasetToken:'test'}));
+  walk(exports.PositionInventoryWorkspace({goalId:'',datasetToken:'test',...props}));
   return nodes;
  }
  function click(label){const node=render().find(n=>n.type==='button'&&n.props.children===label);assert.ok(node,`Missing button: ${label}`);node.props.onClick({currentTarget:{focus:()=>{focused=label;}}});}
- return {render,click,fields,data,writes:()=>writes,focused:()=>focused,flush:()=>{render();callbacks.splice(0).forEach(fn=>fn());}};
+ return {render,click,fields,data,setProps:next=>{props=next;},writes:()=>writes,focused:()=>focused,flush:()=>{render();effects.splice(0).forEach(fn=>fn());render();callbacks.splice(0).forEach(fn=>fn());}};
 }
 const confirmation=h=>h.render().find(n=>n.props?.['aria-label']==='Confirm position draft replacement');
 const register=h=>h.render().find(n=>n.type==='details'&&Object.hasOwn(n.props,'open'));
@@ -108,4 +110,40 @@ test('goal changes block a previously rendered replacement before any storage wr
  const h=renderHarness(example()),before=JSON.stringify(h.fields);h.click('Try the 12-vacancy example');
  h.data.goals.activeId='another-goal';h.click('Replace current draft');assert.equal(h.writes(),0);assert.equal(JSON.stringify(h.fields),before);
  assert.ok(h.render().some(n=>n.props?.role==='alert'&&n.props.children==='The goal or dataset changed. Reopen this workspace.'));
+});
+
+
+test('explicit Overview handoff preserves existing edits until confirmation and opens exact finance binding',()=>{
+ const draft=example();draft.input.budgetUsd=234567;const h=renderHarness(draft),original=JSON.stringify(h.fields),saved=storedLedger().records[0];
+ const request={requestId:'one',scenarioId:saved.scenarioId,revision:saved.revision,allocationSignature:finance.positionAllocationSignature(saved.draft),financeRevision:null};
+ h.setProps({embedded:true,handoffRequest:request});h.flush();assert.ok(confirmation(h));assert.equal(h.writes(),0);assert.equal(h.focused(),'Cancel');
+ h.click('Cancel');h.flush();assert.equal(JSON.stringify(h.fields),original);assert.equal(confirmation(h),undefined);
+ h.setProps({embedded:true,handoffRequest:{...request,requestId:'two'}});h.flush();h.click('Replace current draft');h.flush();assert.equal(h.writes(),1);
+ const panel=h.render().find(n=>n.type==='PositionFinancePanel');assert.equal(panel.props.initialFinanceRevision,null);assert.equal(panel.props.savedCapture.scenarioId,saved.scenarioId);assert.equal(panel.props.savedCapture.revision,1);
+ assert.equal(h.fields[ledger.POSITION_ALLOCATION_DRAFT_FIELD].input.budgetUsd,saved.draft.input.budgetUsd);assert.equal(h.focused(),'Current position scenario');
+});
+
+
+test('native reopen requires confirmation, Cancel retains edits, then opens exact saved revision',()=>{
+ const draft=example();draft.input.budgetUsd=234567;const h=renderHarness(draft),before=JSON.stringify(h.fields);
+ const select=()=>h.render().find(n=>n.type==='select'&&n.props['aria-label']==='Saved position revision');
+ select().props.onChange({target:{value:'saved-original:1'}});h.click('Open revision (replace draft)');h.flush();assert.ok(confirmation(h));assert.equal(h.writes(),0);assert.equal(h.focused(),'Cancel');
+ h.click('Cancel');h.flush();assert.equal(JSON.stringify(h.fields),before);assert.equal(h.focused(),'Open revision (replace draft)');
+ h.click('Open revision (replace draft)');h.flush();h.click('Replace current draft');h.flush();assert.equal(h.writes(),1);assert.equal(h.fields[ledger.POSITION_ALLOCATION_DRAFT_FIELD].input.budgetUsd,150000);
+ assert.equal(h.render().find(n=>n.type==='PositionFinancePanel').props.initialFinanceRevision,null);assert.equal(h.focused(),'Current position scenario');
+});
+
+test('native reopen revalidates goal at confirmation and inactive planner keeps form draft',()=>{
+ const draft=example();draft.input.budgetUsd=234567;const h=renderHarness(draft),before=JSON.stringify(h.fields);
+ h.setProps({active:false});assert.equal(h.render().find(n=>n.type==='PositionFinancePanel').props.active,false);assert.equal(JSON.stringify(h.fields),before);
+ h.render().find(n=>n.type==='select'&&n.props['aria-label']==='Saved position revision').props.onChange({target:{value:'saved-original:1'}});
+ h.click('Open revision (replace draft)');h.flush();h.data.goals.activeId='different';h.click('Replace current draft');assert.equal(h.writes(),0);assert.equal(JSON.stringify(h.fields),before);
+});
+
+
+test('native reopen retains unsupported persisted draft rather than replacing it with a saved revision',()=>{
+ const unsupported={...example(),modelVersion:'unsupported-next-version'},h=renderHarness(unsupported),before=JSON.stringify(h.fields);
+ h.render().find(n=>n.type==='select'&&n.props['aria-label']==='Saved position revision').props.onChange({target:{value:'saved-original:1'}});
+ h.click('Open revision (replace draft)');h.flush();assert.equal(h.writes(),0);assert.equal(JSON.stringify(h.fields),before);assert.equal(confirmation(h),undefined);
+ assert.ok(h.render().some(n=>n.props?.role==='alert'&&typeof n.props.children==='string'&&n.props.children.includes('unsupported and has been retained')));
 });

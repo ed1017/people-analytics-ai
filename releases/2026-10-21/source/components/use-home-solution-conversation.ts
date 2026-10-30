@@ -17,7 +17,8 @@ import {editRequiredStaffingLocally,currentRequiredStaffing,resolveStaffingDeliv
 import {prepareRequiredStaffingPlan,requiredStaffingPlanFields} from '@/lib/home-required-staffing-plan-save';
 import {prepareHiringPlan,prepareConditionalHiringPlan,hiringPlanFields,type HiringPlanSelection} from '@/lib/home-hiring-plan-save';
 import {currentHiringBudget,editHiringBudgetLocally,restoreHiringBudgetBaseline,type HiringBudgetReview} from '@/lib/home-hiring-budget';
-import type {RequiredStaffingInput} from '@/lib/required-staffing';
+import type {RequiredStaffingInput,RequiredStaffingCostBasis} from '@/lib/required-staffing';
+import {currentStaffingPresentationField,captureCurrentStaffingPresentation,currentStaffingPresentation} from '@/lib/current-required-staffing-summary';
 import type {HiringBudgetInput} from '@/lib/hiring-budget';
 import {readChatEvidenceSeries,type ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 import {prepareBusinessPlanningSelection,businessPlanningSelectionFields,businessPlanningReceiptField,type BusinessPlanningSelection} from '@/lib/home-business-planning-save';
@@ -84,7 +85,7 @@ export function useHomeSolutionConversation(props:Props){
  }
  function requireCurrent(){const p=currentProps.current,snapshot=decisionStore.getSnapshot();if(!mounted.current||!p.enabled||!p.active||!p.settled||!snapshot.saved||!p.conversation.storageReady||p.conversation.issueEditor||snapshot.data.goals.activeId!==p.conversation.activeGoalId||(snapshot.data.goals.goals.find(g=>g.id===snapshot.data.goals.activeId)?.statement??'')!==p.conversation.focusedIssue)throw Error('The goal, sources or browser storage changed. Your earlier work is kept.');return snapshot;}
  function storedRecipes(){const p=currentProps.current,data=decisionStore.getSnapshot().data;return (p.conversation.activeGoalId?data.workspaces[p.conversation.activeGoalId]:data.exploration)?.fields[publicAiEvidenceField];}
- function persist(state:SolutionState,recipes?:unknown,visual?:unknown){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json,...(visual===undefined?{}:{[homeAnswerVisualField]:visual as Json}),...(recipes===undefined?{}:{[publicAiEvidenceField]:recipes as Json})});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else if(!p.guided?.goalId)decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
+ function persist(state:SolutionState,recipes?:unknown,visual?:unknown,staffingPresentation?:unknown){const p=currentProps.current,snapshot=requireCurrent(),build=()=>({[solutionConversationField]:state as unknown as Json,...(staffingPresentation===undefined?{}:{[currentStaffingPresentationField]:staffingPresentation as Json}),...(visual===undefined?{}:{[homeAnswerVisualField]:visual as Json}),...(recipes===undefined?{}:{[publicAiEvidenceField]:recipes as Json})});if(p.conversation.activeGoalId)decisionStore.commitGoalFields(p.conversation.activeGoalId,p.conversation.focusedIssue,snapshot.data.revision,new Date().toISOString(),build);else if(!p.guided?.goalId)decisionStore.commitExplorationFields(snapshot.data.revision,new Date().toISOString(),build);memoryRef.current=state;setMemory(state);}
  function selectedPlanId(value:PlanAlternatives|null){const p=currentProps.current,target=p.target();return target?.goalId===p.conversation.activeGoalId&&value?.order.includes(target.id)?target.id:null;}
  function makeRequest(text:string):SolutionRequest{
   const p=currentProps.current,current=catalog(true),params=new URLSearchParams(p.query),progress=captureGoalProgressInput(decisionStore,p.conversation.activeGoalId);
@@ -163,11 +164,11 @@ export function useHomeSolutionConversation(props:Props){
   }catch(error){setNotice((error as Error).message);}finally{setSaving(false);}
  }
  function reject(item:SolutionEvaluation){try{requireCurrent();const state=structuredClone(memoryRef.current),turnId=crypto.randomUUID();state.turns=[...state.turns,{id:turnId,role:'user' as const,text:`Discard proposal ${item.candidate.name}, revision ${item.revision}.`}].slice(-32);state.rejected=[...state.rejected,{candidateId:item.id,revision:item.revision,reason:'Discarded using the proposal review control.',turnId}].slice(-24);if(state.focusCandidateId===item.id)state.focusCandidateId=null;persist(state);}catch(error){setNotice((error as Error).message);}}
- function updateRequiredStaffing(expected:string,inputs:RequiredStaffingInput){
+ function updateRequiredStaffing(expected:string,inputs:RequiredStaffingInput,costBasis?:RequiredStaffingCostBasis){
   if(controller.current||pending||saving)throw Error('Wait for the current request before applying staffing changes.');
   requireCurrent();const request=makeRequest('Apply locally reviewed staffing assumptions.');
-  const review=editRequiredStaffingLocally(request,decisionStore.getDatasetToken(),expected,inputs);
-  persist({...memoryRef.current,requiredStaffing:review});
+  const review=editRequiredStaffingLocally(request,decisionStore.getDatasetToken(),expected,inputs,costBasis);
+  persist({...memoryRef.current,requiredStaffing:review},undefined,undefined,captureCurrentStaffingPresentation(review,memoryRef.current.turns));
  }
  function clearRequiredStaffing(){
   if(controller.current||pending||saving)throw Error('Wait for the current request before clearing this comparison.');
@@ -295,5 +296,7 @@ export function useHomeSolutionConversation(props:Props){
  const raw=storage.data.workspaces[goal.id]?.fields[planAlternativesField],saved=raw?readPlanAlternatives(raw,{goalId:goal.id,goal:goal.statement}):null;
  const storedVisual=(goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[homeAnswerVisualField];
  const restoredAnswerSeries=restoreHomeAnswerVisual(storedVisual,JSON.stringify([props.scope,props.query]),decisionStore.getDatasetToken(),memory.turns);
- return {adjustBusinessAssumptions,updateRequiredStaffing,saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
+ const staffingParams=new URLSearchParams(props.query),staffingScope=JSON.stringify([goal,props.scope,{country:staffingParams.get('country')||'all',org:staffingParams.get('org')||'all',level:staffingParams.get('level')||'all'}]);
+ const staffingPresentation=memory.requiredStaffing?.datasetToken===decisionStore.getDatasetToken()&&memory.requiredStaffing.scopeKey===staffingScope?currentStaffingPresentation((goal.id?storage.data.workspaces[goal.id]:storage.data.exploration)?.fields[currentStaffingPresentationField],memory.requiredStaffing,memory.turns):null;
+ return {staffingPresentation,adjustBusinessAssumptions,updateRequiredStaffing,saveProjectionEntry,saveProjectionEdit,adjustBusinessMix,resetHiringScenario,restoredAnswerSeries,staffingDeliveryTarget,pinRequiredStaffing,pinnedRequiredStaffing,hiringEditorDirty:hiringEdit?.dirty===true&&hiringEdit.key===JSON.stringify(memory.hiringBudget),setHiringEditorDirty,reviewHiringPlan,saveHiringPlan,previewPlanningInputs,editPlanningInputs,answerSeries,clearRequiredStaffing,updateHiringBudget,clearBusinessPlanning,reviewBusinessOption,saveBusinessOption,state:memory,pending,pendingStartedAt,saving,notice,send,cancel,save,reject,saved,canSend:props.enabled&&props.active&&props.settled&&props.conversation.storageReady&&props.conversation.saved&&!props.conversation.issueEditor};
 }

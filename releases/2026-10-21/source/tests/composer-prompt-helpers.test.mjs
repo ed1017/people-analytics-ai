@@ -76,3 +76,7 @@ test('helper cards share centered sizing and center an odd final card only on de
   a.doesNotMatch(button.props.className,/items-start|text-left/);
  }
 });
+
+ test('position template opens shared planner without editing or sending the chat draft',()=>{
+  const {PromptTemplates}=component();let opened=0,edited=0;const tree=PromptTemplates({value:'Keep my question',onChange:()=>edited++,textareaRef:{current:null},onPlanFromPositions:()=>opened++});const buttons=walk(tree).filter(n=>n.type==='button');a.equal(buttons.length,4);buttons.at(-1).props.onClick();a.equal(opened,1);a.equal(edited,0);a.equal(buttons.at(-1).props.type,'button');a.match(renderToStaticMarkup(tree),/\[Template\] Plan staffing from positions/);
+ });
