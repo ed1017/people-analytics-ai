@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR475 current - compact Workforce ratings; PR474 recovery
+### PR477 current - comparison snapshot recovery
+
+PR477 has been promoted at runtime `0e1136ea573090dabdbc67b17c8f6876aa9a43db`, merge `6c9b2440a9c15bab72e3b03a7eda26766c0efe7a`, deployment `dpl_CkEfXmvoh2XFinv3KKUavzx5jbUb`. Exact-head CI `41113203658` passed. Staged desktop and mobile each completed 13 functional checks; desktop teardown stalled with a partial report, and mobile recorded close/route-handled test-peer transport errors. Public desktop and mobile each passed 13 functional checks with zero page errors, blocked requests or bridge errors and drained teardown. Each run used one locally fulfilled captured calculator response; no upstream calculator or model POST was made during browser acceptance. [Release evidence and limits](comparison-snapshot-recovery-2026-10-30.md).
+
+Older general-exploration workforce comparison snapshots now have strict recorded-output validation, separate confirmed export/restore, conflict checks and write-before-state save/delete handling. Current inputs and names survive storage failure; goal-linked plans remain isolated in the existing saved-work backup. Restored snapshots retain their historical assumptions and outputs; they are not recalculated or authenticated against current source data.
+
+### PR475 previous release - compact Workforce ratings; PR474 recovery
 
 PR475 is live at runtime `fc181d20ad4c716b7dcdeb8ae2d8fb8f5fd6d6c6`, merge `bda92ab81fab222da76e70aafe543728a6220e4f`, deployment `dpl_6tE2Hna459BDrvQXpSh8pBpEfeFo`. Exact-head CI `41110227539` passed. Public desktop (1440px) and mobile (390px) each passed eight affected-flow checks with no page or bridge errors and no provider attempts. Workforce now includes compact ratings using the existing 2026 YTD source and matching population/scope; Career Growth remains compatible. [Release evidence and limits](recovery-ratings-2026-10-30.md).
 
@@ -22,7 +28,7 @@ The actual Vercel scheduled renewal returned HTTP 200 on October 30 at 06:00:08 
 
 Saved position and optional funding revisions now bind to an explicit target date in Action plans. Track accepts fractional ready FTE in existing vacancies; corrections append history and Review compares only compatible dates and scope. Proposed additional positions remain separate. The existing saved-work backup preserves these relationships. No paid provider calls or guard changes.
 
-Active recovery work: older separately saved workforce comparison snapshots need a strict validated export/restore contract and explicit save-failure path; that separate branch is not live. Standalone risk/trend saved scenarios are covered by PR474. Unsaved drafts, recovery state, preferences, other datasets and full database reconstruction remain outside these backups. Authoritative role/location applicant availability and completed hiring-time evidence remain incomplete; employment stock, vacancies and jobseekers are different measures. Denied BLS, Canadian and German archive routes must not be bypassed. Fresh provider-answer acceptance remains separate. FoW/Lab methodology validation and handoff retesting are user-owned, not an agent backlog. Target overlays remain preview-only; video and new findings pinning remain deferred.
+PR477 ships publicly verified recovery for older separately saved workforce comparison snapshots. These use separate controls rather than the goal-linked saved-work export. Standalone risk/trend saved scenarios are covered by PR474. Unsaved drafts, recovery state, preferences, other datasets and full database reconstruction remain outside these backups. Authoritative role/location applicant availability and completed hiring-time evidence remain incomplete; employment stock, vacancies and jobseekers are different measures. Denied BLS, Canadian and German archive routes must not be bypassed. Fresh provider-answer acceptance remains separate. FoW/Lab methodology validation and handoff retesting are user-owned, not an agent backlog. Target overlays remain preview-only; video and new findings pinning remain deferred.
 
 ### PR470 live - issue exploration and populated position model v2
 
