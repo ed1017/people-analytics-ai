@@ -7,6 +7,8 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 | Freshly verified | 22 desktop and 7 mobile routes rendered without page exceptions or horizontal overflow. Headcount, position drilldown, six-month what-if, UK/Toronto references, intro, About and settings received bounded interaction checks. |
 | Save and Track verified | Both 1440px and 390px completed nine steps: guided example, option selection, reviewed goal/plan save, Action plans, Track, dated 2-role report, correction to 3 roles, and reload retaining current and superseded history. |
 | Talent Inventory and market explorer live | PR461 publishes the complete modeled register and goal-isolated vacancy scenarios, with immutable revisions and native-unit market carries. Staged/public desktop/mobile each passed 14 checks. Genuine position/location/FTE records and applicant availability remain limited. |
+| Position results live | PR472 connects exact saved allocation/funding revisions to explicit dated ready-FTE targets, manual results/corrections, Review and existing backup. Staged/public desktop/mobile each passed seven checks. Proposed positions remain separate from existing-vacancy readiness. |
+| KPI targets and risks live | PR471 shares one scope/period-matched evaluator across KPI status and red Workforce Risks. Missing comparisons remain neutral; target-line overlays are preview-only. |
 | Shared planner live | PR469 native positions and staffing assumptions share Overview; exact funding adoption, horizon edits and updated-answer receipt passed 32 public desktop/mobile checks. No paid model interpretation tested. |
 | Position funding and Overview entry live | PR465/466 add immutable funding comparisons and explicit saved-revision selection in Overview. Public desktop/mobile preserved drafts, goals and revisions; explanations used versioned mocks, not paid model calls. Finance source approval remains unavailable. |
 | Density verified on representative routes | PR464/465 preserve controls and saved work; mobile inventory and Action plans fixtures decreased about 38% and 53% respectively. This is not an all-page geometry claim. |
@@ -28,9 +30,9 @@ Career Growth rejected valid 9,037-person ratings using an older 10,000-person c
 
 ## Current release
 
-PR466 is live at runtime `8542b077484ba44df39d556a7a44c8cb8b2b7805`, deployment `dpl_3jSAS1C2NWu1ibwPC4g9tBuDYjbo`. Exact-head CI, full build/TypeScript, independent review and six public checks at each of 1440px/390px passed. It includes PR465 position funding and Action plans density, PR463 renewal repair and PR464 shared density. [Position acceptance and limits](position-finance-2026-10-30.md).
+PR472 is live at runtime `ea458ff6ecf28d3fa82b9f98f0b4d31abedd6fc7`, merge `9622a7b074b70a770bf5764620b4b3b353cbaaa7`, deployment `dpl_9DZmU9f4xStw8uZTZGdA2YnRYDCo`. Independent review, focused regression, isolated production build/TypeScript and exact-head CI `41102562384` passed. Both staged and public desktop (1440px) and mobile (390px) passed seven acceptance checks each. [Release evidence and limits](position-results-2026-10-30.md).
 
-Readiness recovery was verified without provider requests. The next scheduled renewal is October 30 at 06:00 UTC and remains unobserved at this checkpoint. General capacity optimization is separate from the explicitly selected position scenario; no authenticated Finance approval adapter is connected.
+PR470 modeled register v2 fills country/FTE using deterministic aggregate-constrained assumptions while preserving v1 saves. PR469 provides the shared position/staffing planner. No authenticated Finance approval adapter is connected. The actual October 30 06:00 UTC scheduled renewal succeeded with unchanged terms; no provider request was made. Broader fresh model-answer acceptance remains separate.
 
 ## Previous inventory and market release
 

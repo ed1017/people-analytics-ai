@@ -2,15 +2,19 @@
 
 ## Current live release and active parallel work
 
-### PR471 live; position-result handoff in progress
+### PR472 live - position scenarios through Track and Review
 
-PR471 runtime `cbbb4abd63f3b5bfbe023f0f783a2875e61b48c9`, merge `dc60cd78672256c42add0aa431f7f24c31e442ca`, deployment `dpl_A58qjcD99nmQ3HBLhf2U58UcNcHf`. Exact-head CI `41002546750`, independent review, isolated build, 20 staged and 20 public desktop/mobile checks passed. One evaluator now connects editable, scope/period-matched KPI targets to all red Workforce Risks. Raw counts and missing/mismatched comparisons remain neutral. Target-line overlay is delivered as a preview only and awaits user approval.
+PR472 is live at runtime `ea458ff6ecf28d3fa82b9f98f0b4d31abedd6fc7`, merge `9622a7b074b70a770bf5764620b4b3b353cbaaa7`, deployment `dpl_9DZmU9f4xStw8uZTZGdA2YnRYDCo`. Independent review, focused regression, isolated production build/TypeScript and exact-head CI `41102562384` passed. Both staged and public desktop (1440px) and mobile (390px) passed seven acceptance checks each. [Release evidence and limits](position-results-2026-10-30.md).
+
+Previous PR471 runtime `cbbb4abd63f3b5bfbe023f0f783a2875e61b48c9`, merge `dc60cd78672256c42add0aa431f7f24c31e442ca`, deployment `dpl_A58qjcD99nmQ3HBLhf2U58UcNcHf`. Exact-head CI `41002546750`, independent review, isolated build, 20 staged and 20 public desktop/mobile checks passed. One evaluator now connects editable, scope/period-matched KPI targets to all red Workforce Risks. Raw counts and missing/mismatched comparisons remain neutral. Target-line overlay is delivered as a preview only and awaits user approval.
 
 PR468 business labels/template (runtime `6c09a9a7fb90054ac67c3bbe08f68403e3601a7f`, deployment `dpl_FpXZyAxXfw2WbMaoZy6vXkMgnTsY`), PR469 shared planner and PR470 populated register/exploration prompts are all included and publicly verified. Their earlier release records below remain historical evidence.
 
 The actual Vercel scheduled renewal returned HTTP 200 on October 30 at 06:00:08 UTC (`vercel-cron/1.0`); immutable verification 9 was observed at 06:00:09.263 UTC, valid through October 31 at 06:00:09.263 UTC. Prices, cap and permission boundary were unchanged. Public readiness returned configured. This supersedes the pending scheduled-observation entries below; no model call was made.
 
-Active bounded gap: position allocations save correctly but do not appear in Track/Review, whose contracts only recognize headcount and whole-role plans. Add an explicit target-date handoff for an exact saved position/funding revision, tracking calculated ready FTE in existing vacancies through the existing manual-result/correction and backup model. Proposed additional positions remain separate and contribute zero ready FTE. No automatic date, Finance approval, completed hire, or outcome inference. Implementation/acceptance pending; not live.
+Saved position and optional funding revisions now bind to an explicit target date in Action plans. Track accepts fractional ready FTE in existing vacancies; corrections append history and Review compares only compatible dates and scope. Proposed additional positions remain separate. The existing saved-work backup preserves these relationships. No paid provider calls or guard changes.
+
+Remaining priorities: cross-store backup coverage; authoritative role/location applicant availability and hiring-time evidence; fresh provider-answer acceptance when separately authorized; Lab validation/retest. Historical performance/survey filter requests require current-contract reconciliation before implementation. Canadian archive access remains evidence-gated; do not bypass the prior 403. Target overlays, video and new findings pinning remain deferred or awaiting owner choice.
 
 ### PR470 live - issue exploration and populated position model v2
 
