@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "50be43dbe2af0002ddc3727330e16f137f0e336920a533f44b570889c9503d87",
-      "bytes": 107198
+      "sha256": "cf08b6a119cf2ea95d867b46e8bedd2eda67b45d03d3fffd373b87c51b1c0fb3",
+      "bytes": 107564
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "b971801395a5ffc802a2f3fd6da8410d398880ac37992ae11b2d685b73391eb6",
-      "bytes": 73208
+      "sha256": "26cd157eb402275da7560e9839c6acfadda4b987a7758ab01d801495f7d8841c",
+      "bytes": 73211
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -884,8 +884,8 @@
     },
     {
       "path": "components/project-case-study.tsx",
-      "sha256": "1134b49ebe4c12adf048250e68548bb683822f95748565f4ea2e9b75ff79cd1e",
-      "bytes": 3126
+      "sha256": "ad466b3f65baca95a31d82e821a9bcb36e889beed166a66eec3378494bcd5d86",
+      "bytes": 3111
     },
     {
       "path": "components/projection-backtest-details.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "b07213dabc178e16d9a20bead4070cd8aa3c91402ec6faca54625d9b5e740573",
-      "bytes": 38076
+      "sha256": "aebece53e4eb1dc4db9250053708df8bc1e6eb95d335f7a12b4b4696aaa60ef3",
+      "bytes": 38048
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -1209,8 +1209,8 @@
     },
     {
       "path": "components/workforce-planning/planning-landing.tsx",
-      "sha256": "01bd0df288f4331b0802257c52e1fdba09b49cc7afbaf34ed9f27b1803729e46",
-      "bytes": 6614
+      "sha256": "530d78491574274e58a5f5ac67ea9a652275ffb1b94a647dc6db6cac5564e8f9",
+      "bytes": 6595
     },
     {
       "path": "components/workforce-planning/planning-overview.tsx",
@@ -4239,8 +4239,8 @@
     },
     {
       "path": "components/home-risk-summary.tsx",
-      "sha256": "17ea3188d5a0c5725ac97b99a828e4de72f2184cfc8cfab7be874cdf885131f0",
-      "bytes": 7069
+      "sha256": "c7654c0568ce3b51683e789997a09221ffd87cda3b8edb722b0b4b349727c4bd",
+      "bytes": 7048
     },
     {
       "path": "lib/dashboard-risk-summary.ts",
@@ -4284,8 +4284,8 @@
     },
     {
       "path": "components/planner-design-preview.tsx",
-      "bytes": 12413,
-      "sha256": "2fbf5290eca3660ddf0296bee8088ce47d13e84d497cc08af614e04533437c45"
+      "bytes": 12364,
+      "sha256": "fbc1faa6914afb426dffec09c3cb44d30145a6b45b512795abf95e4282d6dbe2"
     },
     {
       "path": "lib/planner-display.ts",
@@ -4444,8 +4444,8 @@
     },
     {
       "path": "tests/dashboard-risk-presentation.test.mjs",
-      "bytes": 3851,
-      "sha256": "f7f3a2ab08b6cc5fea7956b31bb7bf4e36194bf799cb23cd1c426606ef89f0f2"
+      "bytes": 3874,
+      "sha256": "76fea65757951972ea74df0228ccc8d39b259b3022331eea801f796cd3dc52b7"
     },
     {
       "path": "tests/demo-company-profile.test.mjs",
@@ -4604,8 +4604,8 @@
     },
     {
       "path": "components/synthetic-capacity-risk-scenario.tsx",
-      "bytes": 2195,
-      "sha256": "4b49ea76a567b50c47383ded9d32cd1325f93aa6c084f7e8ec7868d3d2d0c3b4"
+      "bytes": 2198,
+      "sha256": "e5a9a6bc3e9ca62a2163dfea6052773164567a8d0cfd675479eefc1b49f1f3e6"
     },
     {
       "path": "lib/home-turnover-investigation.mjs",
@@ -4889,8 +4889,8 @@
     },
     {
       "path": "components/workforce-planning/talent-inventory-scenarios.tsx",
-      "bytes": 35697,
-      "sha256": "5f43041e8de02f722032c72d8448bbcee014a5b2cef59d12043b9bd812784054"
+      "bytes": 35668,
+      "sha256": "f8b89fb77811e594a4f58235c19842773660fdc95a72accc21153dd5073a2830"
     },
     {
       "path": "lib/data/position-inventory-constraints-v1.json",
@@ -4934,8 +4934,8 @@
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
-      "bytes": 12045,
-      "sha256": "915c51c0c1fc318d69b7b08eaa6fb8b5636431c78c9348b14fd272e04d052c34"
+      "bytes": 12039,
+      "sha256": "3426bd8143a3a16558cfea4ca28378785d9692099afa6c8a4b9af512c4d02f50"
     },
     {
       "path": "components/workforce-planning/position-scenario-explanation.tsx",

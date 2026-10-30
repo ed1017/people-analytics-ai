@@ -2063,7 +2063,7 @@ export function WorkforcePlanningPage({
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4 space-y-4">
             <details className="rounded-xl border border-primary/30 bg-primary/5 p-4" data-worked-example-entry>
-              <summary className="min-h-11 cursor-pointer rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Open worked example</summary>
+              <summary className="min-h-11 cursor-pointer rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Open staffing scenario</summary>
               <PlanningLanding />
             </details>
             <p className="text-sm text-muted-foreground">Try the populated example above, or enter your own work and team below to save and compare scenarios.</p>
