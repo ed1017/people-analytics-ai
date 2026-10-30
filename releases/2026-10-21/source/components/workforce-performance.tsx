@@ -1,11 +1,12 @@
+import { SyntheticWorkforceHistory } from '@/components/synthetic-workforce-history';
 import { resolveWorkforcePerformance, resolvePublicWorkforcePerformance, supportsPerformanceFilters, type PerformanceFilters } from '@/lib/workforce-performance';
 import type { SelectedBusinessContext } from '@/lib/talent-evidence-scope';
 
-/** One workforce, the existing top filters, and no fixture data imported at runtime. */
+/** Current ratings remain separate from the optional modeled historical explorer. */
 export function WorkforcePerformanceField({ value, filters, selectedContext, population, scopeReceipt, loading = false, ratingsOnly = false }: { value: unknown; filters: PerformanceFilters; selectedContext: SelectedBusinessContext; population?: number | null; scopeReceipt?: unknown; loading?: boolean; ratingsOnly?: boolean }) {
   const result = loading ? null : resolvePublicWorkforcePerformance(value, filters, population, scopeReceipt) ?? resolveWorkforcePerformance(value, filters, population);
   const counts = result?.counts;
-  return <section className={ratingsOnly ? "min-w-0 rounded-lg border p-4" : "mb-6"} aria-label={ratingsOnly ? "Workforce performance" : "Workforce career measures"}>
+  const currentRatings = <>
     <p className="text-sm text-muted-foreground">Workforce at 30 Sep 2026 · 2026 year to date</p>
     <p className="mt-1 text-xs text-muted-foreground">{ratingsOnly && "Ratings scope: "}{selectedContext.country} · {selectedContext.businessUnit} · {selectedContext.level}</p>
     <div className={ratingsOnly ? "mt-2 min-w-0" : "mt-4 evidence-panel-grid grid min-w-0 gap-4"}>
@@ -27,6 +28,9 @@ export function WorkforcePerformanceField({ value, filters, selectedContext, pop
       </>}
     </div>
     <details className="mt-3 text-xs text-muted-foreground"><summary className="min-h-11 cursor-pointer py-2 font-medium">Details</summary><p>Numeric ratings are ordinal categories. Rating names, calibration and not-rated status are unavailable. The displayed September 30 date is a dataset convention.</p></details>
+  </>;
+  return <section className={ratingsOnly ? "min-w-0 rounded-lg border p-4" : "mb-6"} aria-label={ratingsOnly ? "Workforce performance" : "Workforce career measures"}>
+    {ratingsOnly ? <SyntheticWorkforceHistory filters={filters} scopeReceipt={scopeReceipt} loading={loading}>{currentRatings}</SyntheticWorkforceHistory> : currentRatings}
   </section>;
 }
 function UnavailableMeasure({ title, unit, reason }: { title: string; unit: string; reason: string }) {

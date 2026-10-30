@@ -11,7 +11,12 @@ let compiled;
 for(const file of files){const r=ts.transpileModule(fs.readFileSync(new URL(file,candidate),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020},reportDiagnostics:true,fileName:file});assert.equal(r.diagnostics.length,0,file);if(file==='components/workforce-performance.tsx')compiled=r.outputText;}
 const model=await import(new URL('lib/workforce-performance.ts',root));
 const {PUBLIC_9037:P}=await import(new URL('lib/public-9037-contract.mjs',root));
-const module={exports:{}};vm.runInNewContext(compiled,{module,exports:module.exports,require:name=>name==='@/lib/workforce-performance'?model:require(name)});
+const historyModel=await import(new URL('lib/synthetic-workforce-history.ts',root));
+const scopeModel=await import(new URL('lib/dashboard-scope.ts',root));
+const historyModule={exports:{}};
+const historyCode=ts.transpileModule(fs.readFileSync(new URL('components/synthetic-workforce-history.tsx',root),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+vm.runInNewContext(historyCode,{module:historyModule,exports:historyModule.exports,require:name=>name==='@/lib/synthetic-workforce-history'?historyModel:name==='@/lib/dashboard-scope'?scopeModel:require(name)});
+const module={exports:{}};vm.runInNewContext(compiled,{module,exports:module.exports,require:name=>name==='@/lib/workforce-performance'?model:name==='@/components/synthetic-workforce-history'?historyModule.exports:require(name)});
 const filters={country:'all',org:'all',level:'all'};
 const receipt={version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:'All',basis:'Verified public synthetic aggregate',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'};
 const value={version:'ratings-9037-2026-09-30-offline-v1',source:'employee_snapshots JOIN performance_reviews',snapshotDate:P.cutoff,reviewPeriod:'2026 YTD',periodKind:'ytd',filters,status:'available',availabilityKind:'simulated_convention',simulatedAvailableAt:'2026-09-30T23:59:59.999Z',originalAvailableAt:null,provenance:'Constructed synthetic workforce; deterministic all-active demo ratings; not observed performance.',notRatedStatus:'not_collected',counts:{population:9037,rated:9037,ratings:[396,1071,4634,2409,527],notRated:null,unavailable:0}};
