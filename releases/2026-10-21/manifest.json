@@ -1234,8 +1234,8 @@
     },
     {
       "path": "components/workforce-planning/position-workforce-design-destination.tsx",
-      "sha256": "57fc21cb5c39b42f582c14e0a26d8f5022ba24e267a77ed6b7d14b9de517fc13",
-      "bytes": 4560
+      "sha256": "a4cd572e663e488209433ddfc66201ca679d1dc6a6cf83ce23418454a2acd3e0",
+      "bytes": 4896
     },
     {
       "path": "components/workforce-planning/response-portfolio-allocation-section.tsx",
@@ -1404,8 +1404,8 @@
     },
     {
       "path": "lib/app-navigation.ts",
-      "sha256": "07de0971e75ccb4737650106317b4063b6c59bec3437db5920196cd8724ecf1f",
-      "bytes": 7376
+      "sha256": "bfdf6258a5ea724b0e0e1c185e174ccb29050b146b1d3a7ef9049086ce16cc95",
+      "bytes": 7364
     },
     {
       "path": "lib/app-page-url.ts",
@@ -3079,8 +3079,8 @@
     },
     {
       "path": "lib/planning-journey.ts",
-      "sha256": "c323bce7ecbec5499dbb19f9b2565ef23baa8f62b17372ebc950bc1171c9729a",
-      "bytes": 678
+      "sha256": "db4b4ffc775b345a95316da2ac84d067bff1765b36eecb185f371f6a60a9d08a",
+      "bytes": 744
     },
     {
       "path": "lib/planning-slider.ts",
@@ -4839,8 +4839,8 @@
     },
     {
       "path": "lib/decision-backup.ts",
-      "bytes": 4884,
-      "sha256": "0a95a7d1dccdc759fb1a6f36bce847471f49dc32a3bed643948e9b2422c208c0"
+      "bytes": 5260,
+      "sha256": "873570aa4dea140af52f90bdabd7a6fb14e38264add25f194ba86602613bef91"
     },
     {
       "path": "tests/decision-backup-store.test.mjs",
@@ -4881,9 +4881,55 @@
       "path": "tests/market-explorer.test.mjs",
       "sha256": "94faff4cd2c26f0c1bba42e1cc7dd28e2a000243dbc56ee3f5bc33e7151ebca0",
       "bytes": 5696
+    },
+    {
+      "path": "components/workforce-planning/position-allocation-visuals.tsx",
+      "sha256": "5b6ef83cccb2b2e564c4fffb32ab5550b89bd1bf42e2546299c807ebc1565644",
+      "bytes": 5271
+    },
+    {
+      "path": "components/workforce-planning/talent-inventory-scenarios.tsx",
+      "sha256": "52cdc62be6c534676990e48305a5107c7aac43582dcd685fefc29c2a3bb64daa",
+      "bytes": 31907
+    },
+    {
+      "path": "lib/data/position-inventory-constraints-v1.json",
+      "sha256": "bf8787b12a41a99a710985d46fdb567b1d3f62e332b070bc8ce580e7570f4e06",
+      "bytes": 656543
+    },
+    {
+      "path": "lib/position-allocation-store.ts",
+      "sha256": "d6553a79f30fad1215b74aa623663b8008420020d7d50b88df577210647c1086",
+      "bytes": 4762
+    },
+    {
+      "path": "lib/position-allocation.ts",
+      "sha256": "b13c6de9d778b60ee7989819b6fe38e17534b6334f2f35f8b4f134913ffc47ab",
+      "bytes": 10914
+    },
+    {
+      "path": "lib/position-inventory.ts",
+      "sha256": "036e6eba61fdb858feebc136ada4e4e94f45487c3fd8cd19461a36850f595df2",
+      "bytes": 7720
+    },
+    {
+      "path": "tests/manual/check-position-feature-types.mjs",
+      "sha256": "a2a89ae2ba3abae6a214d2546be5d4530cdf238edb6bd883defafeeb589db171",
+      "bytes": 1685
+    },
+    {
+      "path": "tests/position-allocation-store.test.mjs",
+      "sha256": "32d878694897db901e6717bba6e27fbab038b766b6eb4afb0a71763f5aab1610",
+      "bytes": 6006
+    },
+    {
+      "path": "tests/position-allocation.test.mjs",
+      "sha256": "6e30772d35c149979e326c7fc6c85fcaed44855f1a32030b1c46468a64f95a1f",
+      "bytes": 9802
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
   "verifiedDeployedArchiveSha256": "37afb09d30b6a4ea130a44e71260547c09224d6ea735b7d50f42a33f5877aca0",
-  "overlayBasePublicCommit": "388906336efb501f0dc9ebc595880fe2468c1676"
+  "overlayBasePublicCommit": "388906336efb501f0dc9ebc595880fe2468c1676",
+  "positionScenarioOverlayBasePublicCommit": "c5899c59cbe5d25def4b2965be6d651d22069b19"
 }

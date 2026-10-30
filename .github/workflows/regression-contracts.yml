@@ -51,7 +51,10 @@ jobs:
         run: node --test tests/public-pricing-verifier.test.mjs tests/public-pricing-renewal.test.mjs tests/public-pricing-policy.test.mjs tests/public-planner-ledger.test.mjs tests/public-planner-round.test.mjs
       - name: Verify chart-first positions and intro controls
         working-directory: releases/2026-10-21/source
-        run: node --test tests/position-dashboard.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
+        run: node --test tests/position-dashboard.test.mjs tests/position-allocation.test.mjs tests/position-allocation-store.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
+      - name: Verify position scenario type graph
+        working-directory: releases/2026-10-21/source
+        run: node tests/manual/check-position-feature-types.mjs
       - name: Verify sourced workforce evidence and synthetic workload
         working-directory: releases/2026-10-21/source
         run: node --test tests/home-turnover-investigation.test.mjs tests/external-workforce-evidence.test.mjs tests/market-explorer.test.mjs tests/synthetic-capacity-risk.test.mjs tests/dashboard-risk-presentation.test.mjs tests/swp-capacity-cost.test.mjs tests/group-capacity-risk.test.mjs
