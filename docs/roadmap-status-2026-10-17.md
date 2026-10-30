@@ -2,11 +2,23 @@
 
 ## Current live release and active parallel work
 
-### PR460/461 live - market explorer and Talent Inventory
+### PR466 live - explicit Overview position planning
+
+Runtime `8542b077484ba44df39d556a7a44c8cb8b2b7805`, merge `f211f0962599fd70b79d6631e1aa2a305d4e9c95`, deployment `dpl_3jSAS1C2NWu1ibwPC4g9tBuDYjbo` (https://people-analytics-3lk9yk9fd-ed-56dc.vercel.app). Exact-head CI `40988996177`, 37 focused tests, full isolated runtime build/TypeScript and independent review passed. Public desktop/mobile each passed six checks: fresh keyboard-accessible entry, draft-preserving navigation, explicit saved-revision calculation, bound mocked explanation, goal isolation and reload without automatic selection or horizontal overflow. No paid calls; generated explanation quality was not tested.
+
+Overview now offers **Plan from positions** without a written prompt. It uses an explicitly selected saved allocation and funding comparison, or routes to Talent Inventory. General capacity optimization remains separate; modeled budgeted flags are not verified Finance approvals. PR465 funding comparisons preserve immutable allocation/revision bindings, unknown approval, proposed additional positions and frozen/on-hold release requirements. No authenticated Finance source adapter is connected. [Contracts and acceptance](position-finance-2026-10-30.md).
+
+The composed release includes PR464 density, then PR463 renewal repair, then PR465 funding/Action plans, then PR466 Overview. PR465 public desktop/mobile passed its position checks and seven Action plans checks per width; the measured mobile Action plans fixture decreased from 5,625 to 2,645 px. Representative checks do not establish that every page is equally compact.
+
+Scoped AI readiness was restored without paid calls. The approved document fingerprint update preserved rates, cap, reservations, ACL and 24-hour validity. Recovery verification expires October 31 at 01:23:38.632 UTC. The next actual scheduled renewal is **October 30 at 06:00 UTC**, not yet observed at this release checkpoint. [Renewal evidence and release order](density-renewal-release-2026-10-30.md).
+
+Remaining: authenticated Finance evidence, broader fresh model-answer acceptance, actual scheduled renewal observation, external applicant-availability/hiring-time evidence and Lab retest. Existing deferred features and cross-store backup limits remain unchanged.
+
+### PR460/461 - market explorer and Talent Inventory (previous release)
 
 Candidate `8d3c6d212f25e5ce3c9c9f186578e8649f24bede`, deployment `dpl_CZ9qXzZoDfJNgHtsWmZnaqrzj5Pq`, merge `65fa9c5881d986104da8e5a14364d896d9f79726`. Company-scale modeled position inventory and editable vacancy allocations now save immutable goal-scoped revisions and compare/reopen them. The separate 12-vacancy worked example supports hire 3 / repurpose 6 / train 3. Market references retain dated/native-unit evidence and an optional qualitative training comparison.
 
-Independent review, exact-head CI `40970994357`, complete-runtime build/TypeScript and staged/public desktop/mobile acceptance passed (14 checks per width). The earlier failed PR460 deployment was rolled back; this release staged the complete verified package with exact organization metadata before promotion. Scoped Live-AI readiness is unavailable: read-only inspection confirms expired pricing verification, with scheduled renewal returning HTTP503. The initial unscoped capability response was only a middleware rejection. Diagnosis continues without provider calls or policy changes. The internal live BLS route remains unavailable. [Release, recovery evidence and limits](talent-market-publication-2026-10-30.md). No paid calls or persistent guard/access changes.
+Independent review, exact-head CI `40970994357`, complete-runtime build/TypeScript and staged/public desktop/mobile acceptance passed (14 checks per width). The earlier failed PR460 deployment was rolled back; this release staged the complete verified package with exact organization metadata before promotion. At that release, scoped Live-AI readiness was unavailable: inspection confirmed expired pricing verification, with scheduled renewal returning HTTP503. PR463 subsequently repaired it as recorded above. The initial unscoped capability response was only a middleware rejection. That historical diagnosis used no provider calls or policy changes. The internal live BLS route remains unavailable. [Release, recovery evidence and limits](talent-market-publication-2026-10-30.md). No paid calls or persistent guard/access changes.
 
 ### PR458 - local saved-work backup and direct plan navigation (previous release)
 
