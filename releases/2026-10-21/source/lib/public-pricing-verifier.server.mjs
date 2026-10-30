@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 // Public documents only. No provider endpoint, credentials, ledger port or caller URLs.
 export const PUBLIC_PRICING_SOURCES = Object.freeze([
  Object.freeze({id:'pricing',url:'https://developers.openai.com/api/docs/pricing.md',sha256:'93d302a9b7a384877533bc3ab5bb48eebf4b56bd6add0f194095054b2a13f952'}),
- Object.freeze({id:'sol',url:'https://developers.openai.com/api/docs/models/gpt-6.1-sol.md',sha256:'374c323fe934443bd6d5f90f3e16dc4fb06552c83bde433dee60b0a84d9bd388'}),
+ Object.freeze({id:'sol',url:'https://developers.openai.com/api/docs/models/gpt-6.1-sol.md',sha256:'ebcc1b0ae6c729a64411dacf303c0ae8b91b11a9be176dc8997b2652bec4b9b0'}),
  Object.freeze({id:'luna',url:'https://developers.openai.com/api/docs/models/gpt-5.6-luna.md',sha256:'bf9fdb1c3b6466c37fb856e5f8e5973ff088164b6c7792d3fb15e0d9927bd781'}),
  Object.freeze({id:'cache',url:'https://developers.openai.com/api/docs/guides/prompt-caching.md',sha256:'2da1ea8a2404b306773bee6aa1027ca36c9d0bc2f8a4ea3df83166d3da9d7e6c'}),
 ]);
@@ -39,7 +39,7 @@ function model(text,id,input,output,cached){
  }
  once(text,'- Cache writes are billed at 1.25x the uncached input token rate.');
  once(text,id==='gpt-6.1-sol'
-  ? '- Prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the full request.'
+  ? '- API prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the full request.'
   : '- Prompts with >272K input tokens are priced at 2x input and 1.5x output for the full request.');
  equal(row(text,'Responses'),['Responses','`v1/responses`','Supported']);
 }

@@ -4549,8 +4549,8 @@
     },
     {
       "path": "lib/public-pricing-verifier.server.mjs",
-      "bytes": 8345,
-      "sha256": "49ed547ff11c3a1d0371fa7acff7f5f8367b2c0cbb2757a6e458fcf4d8737838"
+      "bytes": 8349,
+      "sha256": "e1b07169a6bbd22d1dc5293ca38547b35f5f11df30d31f8be81b41814d560582"
     },
     {
       "path": "tests/fixtures/public-pricing/cache.md.json",
@@ -4569,8 +4569,8 @@
     },
     {
       "path": "tests/fixtures/public-pricing/sol.md.json",
-      "bytes": 4009,
-      "sha256": "0118a3ad007763509117e95d6b9426add7911d4b3b63ef412fa744704cb26a81"
+      "bytes": 4203,
+      "sha256": "98c2200b0b92f797dbc0a1168448e1163848462ee8152ca7088bb3fc51c3ebc5"
     },
     {
       "path": "tests/public-pricing-policy.test.mjs",
@@ -4584,8 +4584,8 @@
     },
     {
       "path": "tests/public-pricing-verifier.test.mjs",
-      "bytes": 5621,
-      "sha256": "a3c73c6d71bbc20be0f96a4d5449d260e5c2c2ee87b93a33bbc0a83dc37b60ec"
+      "bytes": 6306,
+      "sha256": "3ee8fb7a7ae91df48d4a719a868a59d2b08ffc59b6a500cab98e33fad65fd8c3"
     },
     {
       "path": "components/workforce-planning/position-dashboard.tsx",

@@ -76,3 +76,11 @@ test('timeout bounds a transport that ignores the abort signal',async t=>{
  const assertion=assert.rejects(pending,/pricing_source_timeout/);
  t.mock.timers.tick(15000);await assertion;
 });
+
+
+test('reviewed API wording retains rates; removed qualifiers and subscription edits still fail closed',()=>{
+ const verified=parsePublicPlannerPricing(documents);
+ assert.equal(verified.digest,'ea1e9ef799beccc24cfe6b1a2e5720d1bcbef4579a16486768ea27385482a1b3');
+ assert.throws(()=>parsePublicPlannerPricing({...documents,sol:documents.sol.replace('- API prompts with more than 272K','- Prompts with more than 272K')}),/pricing_terms_unverified/);
+ assert.throws(()=>parsePublicPlannerPricing({...documents,sol:documents.sol.replace('Usage drawn from your subscription has no long-context surcharge.','API requests have no long-context surcharge.')}),/pricing_document_changed/);
+});
