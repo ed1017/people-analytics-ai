@@ -7,6 +7,8 @@ The core analysis, scenario, saved-plan and manual tracking journey works. This 
 | Freshly verified | 22 desktop and 7 mobile routes rendered without page exceptions or horizontal overflow. Headcount, position drilldown, six-month what-if, UK/Toronto references, intro, About and settings received bounded interaction checks. |
 | Save and Track verified | Both 1440px and 390px completed nine steps: guided example, option selection, reviewed goal/plan save, Action plans, Track, dated 2-role report, correction to 3 roles, and reload retaining current and superseded history. |
 | Talent Inventory and market explorer live | PR461 publishes the complete modeled register and goal-isolated vacancy scenarios, with immutable revisions and native-unit market carries. Staged/public desktop/mobile each passed 14 checks. Genuine position/location/FTE records and applicant availability remain limited. |
+| Position funding and Overview entry live | PR465/466 add immutable funding comparisons and explicit saved-revision selection in Overview. Public desktop/mobile preserved drafts, goals and revisions; explanations used versioned mocks, not paid model calls. Finance source approval remains unavailable. |
+| Density verified on representative routes | PR464/465 preserve controls and saved work; mobile inventory and Action plans fixtures decreased about 38% and 53% respectively. This is not an all-page geometry claim. |
 | Saved-work backup and journey links live | PR458 exports/restores current-dataset goals, plan versions and tracking/correction history with explicit validated replacement. Public desktop/mobile passed seven checks each, including selected-plan Action plans → Track → results. Separate standalone scenarios and unsaved edits are excluded. |
 | Review plan results live | PR456 replaces the Assess & Evaluate placeholder with exact saved-target/manual-result comparison and a selected-plan Track link. Public desktop/mobile acceptance passed 10 checks each. |
 | FoW improvement live | PR453 adds selected-work controls and reviewed transfer into a populated capacity scenario. Desktop/mobile edits, selection isolation, cancellation, explicit draft replacement and save/reopen passed. Lab exposure is not converted into staffing savings. |
@@ -25,7 +27,13 @@ Career Growth rejected valid 9,037-person ratings using an older 10,000-person c
 
 ## Current release
 
-PR460/461 are live at deployment `dpl_CZ9qXzZoDfJNgHtsWmZnaqrzj5Pq`, candidate `8d3c6d212f25e5ce3c9c9f186578e8649f24bede`. Exact-head CI, full runtime build/TypeScript, independent review and staged/public 1440px/390px checks passed. [Publication and remaining limits](talent-market-publication-2026-10-30.md).
+PR466 is live at runtime `8542b077484ba44df39d556a7a44c8cb8b2b7805`, deployment `dpl_3jSAS1C2NWu1ibwPC4g9tBuDYjbo`. Exact-head CI, full build/TypeScript, independent review and six public checks at each of 1440px/390px passed. It includes PR465 position funding and Action plans density, PR463 renewal repair and PR464 shared density. [Position acceptance and limits](position-finance-2026-10-30.md).
+
+Readiness recovery was verified without provider requests. The next scheduled renewal is October 30 at 06:00 UTC and remains unobserved at this checkpoint. General capacity optimization is separate from the explicitly selected position scenario; no authenticated Finance approval adapter is connected.
+
+## Previous inventory and market release
+
+PR460/461 shipped at deployment `dpl_CZ9qXzZoDfJNgHtsWmZnaqrzj5Pq`, candidate `8d3c6d212f25e5ce3c9c9f186578e8649f24bede`. [Historical publication and limits](talent-market-publication-2026-10-30.md).
 
 ## Previous backup release
 
