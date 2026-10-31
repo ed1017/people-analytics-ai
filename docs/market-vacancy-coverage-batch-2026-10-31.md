@@ -1,6 +1,6 @@
 # Ranked vacancy market coverage
 
-Status: source review complete; implementation and release checks in progress. Current production remains PR487 until the candidate passes isolated staging and promotion.
+PR489 is live and direct public desktop/mobile acceptance passed. Runtime `15579b694d771182cedf848a7626f20ffe823c83`, merge `64ae833708172a358d02c626fd8c4cedc85abdfe`, deployment `dpl_6yD7TBwzsCv41Mjn8L4zddrUfdD8`.
 
 ## Inventory priorities
 
@@ -47,3 +47,20 @@ Crosswalk review uses the [official ONS SOC2020 unit-group definitions](https://
 Preserve existing v1/v2 evidence objects and immutable revisions. Verify new role/source selection, native currency and explicit FX, mixed and unsupported roles, stale/cancel/reset behavior, freeze/on-hold and fractional-FTE contracts, backup restore and Track/Review. Independent review, focused/aggregate tests, exact-head CI, production-equivalent no-domain staging and direct public desktop/mobile acceptance are required. No paid model requests, new credentials/access, Lab work or chart-overlay default changes.
 
 The full ranked inventory and original workbook extraction are retained in executor evidence: `market-uncovered-ranking-20261031.json` and `ons-ashe-2026-fulltime-source-review.json`. No workbook binaries or private input data are committed.
+
+## Build and staged acceptance
+
+- Independent source/code review passed. Nineteen model and seventeen UI tests passed; all 132 affected regression tests and the position feature type graph passed. An encoding change found before commit was corrected and exact legacy-reference UTF-8 hash regressions added.
+- Exact-head CI `41192575194` succeeded. Full staged build, TypeScript, generated-data and asset checks passed.
+- Production-equivalent stage: https://people-analytics-79fwi8ixn-ed-56dc.vercel.app . The build had no public domains until its functional acceptance passed, then was promoted unchanged.
+- Archive SHA-256 `37b8c9e5b70ffd431a946dafd6a8cf51dbd1e99fb3a6d3cfb1d125b345256c2b`; 1,193 inputs and 1,048 manifest files. Five source/test files changed, including the new four-row source fixture. Private runtime inputs, package manifests and dependency locks were unchanged. Installation reported the existing 33 dependency audit findings; no automatic upgrades were included.
+- Desktop (1440px) and mobile (390px) each passed eight functional groups: actual PR487 backup restoration; all four new role review/cancel/adoption/save flows; correct occupational-group difficulty; unsupported/mixed selections; immutable reload; actual Track/Review result; expanded backup cancel/restore. Source and Review images were inspected.
+- Both staged reports had zero page, blocked-request or bridge errors before teardown. The protected bridge then reached its 15-second shutdown bound and reported late route-already-handled errors on dashboard/capabilities. This limitation is retained separately from functional acceptance. Reports: `position-market-uk-professions-stage-15579b69-{1440,390}.json`.
+
+## Public acceptance
+
+Both direct-public widths passed all eight groups in a single run, with zero page, blocked-request or bridge errors and clean drained teardown. Reports: `position-market-uk-professions-public-15579b69-{1440,390}.json`. Actual mobile HR review and desktop legal adoption screenshots were inspected. At an explicitly entered 1.25 USD/GBP and 20% on-cost, legal median produces USD 85,796.85 and HR median USD 92,167.80 per hired FTE; these are QA assumptions, not fetched exchange rates or company-approved budgets.
+
+Legacy US v1, BI v2 and UK software v2 records survived actual prior-release backup restore. All four new role references retained native pay, conversion, source and immutable revision relationships through reload, Track/Review and expanded backup restore. Unsupported and mixed roles stayed neutral; professional-group evidence did not appear for HR manager or recruitment-adviser occupations. Public deployment metadata resolved to the exact promoted deployment above.
+
+Delivered coverage is 12 of 197 vacancies (3 US, 9 UK). Remaining uncovered counts: India 59, US 48, Canada 15, UK 11, Singapore 11, Germany 10, Australia 9, Japan 8, Brazil 7 and France 7. Source and mapping gaps above remain open. No paid provider calls or changes to budget, credentials, access, Lab validation or chart-overlay policy.
