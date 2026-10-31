@@ -1,0 +1,128 @@
+{
+  "id": "dfe-ess-2024-uk-occupation-v1",
+  "source": {
+    "url": "https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/1c000555-8188-4e28-ac32-22313d8702a1/csv",
+    "sha256": "557dbafc39bdcfd96ec6637d8dcaef42c6babbb467359efe7cbed67d1ca65156",
+    "bytes": 35100885,
+    "releasedAt": "2025-07-24",
+    "period": "2024",
+    "fieldwork": "June 2024-January 2025",
+    "geography": "United Kingdom",
+    "geographyCode": "K02000001",
+    "geographicLevel": "National",
+    "timeIdentifier": "Calendar year",
+    "sector": "Total",
+    "taxonomy": "UK SOC 2020",
+    "licence": "Open Government Licence v3.0",
+    "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "attribution": "Source: Department for Education, Employer Skills Survey 2024. Contains public sector information licensed under the Open Government Licence v3.0.",
+    "modifications": "Two reviewed occupation rows extracted; published numeric strings retained. No regional substitution or count-ratio recalculation.",
+    "symbolDefinitionsUrl": "https://dfe-analytical-services.github.io/analysts-guide/statistics-production/ud.html",
+    "symbols": {
+      "c": "confidential or suppressed",
+      "u": "low reliability"
+    },
+    "minimumResponseBasePolicy": 50,
+    "minimumResponseBaseBasis": "Conservative app display policy, not a verified source suppression threshold."
+  },
+  "records": [
+    {
+      "occupationCode": "3571",
+      "occupationTitle": "Human resources and industrial relations officers",
+      "hierarchy": [
+        {
+          "code": "357",
+          "label": "Hr, training and other vocational associate guidance professionals"
+        },
+        {
+          "code": "35",
+          "label": "Business and public service associate professionals"
+        },
+        {
+          "code": "3",
+          "label": "Associate professional occupations"
+        }
+      ],
+      "sourceCsvRow": 160050,
+      "raw": {
+        "base": "67",
+        "vac": "10600",
+        "htfv": "3200",
+        "ssv": "2700",
+        "htfv_den": "30.3747202081464",
+        "ssv_den": "25.2094447650735"
+      }
+    },
+    {
+      "occupationCode": "2421",
+      "occupationTitle": "Chartered and certified accountants",
+      "hierarchy": [
+        {
+          "code": "242",
+          "label": "Finance professionals"
+        },
+        {
+          "code": "24",
+          "label": "Business, media and public service professionals"
+        },
+        {
+          "code": "2",
+          "label": "Professional occupations"
+        }
+      ],
+      "sourceCsvRow": 160121,
+      "raw": {
+        "base": "54",
+        "vac": "3900",
+        "htfv": "1100",
+        "ssv": "600",
+        "htfv_den": "28.2965542462185",
+        "ssv_den": "15.7169911100923"
+      }
+    }
+  ],
+  "held": [
+    {
+      "occupationCode": "2135",
+      "sourceCsvRow": 160111,
+      "base": "c",
+      "measures": "u",
+      "status": "suppressed-or-low-reliability"
+    },
+    {
+      "occupationCode": "1136",
+      "sourceCsvRow": 160092,
+      "base": "15",
+      "measures": "u",
+      "status": "low-reliability"
+    },
+    {
+      "occupationCode": "3544",
+      "sourceCsvRow": 160150,
+      "base": "5",
+      "measures": "u",
+      "status": "low-reliability"
+    },
+    {
+      "occupationCode": "3552",
+      "sourceCsvRow": 160153,
+      "base": "29",
+      "measures": "u",
+      "status": "low-reliability"
+    },
+    {
+      "occupationCode": "2136",
+      "status": "absent-in-2024; 2022 not substituted"
+    },
+    {
+      "occupationCode": "2134",
+      "base": "33",
+      "status": "below-app-response-base-policy"
+    },
+    {
+      "occupationCode": "2412",
+      "base": "49",
+      "status": "below-app-response-base-policy"
+    }
+  ]
+}
