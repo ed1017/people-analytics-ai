@@ -4,7 +4,7 @@ import {generateCompanyPositionInventoryV2} from '../lib/company-position-model-
 import {DEMO_POSITION_INVENTORY} from '../lib/position-inventory.ts';
 import {createPositionAllocation} from '../lib/position-allocation.ts';
 import {savePositionScenario,POSITION_ALLOCATION_DRAFT_FIELD as D,POSITION_ALLOCATION_LEDGER_FIELD as A} from '../lib/position-allocation-store.ts';
-import {POSITION_MARKET_FIELD as M,positionMarketEligibility,preparePositionMarketAdoption as prepare,confirmPositionMarketAdoption as confirm,updatePositionMarketDraft as edit,readPositionMarketLedger,currentPositionMarketEvidence,positionMarketForCapture} from '../lib/position-market-assumptions.ts';
+import {POSITION_MARKET_FIELD as M,POSITION_MARKET_REFERENCE,POSITION_MARKET_BI_REFERENCE,POSITION_MARKET_UK_REFERENCE,positionMarketNativeAmounts,positionMarketEligibility,preparePositionMarketAdoption as prepare,confirmPositionMarketAdoption as confirm,updatePositionMarketDraft as edit,readPositionMarketLedger,currentPositionMarketEvidence,positionMarketForCapture} from '../lib/position-market-assumptions.ts';
 import {preparePositionTrackingGoal,confirmPositionTrackingGoal} from '../lib/position-tracking-goal.ts';
 import {encodeDecisionBackup,parseDecisionBackup} from '../lib/decision-backup.ts';
 import {preparePositionResultTarget} from '../lib/position-result-targets.ts';
@@ -59,4 +59,46 @@ test('unknown annual cost clears applicability; old stale current data is retain
  // Older draft writers may leave the sidecar untouched: validation retains evidence but no current claim is returned.
  h.store.setField('',D,next);assert.equal(currentPositionMarketEvidence(h.ledger(),next),null);assert.doesNotThrow(()=>parseDecisionBackup(encodeDecisionBackup(h.store.getSnapshot().data,h.datasetToken,at),h.datasetToken));
  edit({...h.options,draft:next});assert.equal(h.ledger().current,null);assert.equal(h.ledger().records.length,1);
+});
+const fx={basis:'user-assumption',from:'GBP',to:'USD',usdPerGbp:1.25,date:'2026-10-30',confirmed:true};
+function scoped(role,country){const h=setup(),positions=inventory.positions.filter(p=>p.role===role&&p.countryCode===country&&p.status==='vacant');assert.ok(positions.length);const draft=createPositionAllocation(positions.map(p=>p.id),false,inventory);draft.input.hire=1;h.store.setField('',D,draft);return h;}
+test('expanded mappings cover exactly six of197 real modeled vacancies, with no fuzzy fallback',()=>{
+ const vacancies=inventory.positions.filter(p=>p.status==='vacant');assert.equal(vacancies.length,197);
+ const eligible=vacancies.filter(p=>positionMarketEligibility(createPositionAllocation([p.id],false,inventory)).eligible);assert.equal(eligible.length,6);
+ assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Frontend Software Engineer').length,2);
+ assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Business Intelligence Analyst').length,1);
+ assert.deepEqual(eligible.filter(p=>p.countryCode==='GB').map(p=>p.role).sort(),['Backend Software Engineer','Frontend Software Engineer','Software Engineer']);
+ for(const role of ['Business Intelligence Developer','Machine Learning Engineer','Data Engineer']){const h=scoped(role,'US');assert.equal(positionMarketEligibility(h.fields()[D]).eligible,false);assert.throws(()=>h.review());}
+ const mixed=[...scoped('Frontend Software Engineer','US').fields()[D].input.selectedIds,...scoped('Frontend Software Engineer','GB').fields()[D].input.selectedIds];assert.equal(positionMarketEligibility(createPositionAllocation(mixed,false,inventory)).eligible,false);
+ const ukMixed=eligible.filter(p=>p.countryCode==='GB').map(p=>p.id);assert.equal(positionMarketEligibility(createPositionAllocation(ukMixed,false,inventory)).eligible,false);
+});
+test('legacy software adoption emits unchanged v1 shape and preserves source reference byte semantics',()=>{
+ const h=setup();confirm({store:h.store,ticket:h.review(),at});const old=h.ledger().current;
+ assert.equal(old.version,1);assert.deepEqual(Object.keys(old),['version','sourceVersion','reference','inventoryVersion','inventoryKey','selectedIds','role','statistic','wageUsd','employerOncostPercent','annualCostUsd','mappingConfirmed','fullTimeBasisConfirmed','adoptedAt']);
+ assert.equal(JSON.stringify(old.reference),JSON.stringify(POSITION_MARKET_REFERENCE));assert.equal('nativeCurrency' in old,false);assert.equal('fx' in old,false);
+ h.save();const before=JSON.stringify(h.ledger());parseDecisionBackup(encodeDecisionBackup(h.store.getSnapshot().data,h.datasetToken,at),h.datasetToken);assert.equal(JSON.stringify(h.ledger()),before);
+});
+test('BI uses broader Data Scientists pay with nativeUSD and no currency conversion',()=>{
+ const h=scoped('Business Intelligence Analyst','US'),e=positionMarketEligibility(h.fields()[D]);assert.equal(e.reference,POSITION_MARKET_BI_REFERENCE);assert.equal(e.reference.mappingScope,'broader-occupation');assert.equal(e.reference.occupationCode,'15-2051');assert.equal(e.reference.mappingOccupationCode,'15-2051.01');
+ const ticket=h.review({statistic:'mean',employerOncostPercent:10});assert.equal(ticket.nativeWage,126800);assert.equal(ticket.nativeCurrency,'USD');assert.equal(ticket.annualCostUsd,139480);assert.equal(ticket.fx,null);assert.throws(()=>h.review({fx}));
+ confirm({store:h.store,ticket,at});const record=h.save();assert.equal(h.ledger().current.version,2);assert.equal(positionMarketForCapture(h.ledger(),record).reference.occupation,'Data Scientists');
+});
+test('UK retains native gross pay and explicit datedFX; rounds only final USD annual amount',()=>{
+ const h=scoped('Backend Software Engineer','GB');assert.equal(positionMarketEligibility(h.fields()[D]).reference,POSITION_MARKET_UK_REFERENCE);assert.deepEqual(positionMarketNativeAmounts(POSITION_MARKET_UK_REFERENCE),{currency:'GBP',median:59862.5,mean:69120.6});
+ assert.throws(()=>h.review());const ticket=h.review({fx:{...fx,usdPerGbp:1.234567},employerOncostPercent:17.5});assert.equal(ticket.nativeWage,59862.5);assert.equal(ticket.wageUsd,59862.5*1.234567);assert.equal(ticket.annualCostUsd,Math.round((59862.5*1.234567*1.175+Number.EPSILON)*100)/100);assert.equal(Object.isFrozen(ticket.fx),true);
+ confirm({store:h.store,ticket,at});const first=h.save(),a=positionMarketForCapture(h.ledger(),first);assert.equal(a.version,2);assert.equal(a.nativeCurrency,'GBP');assert.equal(a.nativeWage,59862.5);assert.equal(a.fx.from,'GBP');assert.equal(a.fx.to,'USD');assert.equal(a.fx.date,'2026-10-30');
+ let next=structuredClone(h.fields()[D]);next.input.horizonMonths=12;edit({...h.options,draft:next});assert.ok(currentPositionMarketEvidence(h.ledger(),next));h.save('one',1);assert.deepEqual(positionMarketForCapture(h.ledger(),first),a);
+ next.input.annualHireCostUsd=null;edit({...h.options,draft:next});assert.equal(h.ledger().current,null);edit({...h.options,draft:first.draft,restoreCapture:first});assert.deepEqual(h.ledger().current,a);
+});
+test('UK missing, reversed, zero, future, invalid and unconfirmedFX fail without mutating state',()=>{
+ const h=scoped('Software Engineer','GB'),before=JSON.stringify([...h.values]);
+ for(const input of [undefined,null,{...fx,usdPerGbp:0},{...fx,usdPerGbp:-1},{...fx,usdPerGbp:10.01},{...fx,usdPerGbp:Infinity},{...fx,usdPerGbp:'1.25'},{...fx,from:'USD',to:'GBP'},{...fx,basis:'official-rate'},{...fx,confirmed:false},{...fx,date:'2026-02-30'},{...fx,date:'2099-01-01'},{...fx,extra:true}])assert.throws(()=>h.review({fx:input}));
+ assert.equal(JSON.stringify([...h.values]),before);const ticket=h.review({fx});assert.throws(()=>confirm({store:h.store,ticket,at:'2026-10-29T00:00:00.000Z'}));assert.equal(JSON.stringify([...h.values]),before);
+});
+test('v2 backups and goal promotion retain source/FX versions and reject changed source, rates or scope',()=>{
+ for(const [role,country,input] of [['Business Intelligence Analyst','US',null],['Frontend Software Engineer','GB',fx]]){
+  const h=scoped(role,country);confirm({store:h.store,ticket:h.review({fx:input}),at});h.save();const original=structuredClone(h.store.getSnapshot().data.exploration),ticket=preparePositionTrackingGoal({store:h.store,datasetToken:h.datasetToken});confirmPositionTrackingGoal({store:h.store,ticket,goalId:'new-market',at});const data=h.store.getSnapshot().data,fields=data.workspaces['new-market'].fields;
+  assert.deepEqual(data.exploration,original);assert.deepEqual(fields[M].records,original.fields[M].records);assert.equal(fields[M].current,null);assert.doesNotThrow(()=>preparePositionResultTarget(h.store,{scenarioId:'one',allocationRevision:1,financeRevision:null,date:'2027-04-30'}));assert.deepEqual(parseDecisionBackup(encodeDecisionBackup(data,h.datasetToken,at),h.datasetToken).data,data);
+  for(const change of [a=>a.reference.sourceSha256='bad',a=>a.reference.occupationCode='15-1252',a=>a.nativeCurrency='CAD',a=>a.nativeWage++,a=>a.wageUsd++,a=>a.sourceVersion='unknown',a=>a.annualCostUsd++,a=>a.reference.period='May 2026',a=>a.fx=input?{...fx,usdPerGbp:1.26}:fx]){const bad=structuredClone(data);change(bad.workspaces['new-market'].fields[M].records[0].adoption);assert.throws(()=>encodeDecisionBackup(bad,h.datasetToken,at));}
+ }
 });
