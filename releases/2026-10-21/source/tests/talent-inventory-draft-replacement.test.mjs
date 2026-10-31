@@ -9,6 +9,7 @@ import * as inventory from '../lib/position-inventory.ts';
 import * as allocation from '../lib/position-allocation.ts';
 import * as ledger from '../lib/position-allocation-store.ts';
 import * as finance from '../lib/position-finance-store.ts';
+import * as market from '../lib/position-market-assumptions.ts';
 
 const require=createRequire(import.meta.url);
 const source=ts.transpileModule(fs.readFileSync(new URL('../components/workforce-planning/position-allocation-planner.tsx',import.meta.url),'utf8'),{
@@ -16,7 +17,7 @@ const source=ts.transpileModule(fs.readFileSync(new URL('../components/workforce
 }).outputText;
 const ids=inventory.DEMO_POSITION_INVENTORY.positions.filter(p=>p.status==='vacant'&&p.vacancyStatus!=='frozen').map(p=>p.id);
 const example=()=>allocation.createPositionAllocation(ids,true);
-const storedLedger=()=>({version:1,datasetToken:'test',goalId:'',records:[{
+const storedLedger=()=>({version:1,datasetToken:'test:1',goalId:'',records:[{
  scenarioId:'saved-original',scenarioNumber:1,revision:1,sequence:1,savedAt:'2026-10-30T00:00:00.000Z',
  draft:example(),result:allocation.calculatePositionAllocation(example()),
 }]});
@@ -29,7 +30,7 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger(),initialPro
  const fields={...(initialDraft?{[ledger.POSITION_ALLOCATION_DRAFT_FIELD]:structuredClone(initialDraft)}:{}),[ledger.POSITION_ALLOCATION_LEDGER_FIELD]:structuredClone(initialLedger)};
  const data={workspaces:{},exploration:{fields},goals:{goals:[],activeId:''},revision:0};
  const snapshot={data,ready:true,saved:true};
- const store={getDatasetToken:()=> 'test',getSnapshot:()=>snapshot,setField:(_goal,key,value)=>{writes++;fields[key]=value;}};
+ const store={getDatasetToken:()=> 'test:1',getSnapshot:()=>snapshot,setField:(_goal,key,value)=>{writes++;fields[key]=value;},commitExplorationFields:(revision,_at,build)=>{assert.equal(revision,data.revision);const patch=build(structuredClone(fields));Object.assign(fields,structuredClone(patch));data.revision++;writes++;}};
  const useState=initial=>{const i=cursor++;if(!(i in hooks))hooks[i]=typeof initial==='function'?initial():initial;return [hooks[i],value=>{hooks[i]=typeof value==='function'?value(hooks[i]):value;}];};
  const react={...React,useEffect:(fn,deps)=>{const i=cursor++,previous=hooks[i];if(!previous||deps.some((v,j)=>v!==previous[j]))effects.push(fn);hooks[i]=deps;},useState,useMemo:fn=>fn(),useId:()=>':inventory:',useRef:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]={current:initial};return hooks[i];}};
  vm.runInNewContext(source,{exports,require:name=>{
@@ -41,6 +42,8 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger(),initialPro
   if(name==='@/lib/position-allocation')return allocation;
   if(name==='@/lib/position-allocation-store')return ledger;
   if(name==='@/lib/position-finance-store')return finance;
+  if(name==='@/lib/position-market-assumptions')return market;
+  if(name==='./position-market-assumptions')return {PositionMarketAssumptions:'PositionMarketAssumptions'};
   if(name==='./position-finance-panel')return {PositionFinancePanel:'PositionFinancePanel'};
   if(name==='./position-allocation-visuals')return {InventoryCharts:'InventoryCharts',AllocationVisuals:'AllocationVisuals'};
   return require(name);
@@ -54,7 +57,7 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger(),initialPro
    React.Children.forEach(node.props?.children,walk);
    if(node.type==='Planner')for(const key of ['levers','visual','actions','supplement'])walk(node.props[key]);
   }
-  walk(exports.PositionInventoryWorkspace({goalId:'',datasetToken:'test',...props}));
+  walk(exports.PositionInventoryWorkspace({goalId:'',datasetToken:'test:1',...props}));
   return nodes;
  }
  function click(label){const node=render().find(n=>n.type==='button'&&n.props.children===label);assert.ok(node,`Missing button: ${label}`);node.props.onClick({currentTarget:{focus:()=>{focused=label;}}});}

@@ -4929,8 +4929,8 @@
     },
     {
       "path": "tests/talent-inventory-draft-replacement.test.mjs",
-      "bytes": 11950,
-      "sha256": "8c19a847a80a93d9f6837da07e0fb6a4722d59e3a08007d1422ebc66f99fa32f"
+      "bytes": 12391,
+      "sha256": "f44d5ec788d61fbd1997b49372e20534ac3afb56c6d3fea0b2b5142f2615dd53"
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
