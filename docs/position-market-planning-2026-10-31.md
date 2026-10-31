@@ -16,7 +16,7 @@ Keep the existing strict allocation input and result schema. A separate versione
 
 Required before release: independent semantic and state review; focused model, UI, backup and tracking regressions; required aggregate checks and exact-head CI; production-equivalent staging without public domain assignment; desktop/mobile explicit adoption, cancel, stale state, mixed/unmatched selection, saved revision, reload and Track/Review continuity. No paid model requests or new source access.
 
-Release and public acceptance evidence will be recorded after completion.
+Completed release and public acceptance evidence is recorded below.
 
 ## Release checks
 
