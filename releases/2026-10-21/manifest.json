@@ -5229,23 +5229,23 @@
     },
     {
       "path": "components/workforce-planning/position-market-assumptions.tsx",
-      "sha256": "fd63d5361d5e48ed7ee77d80ea6f50c6a0198a91591f5737ee70d95d6c16c027",
-      "bytes": 9306
+      "sha256": "03306111a485a14f2fb73572e064632bd7d26f7e00688b20514f0a3fd9ed462f",
+      "bytes": 13881
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "52edd0dde1cd90581bb798f9b7076fcb5e97747129bf8b55973262fd3272ebe9",
-      "bytes": 15543
+      "sha256": "dbccd553c788d7288ee416329260db270f13b9fa1fa2d5eb1b967ab65263dc2d",
+      "bytes": 21989
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "22b2dcfd84a2d4616ca5729392e33b7ea8f9067fd9997a4a6f25f71780f86a2c",
-      "bytes": 10032
+      "sha256": "c86bd571691ad869de7c44df9e1f5ac69504183f0aeffd51994fab56c036cb61",
+      "bytes": 17382
     },
     {
       "path": "tests/position-market-ui.test.mjs",
-      "sha256": "9d378c0c77578a05bed666aba4f46ef6fdebf4035cd4d44e2fcd2dbaf1889553",
-      "bytes": 7277
+      "sha256": "81dd15738bef9b8adde9ba1b96aa7a3047d9fd3368a0c3ef229fd5942398916c",
+      "bytes": 11893
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
