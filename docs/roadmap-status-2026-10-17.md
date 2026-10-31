@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR487 current - expanded market-to-position coverage
+### PR489 current - ranked UK occupation expansion
+
+PR489 is live at runtime `15579b694d771182cedf848a7626f20ffe823c83`, merge `64ae833708172a358d02c626fd8c4cedc85abdfe`, deployment `dpl_6yD7TBwzsCv41Mjn8L4zddrUfdD8`. Independent source/code review, 132 affected tests, full build/TypeScript and exact-head CI `41192575194` passed. Staged and direct-public desktop/mobile each passed eight functional groups; final public reports and teardown were clean. [Ranked coverage, source blockers and release evidence](market-vacancy-coverage-batch-2026-10-31.md).
+
+The existing market-to-position planner now supports 12 of 197 vacancies, up from six: three UK Legal Counsel plus one Cybersecurity Engineer, HR Business Partner and Talent Acquisition Specialist were added using exact reviewed ONS occupations. Native GBP, explicit FX, source dates and broader-role confirmation remain separate from Finance approval. Old revisions, Track/Review and backups are preserved. Of 185 remaining vacancies, India has 59 and the US 48; India role pay is unsupported and the original US workbook's Library materialization is unavailable. No blocked download was retried and no pay was guessed. Lab validation remains user-owned, the target overlay preview-only and paid AI testing unrun.
+
+### PR487 included - expanded market-to-position coverage
 
 PR487 is live at runtime `dadc0c19ac1596c2425c839f0c73ad4a0cbd8fa8`, merge `f87749f6a3ed178dc8f6c8ff435d65c245e25ddf`, deployment `dpl_CPTkUfw4NN7TfM7HhBHxkzux3wtL`. Independent review, 115 affected tests, full staged build/TypeScript and exact-head CI `41189286409` passed. Final direct-public desktop/mobile each passed seven journey groups with clean reports. Earlier test hydration/header races and protected-stage teardown artifacts are preserved in the [release evidence](position-market-coverage-2026-10-31.md).
 
