@@ -5234,13 +5234,13 @@
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "50df212a2236671e865c65ef0cc7fe4c847ccc8007c10366c844793479abfb9d",
-      "bytes": 39100
+      "sha256": "339dbbea4541d4e89a8c8ac6d402704d9983f33ad0a0e8f20e89bf82aa5df0f5",
+      "bytes": 40433
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "634818cba200887f132eb223f8d42b56ccf736635003d308b78a46cda00fa2d1",
-      "bytes": 48151
+      "sha256": "49ba8369c788745b1c0eaf28fe00f1bcd8f59d42191dd5b679886a4e449cf9b7",
+      "bytes": 50948
     },
     {
       "path": "tests/position-market-ui.test.mjs",
@@ -5254,8 +5254,8 @@
     },
     {
       "path": "lib/data/oews-may2025-position-pay.json",
-      "sha256": "14e5eef8aa1608c728a26c221a5508d4c2e3c0a0766f19311e95f2cdf0a4c111",
-      "bytes": 13216
+      "sha256": "a6970a792ae998a87b1a324e02951c21d34b90fca1c3a7bec01f96c1e3629985",
+      "bytes": 14577
     },
     {
       "path": "lib/data/mhlw-japan-2025-position-pay.json",
@@ -5264,8 +5264,8 @@
     },
     {
       "path": "tests/position-market-chat-context.test.mjs",
-      "sha256": "62abfa624994b4d956671c3880cc8a1d5c31a9ba54b4bcdab50fd5b760d5e11d",
-      "bytes": 6165
+      "sha256": "e3ac98ddd6fcd7955e835ee39e2858ec49971080f9903cf43d4fc53cf00ec9d5",
+      "bytes": 7187
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
