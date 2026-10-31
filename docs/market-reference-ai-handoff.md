@@ -4,9 +4,9 @@ Updated October 31, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-PR499 is live at runtime `fed6ef7d8fda265572ca6107f6946e744ebe21b8`, deployment `dpl_9obRQcR1Qi84mTALwgappaRcB8B6`. Conditional pay references cover **54 of 197** modeled vacancies: 35 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
+PR500 is live at runtime `627518ac4ea2eb7cb829a8105309b415c8bdb16e`, deployment `dpl_6S5XGpma9FE2p17GFyyDiG6fufRH`, including PR499 references. Conditional pay references cover **54 of 197** modeled vacancies: 35 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
 
-The active grounding audit found that position explanations receive derived annual USD payroll but omit the adopted market provenance. The bounded fix is in progress: resolve the canonical adoption for the exact saved scenario/revision, validate it against pinned sources and scope, and include its native statistic and calculation basis. Do not claim this handoff is live until its release acceptance is recorded. Existing packets with no market evidence must retain unknown provenance. No paid model calls are authorized in this batch.
+PR500 fixed the missing explanation provenance: canonical adoption is validated for the exact saved scenario/revision and includes native statistic and calculation basis. Legacy packets without market evidence retain unknown provenance. Both mounted entrypoints passed public desktop/mobile mocked-request acceptance; this is not fresh model-answer acceptance. No paid model calls were made. [Exact release evidence](position-market-grounding-release-2026-10-31.md).
 
 ## Source and interpretation contracts
 
@@ -24,7 +24,7 @@ The source registry contains exact publisher URLs, release/reference dates, occu
 - The user confirms duty applicability and modeled full-time basis, chooses a supported statistic, and enters employer on-cost. Non-USD sources additionally require a dated, explicit USD-per-native-currency assumption; there is no default FX.
 - Annual planning cost per hired FTE equals the native annual wage/annualised cash × explicit FX when needed × (1 + on-cost/100). Existing scenario arithmetic applies FTE and horizon separately. Do not multiply by headcount twice or relabel an added position as an existing vacancy filled.
 - Review/cancel/apply is explicit. Applying pay changes the annual hiring-cost assumption, not budget approval, allocation, timing or source-team capacity. Immutable saved revisions retain their own market capture.
-- `planning.positionMarketAssumptionsV1` stores v1/v2/v3 adoptions. `positionMarketForCapture` resolves saved scenario/revision evidence. A current draft adoption must never stand in for another saved revision or goal. The forthcoming model extension must reuse canonical validation, not trust client-provided prose or hashes as authorization.
+- `planning.positionMarketAssumptionsV1` stores v1/v2/v3 adoptions. `positionMarketForCapture` resolves saved scenario/revision evidence. A current draft adoption must never stand in for another saved revision or goal. The released context extension reuses canonical validation; client-provided prose or hashes do not grant authorization.
 - Track and Review compare matching target/result scope, unit and date. Backup/restore preserves these relationships and old source versions. It does not reconstruct the database or deployment.
 
 ## Verification and known test limitations

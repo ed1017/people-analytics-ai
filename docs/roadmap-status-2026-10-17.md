@@ -2,17 +2,21 @@
 
 ## Current live release and active parallel work
 
-### PR499 current - US machine-learning reference
+### PR500 current - saved market explanation context
 
-PR499 is live at runtime `fed6ef7d8fda265572ca6107f6946e744ebe21b8`, merge `d60c9f4bdda4212917376cfa6502d42ce2ccaf46`, deployment `dpl_9obRQcR1Qi84mTALwgappaRcB8B6`. Two US ML vacancies now have a conditional broader Data Scientists reference for model-development/evaluation duties. Coverage is 54 of 197 (35 US, 14 UK, five Japan); 143 remain unsupported. Prior reference entries, Japan JPY assumptions and saved work are preserved. Independent review, 116 affected checks, 64 independent focused checks, full build/TypeScript and exact-head CI `41233627411` passed; public desktop/mobile each passed seven groups with HTTP 200 and clean reports. [Source rationale and release acceptance](us-machine-learning-market-reference-2026-10-31.md).
+PR500 is live at runtime `627518ac4ea2eb7cb829a8105309b415c8bdb16e`, merge `602cd24171f5e55b06e1baa8af486650f000bf6d`, deployment `dpl_6S5XGpma9FE2p17GFyyDiG6fufRH`. Exact saved source/statistic/native-currency/FX provenance now reaches both mounted position explanation paths. Independent review, 127 affected checks, 68 independent focused checks and CI `41235212064` passed. Public desktop/mobile each passed ten groups with clean reports and preserved saved histories. All explanation traffic was mocked locally; no paid calls or fresh model acceptance. Coverage remains 54 of 197. [Release acceptance](position-market-grounding-release-2026-10-31.md).
 
-Active next slice: carry validated adopted market provenance into the AI explanation for the exact saved position revision. The audit found current explanations receive derived USD payroll without source/statistic/native-currency/FX provenance. This fix is in progress; documentation and mocked tests are not fresh model acceptance. [AI handoff and evidence boundaries](market-reference-ai-handoff.md).
+### PR499 included - US machine-learning reference
+
+PR499 was published at runtime `fed6ef7d8fda265572ca6107f6946e744ebe21b8`, merge `d60c9f4bdda4212917376cfa6502d42ce2ccaf46`, deployment `dpl_9obRQcR1Qi84mTALwgappaRcB8B6`. Its changes are included in PR500. Two US ML vacancies now have a conditional broader Data Scientists reference for model-development/evaluation duties. Coverage is 54 of 197 (35 US, 14 UK, five Japan); 143 remain unsupported. Prior reference entries, Japan JPY assumptions and saved work are preserved. Independent review, 116 affected checks, 64 independent focused checks, full build/TypeScript and exact-head CI `41233627411` passed; public desktop/mobile each passed seven groups with HTTP 200 and clean reports. [Source rationale and release acceptance](us-machine-learning-market-reference-2026-10-31.md).
+
+Next work is evidence-gated: verify the requested US Budget Analysts and Computer Systems Analysts workbook rows and duty fit; resolve Australian customised-report reuse terms and original workbook access. Do not publish guessed mappings. Documentation and mocked tests are not fresh model acceptance. [AI handoff and evidence boundaries](market-reference-ai-handoff.md).
 
 ### PR497 included - Japan market-to-position planning
 
 PR497 was published at runtime `f3a75bc7f9e7c504070e2c255296cf2145f502f3`, merge `f4d186e59b4f75a6fbc9448f6b957480d8c58d6b`, deployment `dpl_4gbAMzVta4hqvrskJUaDbrrV3EDV`. Official Japanese occupation crosswalks and wage components support five vacancies: AI, machine learning, backend and cloud infrastructure. Coverage is 52 of 197 (33 US, 14 UK, five Japan); 145 remain unsupported. Annualised cash, explicit dated JPY conversion and employer on-cost stay distinct. No salary median, actual Finance approval or applicant availability is inferred.
 
-Independent review, 166 affected checks, 62 independent focused checks, full build/TypeScript and exact-head CI `41231621323` passed. Direct public desktop/mobile each passed 11 groups with HTTP 200 and clean reports, including old backups, cancel/stale handling, saved revisions, Track/Review and backup restore. [Source contract, acceptance and precise remaining evidence needs](japan-position-market-reference-2026-10-31.md). Australia needs the original workbook transfer; Singapore reuse authority remains unresolved; India remains the largest source gap. No paid AI calls. Lab remains user-owned and chart overlay preview-only.
+Independent review, 166 affected checks, 62 independent focused checks, full build/TypeScript and exact-head CI `41231621323` passed. Direct public desktop/mobile each passed 11 groups with HTTP 200 and clean reports, including old backups, cancel/stale handling, saved revisions, Track/Review and backup restore. [Source contract, acceptance and precise remaining evidence needs](japan-position-market-reference-2026-10-31.md). Australia needs the original workbook and specific customised-report reuse terms; Singapore reuse authority remains unresolved; India remains the largest source gap. No paid AI calls. Lab remains user-owned and chart overlay preview-only.
 
 ### PR495 included - conditional UK and US role references
 
