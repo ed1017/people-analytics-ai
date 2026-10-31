@@ -1,10 +1,11 @@
+import {marketContextLookupTool,readMarketContext} from './market-context-lookup.ts';
 /** Shared deterministic tool dispatch. The caller supplies its verified read boundary. */
 import {deepFreeze} from './dataset-demo-contracts.mjs';
 import {peopleAnalyticsTools} from './people-analytics-tool-definitions.ts';
 import {assertSolutionShape} from './home-solution-conversation-schema.ts';
 const get={get_workforce_overview:'overview',get_workforce_composition:'workforce',get_attrition:'attrition',get_workforce_finance:'finance',get_workforce_skills:'skills',get_workforce_planning:'workforce-planning',get_talent_acquisition:'talent-acquisition',get_survey_sentiment:'survey-sentiment'};
 const post={run_business_unit_scenario:'business-unit-scenario',run_position_action_scenario:'position-actions',run_structural_position_scenario:'position-structure',run_workforce_response_plan:'workforce-response-plan',run_role_workforce_response_plan:'role-workforce-response-plan',run_workforce_response_portfolio:'workforce-response-portfolio',run_business_unit_response_allocation:'business-unit-response-allocation',run_time_phased_workforce_execution:'time-phased-workforce-execution',run_workforce_response_constraints:'workforce-response-constraints',run_constraint_aware_workforce_scheduler:'constraint-aware-workforce-scheduler'};
-const definitions=structuredClone(peopleAnalyticsTools);
+const definitions=structuredClone([...peopleAnalyticsTools,marketContextLookupTool]);
 const scheduler=definitions.find(t=>t.name==='run_constraint_aware_workforce_scheduler');
 const object=properties=>({type:'object',additionalProperties:false,properties,required:Object.keys(properties)});
 const month={type:['string','null'],maxLength:7},capacity={type:['number','null'],minimum:0,maximum:200000};
@@ -15,6 +16,7 @@ export function createAnalyticsToolDispatch(read){
  return Object.freeze({definitions:analyticsToolDefinitions,async run(name,args,signal){
   signal.throwIfAborted();const definition=analyticsToolDefinitions.find(t=>t.name===name);if(!definition)throw Error('Unsupported analytics tool.');
   assertSolutionShape(args,definition.parameters,'tool arguments');
+  if(name===marketContextLookupTool.name)return readMarketContext(args);
   if(get[name])return read('/api/'+get[name],undefined,signal);
   // Top-level nullable optional tool arguments mean keep API defaults. Nested
   // nulls are meaningful unknowns and are never replaced with zero.

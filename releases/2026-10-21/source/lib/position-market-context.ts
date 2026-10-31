@@ -71,3 +71,6 @@ export function positionMarketContextChatReference(ledger:PositionMarketContextL
 export function readPositionMarketContextChatReference(raw:unknown,expected:{datasetToken:string;goalId:string;scenario:{id:string;revision:number}|null;draft:PositionAllocationDraft}){
  exact(raw,['datasetToken','goalId','record']);must(raw.datasetToken===expected.datasetToken&&raw.goalId===expected.goalId&&expected.scenario);const record=validateRecord(raw.record,expected.draft);must(record.scenarioId===expected.scenario.id&&record.allocationRevision===expected.scenario.revision);return {contextRevision:record.contextRevision,attachedAt:record.attachedAt,status:'Browser-supplied attached context; not authenticated saved state',references:validateSources(record.references,expected.draft)};
 }
+
+/** Read-only canonical catalogue access; does not establish a position/role mapping or attach evidence. */
+export function positionMarketCatalogReferences(){return structuredClone(references);}

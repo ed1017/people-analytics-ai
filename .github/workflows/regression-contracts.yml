@@ -69,7 +69,7 @@ jobs:
         run: node --test tests/position-result-targets.test.mjs tests/position-result-ui.test.mjs tests/position-tracking-goal.test.mjs tests/position-tracking-goal-ui.test.mjs tests/standalone-scenario-backup.test.mjs tests/workforce-snapshot-backup.test.mjs
       - name: Verify explicit position market assumptions
         working-directory: releases/2026-10-21/source
-        run: node --test tests/position-market-assumptions.test.mjs tests/position-market-ui.test.mjs tests/position-market-context.test.mjs tests/position-market-context-ui.test.mjs tests/position-outlook-coverage.test.mjs
+        run: node --test tests/position-market-assumptions.test.mjs tests/position-market-ui.test.mjs tests/position-market-context.test.mjs tests/position-market-context-ui.test.mjs tests/position-outlook-coverage.test.mjs tests/market-context-lookup.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share canonical TypeScript.
+import {readMarketContext,marketContextLookupTool} from './market-context-lookup.ts';
 // @ts-expect-error Native regression tests share TypeScript source.
 import {readProjectionDemand} from './projection-demand.ts';
 import {omitDuplicateComparisonTable} from './home-comparison-visual.mjs';
@@ -219,6 +221,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
     const periodFeedback=demand?demandPeriodFeedback(call.name,args):null;
     if(periodFeedback){coFinalEligible=false;toolStatus='feedback';input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(periodFeedback)});continue;}
     assertSolutionShape(args,tool.parameters,'tool arguments');
+    if(call.name===marketContextLookupTool.name){coFinalEligible=false;const evidence=readMarketContext(args);input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(evidence)});continue;}
     if(call.name===policyEstimateTool.name&&runtime.readPolicyEstimate){const estimate=await runtime.readPolicyEstimate(args,signal);abort(signal);input.push({type:'function_call_output',call_id:call.id,output:JSON.stringify(estimate)});continue;}
     if(call.name===homeDatasetQueryTool.name&&runtime.readDatasetQuestions||call.name===homeAggregateTool.name&&runtime.readAggregate){
      if(round!==0||output.calls.length!==1||staffingRequired||demand)throw Error('Aggregate comparison must be a separate factual request before planning calculations.');
