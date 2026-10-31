@@ -4839,8 +4839,8 @@
     },
     {
       "path": "lib/decision-backup.ts",
-      "bytes": 6500,
-      "sha256": "595c1ae36ed9b2a303392d84177b7025d81a8b2d9bad8ea3a94f3f22cb464e28"
+      "bytes": 6906,
+      "sha256": "beae1c8ae595e27f3b862045b415797e79ba22dcfe95e01727976a3211a645cb"
     },
     {
       "path": "tests/decision-backup-store.test.mjs",
@@ -4934,8 +4934,8 @@
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
-      "sha256": "92d9ac01fc646dac1b83ce7ac02b9a97ef30d6b4a27fae7db28344577a165164",
-      "bytes": 13179
+      "sha256": "886187027ef0b007fadd138e9c8f04311ae2e870b348b09d2504dd7d4e7a26ef",
+      "bytes": 14269
     },
     {
       "path": "components/workforce-planning/position-scenario-explanation.tsx",
@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "32762bb9bfc10eaaf49b07461129f63c9ccbcb4473bd7d02467e6448c3a15b96",
-      "bytes": 12237
+      "sha256": "beafba96a83270b3e3462142f8ffc5300e334ab842fd50fd7c60e477f4b12add",
+      "bytes": 13600
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -4974,8 +4974,8 @@
     },
     {
       "path": "tests/position-finance-panel.test.mjs",
-      "bytes": 10147,
-      "sha256": "0b1caa6bd2aa658988b5c799f900886b238e60892b6c31bbce657c6d088fc67d"
+      "bytes": 10283,
+      "sha256": "ce8a10fcb5eedf6af67f4abc819ba544dbddd998ad4fd8077cd2707c70a4352a"
     },
     {
       "path": "tests/position-finance-store.test.mjs",
@@ -5214,8 +5214,8 @@
     },
     {
       "path": "lib/position-tracking-goal.ts",
-      "bytes": 5431,
-      "sha256": "9c4cd65a6e4c475dcf7ce0bd024249c7c09b89dd4e5729b5eb64448bf0ae0d18"
+      "bytes": 6007,
+      "sha256": "1bf1898a8a45ef6c06e63a1af48243a9317f6ba84ad32d921254ee611c2da3c4"
     },
     {
       "path": "tests/position-tracking-goal-ui.test.mjs",
@@ -5266,6 +5266,36 @@
       "path": "tests/position-market-chat-context.test.mjs",
       "sha256": "e3ac98ddd6fcd7955e835ee39e2858ec49971080f9903cf43d4fc53cf00ec9d5",
       "bytes": 7187
+    },
+    {
+      "path": "components/workforce-planning/position-market-context.tsx",
+      "sha256": "fddd1a5c03c14d3740cf859b69730a8457249487c2f768a49ec074e11b638fd1",
+      "bytes": 10799
+    },
+    {
+      "path": "lib/data/bls-position-outlook-2025-2035.json",
+      "sha256": "2978794c7de9c5e85a67fb090558322b0543d51ae99be4b072e3bad0316a8aa4",
+      "bytes": 7994
+    },
+    {
+      "path": "lib/data/onet-software-skills-31-reviewed-us.json",
+      "sha256": "bbe952c2364c7327e0f878440d92a69e53f38ce41a82dd3cdfb4e188bad1edc7",
+      "bytes": 956714
+    },
+    {
+      "path": "lib/position-market-context.ts",
+      "sha256": "f69564e4f451944aeeb18c10f20939bff364f42e78573fd9636b53a61e048cd2",
+      "bytes": 16028
+    },
+    {
+      "path": "tests/position-market-context-ui.test.mjs",
+      "sha256": "32de4cd227fbdf8e9570667dbaae1df8217ad5b2e0d350701975d2c4222e2fc3",
+      "bytes": 7684
+    },
+    {
+      "path": "tests/position-market-context.test.mjs",
+      "sha256": "ea3fec19e776b3bd937d6112ef01f57856cac2f4b18d614e044e0411a30c0114",
+      "bytes": 9296
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
