@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "8fd9a474bdfa7103ae7885ee86b1616580940c4f0b3facdc4f1cd36aeea5e377",
-      "bytes": 19097
+      "sha256": "df0eeeecb3a23c829e9a60687ad8089a8d28c502ce5a3156cea3badf6d3fadba",
+      "bytes": 19532
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5299,8 +5299,8 @@
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "8572e4049de4fdb8670f7d0d1e3d02176e8bbe0699c51827aa869944ea618f1f",
-      "bytes": 10073
+      "sha256": "9eb5e472fce4cdcc7e9c5a9924a7ca6754323304529afe95d859f9640de3604b",
+      "bytes": 10072
     },
     {
       "path": "lib/market-context-lookup.ts",
@@ -5319,8 +5319,18 @@
     },
     {
       "path": "tests/position-uk-hiring-context.test.mjs",
-      "sha256": "03a412fa3308a9b0f9f59ab3e1fced539fed5fde5eb1872f9017f1169d24465f",
-      "bytes": 20597
+      "sha256": "916d8259be6ab97e50d846ef2a6dd2289242422b17c0a8c977f3b5cc762ba9c3",
+      "bytes": 20627
+    },
+    {
+      "path": "lib/position-nonpay-role-mappings.ts",
+      "sha256": "e2269d585ebddbd2bdc9915f1d5090658d0c6be17297bdb4b934d686d9d23820",
+      "bytes": 1710
+    },
+    {
+      "path": "tests/position-conditional-nonpay.test.mjs",
+      "sha256": "c494e7f8a1d054f18f7d9fbd0c27489f41ba62f9804a06ba5b75f7baf1e653a2",
+      "bytes": 19887
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
