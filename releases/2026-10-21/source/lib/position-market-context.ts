@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share application source.
+import {POSITION_NONPAY_ROLE_MAPPINGS} from './position-nonpay-role-mappings.ts';
 import hiring from './data/dfe-ess2024-uk-position-hiring.json' with {type:'json'};
 import software from './data/onet-software-skills-31-reviewed-us.json' with {type:'json'};
 import outlook from './data/bls-position-outlook-2025-2035.json' with {type:'json'};
@@ -21,13 +23,15 @@ export type PositionMarketContextReference={id:string;version:string;kind:'occup
 function canonicalReferences():PositionMarketContextReference[]{
  if(software.source.sha256!=='6aabb96b464288db849580e6510530efff3f80e25dde2bb23f1fc36bb526b016'||outlook.source.sha256!=='08ee182f992d972593e64559ce467bad75967d2228f11ad5e2f86d4ec0ee6c00')throw Error('Market source identity changed.');
  const cards:PositionMarketContextReference[]=[];
- for(const mapping of software.occupationMappings)for(const role of mapping.conditionalInternalRoles){
+ const mappings=[...software.occupationMappings,...POSITION_NONPAY_ROLE_MAPPINGS.map(r=>({code:r.onetCode,conditionalInternalRoles:[r.role]}))];
+ for(const mapping of mappings)for(const role of mapping.conditionalInternalRoles){
+  const conditional=POSITION_NONPAY_ROLE_MAPPINGS.find(r=>r.role===role&&r.onetCode===mapping.code);
   const pay=POSITION_MARKET_US_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===role);
   const isSoftware=['Software Engineer','Frontend Software Engineer','Backend Software Engineer','Full Stack Software Engineer'].includes(role);
-  const soc=pay?.occupationCode??(isSoftware?POSITION_MARKET_REFERENCE.occupationCode:role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.occupationCode:null);
-  const duties=pay?.mappingDuties??(isSoftware?'Design and develop software applications.':role==='Business Intelligence Analyst'?'Develop and use business-intelligence tools, reports and analysis.':null);
+  const soc=conditional?.outlookCode??pay?.occupationCode??(isSoftware?POSITION_MARKET_REFERENCE.occupationCode:role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.occupationCode:null);
+  const duties=conditional?.duties??pay?.mappingDuties??(isSoftware?'Design and develop software applications.':role==='Business Intelligence Analyst'?'Develop and use business-intelligence tools, reports and analysis.':null);
   if(!duties)continue;
-  const limit=pay?.mappingLimit??(role==='Business Intelligence Analyst'?'Business-intelligence duties; broader Data Scientists outlook is not BI-specific.':'Occupational reference requires matching software development duties.');
+  const limit=conditional?.limit??pay?.mappingLimit??(role==='Business Intelligence Analyst'?'Business-intelligence duties; broader Data Scientists outlook is not BI-specific.':'Occupational reference requires matching software development duties.');
   const rows=software.rows.filter(r=>r.occupationCode===mapping.code),flagged=rows.filter(r=>r.inDemand==='Y').sort((a,b)=>a.softwareExample.localeCompare(b.softwareExample)||a.csvRecord-b.csvRecord),shown=flagged.slice(0,40);
   const base={countryCode:'US',roles:[role],mappingDuties:duties,mappingLimit:limit};
   cards.push({...base,id:`onet-software:${mapping.code}:${role}`,version:`${software.id}:${software.source.sha256}`,kind:'in-demand-software',occupationCode:mapping.code,occupation:rows[0]?.occupationTitle??mapping.code,title:'In-demand software',period:`Database ${software.source.databaseVersion}; software updated ${software.source.contentLastUpdatedMonth}`,geography:software.source.geography,population:'Software examples associated with this O*NET occupation',unit:'categorical source flags',sourceUrl:software.source.url,sourceSha256:software.source.sha256,attribution:software.source.attribution,licence:software.source.licence,licenceUrl:software.source.licenceUrl,facts:{kind:'in-demand-software',items:shown.map(r=>({softwareExample:r.softwareExample,elementId:r.elementId,elementName:r.elementName,inDemand:r.inDemand==='Y',hotTechnology:r.hotTechnology==='Y'})),occupationRows:rows.length,flaggedRows:flagged.length,shownRows:shown.length,truncated:shown.length<flagged.length,ordering:'alphabetical, not ranking',databaseVersion:software.source.databaseVersion,contentLastUpdatedMonth:software.source.contentLastUpdatedMonth}});
