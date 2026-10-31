@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "originalFilename": "national_M2025_dl.xlsx",
+    "sha256": "852250997ceff9b721ff68f63e877d818f9c1ec8b1b69dd367958faedd5282b2",
+    "byteCount": 289615,
+    "worksheet": "national_M2025_dl",
+    "descriptionWorksheet": "Field Descriptions",
+    "vintageText": "May 2025 OEWS Estimates",
+    "sourceUrl": "https://www.bls.gov/oes/special-requests/oesm25nat.zip",
+    "releaseDate": "2026-05-15"
+  },
+  "selection": {
+    "AREA": "99",
+    "NAICS": "000000",
+    "OWN_CODE": "1235",
+    "O_GROUP": "detailed",
+    "I_GROUP": "cross-industry",
+    "matched_rows": 12,
+    "absent_requested_fields": []
+  },
+  "representation": "Raw lexical source strings; empty string means blank. Excel 1-based coordinates. No source workbook modifications.",
+  "fieldDefinitions": {
+    "A_MEAN": {
+      "definition": "Mean annual wage ",
+      "source_cells": [
+        "A29",
+        "B29"
+      ]
+    },
+    "A_MEDIAN": {
+      "definition": "Annual median wage (or the 50th percentile)",
+      "source_cells": [
+        "A38",
+        "B38"
+      ]
+    },
+    "ANNUAL": {
+      "definition": "Contains \"TRUE\" if only annual wages are released. The OEWS program releases only annual wages for some occupations that typically work fewer than 2,080 hours per year, but are paid on an annual basis, such as teachers, pilots, and athletes.",
+      "source_cells": [
+        "A41",
+        "B41"
+      ]
+    },
+    "HOURLY": {
+      "definition": "Contains \"TRUE\" if only hourly wages are released. The OEWS program releases only hourly wages for some occupations that typically work fewer than 2,080 hours per year and are paid on an hourly basis, such as actors, dancers, and musicians and singers.",
+      "source_cells": [
+        "A42",
+        "B42"
+      ]
+    },
+    "TOT_EMP": {
+      "definition": "Estimated total employment rounded to the nearest 10 (excludes self-employed).",
+      "source_cells": [
+        "A22",
+        "B22"
+      ]
+    },
+    "EMP_PRSE": {
+      "definition": "Percent relative standard error for the employment estimate, not wage estimate.",
+      "source_cells": [
+        "A23",
+        "B23"
+      ]
+    },
+    "MEAN_PRSE": {
+      "definition": "Percent relative standard error for the mean wage estimate, not median uncertainty.",
+      "source_cells": [
+        "A30",
+        "B30"
+      ]
+    }
+  },
+  "sourceNotes": [
+    {
+      "text": "*  = indicates that a wage estimate is not available",
+      "source_cell": "A45"
+    },
+    {
+      "text": "**  = indicates that an employment estimate is not available",
+      "source_cell": "A46"
+    },
+    {
+      "text": "#  = indicates a wage equal to or greater than $115.00 per hour or $239,200 per year ",
+      "source_cell": "A47"
+    },
+    {
+      "text": "~ =indicates that the percent of establishments reporting the occupation is less than 0.5%",
+      "source_cell": "A48"
+    }
+  ],
+  "records": [
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 110,
+      "cells": {
+        "A_MEDIAN": "AB110",
+        "A_MEAN": "S110"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "13-2011",
+        "OCC_TITLE": "Accountants and Auditors",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "83680",
+        "A_MEAN": "94750",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "1449500",
+        "EMP_PRSE": "0.5",
+        "MEAN_PRSE": "0.3"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 337,
+      "cells": {
+        "A_MEDIAN": "AB337",
+        "A_MEAN": "S337"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "23-1011",
+        "OCC_TITLE": "Lawyers",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "159670",
+        "A_MEAN": "185840",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "754500",
+        "EMP_PRSE": "1.1000000000000001",
+        "MEAN_PRSE": "1.6"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 93,
+      "cells": {
+        "A_MEDIAN": "AB93",
+        "A_MEAN": "S93"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "13-1082",
+        "OCC_TITLE": "Project Management Specialists",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "102320",
+        "A_MEAN": "110740",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "1066670",
+        "EMP_PRSE": "0.6",
+        "MEAN_PRSE": "0.2"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 152,
+      "cells": {
+        "A_MEDIAN": "AB152",
+        "A_MEAN": "S152"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1255",
+        "OCC_TITLE": "Web and Digital Interface Designers",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "104000",
+        "A_MEAN": "117490",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "113330",
+        "EMP_PRSE": "1.6",
+        "MEAN_PRSE": "0.8"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 136,
+      "cells": {
+        "A_MEDIAN": "AB136",
+        "A_MEAN": "S136"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1212",
+        "OCC_TITLE": "Information Security Analysts",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "129180",
+        "A_MEAN": "132510",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "190650",
+        "EMP_PRSE": "2",
+        "MEAN_PRSE": "0.6"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 95,
+      "cells": {
+        "A_MEDIAN": "AB95",
+        "A_MEAN": "S95"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "13-1111",
+        "OCC_TITLE": "Management Analysts",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "101860",
+        "A_MEAN": "113790",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "898280",
+        "EMP_PRSE": "0.7",
+        "MEAN_PRSE": "1.1000000000000001"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 486,
+      "cells": {
+        "A_MEDIAN": "AB486",
+        "A_MEAN": "S486"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "27-3031",
+        "OCC_TITLE": "Public Relations Specialists",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "74750",
+        "A_MEAN": "84120",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "283380",
+        "EMP_PRSE": "1.1000000000000001",
+        "MEAN_PRSE": "1.1000000000000001"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 145,
+      "cells": {
+        "A_MEDIAN": "AB145",
+        "A_MEAN": "S145"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1243",
+        "OCC_TITLE": "Database Architects",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "139500",
+        "A_MEAN": "144440",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "67140",
+        "EMP_PRSE": "2.9",
+        "MEAN_PRSE": "1"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 101,
+      "cells": {
+        "A_MEDIAN": "AB101",
+        "A_MEAN": "S101"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "13-1141",
+        "OCC_TITLE": "Compensation, Benefits, and Job Analysis Specialists",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "78210",
+        "A_MEAN": "84330",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "112380",
+        "EMP_PRSE": "1.6",
+        "MEAN_PRSE": "0.9"
+      }
+    },
+    {
+      "purpose": "parity_control",
+      "worksheet": "national_M2025_dl",
+      "row": 149,
+      "cells": {
+        "A_MEDIAN": "AB149",
+        "A_MEAN": "S149"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1252",
+        "OCC_TITLE": "Software Developers",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "135980",
+        "A_MEAN": "148100",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "1687890",
+        "EMP_PRSE": "0.6",
+        "MEAN_PRSE": "0.4"
+      }
+    },
+    {
+      "purpose": "parity_control",
+      "worksheet": "national_M2025_dl",
+      "row": 165,
+      "cells": {
+        "A_MEDIAN": "AB165",
+        "A_MEAN": "S165"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-2051",
+        "OCC_TITLE": "Data Scientists",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "120230",
+        "A_MEAN": "126800",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "262440",
+        "EMP_PRSE": "1.1000000000000001",
+        "MEAN_PRSE": "0.7"
+      }
+    },
+    {
+      "purpose": "parity_control",
+      "worksheet": "national_M2025_dl",
+      "row": 540,
+      "cells": {
+        "A_MEDIAN": "AB540",
+        "A_MEAN": "S540"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "29-1141",
+        "OCC_TITLE": "Registered Nurses",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "97550",
+        "A_MEAN": "101420",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "3379720",
+        "EMP_PRSE": "0.3",
+        "MEAN_PRSE": "0.2"
+      }
+    }
+  ]
+}

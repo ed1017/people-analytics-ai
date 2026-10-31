@@ -1,3 +1,4 @@
+import usPositionPay from './data/oews-may2025-position-pay.json' with {type:'json'};
 import ukPositionPay from './data/ons-ashe2026-position-pay.json' with {type:'json'};
 import type {DecisionStore,Json} from './local-decisions';
 // @ts-expect-error Native tests share canonical TypeScript.
@@ -50,8 +51,36 @@ export const POSITION_MARKET_UK_ADDITIONAL_REFERENCES=Object.freeze(ukPositionPa
  payWorkbook:ukPositionPay.payWorkbook,payWorkbookSha256:ukPositionPay.payWorkbookSha256,cvWorkbook:ukPositionPay.cvWorkbook,cvWorkbookSha256:ukPositionPay.cvWorkbookSha256,
  sourceSheet:ukPositionPay.sheet,medianCell:row.medianCell,meanCell:row.meanCell,license:ukPositionPay.license,licenseUrl:ukPositionPay.licenseUrl,
 })));
+const additionalUsMappings=[
+ {role:'Accountant',soc:'13-2011',onet:'13-2011.00',duties:'Prepare and examine accounting records and financial statements.',limit:'Accounting and auditing duties; not all finance roles.'},
+ {role:'Privacy Counsel',soc:'23-1011',onet:'23-1011.00',duties:'Advise clients on legal rights and obligations and prepare legal documents.',limit:'Qualified legal-counsel duties; this is broader Lawyers pay, not a privacy-specialist estimate.'},
+ {role:'Legal Counsel',soc:'23-1011',onet:'23-1011.00',duties:'Advise clients on legal rights and obligations and prepare legal documents.',limit:'Qualified legal-counsel duties; not paralegal or compliance-administration work.'},
+ {role:'Project Manager',soc:'13-1082',onet:'13-1082.00',duties:'Coordinate project schedules, staffing, procurement and budgets.',limit:'Project-management specialist duties; not construction-management or executive pay.'},
+ {role:'User Experience Designer',soc:'15-1255',onet:'15-1255.00',duties:'Design and test digital interfaces and usability.',limit:'Digital-interface design duties; not all graphic or industrial design.'},
+ {role:'Information Security Analyst',soc:'15-1212',onet:'15-1212.00',duties:'Plan and implement security measures protecting computer networks and information.',limit:'Information-security analysis duties; not all engineering or IT roles.'},
+ {role:'Management Consultant',soc:'13-1111',onet:'13-1111.00',duties:'Analyze organizational operations and recommend improvements.',limit:'Management-analysis consulting duties; not every consulting specialty.'},
+ {role:'Communications Specialist',soc:'27-3031',onet:'27-3031.00',duties:'Prepare communications and manage public information and organizational reputation.',limit:'Public-relations communication duties; not all marketing or technical writing.'},
+ {role:'Data Architect',soc:'15-1243',onet:'15-1243.00',duties:'Design database architectures and data models and set database standards.',limit:'Database-architecture duties; not generic data engineering or infrastructure work.'},
+ {role:'Total Rewards Specialist',soc:'13-1141',onet:'13-1141.00',duties:'Analyze compensation, benefits and job classifications and administer reward programs.',limit:'Compensation, benefits and job-analysis duties; not all HR work.'},
+] as const;
+function reviewedUsRow(soc:string){
+ const rows=usPositionPay.records.filter(r=>r.raw.OCC_CODE===soc),r=rows[0];
+ if(usPositionPay.source.sha256!=='852250997ceff9b721ff68f63e877d818f9c1ec8b1b69dd367958faedd5282b2'||usPositionPay.source.worksheet!=='national_M2025_dl'||usPositionPay.source.vintageText!=='May 2025 OEWS Estimates'||rows.length!==1||!r||r.raw.AREA!=='99'||r.raw.NAICS!=='000000'||r.raw.OWN_CODE!=='1235'||r.raw.I_GROUP!=='cross-industry'||r.raw.O_GROUP!=='detailed'||r.raw.ANNUAL!==''||r.raw.HOURLY!==''||![r.raw.A_MEDIAN,r.raw.A_MEAN].every(v=>/^\d+(\.\d+)?$/.test(v)&&Number(v)>0&&Number(v)<239200)||r.worksheet!=='national_M2025_dl'||r.cells.A_MEDIAN!==`AB${r.row}`||r.cells.A_MEAN!==`S${r.row}`)throw Error('The reviewed national pay source cannot be verified.');
+ return r;
+}
+export const POSITION_MARKET_US_ADDITIONAL_REFERENCES=Object.freeze(additionalUsMappings.map(mapping=>{
+ const row=reviewedUsRow(mapping.soc);
+ return Object.freeze({version:`oews-may2025-us-${mapping.soc}-${mapping.role.toLowerCase().replaceAll(' ','-')}-v2`,
+ sourceSha256:usPositionPay.source.sha256,occupation:row.raw.OCC_TITLE,occupationCode:mapping.soc,taxonomy:'2018 SOC',geography:'United States',area:'99',
+ period:'May 2025',currency:'USD' as const,wageBasis:'Annual wages per occupational worker; excludes employer benefits',medianNative:Number(row.raw.A_MEDIAN),meanNative:Number(row.raw.A_MEAN),
+ sourceUrl:usPositionPay.source.sourceUrl,mappingScope:'broader-occupation' as const,mappedRole:mapping.role,mappingSourceUrl:`https://www.onetonline.org/link/summary/${mapping.onet}`,mappingDuties:mapping.duties,mappingLimit:mapping.limit,
+ population:'Wage and salary workers across industries in the national occupation',periodStart:'2025-05-01',periodEnd:'2025-05-31',releasedAt:usPositionPay.source.releaseDate,revision:'reviewed-extract',
+ sourceWorkbook:usPositionPay.source.originalFilename,sourceSheet:row.worksheet,medianCell:row.cells.A_MEDIAN,meanCell:row.cells.A_MEAN,annualFlag:row.raw.ANNUAL,hourlyFlag:row.raw.HOURLY,
+ });
+}));
+type AdditionalUsReference=typeof POSITION_MARKET_US_ADDITIONAL_REFERENCES[number];
 type AdditionalUkReference=typeof POSITION_MARKET_UK_ADDITIONAL_REFERENCES[number];
-export type PositionMarketReference=typeof POSITION_MARKET_REFERENCE|typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference;
+export type PositionMarketReference=typeof POSITION_MARKET_REFERENCE|typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference|AdditionalUsReference;
 export type PositionMarketFx={basis:'user-assumption';from:'GBP';to:'USD';usdPerGbp:number;date:string;confirmed:true};
 export function positionMarketNativeAmounts(reference:PositionMarketReference){return 'medianUsd' in reference?{currency:'USD' as const,median:reference.medianUsd,mean:reference.meanUsd}:{currency:reference.currency,median:reference.medianNative,mean:reference.meanNative};}
 const exact=(value:unknown,keys:string[]):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).sort().join()===keys.sort().join();
@@ -61,6 +90,8 @@ const validAt=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-
 const signature=(draft:PositionAllocationDraft)=>JSON.stringify(draft);
 const cost=(wage:number,percent:number)=>Math.round((wage*(1+percent/100)+Number.EPSILON)*100)/100;
 function reviewedSource(version:string=POSITION_MARKET_SOURCE_VERSION):PositionMarketReference{
+ const additionalUs=POSITION_MARKET_US_ADDITIONAL_REFERENCES.find(r=>r.version===version);
+ if(additionalUs){const row=reviewedUsRow(additionalUs.occupationCode);assert(additionalUs.medianNative===Number(row.raw.A_MEDIAN)&&additionalUs.meanNative===Number(row.raw.A_MEAN),'The reviewed national source changed.');return additionalUs;}
  const additional=POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.version===version);
  if(additional){assert(additional.sourceSha256===POSITION_MARKET_UK_REFERENCE.sourceSha256&&[additional.medianNative,additional.meanNative].every(v=>Number.isFinite(v)&&v>0)&&[additional.medianCvPercent,additional.meanCvPercent].every(v=>Number.isFinite(v)&&v>=0&&v<=20),'The reviewed additional UK pay source changed.');return additional;}
  if(version===POSITION_MARKET_BI_REFERENCE.version){const row=marketEvidence({soc:'15-2051',area:'99'});assert(row&&row.currency==='USD'&&row.period==='May 2025'&&row.sourceUrl===POSITION_MARKET_BI_REFERENCE.sourceUrl&&row.selected.A_MEDIAN===120230&&row.selected.A_MEAN===126800,'The reviewed BI occupation source changed.');return POSITION_MARKET_BI_REFERENCE;}
@@ -79,7 +110,7 @@ function eligibleScope(inventoryVersion:string,inventoryKey:string,selectedIds:r
  const role=rows[0]!.role;
  const country=rows[0]!.location;
  assert(rows.every(row=>row!.role===role&&row!.location===country),'Choose vacancies for one role and country before adopting a pay reference.');
- const version=country==='United States'&&softwareRoles.includes(role)?POSITION_MARKET_SOURCE_VERSION:country==='United States'&&role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.version:country==='United Kingdom'&&['Frontend Software Engineer','Backend Software Engineer','Software Engineer'].includes(role)?POSITION_MARKET_UK_REFERENCE.version:country==='United Kingdom'?POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===role)?.version??null:null;
+ const version=country==='United States'&&softwareRoles.includes(role)?POSITION_MARKET_SOURCE_VERSION:country==='United States'&&role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.version:country==='United States'?POSITION_MARKET_US_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===role)?.version??null:country==='United Kingdom'&&['Frontend Software Engineer','Backend Software Engineer','Software Engineer'].includes(role)?POSITION_MARKET_UK_REFERENCE.version:country==='United Kingdom'?POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===role)?.version??null:null;
  assert(version&&(!sourceVersion||version===sourceVersion),'This role and country have no supported pay reference.');
  return {role,reference:reviewedSource(version!)};
 }
@@ -88,7 +119,7 @@ export function positionMarketEligibility(draft:PositionAllocationDraft){
  catch(error){return {eligible:false,reason:error instanceof Error?error.message:'This position scope has no supported pay reference.',role:null,selectedIds:[],reference:null};}
 }
 type AdoptionCommon={inventoryVersion:string;inventoryKey:string;selectedIds:string[];role:string;statistic:'median'|'mean';wageUsd:number;employerOncostPercent:number;annualCostUsd:number;mappingConfirmed:true;fullTimeBasisConfirmed:true;adoptedAt:string};
-export type PositionMarketAdoption=AdoptionCommon&({version:1;sourceVersion:typeof POSITION_MARKET_SOURCE_VERSION;reference:typeof POSITION_MARKET_REFERENCE}|{version:2;sourceVersion:string;reference:typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference;nativeCurrency:'USD'|'GBP';nativeWage:number;fx:PositionMarketFx|null});
+export type PositionMarketAdoption=AdoptionCommon&({version:1;sourceVersion:typeof POSITION_MARKET_SOURCE_VERSION;reference:typeof POSITION_MARKET_REFERENCE}|{version:2;sourceVersion:string;reference:typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference|AdditionalUsReference;nativeCurrency:'USD'|'GBP';nativeWage:number;fx:PositionMarketFx|null});
 export type PositionMarketRecord={scenarioId:string;allocationRevision:number;allocationSignature:string;adoption:PositionMarketAdoption};
 export type PositionMarketLedger={version:1;datasetToken:string;goalId:string;current:PositionMarketAdoption|null;records:PositionMarketRecord[]};
 function requireAdoption(value:unknown):asserts value is PositionMarketAdoption{
@@ -160,7 +191,7 @@ export function confirmPositionMarketAdoption({store,ticket,at}:{store:DecisionS
  assert(state.data.revision===b!.revision&&JSON.stringify(state.data)===b!.stateSignature&&validAt(at),'The saved draft changed. Review the market assumption again.');
  const draft=structuredClone(b!.draft);draft.input.annualHireCostUsd=ticket.annualCostUsd;
  const common={inventoryVersion:draft.inventory.version,inventoryKey:draft.inventoryKey,selectedIds:[...draft.input.selectedIds],role:ticket.role,statistic:ticket.statistic,wageUsd:ticket.wageUsd,employerOncostPercent:ticket.employerOncostPercent,annualCostUsd:ticket.annualCostUsd,mappingConfirmed:true as const,fullTimeBasisConfirmed:true as const,adoptedAt:at};
- const adoption:PositionMarketAdoption=ticket.reference.version===POSITION_MARKET_SOURCE_VERSION?{version:1,sourceVersion:POSITION_MARKET_SOURCE_VERSION,reference:POSITION_MARKET_REFERENCE,...common}:{version:2,sourceVersion:ticket.reference.version,reference:ticket.reference as typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference,...common,nativeCurrency:ticket.nativeCurrency,nativeWage:ticket.nativeWage,fx:ticket.fx};requireAdoption(adoption);
+ const adoption:PositionMarketAdoption=ticket.reference.version===POSITION_MARKET_SOURCE_VERSION?{version:1,sourceVersion:POSITION_MARKET_SOURCE_VERSION,reference:POSITION_MARKET_REFERENCE,...common}:{version:2,sourceVersion:ticket.reference.version,reference:ticket.reference as typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference|AdditionalUsReference,...common,nativeCurrency:ticket.nativeCurrency,nativeWage:ticket.nativeWage,fx:ticket.fx};requireAdoption(adoption);
  const patch={[POSITION_ALLOCATION_DRAFT_FIELD]:draft as unknown as Json,[POSITION_MARKET_FIELD]:{...ledger,current:adoption} as unknown as Json};
  if(b!.goalId)store.commitGoalFields(b!.goalId,goal,b!.revision,at,()=>patch);else store.commitExplorationFields(b!.revision,at,()=>patch);
  tickets.delete(ticket);return structuredClone(draft);
