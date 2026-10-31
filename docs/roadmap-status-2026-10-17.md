@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR491 current - verified US position pay expansion
+### PR493 current - additional duty-qualified US roles
+
+PR493 is live at runtime `07cd690d940fdb6108915f8d1e5b4bff41aa693b`, merge `7bafd4b6302a900bd3289eaf9c3018485d609802`, deployment `dpl_2N94372CZ5JkqR1Lh99d56GFHAA9`. Independent review, 152 affected tests, position type graph, full build/TypeScript and exact-head CI `41225149380` passed. Final public desktop/mobile each passed 10 journey groups with clean reports. [Crosswalk decisions, test-fixture corrections and release evidence](us-market-duty-expansion-2026-10-31.md).
+
+Four roles add six US vacancies: Data Engineer, BI Developer, Transformation Consultant and software QA. Coverage is now 40 of 197 (31 US, nine UK); 157 remain unsupported. The verified QA source row is appended without changing prior rows or reference identities. Procurement's exact occupation is absent, so the broader buyer aggregate is not substituted. Country-only modeled positions receive no inferred state rates. Explicit adoption, original goals/exploration, saved revisions, Track/Review and backups passed. No paid AI calls; Lab validation remains user-owned and the target overlay preview-only.
+
+### PR491 included - verified US position pay expansion
 
 PR491 is live at runtime `9932e961736f027c3c2ac7dcf25d6c13ac6dde4d`, merge `3fff83aeb95aea1662dc0d4bc368e6453d114a4e`, deployment `dpl_64sEzx63QYUqeAjxMm29iScMDxVd`. Independent review, 145 affected tests, position type graph, full build/TypeScript and exact-head CI `41219477499` passed. Staged desktop/mobile and final direct-public desktop/mobile each passed 14 journey groups; final public reports were clean. The initial protected desktop reload timeout and successful isolated retry remain documented in the [source and release evidence](us-position-market-expansion-2026-10-31.md).
 
