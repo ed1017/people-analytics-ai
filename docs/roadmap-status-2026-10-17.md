@@ -1,8 +1,14 @@
-# Active roadmap - October 30
+# Active roadmap - October 31
 
 ## Current live release and active parallel work
 
-### PR483 current - visitor position-to-results journey
+### PR485 current - market evidence into position scenarios
+
+PR485 is live at runtime `9b96fdc373137ac241b848ce547c1b04576fb88e`, merge `5f4fc3f4ec27dbf989ab3fb54d0fe168a3e0fe2d`, deployment `dpl_2wQkjJuvkBbwSzb8eyggXoEnVKe7`. Independent review, exact-head CI `41157396003`, production-equivalent staging and public desktop/mobile acceptance passed. Each public width completed ten journey groups with no page/transport errors or paid provider calls. [Scope and release evidence](position-market-planning-2026-10-31.md).
+
+Selected US software vacancies now compare sourced wages and explicitly adopt an editable cost basis into the existing position planner. Exact saved revisions retain provenance through backup and Track/Review; other roles, country-only regional mismatches and non-USD evidence do not acquire invented rates or approvals. Broader role/location applicant availability and hiring-time evidence remain incomplete. Lab validation stays user-owned; the target overlay remains preview-only.
+
+### PR483 included - visitor position-to-results journey
 
 PR483 is live at runtime `021fa8f0f14cc24dc12ad899182785dab217b082`, merge `2a4fc1e46bb3dd32789dff9764a86257a426b183`, deployment `dpl_FCRHwgs8dy8gcV9WwW9Q8AxhvbzG`. Independent review, 47 affected tests, full build/TypeScript and exact-head CI `41139814806` passed. Public desktop/mobile each passed seven complete journey checks plus three introduction checks, with clean final reports. [Release evidence](visitor-position-journey-2026-10-30.md).
 
