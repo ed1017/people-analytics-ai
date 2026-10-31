@@ -4,9 +4,13 @@ Updated October 31, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-### PR510 current - UK position hiring difficulty
+### PR512 current - conditional non-pay roles
 
-PR510 is live at runtime `ce8ade7d41d8356fbb1cba02afbf3c2d9063bc25`, deployment `dpl_CxX5bYj6yBhaBxSRKvFhPrUBHszc`. Two verified ESS 2024 occupation rows support three UK HR/accounting vacancies through explicit saved-revision context and read-only general-chat lookup. Any non-pay coverage is 43/197; software 40, outlook 39 and pay 59 remain unchanged and overlap. Independent review, 148 affected tests, exact CI and direct public desktop/mobile passed (nine groups and nine mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Source and release evidence](uk-position-hiring-context-2026-10-31.md).
+PR512 is live at runtime `63236723363e885414937737b5819b0e6836ad75`, deployment `dpl_9xzGmqTvJEBbN3y8e15GPBiFGDjD`. A separate non-pay registry adds three US People Analytics/Business Operations vacancies with explicit restrictive duty confirmation, without expanding pay eligibility. Any non-pay coverage is 46/197 (software 43, outlook 42, UK difficulty 3; overlapping), pay 59 unchanged. Independent review, 144 affected tests, exact CI and direct public desktop/mobile passed (ten groups/eight mocked requests each, HTTP 200, clean/drained). All 50 prior references are byte-equivalent. Readiness/chat were mocked; no paid or fresh provider acceptance. [Evidence and limits](conditional-nonpay-position-context-2026-10-31.md).
+
+### PR510 included - UK position hiring difficulty
+
+PR510 was published at runtime `ce8ade7d41d8356fbb1cba02afbf3c2d9063bc25`, deployment `dpl_CxX5bYj6yBhaBxSRKvFhPrUBHszc`. Two verified ESS 2024 occupation rows support three UK HR/accounting vacancies through explicit saved-revision context and read-only general-chat lookup. Any non-pay coverage is 43/197; software 40, outlook 39 and pay 59 remain unchanged and overlap. Independent review, 148 affected tests, exact CI and direct public desktop/mobile passed (nine groups and nine mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Source and release evidence](uk-position-hiring-context-2026-10-31.md).
 
 ### PR508 included - general-chat market lookup
 
@@ -70,3 +74,5 @@ Lab methodology validation remains user-owned. The chart-target overlay is previ
 The user requested more non-pay intelligence on October 31. Labor Market already surfaces US employment/location and national growth/openings, Toronto software vacancies, UK professional-group hiring difficulty, and qualitative occupational skills. Employment is not available applicants; projected openings are not current vacancies; O*NET requirements are not postings demand. Internal company time-to-fill is synthetic, not an external benchmark.
 
 PR504 attached revision-bound outlook/software evidence, PR506 expanded BLS coverage, and PR508 added separate read-only general-chat retrieval. Explicit attachment, canonical scope validation and backup preservation remain required; do not auto-adjust costs, hiring time, training duration or readiness. PR510 now delivers detailed UK survey rows3571 and2421 for three eligible HR/accounting vacancies. Remaining cells retain source boundaries: c means suppressed/confidential, u means low reliability, and occupation-response bases are not unique employer counts. The report minimum base of 50 is not a proven CSV suppression threshold. Detailed software (33) and solicitor (49) rows remain held from primary comparisons; accountant (54) and HR officers (67) passed exact crosswalk/row review and are live in PR510. No role-specific available-applicant count or measured US/UK hiring duration has been verified. Keep People Analytics pay held under the non-pay priority.
+
+PR512 separates conditional non-pay mappings from pay eligibility. People Analytics pay remains held even though eligible statistical/modeling duties can use non-pay context. Next candidate source extracts 15-1241/13-1161 have arrived; mapping and bounded-extract handling remain under review, not published.
