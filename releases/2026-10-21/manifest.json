@@ -5234,13 +5234,13 @@
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "bf579a0edf35824844b5f919fc4dfd24feea499bdbb4a3f131fd04d9b99307be",
-      "bytes": 36600
+      "sha256": "c3fc38a7b7359b2613db1460f35d1e0cb31b8d75a5328e4aafa8a50c3219a432",
+      "bytes": 37274
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "3dfd72b0a60a06cb60fc1df37807cab0d3cc043ca506aea045c9ae8083a122e0",
-      "bytes": 44118
+      "sha256": "634818cba200887f132eb223f8d42b56ccf736635003d308b78a46cda00fa2d1",
+      "bytes": 48151
     },
     {
       "path": "tests/position-market-ui.test.mjs",
