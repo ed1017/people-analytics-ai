@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "df0eeeecb3a23c829e9a60687ad8089a8d28c502ce5a3156cea3badf6d3fadba",
-      "bytes": 19532
+      "sha256": "211184e5c0f60bdab036335c74505fd366f4203b84fe9ce429e1b1b0478b44cd",
+      "bytes": 19712
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5299,7 +5299,7 @@
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "9eb5e472fce4cdcc7e9c5a9924a7ca6754323304529afe95d859f9640de3604b",
+      "sha256": "1ae773029909a8d5055a757ee96596bd19888d0c8167bfc786a6ee5d6e1f1a44",
       "bytes": 10072
     },
     {
@@ -5329,8 +5329,23 @@
     },
     {
       "path": "tests/position-conditional-nonpay.test.mjs",
-      "sha256": "c494e7f8a1d054f18f7d9fbd0c27489f41ba62f9804a06ba5b75f7baf1e653a2",
-      "bytes": 19887
+      "sha256": "62087a3502702d3b0084d5a019ad771c6a4741468067dc2e403e4250451deb60",
+      "bytes": 19932
+    },
+    {
+      "path": "lib/data/network-market-nonpay-v1.json",
+      "sha256": "30bf87e64b84e4f7b94ee9e2548c16157661a7625572d7bf5a7aa11d67f10985",
+      "bytes": 13490
+    },
+    {
+      "path": "lib/position-network-market-context.ts",
+      "sha256": "0e81bc9546fd24661378aa615bca0ecdf7988ff53877e3fe76e3ee4bfd4173a5",
+      "bytes": 5001
+    },
+    {
+      "path": "tests/position-network-market-context.test.mjs",
+      "sha256": "2b41e524af4e448de22d8db4e0e8f14c54f9ab4b07c3b9eaae22f4d2309954e7",
+      "bytes": 23215
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

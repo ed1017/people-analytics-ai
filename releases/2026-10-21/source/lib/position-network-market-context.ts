@@ -1,0 +1,25 @@
+import source from './data/network-market-nonpay-v1.json' with {type:'json'};
+import type {PositionMarketContextReference} from './position-market-context';
+// @ts-expect-error Native tests share application source.
+import {catalogDisplayLabel} from './catalog-display.ts';
+const networkDuties='Use only for a planned role performing network design and implementation AND architecture and capacity analysis; exclude generic cloud administration, server operations and support-only duties.';
+export const NETWORK_MARKET_MAPPINGS=Object.freeze([
+ Object.freeze({roleId:'CLOUD-ENG',role:'Cloud Engineer',onetCode:'15-1241.00',outlookCode:'15-1241',duties:networkDuties}),
+ Object.freeze({roleId:'INFRA-ENG',role:'Infrastructure Engineer',onetCode:'15-1241.00',outlookCode:'15-1241',duties:networkDuties}),
+ Object.freeze({roleId:'SALES-OPS',role:'Sales Operations Specialist',onetCode:'13-1161.00',outlookCode:'13-1161',duties:'Use only for a planned role performing substantive customer, market and competitor research AND demand and trend analysis; exclude CRM maintenance, pipeline reporting, order processing and commission administration.'}),
+]);
+export function networkMarketReferences():PositionMarketContextReference[]{
+ const {bls,onet}=source.source;
+ if(bls.sha256!=='08ee182f992d972593e64559ce467bad75967d2228f11ad5e2f86d4ec0ee6c00'||onet.sha256!=='6aabb96b464288db849580e6510530efff3f80e25dde2bb23f1fc36bb526b016')throw Error('Network/market source identity changed.');
+ const refs:PositionMarketContextReference[]=[];
+ for(const mapping of NETWORK_MARKET_MAPPINGS){
+  if(catalogDisplayLabel(mapping.roleId)!==mapping.role)throw Error('Conditional role identity changed.');
+  const record=source.records.find(r=>r.bls.occupationCode===mapping.outlookCode&&r.software.occupationCode===mapping.onetCode);if(!record)throw Error('Exact occupational reference missing.');
+  const b=record.bls,s=record.software,rows=[...s.rows].sort((a,b)=>a.softwareExample.localeCompare(b.softwareExample)||a.csvRecord-b.csvRecord);
+  if(rows.length!==s.inDemandRows||s.exactOccupationRows!==s.inDemandRows+s.excludedNotFlaggedRows||rows.some(r=>r.inDemand!=='Y'||!['Y','N'].includes(r.hotTechnology)||r.occupationCode!==mapping.onetCode)||new Set(rows.map(r=>r.csvRecord)).size!==rows.length)throw Error('Software extract coverage changed.');
+  const base={countryCode:'US',roles:[mapping.role],mappingDuties:mapping.duties,mappingLimit:`Conditional broader ${b.occupationTitle} occupation reference, not ${mapping.role}-specific evidence. Actual vacancy duties require confirmation. National figures are shared across mapped roles and must not be added together. No applicant availability, hiring-time or proficiency inference.`,geography:'United States national'};
+  refs.push({...base,id:`onet-software:${mapping.onetCode}:${mapping.role}`,version:`${source.id}:onet:${onet.sha256}`,kind:'in-demand-software',occupationCode:mapping.onetCode,occupation:s.occupationTitle,title:'In-demand software',period:'Database 31.0; software updated May 2026',population:'Software examples associated with this O*NET occupation',unit:'categorical source flags',sourceUrl:onet.url,sourceSha256:onet.sha256,attribution:onet.attribution+' Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.',licence:onet.licence,licenceUrl:onet.licenceUrl,facts:{kind:'in-demand-software',items:rows.map(r=>({softwareExample:r.softwareExample,elementId:r.elementId,elementName:r.elementName,inDemand:r.inDemand==='Y',hotTechnology:r.hotTechnology==='Y'})),occupationRows:s.exactOccupationRows,flaggedRows:s.inDemandRows,shownRows:rows.length,truncated:false,ordering:'alphabetical, not ranking',databaseVersion:onet.databaseVersion,contentLastUpdatedMonth:'May 2026'}});
+  refs.push({...base,id:`bls-outlook:${mapping.outlookCode}:${mapping.role}`,version:`${source.id}:bls:${bls.sha256}`,kind:'occupation-outlook',occupationCode:mapping.outlookCode,occupation:b.occupationTitle,title:'Employment outlook',period:`${bls.baseYear}-${bls.projectionYear}`,population:'US national occupation employment and projected annual openings/separations',unit:'jobs; projected annual openings and separations',sourceUrl:bls.url,sourceSha256:bls.sha256,attribution:'Source: U.S. Bureau of Labor Statistics, Employment Projections 2025-2035. Counts converted from thousands; published components independently rounded.',licence:bls.licence,licenceUrl:bls.licenceUrl,facts:{kind:'occupation-outlook',employmentBase:b.employmentBase,employmentProjected:b.employmentProjected,employmentChange:b.employmentChangeNumeric,employmentChangePercent:b.employmentChangePercent,annualOpenings:b.annualAverageOpenings,annualExits:b.annualAverageLaborForceExits,annualTransfers:b.annualAverageOccupationalTransfers,annualSeparations:b.annualAverageOccupationalSeparations,sourceUnit:'thousands',countUnit:'jobs and annual openings/separations',table12Row:b.table12Row,table110Row:b.table110Row}});
+ }
+ return refs;
+}

@@ -1,4 +1,6 @@
 // @ts-expect-error Native tests share application source.
+import {networkMarketReferences} from './position-network-market-context.ts';
+// @ts-expect-error Native tests share application source.
 import {POSITION_NONPAY_ROLE_MAPPINGS} from './position-nonpay-role-mappings.ts';
 import hiring from './data/dfe-ess2024-uk-position-hiring.json' with {type:'json'};
 import software from './data/onet-software-skills-31-reviewed-us.json' with {type:'json'};
@@ -46,6 +48,7 @@ function canonicalReferences():PositionMarketContextReference[]{
   if(base<50||!Number.isSafeInteger(base)||![vac,htf,ssv].every(Number.isSafeInteger)||ssv>htf||htf>vac||ssvPercent>htfPercent||htfPercent>100)continue;
   cards.push({id:`dfe-ess-hiring:${row.occupationCode}:${mapping.mappedRole}`,version:`${hiring.id}:${hiring.source.sha256}`,kind:'hiring-difficulty',countryCode:'GB',roles:[mapping.mappedRole],occupationCode:row.occupationCode,occupation:row.occupationTitle,title:'Hiring difficulty',period:'2024',geography:hiring.source.geography,population:'UK vacancies in this occupation; all sectors',unit:'estimated vacancies and published vacancy percentages',sourceUrl:hiring.source.url,sourceSha256:hiring.source.sha256,attribution:hiring.source.attribution,licence:hiring.source.licence,licenceUrl:hiring.source.licenceUrl,mappingDuties:mapping.dutyAcknowledgement??`Confirm planned duties match ${mapping.occupation} (UK SOC 2020 ${mapping.occupationCode}).`,mappingLimit:'ESS 2024; fieldwork June 2024-January 2025; released July 24, 2025. National occupation survey estimate, not role-specific or local hiring difficulty. Shared occupation figures are not additive across mapped roles. Skill-shortage vacancies are a subset of hard-to-fill vacancies. Counts are rounded; use published percentages. The response base counts occupation responses, not unique employers. App display policy requires at least 50 responses, not a claimed source suppression threshold. No available-applicant or time-to-fill estimate.',facts:{kind:'hiring-difficulty',vacancies:vac,hardToFillVacancies:htf,skillShortageVacancies:ssv,hardToFillPercent:htfPercent,skillShortagePercent:ssvPercent,occupationResponseBase:base,sourceCsvRow:row.sourceCsvRow}});
  }
+ cards.push(...networkMarketReferences());
  return cards;
 }
 const references=canonicalReferences();
