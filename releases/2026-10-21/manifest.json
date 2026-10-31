@@ -5274,8 +5274,8 @@
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
-      "sha256": "2978794c7de9c5e85a67fb090558322b0543d51ae99be4b072e3bad0316a8aa4",
-      "bytes": 7994
+      "sha256": "6abd33f95ef5f641ebe5c0591b1e0f6bc18b9f42c70acffc646c41d3bf2c91d0",
+      "bytes": 14505
     },
     {
       "path": "lib/data/onet-software-skills-31-reviewed-us.json",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "f69564e4f451944aeeb18c10f20939bff364f42e78573fd9636b53a61e048cd2",
-      "bytes": 16028
+      "sha256": "4c569c9945ea404ba1c66aa1ee345f3c1ccb2b501ee5ad82c2790a4582ece6ae",
+      "bytes": 16264
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5296,6 +5296,11 @@
       "path": "tests/position-market-context.test.mjs",
       "sha256": "ea3fec19e776b3bd937d6112ef01f57856cac2f4b18d614e044e0411a30c0114",
       "bytes": 9296
+    },
+    {
+      "path": "tests/position-outlook-coverage.test.mjs",
+      "sha256": "8572e4049de4fdb8670f7d0d1e3d02176e8bbe0699c51827aa869944ea618f1f",
+      "bytes": 10073
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
