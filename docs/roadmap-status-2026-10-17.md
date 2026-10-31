@@ -2,15 +2,21 @@
 
 ## Current live release and active parallel work
 
-### PR500 current - saved market explanation context
+### PR502 current - budgeting and HR systems references
 
-PR500 is live at runtime `627518ac4ea2eb7cb829a8105309b415c8bdb16e`, merge `602cd24171f5e55b06e1baa8af486650f000bf6d`, deployment `dpl_6S5XGpma9FE2p17GFyyDiG6fufRH`. Exact saved source/statistic/native-currency/FX provenance now reaches both mounted position explanation paths. Independent review, 127 affected checks, 68 independent focused checks and CI `41235212064` passed. Public desktop/mobile each passed ten groups with clean reports and preserved saved histories. All explanation traffic was mocked locally; no paid calls or fresh model acceptance. Coverage remains 54 of 197. [Release acceptance](position-market-grounding-release-2026-10-31.md).
+PR502 is live at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, merge `8893169c57db91d1be5da53716045cbc0ac2e441`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`. Conditional pay-reference coverage is 59 of 197 (40 US, 14 UK, five Japan). Independent review, 113 affected checks, full build/TypeScript and CI `41239788805` passed; public desktop/mobile each passed eight groups with clean reports and preserved saved histories. [Source and release evidence](us-budget-systems-market-reference-2026-10-31.md).
+
+The user has shifted priority to non-pay external intelligence: hiring demand, skills, difficulty and credible supply/hiring-time evidence. A reviewed People Analytics pay candidate is held in a separate checkout, not released. Next integration should attach verified non-pay context explicitly to saved position revisions and AI explanations without changing costs, timing or readiness automatically. Broader source evidence is being checked; do not claim available applicants from employment or measured hiring time from vacancy difficulty.
+
+### PR500 included - saved market explanation context
+
+PR500 was published at runtime `627518ac4ea2eb7cb829a8105309b415c8bdb16e`, merge `602cd24171f5e55b06e1baa8af486650f000bf6d`, deployment `dpl_6S5XGpma9FE2p17GFyyDiG6fufRH`. Exact saved source/statistic/native-currency/FX provenance now reaches both mounted position explanation paths. Independent review, 127 affected checks, 68 independent focused checks and CI `41235212064` passed. Public desktop/mobile each passed ten groups with clean reports and preserved saved histories. All explanation traffic was mocked locally; no paid calls or fresh model acceptance. Coverage at that release was 54 of 197. [Release acceptance](position-market-grounding-release-2026-10-31.md).
 
 ### PR499 included - US machine-learning reference
 
 PR499 was published at runtime `fed6ef7d8fda265572ca6107f6946e744ebe21b8`, merge `d60c9f4bdda4212917376cfa6502d42ce2ccaf46`, deployment `dpl_9obRQcR1Qi84mTALwgappaRcB8B6`. Its changes are included in PR500. Two US ML vacancies now have a conditional broader Data Scientists reference for model-development/evaluation duties. Coverage is 54 of 197 (35 US, 14 UK, five Japan); 143 remain unsupported. Prior reference entries, Japan JPY assumptions and saved work are preserved. Independent review, 116 affected checks, 64 independent focused checks, full build/TypeScript and exact-head CI `41233627411` passed; public desktop/mobile each passed seven groups with HTTP 200 and clean reports. [Source rationale and release acceptance](us-machine-learning-market-reference-2026-10-31.md).
 
-Next work is evidence-gated: verify the requested US Budget Analysts and Computer Systems Analysts workbook rows and duty fit; resolve Australian customised-report reuse terms and original workbook access. Do not publish guessed mappings. Documentation and mocked tests are not fresh model acceptance. [AI handoff and evidence boundaries](market-reference-ai-handoff.md).
+The US Budget Analysts and Computer Systems Analysts rows and duty review were completed in PR502. Australian customised-report reuse terms and original workbook access remain unresolved. Do not publish guessed mappings. Documentation and mocked tests are not fresh model acceptance. [AI handoff and evidence boundaries](market-reference-ai-handoff.md).
 
 ### PR497 included - Japan market-to-position planning
 

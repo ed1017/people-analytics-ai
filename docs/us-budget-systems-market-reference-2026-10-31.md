@@ -1,6 +1,6 @@
 # US budgeting and HR systems market references
 
-Status: implementation candidate, not yet released. The bounded proposal adds three US Financial Planning and Analysis Analyst vacancies and two US HR Systems Specialist vacancies, moving conditional reference coverage from 54 to 59 of 197 if acceptance passes. These are modeled recruiting vacancies; reference eligibility is not funding approval or verified recruitment feasibility.
+Status: PR502 is live at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, merge `8893169c57db91d1be5da53716045cbc0ac2e441`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`. Three US Financial Planning and Analysis Analyst vacancies and two US HR Systems Specialist vacancies now have conditional references. Coverage is **59 of 197**: 40 US, 14 UK and five Japan. These are modeled recruiting vacancies; eligibility is not funding approval or recruitment feasibility.
 
 ## Reviewed role scope
 
@@ -24,4 +24,10 @@ Adoption retains explicit duty confirmation, chosen mean/median, modeled FTE bas
 
 ## Acceptance record
 
-Pending focused/aggregate checks, independent review, exact-head CI, production-equivalent staging and direct public desktop/mobile acceptance. No release or expanded live coverage is claimed by this document yet.
+Independent review and five independently run targeted checks passed, alongside 72 focused checks, 113 affected aggregate checks, zero component type diagnostics, full packaged build/TypeScript and exact-head CI `41239788805`. Package SHA256 `a3253ade0482bf0c6fe20fa841e28cb7a173d59dba2fd1c4ea02e121b5c97165` includes 1,196 inputs and 1,051 manifest files. Private inputs and dependency locks are unchanged.
+
+The production-equivalent build https://people-analytics-nfj42anxh-ed-56dc.vercel.app was promoted without rebuilding. Initial staged tests incorrectly required a replacement dialog for a non-conflicting draft, then an eligible-pay heading for an unsupported country. The corrected harness checks actual selected IDs and conditional confirmation. Four completed groups were retained; a validated QA checkpoint resumed the remaining five groups. No app code changed for these corrections. Protected staging had a post-assertion teardown timeout and already-handled dashboard route, with no pre-cleanup app or transport errors.
+
+Direct public desktop (1440px) and mobile (390px) each passed **eight groups**, HTTP 200, zero application/blocked/mock/bridge errors and drained teardown. Actual images were inspected. Checks cover real prior-backup restoration, USD/GBP/JPY reopening, isolated goal creation, both new roles and duty consent, mean/median/on-cost, pure cancel/stale review, mixed and unsupported scopes, immutable revision/reload, a 3-FTE target versus a dated 2.5-FTE result (0.5-FTE Review gap), and actual backup cancel/restore. One locally intercepted explanation request per width verified canonical saved source context. All model and readiness responses were mocked; no paid calls or fresh provider/readiness acceptance is claimed.
+
+Evidence: `integration-evidence/position-market-us-budget-systems-public-a40f891-{1440,390}.json`, images/backups and `US-BUDGET-SYSTEMS-MARKET-RELEASE.json`.
