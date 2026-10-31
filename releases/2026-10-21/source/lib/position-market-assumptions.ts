@@ -1,3 +1,4 @@
+import ukPositionPay from './data/ons-ashe2026-position-pay.json' with {type:'json'};
 import type {DecisionStore,Json} from './local-decisions';
 // @ts-expect-error Native tests share canonical TypeScript.
 import {requirePositionAllocationDraft,type PositionAllocationDraft} from './position-allocation.ts';
@@ -37,7 +38,20 @@ export const POSITION_MARKET_UK_REFERENCE=Object.freeze({
  population:'Full-time employee jobs; adult rates; same job more than one year',periodStart:'2025-04-06',periodEnd:'2026-04-05',releasedAt:'2026-10-22',revision:'provisional',
  medianCvPercent:2.4,meanCvPercent:2,
 });
-export type PositionMarketReference=typeof POSITION_MARKET_REFERENCE|typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE;
+/** Immutable additional references; legacy reference objects remain unchanged. */
+export const POSITION_MARKET_UK_ADDITIONAL_REFERENCES=Object.freeze(ukPositionPay.rows.map(row=>Object.freeze({
+ version:`ons-ashe2026-uk-${row.occupationCode}-v2`,sourceSha256:ukPositionPay.archiveSha256,
+ occupation:row.occupation,occupationCode:row.occupationCode,taxonomy:'UK SOC 2020',geography:'United Kingdom',area:'GB',
+ period:'April 2025-April 2026',currency:'GBP' as const,wageBasis:'Annual gross employee pay; excludes employer benefit costs',
+ medianNative:row.medianNative,meanNative:row.meanNative,sourceUrl:ukPositionPay.sourceUrl,mappingScope:'broader-occupation' as const,
+ population:'Full-time employee jobs; adult rates; same job more than one year',periodStart:'2025-04-06',periodEnd:'2026-04-05',releasedAt:'2026-10-22',revision:'provisional',
+ medianCvPercent:row.medianCvPercent,meanCvPercent:row.meanCvPercent,socMajorGroup:row.socMajorGroup,
+ mappingSourceUrl:row.mappingSourceUrl,mappingPages:row.mappingPages,mappedRole:row.role,
+ payWorkbook:ukPositionPay.payWorkbook,payWorkbookSha256:ukPositionPay.payWorkbookSha256,cvWorkbook:ukPositionPay.cvWorkbook,cvWorkbookSha256:ukPositionPay.cvWorkbookSha256,
+ sourceSheet:ukPositionPay.sheet,medianCell:row.medianCell,meanCell:row.meanCell,license:ukPositionPay.license,licenseUrl:ukPositionPay.licenseUrl,
+})));
+type AdditionalUkReference=typeof POSITION_MARKET_UK_ADDITIONAL_REFERENCES[number];
+export type PositionMarketReference=typeof POSITION_MARKET_REFERENCE|typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference;
 export type PositionMarketFx={basis:'user-assumption';from:'GBP';to:'USD';usdPerGbp:number;date:string;confirmed:true};
 export function positionMarketNativeAmounts(reference:PositionMarketReference){return 'medianUsd' in reference?{currency:'USD' as const,median:reference.medianUsd,mean:reference.meanUsd}:{currency:reference.currency,median:reference.medianNative,mean:reference.meanNative};}
 const exact=(value:unknown,keys:string[]):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).sort().join()===keys.sort().join();
@@ -47,6 +61,8 @@ const validAt=(value:unknown):value is string=>typeof value==='string'&&/^\d{4}-
 const signature=(draft:PositionAllocationDraft)=>JSON.stringify(draft);
 const cost=(wage:number,percent:number)=>Math.round((wage*(1+percent/100)+Number.EPSILON)*100)/100;
 function reviewedSource(version:string=POSITION_MARKET_SOURCE_VERSION):PositionMarketReference{
+ const additional=POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.version===version);
+ if(additional){assert(additional.sourceSha256===POSITION_MARKET_UK_REFERENCE.sourceSha256&&[additional.medianNative,additional.meanNative].every(v=>Number.isFinite(v)&&v>0)&&[additional.medianCvPercent,additional.meanCvPercent].every(v=>Number.isFinite(v)&&v>=0&&v<=20),'The reviewed additional UK pay source changed.');return additional;}
  if(version===POSITION_MARKET_BI_REFERENCE.version){const row=marketEvidence({soc:'15-2051',area:'99'});assert(row&&row.currency==='USD'&&row.period==='May 2025'&&row.sourceUrl===POSITION_MARKET_BI_REFERENCE.sourceUrl&&row.selected.A_MEDIAN===120230&&row.selected.A_MEAN===126800,'The reviewed BI occupation source changed.');return POSITION_MARKET_BI_REFERENCE;}
  if(version===POSITION_MARKET_UK_REFERENCE.version){const r=UK_SOFTWARE_PAY_REFERENCE;assert(r.id==='ons-ashe-2026-provisional-2134-full-time-annual-gross-gb'&&r.occupation.code==='2134'&&r.geography.code==='GB'&&r.currency==='GBP'&&r.source.archiveSha256===POSITION_MARKET_UK_REFERENCE.sourceSha256&&r.estimates.median===59862.5&&r.estimates.mean===69120.6&&r.estimates.medianCvPercent===2.4&&r.estimates.meanCvPercent===2&&r.periodStart==='2025-04-06'&&r.periodEnd==='2026-04-05'&&r.revision==='provisional','The reviewed UK pay source changed.');return POSITION_MARKET_UK_REFERENCE;}
  assert(version===POSITION_MARKET_SOURCE_VERSION,'Unsupported market source version.');
@@ -63,7 +79,7 @@ function eligibleScope(inventoryVersion:string,inventoryKey:string,selectedIds:r
  const role=rows[0]!.role;
  const country=rows[0]!.location;
  assert(rows.every(row=>row!.role===role&&row!.location===country),'Choose vacancies for one role and country before adopting a pay reference.');
- const version=country==='United States'&&softwareRoles.includes(role)?POSITION_MARKET_SOURCE_VERSION:country==='United States'&&role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.version:country==='United Kingdom'&&['Frontend Software Engineer','Backend Software Engineer','Software Engineer'].includes(role)?POSITION_MARKET_UK_REFERENCE.version:null;
+ const version=country==='United States'&&softwareRoles.includes(role)?POSITION_MARKET_SOURCE_VERSION:country==='United States'&&role==='Business Intelligence Analyst'?POSITION_MARKET_BI_REFERENCE.version:country==='United Kingdom'&&['Frontend Software Engineer','Backend Software Engineer','Software Engineer'].includes(role)?POSITION_MARKET_UK_REFERENCE.version:country==='United Kingdom'?POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===role)?.version??null:null;
  assert(version&&(!sourceVersion||version===sourceVersion),'This role and country have no supported pay reference.');
  return {role,reference:reviewedSource(version!)};
 }
@@ -72,7 +88,7 @@ export function positionMarketEligibility(draft:PositionAllocationDraft){
  catch(error){return {eligible:false,reason:error instanceof Error?error.message:'This position scope has no supported pay reference.',role:null,selectedIds:[],reference:null};}
 }
 type AdoptionCommon={inventoryVersion:string;inventoryKey:string;selectedIds:string[];role:string;statistic:'median'|'mean';wageUsd:number;employerOncostPercent:number;annualCostUsd:number;mappingConfirmed:true;fullTimeBasisConfirmed:true;adoptedAt:string};
-export type PositionMarketAdoption=AdoptionCommon&({version:1;sourceVersion:typeof POSITION_MARKET_SOURCE_VERSION;reference:typeof POSITION_MARKET_REFERENCE}|{version:2;sourceVersion:string;reference:typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE;nativeCurrency:'USD'|'GBP';nativeWage:number;fx:PositionMarketFx|null});
+export type PositionMarketAdoption=AdoptionCommon&({version:1;sourceVersion:typeof POSITION_MARKET_SOURCE_VERSION;reference:typeof POSITION_MARKET_REFERENCE}|{version:2;sourceVersion:string;reference:typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference;nativeCurrency:'USD'|'GBP';nativeWage:number;fx:PositionMarketFx|null});
 export type PositionMarketRecord={scenarioId:string;allocationRevision:number;allocationSignature:string;adoption:PositionMarketAdoption};
 export type PositionMarketLedger={version:1;datasetToken:string;goalId:string;current:PositionMarketAdoption|null;records:PositionMarketRecord[]};
 function requireAdoption(value:unknown):asserts value is PositionMarketAdoption{
@@ -144,7 +160,7 @@ export function confirmPositionMarketAdoption({store,ticket,at}:{store:DecisionS
  assert(state.data.revision===b!.revision&&JSON.stringify(state.data)===b!.stateSignature&&validAt(at),'The saved draft changed. Review the market assumption again.');
  const draft=structuredClone(b!.draft);draft.input.annualHireCostUsd=ticket.annualCostUsd;
  const common={inventoryVersion:draft.inventory.version,inventoryKey:draft.inventoryKey,selectedIds:[...draft.input.selectedIds],role:ticket.role,statistic:ticket.statistic,wageUsd:ticket.wageUsd,employerOncostPercent:ticket.employerOncostPercent,annualCostUsd:ticket.annualCostUsd,mappingConfirmed:true as const,fullTimeBasisConfirmed:true as const,adoptedAt:at};
- const adoption:PositionMarketAdoption=ticket.reference.version===POSITION_MARKET_SOURCE_VERSION?{version:1,sourceVersion:POSITION_MARKET_SOURCE_VERSION,reference:POSITION_MARKET_REFERENCE,...common}:{version:2,sourceVersion:ticket.reference.version,reference:ticket.reference as typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE,...common,nativeCurrency:ticket.nativeCurrency,nativeWage:ticket.nativeWage,fx:ticket.fx};requireAdoption(adoption);
+ const adoption:PositionMarketAdoption=ticket.reference.version===POSITION_MARKET_SOURCE_VERSION?{version:1,sourceVersion:POSITION_MARKET_SOURCE_VERSION,reference:POSITION_MARKET_REFERENCE,...common}:{version:2,sourceVersion:ticket.reference.version,reference:ticket.reference as typeof POSITION_MARKET_BI_REFERENCE|typeof POSITION_MARKET_UK_REFERENCE|AdditionalUkReference,...common,nativeCurrency:ticket.nativeCurrency,nativeWage:ticket.nativeWage,fx:ticket.fx};requireAdoption(adoption);
  const patch={[POSITION_ALLOCATION_DRAFT_FIELD]:draft as unknown as Json,[POSITION_MARKET_FIELD]:{...ledger,current:adoption} as unknown as Json};
  if(b!.goalId)store.commitGoalFields(b!.goalId,goal,b!.revision,at,()=>patch);else store.commitExplorationFields(b!.revision,at,()=>patch);
  tickets.delete(ticket);return structuredClone(draft);
