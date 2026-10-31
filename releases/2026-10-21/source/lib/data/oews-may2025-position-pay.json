@@ -16,7 +16,7 @@
     "OWN_CODE": "1235",
     "O_GROUP": "detailed",
     "I_GROUP": "cross-industry",
-    "matched_rows": 15,
+    "matched_rows": 17,
     "absent_requested_fields": []
   },
   "representation": "Raw lexical source strings; empty string means blank. Excel 1-based coordinates. No source workbook modifications.",
@@ -468,6 +468,60 @@
         "TOT_EMP": "186740",
         "EMP_PRSE": "2.2999999999999998",
         "MEAN_PRSE": "0.7"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 114,
+      "cells": {
+        "A_MEDIAN": "AB114",
+        "A_MEAN": "S114"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "13-2031",
+        "OCC_TITLE": "Budget Analysts",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "91640",
+        "A_MEAN": "96370",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "47160",
+        "EMP_PRSE": "1.4",
+        "MEAN_PRSE": "0.6"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 135,
+      "cells": {
+        "A_MEDIAN": "AB135",
+        "A_MEAN": "S135"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1211",
+        "OCC_TITLE": "Computer Systems Analysts",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "105850",
+        "A_MEAN": "114610",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "519530",
+        "EMP_PRSE": "1",
+        "MEAN_PRSE": "0.4"
       }
     }
   ]
