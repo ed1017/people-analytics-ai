@@ -16,7 +16,7 @@
     "OWN_CODE": "1235",
     "O_GROUP": "detailed",
     "I_GROUP": "cross-industry",
-    "matched_rows": 13,
+    "matched_rows": 15,
     "absent_requested_fields": []
   },
   "representation": "Raw lexical source strings; empty string means blank. Excel 1-based coordinates. No source workbook modifications.",
@@ -90,6 +90,35 @@
     }
   ],
   "records": [
+    {
+      "purpose": "crosswalk_review_candidate_no_automatic_mapping",
+      "worksheet": "national_M2025_dl",
+      "row": 815,
+      "cells": { "A_MEDIAN": "AB815", "A_MEAN": "S815" },
+      "raw": {
+        "AREA": "99", "AREA_TITLE": "U.S.", "AREA_TYPE": "1",
+        "NAICS": "000000", "I_GROUP": "cross-industry", "OWN_CODE": "1235",
+        "OCC_CODE": "41-3091",
+        "OCC_TITLE": "Sales Representatives of Services, Except Advertising, Insurance, Financial Services, and Travel",
+        "O_GROUP": "detailed", "A_MEDIAN": "69990", "A_MEAN": "82430",
+        "ANNUAL": "", "HOURLY": "", "TOT_EMP": "1256010",
+        "EMP_PRSE": "0.7", "MEAN_PRSE": "0.4"
+      }
+    },
+    {
+      "purpose": "explicit_aggregate_crosswalk_reference",
+      "worksheet": "national_M2025_dl",
+      "row": 79,
+      "cells": { "A_MEDIAN": "AB79", "A_MEAN": "S79" },
+      "raw": {
+        "AREA": "99", "AREA_TITLE": "U.S.", "AREA_TYPE": "1",
+        "NAICS": "000000", "I_GROUP": "cross-industry", "OWN_CODE": "1235",
+        "OCC_CODE": "13-1020", "OCC_TITLE": "Buyers and Purchasing Agents",
+        "O_GROUP": "detailed", "A_MEDIAN": "77710", "A_MEAN": "83770",
+        "ANNUAL": "", "HOURLY": "", "TOT_EMP": "491430",
+        "EMP_PRSE": "0.7", "MEAN_PRSE": "0.2"
+      }
+    },
     {
       "purpose": "crosswalk_review_candidate",
       "worksheet": "national_M2025_dl",

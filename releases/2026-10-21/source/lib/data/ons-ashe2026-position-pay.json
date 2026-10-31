@@ -36,7 +36,7 @@
       "medianCell": "D87",
       "meanCell": "F87",
       "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
-      "mappingPages": "67\u201368"
+      "mappingPages": "67–68"
     },
     {
       "role": "HR Business Partner",
@@ -64,7 +64,87 @@
       "medianCell": "D274",
       "meanCell": "F274",
       "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
-      "mappingPages": "203\u2013204"
+      "mappingPages": "203–204"
+    },
+    {
+      "role": "Accountant",
+      "occupationCode": "2421",
+      "occupation": "Chartered and certified accountants",
+      "socMajorGroup": "2",
+      "medianNative": 50744.7,
+      "meanNative": 54781.8,
+      "medianCvPercent": 7.9,
+      "meanCvPercent": 3.9,
+      "medianCell": "D152",
+      "meanCell": "F152",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "114–115",
+      "referenceVersion": "ons-ashe2026-uk-2421-accountant-v2",
+      "dutyAcknowledgement": "Use this reference for a planned role requiring professionally qualified accounting or audit duties."
+    },
+    {
+      "role": "Quality Assurance Engineer",
+      "occupationCode": "2136",
+      "occupation": "IT quality and testing professionals",
+      "socMajorGroup": "2",
+      "medianNative": 45165.4,
+      "meanNative": 47938.1,
+      "medianCvPercent": 9.5,
+      "meanCvPercent": 11.0,
+      "medianCell": "D88",
+      "meanCell": "F88",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "68",
+      "referenceVersion": "ons-ashe2026-uk-2136-quality-assurance-engineer-v2",
+      "dutyAcknowledgement": "Use this reference for a planned role requiring software or system testing duties."
+    },
+    {
+      "role": "Business Intelligence Analyst",
+      "occupationCode": "3544",
+      "occupation": "Data analysts",
+      "socMajorGroup": "3",
+      "medianNative": 41246.8,
+      "meanNative": 48474.7,
+      "medianCvPercent": 3.2,
+      "meanCvPercent": 4.5,
+      "medianCell": "D261",
+      "meanCell": "F261",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "194",
+      "referenceVersion": "ons-ashe2026-uk-3544-business-intelligence-analyst-v2",
+      "dutyAcknowledgement": "Use this reference for a planned role requiring data analysis, dashboards and reporting duties."
+    },
+    {
+      "role": "Sales Account Executive",
+      "occupationCode": "3552",
+      "occupation": "Business sales executives",
+      "socMajorGroup": "3",
+      "medianNative": 41693.6,
+      "meanNative": 50661.8,
+      "medianCvPercent": 3.7,
+      "meanCvPercent": 3.5,
+      "medianCell": "D265",
+      "meanCell": "F265",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "197",
+      "referenceVersion": "ons-ashe2026-uk-3552-sales-account-executive-v2",
+      "dutyAcknowledgement": "Use this reference for a planned role requiring technical goods or services sales duties."
+    },
+    {
+      "role": "Talent Management Specialist",
+      "occupationCode": "3571",
+      "occupation": "Human resources and industrial relations officers",
+      "socMajorGroup": "3",
+      "medianNative": 36612.2,
+      "meanNative": 42101.3,
+      "medianCvPercent": 4.3,
+      "meanCvPercent": 4.1,
+      "medianCell": "D274",
+      "meanCell": "F274",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "203–204",
+      "referenceVersion": "ons-ashe2026-uk-3571-talent-management-specialist-v2",
+      "dutyAcknowledgement": "Use this reference for a planned role requiring appraisal and training-policy advisory duties."
     }
   ]
 }

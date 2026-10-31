@@ -41,7 +41,7 @@ export const POSITION_MARKET_UK_REFERENCE=Object.freeze({
 });
 /** Immutable additional references; legacy reference objects remain unchanged. */
 export const POSITION_MARKET_UK_ADDITIONAL_REFERENCES=Object.freeze(ukPositionPay.rows.map(row=>Object.freeze({
- version:`ons-ashe2026-uk-${row.occupationCode}-v2`,sourceSha256:ukPositionPay.archiveSha256,
+ version:row.referenceVersion??`ons-ashe2026-uk-${row.occupationCode}-v2`,sourceSha256:ukPositionPay.archiveSha256,
  occupation:row.occupation,occupationCode:row.occupationCode,taxonomy:'UK SOC 2020',geography:'United Kingdom',area:'GB',
  period:'April 2025-April 2026',currency:'GBP' as const,wageBasis:'Annual gross employee pay; excludes employer benefit costs',
  medianNative:row.medianNative,meanNative:row.meanNative,sourceUrl:ukPositionPay.sourceUrl,mappingScope:'broader-occupation' as const,
@@ -50,6 +50,7 @@ export const POSITION_MARKET_UK_ADDITIONAL_REFERENCES=Object.freeze(ukPositionPa
  mappingSourceUrl:row.mappingSourceUrl,mappingPages:row.mappingPages,mappedRole:row.role,
  payWorkbook:ukPositionPay.payWorkbook,payWorkbookSha256:ukPositionPay.payWorkbookSha256,cvWorkbook:ukPositionPay.cvWorkbook,cvWorkbookSha256:ukPositionPay.cvWorkbookSha256,
  sourceSheet:ukPositionPay.sheet,medianCell:row.medianCell,meanCell:row.meanCell,license:ukPositionPay.license,licenseUrl:ukPositionPay.licenseUrl,
+ ...(row.dutyAcknowledgement?{dutyAcknowledgement:row.dutyAcknowledgement}:{}),
 })));
 const additionalUsMappings=[
  {role:'Accountant',soc:'13-2011',onet:'13-2011.00',duties:'Prepare and examine accounting records and financial statements.',limit:'Accounting and auditing duties; not all finance roles.'},
@@ -66,6 +67,8 @@ const additionalUsMappings=[
  {role:'Business Intelligence Developer',soc:'15-2051',onet:'15-2051.01',duties:'Develop business-intelligence tools, reports and supporting databases.',limit:'Business-intelligence duties within the broader Data Scientists wage occupation; not developer-specific wages.'},
  {role:'Transformation Consultant',soc:'13-1111',onet:'13-1111.00',duties:'Analyze organizational processes and plan changes that improve operations.',limit:'Organizational and process-change analysis duties; not all transformation or technical consulting.'},
  {role:'Quality Assurance Engineer',soc:'15-1253',onet:'15-1253.00',duties:'Design and execute software tests and identify and document software defects.',limit:'Software quality-assurance and testing duties; not manufacturing or other quality-engineering work.'},
+ {role:'Sourcing Specialist',soc:'13-1020',onet:'13-1023.00',duties:'Select suppliers, purchase goods and services, and negotiate purchasing contracts.',limit:'Narrower purchasing-agent duties use the broader Buyers and Purchasing Agents wage group, not a separate 13-1023 wage estimate.',acknowledgement:'Use Buyers and Purchasing Agents pay for a planned role requiring supplier selection, purchasing and contract negotiation duties.'},
+ {role:'Sales Account Executive',soc:'41-3091',onet:'41-3091.00',duties:'Sell services to customers, explain service features and negotiate sales terms.',limit:'Services sales excluding advertising, insurance, financial services and travel; not goods sales.',acknowledgement:'Use this reference for a planned role selling services outside advertising, insurance, financial services and travel.'},
 ] as const;
 function reviewedUsRow(soc:string){
  const rows=usPositionPay.records.filter(r=>r.raw.OCC_CODE===soc),r=rows[0];
@@ -80,6 +83,7 @@ export const POSITION_MARKET_US_ADDITIONAL_REFERENCES=Object.freeze(additionalUs
  sourceUrl:usPositionPay.source.sourceUrl,mappingScope:'broader-occupation' as const,mappedRole:mapping.role,mappingSourceUrl:`https://www.onetonline.org/link/summary/${mapping.onet}`,mappingDuties:mapping.duties,mappingLimit:mapping.limit,
  population:'Wage and salary workers across industries in the national occupation',periodStart:'2025-05-01',periodEnd:'2025-05-31',releasedAt:usPositionPay.source.releaseDate,revision:'reviewed-extract',
  sourceWorkbook:usPositionPay.source.originalFilename,sourceSheet:row.worksheet,medianCell:row.cells.A_MEDIAN,meanCell:row.cells.A_MEAN,annualFlag:row.raw.ANNUAL,hourlyFlag:row.raw.HOURLY,
+ ...("acknowledgement" in mapping?{dutyAcknowledgement:mapping.acknowledgement}:{}),
  });
 }));
 type AdditionalUsReference=typeof POSITION_MARKET_US_ADDITIONAL_REFERENCES[number];
