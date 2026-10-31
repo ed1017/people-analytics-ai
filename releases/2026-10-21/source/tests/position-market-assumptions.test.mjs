@@ -1,10 +1,11 @@
+import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {DecisionStore} from '../lib/local-decisions.ts';
 import {generateCompanyPositionInventoryV2} from '../lib/company-position-model-v2.ts';
 import {DEMO_POSITION_INVENTORY} from '../lib/position-inventory.ts';
 import {createPositionAllocation} from '../lib/position-allocation.ts';
 import {savePositionScenario,POSITION_ALLOCATION_DRAFT_FIELD as D,POSITION_ALLOCATION_LEDGER_FIELD as A} from '../lib/position-allocation-store.ts';
-import {POSITION_MARKET_FIELD as M,POSITION_MARKET_REFERENCE,POSITION_MARKET_BI_REFERENCE,POSITION_MARKET_UK_REFERENCE,positionMarketNativeAmounts,positionMarketEligibility,preparePositionMarketAdoption as prepare,confirmPositionMarketAdoption as confirm,updatePositionMarketDraft as edit,readPositionMarketLedger,currentPositionMarketEvidence,positionMarketForCapture} from '../lib/position-market-assumptions.ts';
+import {POSITION_MARKET_FIELD as M,POSITION_MARKET_REFERENCE,POSITION_MARKET_BI_REFERENCE,POSITION_MARKET_UK_REFERENCE,POSITION_MARKET_UK_ADDITIONAL_REFERENCES,positionMarketNativeAmounts,positionMarketEligibility,preparePositionMarketAdoption as prepare,confirmPositionMarketAdoption as confirm,updatePositionMarketDraft as edit,readPositionMarketLedger,currentPositionMarketEvidence,positionMarketForCapture} from '../lib/position-market-assumptions.ts';
 import {preparePositionTrackingGoal,confirmPositionTrackingGoal} from '../lib/position-tracking-goal.ts';
 import {encodeDecisionBackup,parseDecisionBackup} from '../lib/decision-backup.ts';
 import {preparePositionResultTarget} from '../lib/position-result-targets.ts';
@@ -16,7 +17,7 @@ test('only exact supported US software vacancy scopes can adopt the national ref
  assert.equal(ids.length,2);const h=setup(),eligible=positionMarketEligibility(h.draft);assert.equal(eligible.eligible,true);assert.equal(eligible.reference.medianUsd,135980);
  assert.ok(ids.every(id=>inventory.positions.find(p=>p.id===id).fte===1));
  const demo=createPositionAllocation(DEMO_POSITION_INVENTORY.positions.filter(p=>p.status==='vacant').slice(0,12).map(p=>p.id),true);assert.equal(positionMarketEligibility(demo).eligible,false);
- for(const position of [inventory.positions.find(p=>p.countryCode==='GB'&&p.status==='vacant'),inventory.positions.find(p=>p.countryCode==='US'&&p.role==='Accountant'&&p.status==='vacant'),inventory.positions.find(p=>p.status==='filled'&&p.role==='Frontend Software Engineer'&&p.countryCode==='US')])assert.equal(positionMarketEligibility(createPositionAllocation([position.id],false,inventory)).eligible,false);
+ for(const position of [inventory.positions.find(p=>p.countryCode==='GB'&&p.role==='Corporate Development Analyst'&&p.status==='vacant'),inventory.positions.find(p=>p.countryCode==='US'&&p.role==='Accountant'&&p.status==='vacant'),inventory.positions.find(p=>p.status==='filled'&&p.role==='Frontend Software Engineer'&&p.countryCode==='US')])assert.equal(positionMarketEligibility(createPositionAllocation([position.id],false,inventory)).eligible,false);
  const mixed=[ids[0],inventory.positions.find(p=>p.countryCode==='US'&&p.role==='Accountant'&&p.status==='vacant').id];assert.equal(positionMarketEligibility(createPositionAllocation(mixed,false,inventory)).eligible,false);
 });
 test('review is pure; explicit adoption changes only annual cost and provenance atomically',()=>{
@@ -62,12 +63,12 @@ test('unknown annual cost clears applicability; old stale current data is retain
 });
 const fx={basis:'user-assumption',from:'GBP',to:'USD',usdPerGbp:1.25,date:'2026-10-30',confirmed:true};
 function scoped(role,country){const h=setup(),positions=inventory.positions.filter(p=>p.role===role&&p.countryCode===country&&p.status==='vacant');assert.ok(positions.length);const draft=createPositionAllocation(positions.map(p=>p.id),false,inventory);draft.input.hire=1;h.store.setField('',D,draft);return h;}
-test('expanded mappings cover exactly six of197 real modeled vacancies, with no fuzzy fallback',()=>{
+test('expanded mappings cover exactly twelve of197 real modeled vacancies, with no fuzzy fallback',()=>{
  const vacancies=inventory.positions.filter(p=>p.status==='vacant');assert.equal(vacancies.length,197);
- const eligible=vacancies.filter(p=>positionMarketEligibility(createPositionAllocation([p.id],false,inventory)).eligible);assert.equal(eligible.length,6);
+ const eligible=vacancies.filter(p=>positionMarketEligibility(createPositionAllocation([p.id],false,inventory)).eligible);assert.equal(eligible.length,12);
  assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Frontend Software Engineer').length,2);
  assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Business Intelligence Analyst').length,1);
- assert.deepEqual(eligible.filter(p=>p.countryCode==='GB').map(p=>p.role).sort(),['Backend Software Engineer','Frontend Software Engineer','Software Engineer']);
+ assert.equal(eligible.filter(p=>p.countryCode==='GB').length,9);
  for(const role of ['Business Intelligence Developer','Machine Learning Engineer','Data Engineer']){const h=scoped(role,'US');assert.equal(positionMarketEligibility(h.fields()[D]).eligible,false);assert.throws(()=>h.review());}
  const mixed=[...scoped('Frontend Software Engineer','US').fields()[D].input.selectedIds,...scoped('Frontend Software Engineer','GB').fields()[D].input.selectedIds];assert.equal(positionMarketEligibility(createPositionAllocation(mixed,false,inventory)).eligible,false);
  const ukMixed=eligible.filter(p=>p.countryCode==='GB').map(p=>p.id);assert.equal(positionMarketEligibility(createPositionAllocation(ukMixed,false,inventory)).eligible,false);
@@ -101,4 +102,38 @@ test('v2 backups and goal promotion retain source/FX versions and reject changed
   assert.deepEqual(data.exploration,original);assert.deepEqual(fields[M].records,original.fields[M].records);assert.equal(fields[M].current,null);assert.doesNotThrow(()=>preparePositionResultTarget(h.store,{scenarioId:'one',allocationRevision:1,financeRevision:null,date:'2027-04-30'}));assert.deepEqual(parseDecisionBackup(encodeDecisionBackup(data,h.datasetToken,at),h.datasetToken).data,data);
   for(const change of [a=>a.reference.sourceSha256='bad',a=>a.reference.occupationCode='15-1252',a=>a.nativeCurrency='CAD',a=>a.nativeWage++,a=>a.wageUsd++,a=>a.sourceVersion='unknown',a=>a.annualCostUsd++,a=>a.reference.period='May 2026',a=>a.fx=input?{...fx,usdPerGbp:1.26}:fx]){const bad=structuredClone(data);change(bad.workspaces['new-market'].fields[M].records[0].adoption);assert.throws(()=>encodeDecisionBackup(bad,h.datasetToken,at));}
  }
+});
+
+const additionalCases=[['Legal Counsel','2412',3,57197.9,74738.3,7.7,6.3],['Cybersecurity Engineer','2135',1,55372.7,65521.6,6.2,5.3],['HR Business Partner','1136',1,61445.2,75399.7,3.8,4],['Talent Acquisition Specialist','3571',1,36612.2,42101.3,4.3,4.1]];
+test('additional UK references pin exact reviewed pay, population, cells and broader mapping consent',()=>{
+ assert.equal(POSITION_MARKET_UK_ADDITIONAL_REFERENCES.length,4);
+ for(const [role,code,count,median,mean,medianCv,meanCv] of additionalCases){
+  const h=scoped(role,'GB'),ref=positionMarketEligibility(h.fields()[D]).reference;
+  assert.equal(h.fields()[D].input.selectedIds.length,count);assert.equal(ref.occupationCode,code);assert.equal(ref.mappedRole,role);assert.equal(ref.socMajorGroup,code[0]);assert.equal(ref.mappingScope,'broader-occupation');
+  assert.deepEqual(positionMarketNativeAmounts(ref),{currency:'GBP',median,mean});assert.equal(ref.medianCvPercent,medianCv);assert.equal(ref.meanCvPercent,meanCv);assert.equal(ref.sourceSheet,'Full-Time');assert.match(ref.payWorkbook,/14.7a/);assert.match(ref.cvWorkbook,/14.7b/);assert.match(ref.mappingSourceUrl,/soc2020.*pdf/);assert.equal(Object.isFrozen(ref),true);
+  assert.throws(()=>h.review({fx,mappingConfirmed:false}));assert.throws(()=>h.review({fx:null}));
+  for(const statistic of ['median','mean']){const ticket=h.review({fx,statistic,employerOncostPercent:20});assert.equal(ticket.nativeWage,statistic==='median'?median:mean);assert.equal(ticket.annualCostUsd,Math.round(((statistic==='median'?median:mean)*1.25*1.2+Number.EPSILON)*100)/100);}
+ }
+ for(const role of ['Corporate Development Analyst','Accountant','Talent Management Specialist','Quality Assurance Engineer'])assert.equal(positionMarketEligibility(scoped(role,'GB').fields()[D]).eligible,false);
+});
+test('additional UK adoption preserves allocation inputs, immutable captures, backup and tracking bindings',()=>{
+ for(const [role] of additionalCases){
+  const h=scoped(role,'GB'),before=structuredClone(h.fields()[D]),ticket=h.review({fx});const updated=confirm({store:h.store,ticket,at});assert.deepEqual(updated,{...before,input:{...before.input,annualHireCostUsd:ticket.annualCostUsd}});
+  const capture=h.save(),evidence=positionMarketForCapture(h.ledger(),capture);assert.equal(evidence.version,2);assert.equal(evidence.nativeCurrency,'GBP');
+  const next=structuredClone(updated);next.input.annualHireCostUsd=null;edit({...h.options,draft:next});assert.equal(currentPositionMarketEvidence(h.ledger(),next),null);assert.deepEqual(positionMarketForCapture(h.ledger(),capture),evidence);
+  const promote=preparePositionTrackingGoal({store:h.store,datasetToken:h.datasetToken});confirmPositionTrackingGoal({store:h.store,ticket:promote,goalId:'additional-uk',at});const data=h.store.getSnapshot().data;
+  assert.deepEqual(parseDecisionBackup(encodeDecisionBackup(data,h.datasetToken,at),h.datasetToken).data,data);
+  for(const mutate of [a=>a.reference.meanNative++,a=>a.reference.medianCvPercent=21,a=>a.reference.socMajorGroup='2x',a=>a.reference.mappedRole='Accountant',a=>a.reference.medianCell='D1',a=>a.nativeCurrency='USD']){const bad=structuredClone(data);mutate(bad.workspaces['additional-uk'].fields[M].records[0].adoption);assert.throws(()=>encodeDecisionBackup(bad,h.datasetToken,at));}
+ }
+});
+
+test('legacy reference definitions retain exact prior UTF-8 bytes',()=>{
+ const text=readFileSync(new URL('../lib/position-market-assumptions.ts',import.meta.url),'utf8');
+ const expected={"POSITION_MARKET_REFERENCE": "1e939625ea4e9d9783d0740691d3ab6ff9af21839957ad6f75ad3b1a9eb1ead7", "POSITION_MARKET_BI_REFERENCE": "ef50f4d467e1bba5b187ac406361c69ef537a79cd717b367163749456b3c2e0c", "POSITION_MARKET_UK_REFERENCE": "4dff9137bde6501e94ea4b257105a043b8b7efab0047da325d9a3e80220b9406"};
+ for(const [name,hash] of Object.entries(expected)){const block=text.match(new RegExp('export const '+name+'=Object.freeze\\(\\{[\\s\\S]*?\\n\\}\\);'))?.[0];assert.ok(block);assert.equal(createHash('sha256').update(block).digest('hex'),hash);}
+});
+test('reviewed fixture and emitted references agree on every source cell and estimate',()=>{
+ const fixture=JSON.parse(readFileSync(new URL('../lib/data/ons-ashe2026-position-pay.json',import.meta.url),'utf8'));
+ assert.equal(fixture.archiveSha256,'4719f364d596739679d1bb492a1fc42e4c8e980a5b93ffc791e350f4ba8f4f1d');assert.equal(fixture.payWorkbookSha256,'a26908bc4e68162649c3de46b5fdfad051adcb87f256c5f667c7e4e23d0e230a');assert.equal(fixture.cvWorkbookSha256,'124e8532d4abc6a4ab18f91f8b8ea5d97d191e6139dce7bc9d7a8a4770c695eb');
+ for(const row of fixture.rows){const ref=POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.mappedRole===row.role);for(const key of ['occupationCode','occupation','socMajorGroup','medianNative','meanNative','medianCvPercent','meanCvPercent','medianCell','meanCell','mappingSourceUrl','mappingPages'])assert.equal(ref[key],row[key]);}
 });

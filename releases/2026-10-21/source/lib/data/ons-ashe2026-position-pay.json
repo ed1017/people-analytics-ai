@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "archiveSha256": "4719f364d596739679d1bb492a1fc42e4c8e980a5b93ffc791e350f4ba8f4f1d",
+  "sourceUrl": "https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/occupation4digitsoc2010ashetable14",
+  "payWorkbook": "PROV - Occupation  SOC20 (4) Table 14.7a   Annual pay - Gross 2026.xlsx",
+  "payWorkbookSha256": "a26908bc4e68162649c3de46b5fdfad051adcb87f256c5f667c7e4e23d0e230a",
+  "cvWorkbook": "PROV - Occupation  SOC20 (4) Table 14.7b   Annual pay - Gross 2026 CV.xlsx",
+  "cvWorkbookSha256": "124e8532d4abc6a4ab18f91f8b8ea5d97d191e6139dce7bc9d7a8a4770c695eb",
+  "sheet": "Full-Time",
+  "license": "Open Government Licence v3.0",
+  "licenseUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "rows": [
+    {
+      "role": "Legal Counsel",
+      "occupationCode": "2412",
+      "occupation": "Solicitors and lawyers",
+      "socMajorGroup": "2",
+      "medianNative": 57197.9,
+      "meanNative": 74738.3,
+      "medianCvPercent": 7.7,
+      "meanCvPercent": 6.3,
+      "medianCell": "D149",
+      "meanCell": "F149",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "112"
+    },
+    {
+      "role": "Cybersecurity Engineer",
+      "occupationCode": "2135",
+      "occupation": "Cyber security professionals",
+      "socMajorGroup": "2",
+      "medianNative": 55372.7,
+      "meanNative": 65521.6,
+      "medianCvPercent": 6.2,
+      "meanCvPercent": 5.3,
+      "medianCell": "D87",
+      "meanCell": "F87",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "67\u201368"
+    },
+    {
+      "role": "HR Business Partner",
+      "occupationCode": "1136",
+      "occupation": "Human resource managers and directors",
+      "socMajorGroup": "1",
+      "medianNative": 61445.2,
+      "meanNative": 75399.7,
+      "medianCvPercent": 3.8,
+      "meanCvPercent": 4.0,
+      "medianCell": "D22",
+      "meanCell": "F22",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "17"
+    },
+    {
+      "role": "Talent Acquisition Specialist",
+      "occupationCode": "3571",
+      "occupation": "Human resources and industrial relations officers",
+      "socMajorGroup": "3",
+      "medianNative": 36612.2,
+      "meanNative": 42101.3,
+      "medianCvPercent": 4.3,
+      "meanCvPercent": 4.1,
+      "medianCell": "D274",
+      "meanCell": "F274",
+      "mappingSourceUrl": "https://www.ons.gov.uk/file?uri=/methodology/classificationsandstandards/standardoccupationalclassificationsoc/soc2020/soc2020volume1structureanddescriptionsofunitgroups/soc2020volume1structureanddescriptionofunitgroups20260827.pdf",
+      "mappingPages": "203\u2013204"
+    }
+  ]
+}

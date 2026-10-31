@@ -5229,23 +5229,28 @@
     },
     {
       "path": "components/workforce-planning/position-market-assumptions.tsx",
-      "sha256": "03306111a485a14f2fb73572e064632bd7d26f7e00688b20514f0a3fd9ed462f",
-      "bytes": 13881
+      "sha256": "cf30e6a02c8d359ef34980f906bc4e9714453a52f39054ba9ba16c8ed3f46082",
+      "bytes": 16074
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "dbccd553c788d7288ee416329260db270f13b9fa1fa2d5eb1b967ab65263dc2d",
-      "bytes": 21989
+      "sha256": "185b08d19b53fef012883ca20dc6308e5e553d94a662df2d125e08287ecc8164",
+      "bytes": 24137
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "c86bd571691ad869de7c44df9e1f5ac69504183f0aeffd51994fab56c036cb61",
-      "bytes": 17382
+      "sha256": "b249017c7cda043bc0a6e8ee3502d05bfaa9975fa2e142a64589d25afb0c2844",
+      "bytes": 22366
     },
     {
       "path": "tests/position-market-ui.test.mjs",
-      "sha256": "81dd15738bef9b8adde9ba1b96aa7a3047d9fd3368a0c3ef229fd5942398916c",
-      "bytes": 11893
+      "sha256": "9749e48eead81b919341a26a3c8ec4125e939331bc46bdc135c5a473f715518f",
+      "bytes": 14871
+    },
+    {
+      "path": "lib/data/ons-ashe2026-position-pay.json",
+      "sha256": "99dc5e16495c46dafc9991b902d21f8e15aa05f66f896ead40ebc1ee9d18c6a3",
+      "bytes": 3334
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
