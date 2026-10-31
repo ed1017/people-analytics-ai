@@ -2,7 +2,15 @@
 
 ## Current live release and active parallel work
 
-### PR493 current - additional duty-qualified US roles
+### PR495 current - conditional UK and US role references
+
+PR495 is live at runtime `8e17f49f6ab2ec39c282178a54f2d73a9d7de9b1`, merge `4bbcc2a8e476caecbdf00aad03f0bd3ab7b42171`, deployment `dpl_5SzQeQsQRzYKg6CxcJFzofgA6nvD`. Independent review, 158 affected tests, position type graph, full build/TypeScript and exact-head CI `41228435697` passed. Direct public desktop/mobile each passed 13 groups with HTTP 200 and clean reports. [Source decisions, remaining evidence requirements and release acceptance](market-reference-next-batch-2026-10-31.md).
+
+Seven additional vacancies now have conditional pay references: five UK professional/advisory/sales roles, US sourcing using the explicitly named buyer aggregate, and US services sales with its sector exclusions. Coverage is 47 of 197 (33 US, 14 UK); 150 remain unsupported. Role-specific duty confirmation, explicit FX/on-cost, immutable original revisions, goal isolation, Track/Review and backups passed. No paid AI calls, inferred state locations or changes to user-owned Lab/preview-only target overlay. Next permitted source investigation checks the Australian workbook's exact wage and reuse contract; India remains the largest source gap at 59 vacancies.
+
+Earlier release sections below preserve coverage and source status at those release checkpoints.
+
+### PR493 included - additional duty-qualified US roles
 
 PR493 is live at runtime `07cd690d940fdb6108915f8d1e5b4bff41aa693b`, merge `7bafd4b6302a900bd3289eaf9c3018485d609802`, deployment `dpl_2N94372CZ5JkqR1Lh99d56GFHAA9`. Independent review, 152 affected tests, position type graph, full build/TypeScript and exact-head CI `41225149380` passed. Final public desktop/mobile each passed 10 journey groups with clean reports. [Crosswalk decisions, test-fixture corrections and release evidence](us-market-duty-expansion-2026-10-31.md).
 
