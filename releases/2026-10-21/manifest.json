@@ -1399,8 +1399,8 @@
     },
     {
       "path": "lib/analytics-tool-dispatch.mjs",
-      "sha256": "258fb35a5dc2f1a4d229be6568f28836e0d92ab864a5a66b929fe3c4210bae3d",
-      "bytes": 3589
+      "sha256": "c060c7bbd89b4ce27ccae5bc23bfab1b0483c7f8947da5e90bc258c7c4514bff",
+      "bytes": 3777
     },
     {
       "path": "lib/app-navigation.ts",
@@ -2609,13 +2609,13 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "25f08035f1584ea766378c6b7983182995976f2486f781d33158bbbc7b8739a6",
-      "bytes": 40724
+      "sha256": "ce76e5720321eceb168c18385191d14a6d034b9f2e71e403ccc69467df98410c",
+      "bytes": 40948
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "5148941dc5b16782332254a0b882c736c75c2703bb4133ac6c6467e1fc06f4af",
-      "bytes": 45307
+      "sha256": "f5160016311da1f26a33f9a7710987581c43117b7b2270dffa1de0fb42f2981f",
+      "bytes": 45665
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2749,8 +2749,8 @@
     },
     {
       "path": "lib/intelligence-chat.ts",
-      "sha256": "c988f54ba3be7d7b96613e0e668ef3378b2bd5f307438f103a855161c4113e2e",
-      "bytes": 14545
+      "sha256": "da6ba13f512c06923721c88387b540fd41ec90274c5933d87519a15d239ce7e4",
+      "bytes": 14708
     },
     {
       "path": "lib/internal-talent-readiness.ts",
@@ -3164,8 +3164,8 @@
     },
     {
       "path": "lib/public-chat-conversation.mjs",
-      "sha256": "5c3d9dffbfcf7547ff90cef901717bd69bb4a269d80684b2ab1056b73b3e6f53",
-      "bytes": 13546
+      "sha256": "c13a560f7368e50929685a9698aa678dfeb7a97f15eb5da44dd2b6d02e04ffa6",
+      "bytes": 14023
     },
     {
       "path": "lib/public-home-aggregate.server.mjs",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "4c569c9945ea404ba1c66aa1ee345f3c1ccb2b501ee5ad82c2790a4582ece6ae",
-      "bytes": 16264
+      "sha256": "4b7963fd14efd8ef7b2366480c8108024455446dae3bdede3a09a2e426586197",
+      "bytes": 16460
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5301,6 +5301,16 @@
       "path": "tests/position-outlook-coverage.test.mjs",
       "sha256": "8572e4049de4fdb8670f7d0d1e3d02176e8bbe0699c51827aa869944ea618f1f",
       "bytes": 10073
+    },
+    {
+      "path": "lib/market-context-lookup.ts",
+      "sha256": "f16c97cbbaa9f79dcfc7fa59784b99a36ec622cf5b0552af5cb0fd70d34693c8",
+      "bytes": 4392
+    },
+    {
+      "path": "tests/market-context-lookup.test.mjs",
+      "sha256": "f153448cc08c17bf804e9f1c60e0ea27c59176fd45948eed3bcdaa3ca87ecf09",
+      "bytes": 8353
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

@@ -1,3 +1,4 @@
+import {marketContextLookupTool,marketContextLookupInstructions} from './market-context-lookup.ts';
 import {PUBLIC_9037} from './public-9037-contract.mjs';
 import {capacityChatPrompt} from './capacity-chat-context.ts';
 import {positionChatPrompt,readPositionChatContext} from './position-chat-context.ts';
@@ -74,14 +75,16 @@ export function createPublicChatConversation({inputs,progressEnabled=false,now})
    if(bundle){const result=await inspectBundleResponse(()=>call(spec,signal),goal.goal,evidence,task,homeBundleOutputTokens);if(!result.proposal)throw Error('Invalid bundle response.');return result;}
    const result=await call(spec,signal);if(result.status!=='completed')throw Error('Incomplete action response.');return {proposal:decodeHomeActionProposal(result.output_text??'',goal.goal,evidence),usage:usage(result.usage)};
   }
-  const spec={store:false,instructions:instructions+'\n'+positionInstructions+'\n'+shared.instructions+'\n'+guided.instructions+'\n'+guidedConversationInstructions(chatCalculationToolsAvailable(body.page,summary))+'\n'+conversationalAnswerStyle+'\n'+(missingPage?missingProgressPageInstructions:summary?goalSummaryInstructions:independent?intelligenceInstructions:home?homeConversationInstructions(purpose)+'\n'+strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)+'\n'+homeFindingInstructions(evidence)+'\n'+style.instructions+'\n'+(prepareGoal?homeGoalChoiceInstructions+'\n'+homeCandidateInstructions:''):''),input,max_output_tokens:entryContext?4000:missingPage||summary?1100:home?style.maxOutputTokens:3000,...(home&&!summary?{text:{format:buildHomeReplyFormat(evidence,prepareGoal)}}:guided.format),tools:hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?[]:[...tools.definitions,...(progress?[goalProgressReadTool]:[])],tool_choice:hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?'none':'auto',parallel_tool_calls:false};
+  const catalogAllowed=!hasPositionContext&&!summary&&!missingPage;
+  const catalogOnly=catalogAllowed&&(home||independent||!chatCalculationToolsAvailable(body.page,summary));
+  const spec={store:false,instructions:instructions+'\n'+(catalogAllowed?marketContextLookupInstructions:'')+'\n'+positionInstructions+'\n'+shared.instructions+'\n'+guided.instructions+'\n'+guidedConversationInstructions(chatCalculationToolsAvailable(body.page,summary))+'\n'+conversationalAnswerStyle+'\n'+(missingPage?missingProgressPageInstructions:summary?goalSummaryInstructions:independent?intelligenceInstructions:home?homeConversationInstructions(purpose)+'\n'+strategicPlanningInstructions(message,planningHistory,body.planningCalculatorAvailable===true)+'\n'+homeFindingInstructions(evidence)+'\n'+style.instructions+'\n'+(prepareGoal?homeGoalChoiceInstructions+'\n'+homeCandidateInstructions:''):''),input,max_output_tokens:entryContext?4000:missingPage||summary?1100:home?style.maxOutputTokens:3000,...(home&&!summary?{text:{format:buildHomeReplyFormat(evidence,prepareGoal)}}:guided.format),tools:catalogOnly?[marketContextLookupTool]:hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?[]:[...tools.definitions,...(progress?[goalProgressReadTool]:[])],tool_choice:catalogOnly?'auto':hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)?'none':'auto',parallel_tool_calls:false};
   let response,calls=0;
   for(let round=0;round<6;round++){
    if(JSON.stringify(spec.input).length>180000)throw Error('Public context budget exceeded.');
    response=await call(spec,signal);if(response.status!=='completed'||JSON.stringify(response).length>200000)throw Error('Incomplete or oversized model response.');
    const requested=(Array.isArray(response.output)?response.output:[]).filter(x=>x?.type==='function_call');
    if(!requested.length)break;
-   if(hasPositionContext||home||summary||independent||missingPage||!chatCalculationToolsAvailable(body.page,summary)||round===5||calls+requested.length>8)throw Error('Unsupported tool call or exhausted budget.');
+   if(hasPositionContext||summary||missingPage||catalogOnly&&requested.some(t=>t.name!==marketContextLookupTool.name)||!catalogOnly&&(home||independent||!chatCalculationToolsAvailable(body.page,summary))||round===5||calls+requested.length>8)throw Error('Unsupported tool call or exhausted budget.');
    spec.input.push(...response.output);
    for(const tool of requested){
     if(!boundedText(tool.call_id,120)||!boundedText(tool.arguments,65536))throw Error('Invalid model tool request.');
