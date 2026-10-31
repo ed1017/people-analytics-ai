@@ -4,7 +4,13 @@ Updated October 31, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-PR502 is live at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`, including PR500 grounding. Conditional pay references cover **59 of 197** modeled vacancies: 40 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
+### PR504 current - non-pay context attached to saved positions
+
+PR504 is live at runtime `45214a6aa3fa89625849e91aa03e930fa7732ff6`, merge `59bbccb542e00bdee71b5c43234616b1fc8059a1`, deployment `dpl_97VfRULVhVFtQoMyVyBjLsDPRvGA`. Software-demand context supports 40 of 197 vacancies; 17 also have projected openings/exits/transfers. Pay coverage remains 59 of 197. Explicit append-only context attachments bind to saved allocation revisions and survive backup/tracking copies; explanations use the explicitly selected version. Independent review, 134 affected tests, build/TypeScript and CI `41242899587` passed. Public desktop/mobile each passed eight groups and seven mocked requests, HTTP 200 and clean reports. [Sources, contracts, limits and release acceptance](nonpay-position-context-2026-10-31.md).
+
+Next priority is broader verified non-pay occupation coverage. Detailed UK survey comparisons remain separately gated by sample/suppression interpretation. People Analytics pay candidate stays held; no paid AI calls, Lab validation or target-overlay promotion.
+
+PR502 was published at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`, including PR500 grounding. Conditional pay references cover **59 of 197** modeled vacancies: 40 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
 
 PR500 fixed the missing explanation provenance: canonical adoption is validated for the exact saved scenario/revision and includes native statistic and calculation basis. Legacy packets without market evidence retain unknown provenance. Both mounted entrypoints passed public desktop/mobile mocked-request acceptance; this is not fresh model-answer acceptance. No paid model calls were made. [Exact release evidence](position-market-grounding-release-2026-10-31.md).
 

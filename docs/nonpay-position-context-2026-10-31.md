@@ -1,6 +1,6 @@
 # Non-pay market context for position planning
 
-Status: implementation candidate, not released. User priority changed on October 31 from incremental pay coverage to decision-useful non-pay evidence. The separate People Analytics pay candidate is held; it is not part of this slice.
+Status: PR504 live and publicly verified. User priority changed on October 31 from incremental pay coverage to decision-useful non-pay evidence. The separate People Analytics pay candidate is held; it is not part of this slice.
 
 ## New evidence
 
@@ -24,7 +24,7 @@ For example, Budget Analysts has 2,900 projected annual openings, 1,000 labor-fo
 
 ## Revision and explanation contract
 
-The proposed `planning.positionMarketContextV1` lives in the existing saved-work store. Explicit reviewed attachments bind canonical source IDs/versions to the exact dataset, goal, scenario, allocation revision and signature. Context revisions are append-only and explicitly selected for explanation. No pay adoption is required. Attaching context must not alter allocation, finance, pay, hiring time, training duration or readiness.
+The versioned `planning.positionMarketContextV1` lives in the existing saved-work store. Explicit reviewed attachments bind canonical source IDs/versions to the exact dataset, goal, scenario, allocation revision and signature. Context revisions are append-only and explicitly selected for explanation. No pay adoption is required. Attaching context must not alter allocation, finance, pay, hiring time, training duration or readiness.
 
 Server validation reconstructs canonical evidence instead of trusting client-supplied figures or URLs. Backup/restore and tracking-goal copies must preserve and validate the attachment relationships. Legacy records with no attachment remain compatible. Selected-role duty confirmation remains necessary; a company title alone is not occupational equivalence. Mixed or unsupported scopes stay unavailable.
 
@@ -32,4 +32,21 @@ Server validation reconstructs canonical evidence instead of trusting client-sup
 
 UK occupation-specific ESS difficulty is being evaluated separately: preserve published density, sample base and every suppression symbol; do not derive rates from rounded counts or silently inherit broad-group estimates. Toronto cannot be inferred from a Canada-only position. German vacancy-duration workbook rights remain unresolved. No direct role-specific available-applicant count or open US/UK measured time-to-fill was established. The company time-to-fill metric remains internal synthetic data.
 
-Acceptance is pending independent model/UI review, regression/CI, isolated production staging and public desktop/mobile checks. Mocked explanation requests are not paid-provider answer acceptance. No paid calls, new credentials, accounting/access changes, Lab validation or target-overlay publication are included.
+Independent model/UI review, regression/CI, isolated production staging and public desktop/mobile checks passed. Mocked explanation requests are not paid-provider answer acceptance. No paid calls, new credentials, accounting/access changes, Lab validation or target-overlay publication are included.
+
+## Release and acceptance
+
+- PR504 runtime `45214a6aa3fa89625849e91aa03e930fa7732ff6`; merge `59bbccb542e00bdee71b5c43234616b1fc8059a1`.
+- Deployment `dpl_97VfRULVhVFtQoMyVyBjLsDPRvGA`, stage `people-analytics-phrikgtkp-ed-56dc.vercel.app`; exact tested production build promoted and confirmed on `www.ed-ai.app`.
+- Archive SHA256 `05140e523e229f8808dff4db35af82a4f32cef1c63894ff00fc1321f931862f1`; 1,202 runtime inputs and 1,057 manifest source files. Private inputs and dependency locks unchanged.
+- Independent review compared every selected software row and all eight BLS tuples; 8 backend and 15 UI checks passed. Root aggregate: 134 passed. Position type graph, full production build/TypeScript and exact-head CI `41242899587` passed.
+- Staged desktop 1440px/mobile 390px each passed eight groups and seven locally fulfilled explanation requests, with no errors before cleanup. Protected transport cleanup hit its 15-second bound and emitted already-handled-route errors after closure; this is recorded separately from application acceptance.
+- Direct public desktop/mobile each passed eight groups and seven locally fulfilled requests: HTTP 200, zero page/blocked/mock/bridge errors, clean drained teardown. Screenshots inspected. Actual PR502 backups restored; explicit goal copy, no-pay attachment, consent, cancellation, stale edits, immutable versions, selected/cleared context, reload, Inventory/Overview and backup round-trip passed.
+- Software context is eligible for 40 of 197 vacancies; 17 also support outlook context. All are US references. Pay coverage remains 59 of 197. Eight BLS source rows do not imply eight eligible internal role mappings; HR source rows remain inactive without reviewed mappings.
+- Reports: `position-market-nonpay-context-{stage,public}-45214a6-{1440,390}.json`, coverage inventory `position-market-nonpay-coverage-20261031.json`, and `POSITION-NONPAY-MARKET-RELEASE.json` in executor integration evidence. No paid calls or fresh provider acceptance.
+
+## Next source work
+
+Requested exact Table 1.2/1.10 records for 15-2051, 15-1212, 15-1243, 15-1253, 15-1255, 13-1082, 13-1141, 27-3031 and 41-3091 from the already verified original workbook. Missing or aggregated rows must be reported, not substituted.
+
+UK ESS symbols are now verified: `c` confidential/suppressed, `u` low reliability ([DfE standards](https://dfe-analytical-services.github.io/analysts-guide/statistics-production/ud.html#data-symbols)). Occupation-response base is not necessarily unique employers; multiple occupations at a site may share a SOC ([methodology](https://explore-education-statistics.service.gov.uk/methodology/employer-skills-survey-2022-2024)). The full report's minimum base of 50 is a reporting convention, not a proven CSV suppression threshold. Software base 33 and solicitor 49 remain held from primary detailed comparisons; accountant 54 is a candidate for a separately reviewed national snapshot. No detailed ESS rows added in PR504.
