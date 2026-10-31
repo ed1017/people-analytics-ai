@@ -93,6 +93,7 @@ const japanMappings=[
  {role:'AI Engineer',code:'1109',ack:'Use this broader occupation for a planned role developing and evaluating machine-learning or AI systems.'},
  {role:'Machine Learning Engineer',code:'1109',ack:'Use this broader occupation for a planned role developing and evaluating machine-learning systems.'},
  {role:'Backend Software Engineer',code:'1104',ack:'Use this reference for a planned role developing web APIs, databases and server-side software.'},
+ {role:'Cloud Engineer',code:'1101',ack:'Use System consultants and designers pay for a planned role designing and building cloud infrastructure through server, network and platform configuration, excluding support-only operations.'},
 ] as const;
 export const POSITION_MARKET_JAPAN_REFERENCES=Object.freeze(japanMappings.map(mapping=>{
  const row=japanPositionPay.occupations[mapping.code];
@@ -100,7 +101,7 @@ export const POSITION_MARKET_JAPAN_REFERENCES=Object.freeze(japanMappings.map(ma
   sourceSha256:japanPositionPay.source.sha256,crosswalkSha256:japanPositionPay.crosswalk.sha256,
   occupation:row.title,occupationCode:mapping.code,taxonomy:'Japan wage survey occupation group',geography:'Japan',area:'JP',period:'2025 wage survey',currency:'JPY' as const,
   wageBasis:'Annualised cash estimate: June monthly cash × 12 plus preceding-calendar-year bonus',annualisedCashJpy:row.annualisedCashJpy,
-  monthlyCashJpy:row.monthlyCashThousandJpy*1000,annualBonusJpy:row.annualBonusThousandJpy*1000,publishedJobTagRoundedJpy:row.publishedJobTagRoundedJpy,
+  monthlyCashJpy:Math.round(row.monthlyCashThousandJpy*1000),annualBonusJpy:Math.round(row.annualBonusThousandJpy*1000),publishedJobTagRoundedJpy:row.publishedJobTagRoundedJpy,
   sourceUrl:japanPositionPay.source.url,mappingScope:'broader-occupation' as const,mappedRole:mapping.role,dutyAcknowledgement:mapping.ack,
   mappingSourceUrl:row.jobTag.url,population:japanPositionPay.methodology.population,methodologyUrl:japanPositionPay.methodology.url,
   sourceSheet:japanPositionPay.source.sheet,sourceCells:row.cells,license:japanPositionPay.licence.attribution,licenseUrl:japanPositionPay.licence.url,
@@ -120,7 +121,7 @@ const signature=(draft:PositionAllocationDraft)=>JSON.stringify(draft);
 const cost=(wage:number,percent:number)=>Math.round((wage*(1+percent/100)+Number.EPSILON)*100)/100;
 function reviewedSource(version:string=POSITION_MARKET_SOURCE_VERSION):PositionMarketReference{
  const japan=POSITION_MARKET_JAPAN_REFERENCES.find(r=>r.version===version);
- if(japan){assert(japan.sourceSha256==='05380f928b776122821214c1e8e50a963a3a4a178bb3d0a27386ae2509221cdd'&&japan.crosswalkSha256==='49f548ac63b4c7ff7ddc4e870ea2ca885700851666d92b863f1021a8e30a393e'&&japan.annualisedCashJpy===japan.monthlyCashJpy*12+japan.annualBonusJpy&&japan.annualisedCashJpy===(japan.occupationCode==='1104'?5784700:6097600),'The reviewed Japanese source changed.');return japan;}
+ if(japan){assert(japan.sourceSha256==='05380f928b776122821214c1e8e50a963a3a4a178bb3d0a27386ae2509221cdd'&&japan.crosswalkSha256==='49f548ac63b4c7ff7ddc4e870ea2ca885700851666d92b863f1021a8e30a393e'&&japan.annualisedCashJpy===japan.monthlyCashJpy*12+japan.annualBonusJpy&&japan.annualisedCashJpy===(japan.occupationCode==='1101'?8890400:japan.occupationCode==='1104'?5784700:6097600),'The reviewed Japanese source changed.');return japan;}
  const additionalUs=POSITION_MARKET_US_ADDITIONAL_REFERENCES.find(r=>r.version===version);
  if(additionalUs){const row=reviewedUsRow(additionalUs.occupationCode);assert(additionalUs.medianNative===Number(row.raw.A_MEDIAN)&&additionalUs.meanNative===Number(row.raw.A_MEAN),'The reviewed national source changed.');return additionalUs;}
  const additional=POSITION_MARKET_UK_ADDITIONAL_REFERENCES.find(r=>r.version===version);

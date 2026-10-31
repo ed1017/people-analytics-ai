@@ -5234,18 +5234,18 @@
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "673f0299eeb998bc9499ef5fd6f794272e69e1cf6fcaa1ad385a0cc1f13ab930",
-      "bytes": 36303
+      "sha256": "bf579a0edf35824844b5f919fc4dfd24feea499bdbb4a3f131fd04d9b99307be",
+      "bytes": 36600
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "337434e97ee657d27896448b3512725816027f2c8ae3cea5d1232e3bb4b66ee0",
-      "bytes": 42831
+      "sha256": "3dfd72b0a60a06cb60fc1df37807cab0d3cc043ca506aea045c9ae8083a122e0",
+      "bytes": 44118
     },
     {
       "path": "tests/position-market-ui.test.mjs",
-      "sha256": "b61092f902c9df3a1902c46791ccf4c44a4a21d8e577653c2b108e7fce390fdc",
-      "bytes": 24728
+      "sha256": "860a905d033c7f42b169066507e08bb3f79a3961ae1566dde6888842f1c44579",
+      "bytes": 25570
     },
     {
       "path": "lib/data/ons-ashe2026-position-pay.json",
@@ -5259,8 +5259,8 @@
     },
     {
       "path": "lib/data/mhlw-japan-2025-position-pay.json",
-      "sha256": "84fa0f6f70af8f3c9c2bd455851cc01658ee11de1f14ee4bbd41a9489acff3d1",
-      "bytes": 5252
+      "sha256": "eadb3991cf57261af24c2d4ec112a087c0203c11120b2bbd0fd0448182bdf7e4",
+      "bytes": 6472
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

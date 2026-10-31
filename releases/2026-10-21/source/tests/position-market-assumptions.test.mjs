@@ -63,9 +63,9 @@ test('unknown annual cost clears applicability; old stale current data is retain
 });
 const fx={basis:'user-assumption',from:'GBP',to:'USD',usdPerGbp:1.25,date:'2026-10-30',confirmed:true};
 function scoped(role,country){const h=setup(),positions=inventory.positions.filter(p=>p.role===role&&p.countryCode===country&&p.status==='vacant');assert.ok(positions.length);const draft=createPositionAllocation(positions.map(p=>p.id),false,inventory);draft.input.hire=1;h.store.setField('',D,draft);return h;}
-test('expanded mappings cover exactly fifty-one of197 real modeled vacancies, with no fuzzy fallback',()=>{
+test('expanded mappings cover exactly fifty-two of197 real modeled vacancies, with no fuzzy fallback',()=>{
  const vacancies=inventory.positions.filter(p=>p.status==='vacant');assert.equal(vacancies.length,197);
- const eligible=vacancies.filter(p=>positionMarketEligibility(createPositionAllocation([p.id],false,inventory)).eligible);assert.equal(eligible.length,51);
+ const eligible=vacancies.filter(p=>positionMarketEligibility(createPositionAllocation([p.id],false,inventory)).eligible);assert.equal(eligible.length,52);
  assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Frontend Software Engineer').length,2);
  assert.equal(eligible.filter(p=>p.countryCode==='US'&&p.role==='Business Intelligence Analyst').length,1);
  assert.equal(eligible.filter(p=>p.countryCode==='GB').length,14);
@@ -198,7 +198,7 @@ test('approved purchasing aggregate is explicit and its narrower duties require 
 
 test('US services sales uses verified detailed row and explicit sector-limited role consent',()=>{const h=scoped('Sales Account Executive','US'),ref=positionMarketEligibility(h.fields()[D]).reference;assert.equal(h.fields()[D].input.selectedIds.length,1);assert.equal(ref.occupationCode,'41-3091');assert.equal(ref.occupation,'Sales Representatives of Services, Except Advertising, Insurance, Financial Services, and Travel');assert.deepEqual(positionMarketNativeAmounts(ref),{currency:'USD',median:69990,mean:82430});assert.equal(ref.medianCell,'AB815');assert.equal(ref.meanCell,'S815');assert.match(ref.dutyAcknowledgement,/services outside advertising, insurance, financial services and travel/);assert.throws(()=>h.review({mappingConfirmed:false}));const ticket=h.review();assert.equal(ticket.fx,null);confirm({store:h.store,ticket,at});h.save();const data=h.store.getSnapshot().data;assert.deepEqual(parseDecisionBackup(encodeDecisionBackup(data,h.datasetToken,at),h.datasetToken).data,data);const uk=positionMarketEligibility(scoped('Sales Account Executive','GB').fields()[D]).reference;assert.equal(uk.occupationCode,'3552');assert.notEqual(ref.version,uk.version);assert.notEqual(ref.dutyAcknowledgement,uk.dutyAcknowledgement);});
 
-const japanCases=[['AI Engineer','1109',1,6097600],['Machine Learning Engineer','1109',2,6097600],['Backend Software Engineer','1104',1,5784700]];
+const japanCases=[['AI Engineer','1109',1,6097600],['Machine Learning Engineer','1109',2,6097600],['Backend Software Engineer','1104',1,5784700],['Cloud Engineer','1101',1,8890400]];
 function japanSetup(role='AI Engineer'){const h=setup(),selected=inventory.positions.filter(p=>p.countryCode==='JP'&&p.status==='vacant'&&p.role===role);const draft=createPositionAllocation(selected.map(p=>p.id),false,inventory);edit({...h.options,draft});return {...h,selected};}
 const jpyFx={basis:'user-assumption',from:'JPY',to:'USD',usdPerJpy:0.00654321,date:'2026-10-30',confirmed:true};
 test('Japan exact scopes use annualised cash components, not rounded job-tag display or median',()=>{
@@ -221,4 +221,11 @@ test('Japan v3 goal promotion and result binding retain exact saved evidence and
  const ticket=preparePositionTrackingGoal({store:h.store,datasetToken:h.datasetToken});confirmPositionTrackingGoal({store:h.store,ticket,goalId:'track-japan',at});const data=h.store.getSnapshot().data,fields=data.workspaces['track-japan'].fields;assert.deepEqual(data.exploration,original);assert.deepEqual(fields[M].records,original.fields[M].records);assert.equal(fields[M].goalId,'track-japan');assert.equal(fields[M].current,null);
  const target=preparePositionResultTarget(h.store,{scenarioId:capture.scenarioId,allocationRevision:capture.revision,financeRevision:null,date:'2027-04-30'});assert.equal(target.target.position.allocationRevision,capture.revision);
  const restored=parseDecisionBackup(encodeDecisionBackup(data,h.datasetToken,at),h.datasetToken);assert.deepEqual(restored.data.workspaces['track-japan'].fields[M],fields[M]);
+});
+
+test('Japan cloud mapping preserves original v3 bytes and rounds published thousand-yen components to integer yen',()=>{
+ assert.equal(createHash('sha256').update(JSON.stringify(POSITION_MARKET_JAPAN_REFERENCES.slice(0,3))).digest('hex'),'c4405b543826f23b617dd1de11c1b6deb0b8aa67c48a942b0fe7aadbef1a4080');
+ const h=japanSetup('Cloud Engineer'),ref=positionMarketEligibility(h.fields()[D]).reference;assert.equal(ref.occupation,'System consultants and designers');assert.equal(ref.monthlyCashJpy,542100);assert.equal(ref.annualBonusJpy,2385200);assert.equal(ref.annualisedCashJpy,8890400);assert.match(ref.mappingSourceUrl,/318$/);assert.match(ref.dutyAcknowledgement,/excluding support-only operations/);
+ const ticket=h.review({statistic:'annualised-cash',fx:{...jpyFx,usdPerJpy:0.0065}});assert.equal(ticket.annualCostUsd,69345.12);confirm({store:h.store,ticket,at});assert.equal(h.ledger().current.reference.occupationCode,'1101');
+ for(const role of ['Data Architect','Talent Management Specialist']){const rows=inventory.positions.filter(p=>p.countryCode==='JP'&&p.status==='vacant'&&p.role===role);assert.ok(rows.length);assert.equal(positionMarketEligibility(createPositionAllocation(rows.map(p=>p.id),false,inventory)).eligible,false);}
 });

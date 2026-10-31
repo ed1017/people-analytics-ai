@@ -4,7 +4,7 @@ Status: source verification passed; implementation and hosted acceptance are in 
 
 ## Scope and verified source
 
-The candidate adds four modeled vacancies: one AI Engineer and two Machine Learning Engineers use wage group 1109, **Other information-processing and communications technicians**; one Backend Software Engineer uses group 1104, **Software creators**. These are broader statistical occupations, not exact-role salary estimates. Adoption requires confirmation of machine-learning development/training/evaluation duties or backend web-service/API/database development duties respectively. Generic infrastructure, cloud and data-architecture positions remain unmapped.
+The candidate adds five modeled vacancies: one AI Engineer and two Machine Learning Engineers use wage group 1109, **Other information-processing and communications technicians**; one Backend Software Engineer uses group 1104, **Software creators**; one Cloud Engineer uses group 1101, **System consultants and designers**. These are broader statistical occupations, not exact-role salary estimates. Adoption requires confirmation of machine-learning development/training/evaluation, backend web-service/API/database development, or cloud-infrastructure design/build duties respectively. Support-only cloud operations, data-architecture and talent-management positions do not acquire an automatic wage mapping.
 
 The official [MHLW AI profile](https://shigoto.mhlw.go.jp/User/Occupation/Detail/325) and [web-development profile](https://shigoto.mhlw.go.jp/User/Occupation/Detail/314) link to an occupation crosswalk updated March 17, 2026. Its sheet `職業分類対応表`, cells I325/J325 and I314/J314, establishes the wage groups. The downloaded crosswalk is 72,636 bytes, ZIP/CRC valid, SHA-256 `49f548ac63b4c7ff7ddc4e870ea2ca885700851666d92b863f1021a8e30a393e`.
 
@@ -12,8 +12,11 @@ The [official 2025 wage Table 1](https://www.e-stat.go.jp/stat-search/file-downl
 
 | Statistical occupation | Monthly cash, thousand JPY | Bonus/special payments, thousand JPY | Derived annualised cash, JPY | Rounded job tag display, JPY |
 |---|---:|---:|---:|---:|
+| 1101 System consultants and designers | H21:542.1 | J21:2,385.2 | 8,890,400 | 8,890,000 |
 | 1104 Software creators | H22:390.8 | J22:1,095.1 | 5,784,700 | 5,785,000 |
 | 1109 Other IT/communications technicians | H23:415.8 | J23:1,108.0 | 6,097,600 | 6,098,000 |
+
+The [official infrastructure profile](https://shigoto.mhlw.go.jp/User/Occupation/Detail/318) explicitly includes cloud design and implementation. Crosswalk row318 maps it to 1101; it is not a guessed assignment to a generic IT group. The source's J21 lexical value `2385.1999999999998` represents the published one-decimal-thousand value2,385.2. Component conversion rounds to integer yen to avoid binary floating-point residue, preserving the other references exactly.
 
 The [job tag method](https://shigoto.mhlw.go.jp/User/topics/detail/584) annualises regular monthly cash by 12 and adds bonuses/special payments. Regular cash reflects June 2025; the [survey definition](https://www.mhlw.go.jp/toukei/list/chinginkouzou_b.html) uses the preceding-calendar-year bonus measure with survey-specific treatment for newer employees. These are constructed annualised survey earnings, not observed calendar-year totals, medians, base salaries or employer total costs. The underlying component calculation is retained separately from job tag's rounded display. No rounding discrepancy is concealed or used to fabricate a second statistic.
 

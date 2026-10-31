@@ -111,6 +111,41 @@
         "Machine Learning Engineer"
       ],
       "mappingLimit": "The published wage applies to the broader statistical occupation, not exclusively to the selected internal role."
+    },
+    "1101": {
+      "occupationCode": "1101",
+      "title": "System consultants and designers",
+      "titleJa": "システムコンサルタント・設計者",
+      "cells": {
+        "label": "B21",
+        "monthlyCash": "H21",
+        "bonus": "J21"
+      },
+      "monthlyCashThousandJpy": 542.1,
+      "annualBonusThousandJpy": 2385.2,
+      "annualisedCashJpy": 8890400,
+      "publishedJobTagRoundedJpy": 8890000,
+      "rawExcelLexicalValues": {
+        "H21": "542.1",
+        "J21": "2385.1999999999998"
+      },
+      "suppressionStatus": "published-numeric",
+      "crosswalkCells": {
+        "jobTagId": "A318",
+        "jobTagTitle": "B318",
+        "mhlwCode": "C318",
+        "wageCode": "I318",
+        "wageTitle": "J318"
+      },
+      "jobTag": {
+        "id": 318,
+        "url": "https://shigoto.mhlw.go.jp/User/Occupation/Detail/318"
+      },
+      "dutyScope": "Design and implementation of server, network and cloud infrastructure systems.",
+      "conditionalInternalRoles": [
+        "Cloud Engineer"
+      ],
+      "mappingLimit": "The published wage applies to the broader statistical occupation, not exclusively to the selected internal role."
     }
   }
 }
