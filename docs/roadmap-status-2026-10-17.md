@@ -1,5 +1,9 @@
 # Active roadmap - October 31
 
+## October 31: UK position hiring difficulty released
+
+PR510 is live at runtime `ce8ade7d41d8356fbb1cba02afbf3c2d9063bc25`, deployment `dpl_CxX5bYj6yBhaBxSRKvFhPrUBHszc`. Two verified ESS 2024 occupation rows support three UK HR/accounting vacancies through explicit saved-revision context and read-only general-chat lookup. Any non-pay coverage is 43/197; software 40, outlook 39 and pay 59 remain unchanged and overlap. Independent review, 148 affected tests, exact CI and direct public desktop/mobile passed (nine groups and nine mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Source and release evidence](uk-position-hiring-context-2026-10-31.md).
+
 ## October 31: general-chat market lookup released
 
 PR508 now supplies a bounded read-only canonical outlook/software catalogue tool to ordinary chat and Home conversation, while preserving exact saved-scenario context and explicit adoption. Runtime `db929e7bcafb495755f6b251327a7c0531748739`; deployment `dpl_Dkayc368edi2zzCqYRHwMsWGUHpk`. Independent review, 94 packaged tests, CI and direct public desktop/mobile passed. No paid calls or fresh model acceptance. Coverage unchanged: outlook 39/197, software 40/197, pay 59/197. [Evidence and limits](general-chat-market-context-2026-10-31.md).
@@ -16,7 +20,7 @@ PR508 subsequently completed bounded general-chat catalogue lookup. Fresh model 
 
 PR504 was published at runtime `45214a6aa3fa89625849e91aa03e930fa7732ff6`, merge `59bbccb542e00bdee71b5c43234616b1fc8059a1`, deployment `dpl_97VfRULVhVFtQoMyVyBjLsDPRvGA`. Software-demand context supports 40 of 197 vacancies; 17 also have projected openings/exits/transfers. Pay coverage remains 59 of 197. Explicit append-only context attachments bind to saved allocation revisions and survive backup/tracking copies; explanations use the explicitly selected version. Independent review, 134 affected tests, build/TypeScript and CI `41242899587` passed. Public desktop/mobile each passed eight groups and seven mocked requests, HTTP 200 and clean reports. [Sources, contracts, limits and release acceptance](nonpay-position-context-2026-10-31.md).
 
-At that release, the next priority was broader verified non-pay occupation coverage. Detailed UK survey comparisons remain separately gated by sample/suppression interpretation. People Analytics pay candidate stays held; no paid AI calls, Lab validation or target-overlay promotion.
+At that release, the next priority was broader verified non-pay occupation coverage. PR510 subsequently publishes two eligible UK occupation rows; all suppressed, absent and low-base rows remain held. People Analytics pay candidate stays held; no paid AI calls, Lab validation or target-overlay promotion.
 
 ### PR502 included - budgeting and HR systems references
 
