@@ -4,7 +4,7 @@ Updated October 31, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-PR500 is live at runtime `627518ac4ea2eb7cb829a8105309b415c8bdb16e`, deployment `dpl_6S5XGpma9FE2p17GFyyDiG6fufRH`, including PR499 references. Conditional pay references cover **54 of 197** modeled vacancies: 35 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
+PR502 is live at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`, including PR500 grounding. Conditional pay references cover **59 of 197** modeled vacancies: 40 US, 14 UK and five Japan. This is eligible reference coverage, not proof of candidate supply, recruiting feasibility, approved funding or an adopted assumption. User confirmation is still required. See [US ML release](us-machine-learning-market-reference-2026-10-31.md), [Japan release](japan-position-market-reference-2026-10-31.md) and [earlier UK/US references](market-reference-next-batch-2026-10-31.md).
 
 PR500 fixed the missing explanation provenance: canonical adoption is validated for the exact saved scenario/revision and includes native statistic and calculation basis. Legacy packets without market evidence retain unknown provenance. Both mounted entrypoints passed public desktop/mobile mocked-request acceptance; this is not fresh model-answer acceptance. No paid model calls were made. [Exact release evidence](position-market-grounding-release-2026-10-31.md).
 
@@ -35,12 +35,18 @@ The protected staging transport can report post-test teardown errors; keep them 
 
 ## Remaining source requirements
 
-143 vacancies remain without conditional pay references: India 59, US 16, Canada 15, Singapore 11, Germany 10, Australia 9, Brazil 7, France 7, UK 6, Japan 3. Do not fill these with guessed wages.
+138 vacancies remain without conditional pay references: India 59, US 11, Canada 15, Singapore 11, Germany 10, Australia 9, Brazil 7, France 7, UK 6, Japan 3. Do not fill these with guessed wages.
 
 - **Australia:** official original `ANZSCO Occupation data - February 2026.xlsx` at the [JSA download](https://www.jobsandskills.gov.au/sites/default/files/2026-07/ANZSCO%20Occupation%20data%20-%20February%202026.xlsx) remains unavailable. Desktop 60s/120s attempts returned no bytes; Linux GET and one transient retry returned 503, also no source bytes. This is an upstream/network failure, not an observed access denial; retries stopped. No hash, ZIP integrity, cells or workbook licence was verified. Official HTML pages for 2247 and 2713 show May 2025 weekly non-managerial full-time adult-rate medians, but the ABS customised report's specific reuse/attribution terms remain unresolved. General JSA CC BY4.0 excludes third-party content. Do not publish new app records from page values alone. Qualified page-only evidence is retained outside the app in `integration-evidence/australia-page-evidence-20261031.json`.
 - **Singapore:** official 2025 monthly wage workbook is readable, SHA256 `aca07332918a4ce079e6418b8bfa21ed6ddf1b793b04264afe8aa0353ce26b43`; product-specific reuse authority is unresolved. Monthly basic/gross medians for full-time resident employees are not annual employer cost. No new mappings are published.
 - **India:** the inspected industrial wage source excludes the professional roles needed. A permitted professional-role source with compatible pay basis and reuse terms is required.
-- **US:** request exact national detailed rows 13-2031 and 15-1211 from the already verified original workbook before considering conditional budgeting or systems-integration mappings. Duties still need narrowing. Generic cloud/infrastructure titles span different occupations; no all-other substitution or state inference.
+- **US:** verified rows 13-2031 and 15-1211 and conditional duty review are released in PR502. People Analytics has a reviewed but unreleased opt-in statistical/predictive duty candidate. Generic cloud/infrastructure and other remaining titles need concrete duties; no all-other substitution or state inference.
 - **Canada/Germany:** prior denied routes must not be retried or circumvented. **France/Brazil:** currently held evidence does not establish a compatible detailed role/cost contract.
 
 Lab methodology validation remains user-owned. The chart-target overlay is preview-only. Preserve spending, accounting, credentials and access controls. A documentation update or mocked payload test is not live-AI reliability proof.
+
+## Current non-pay priority
+
+The user requested more non-pay intelligence on October 31. Labor Market already surfaces US employment/location and national growth/openings, Toronto software vacancies, UK professional-group hiring difficulty, and qualitative occupational skills. Employment is not available applicants; projected openings are not current vacancies; O*NET requirements are not postings demand. Internal company time-to-fill is synthetic, not an external benchmark.
+
+The next concrete integration gap is revision-bound non-pay evidence: position Details currently exposes some difficulty/skills, but numerical outlook/difficulty and skills snapshots are not pinned with the saved position explanation context. Require explicit attachment, canonical source/scope validation and backup preservation. Do not auto-adjust costs, hiring time, training duration or readiness. Broader BLS/O*NET/UK source evidence is under review, not yet integrated. Keep the separate People Analytics pay checkout held under this new priority.
