@@ -16,7 +16,7 @@
     "OWN_CODE": "1235",
     "O_GROUP": "detailed",
     "I_GROUP": "cross-industry",
-    "matched_rows": 12,
+    "matched_rows": 13,
     "absent_requested_fields": []
   },
   "representation": "Raw lexical source strings; empty string means blank. Excel 1-based coordinates. No source workbook modifications.",
@@ -412,6 +412,33 @@
         "TOT_EMP": "3379720",
         "EMP_PRSE": "0.3",
         "MEAN_PRSE": "0.2"
+      }
+    },
+    {
+      "purpose": "crosswalk_review_candidate",
+      "worksheet": "national_M2025_dl",
+      "row": 150,
+      "cells": {
+        "A_MEDIAN": "AB150",
+        "A_MEAN": "S150"
+      },
+      "raw": {
+        "AREA": "99",
+        "AREA_TITLE": "U.S.",
+        "AREA_TYPE": "1",
+        "NAICS": "000000",
+        "I_GROUP": "cross-industry",
+        "OWN_CODE": "1235",
+        "OCC_CODE": "15-1253",
+        "OCC_TITLE": "Software Quality Assurance Analysts and Testers",
+        "O_GROUP": "detailed",
+        "A_MEDIAN": "104300",
+        "A_MEAN": "111490",
+        "ANNUAL": "",
+        "HOURLY": "",
+        "TOT_EMP": "186740",
+        "EMP_PRSE": "2.2999999999999998",
+        "MEAN_PRSE": "0.7"
       }
     }
   ]

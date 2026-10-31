@@ -62,6 +62,10 @@ const additionalUsMappings=[
  {role:'Communications Specialist',soc:'27-3031',onet:'27-3031.00',duties:'Prepare communications and manage public information and organizational reputation.',limit:'Public-relations communication duties; not all marketing or technical writing.'},
  {role:'Data Architect',soc:'15-1243',onet:'15-1243.00',duties:'Design database architectures and data models and set database standards.',limit:'Database-architecture duties; not generic data engineering or infrastructure work.'},
  {role:'Total Rewards Specialist',soc:'13-1141',onet:'13-1141.00',duties:'Analyze compensation, benefits and job classifications and administer reward programs.',limit:'Compensation, benefits and job-analysis duties; not all HR work.'},
+ {role:'Data Engineer',soc:'15-1243',onet:'15-1243.00',duties:'Design database and data-warehouse structures and integrate data systems.',limit:'Database and warehouse design or integration duties; not all data engineering work.'},
+ {role:'Business Intelligence Developer',soc:'15-2051',onet:'15-2051.01',duties:'Develop business-intelligence tools, reports and supporting databases.',limit:'Business-intelligence duties within the broader Data Scientists wage occupation; not developer-specific wages.'},
+ {role:'Transformation Consultant',soc:'13-1111',onet:'13-1111.00',duties:'Analyze organizational processes and plan changes that improve operations.',limit:'Organizational and process-change analysis duties; not all transformation or technical consulting.'},
+ {role:'Quality Assurance Engineer',soc:'15-1253',onet:'15-1253.00',duties:'Design and execute software tests and identify and document software defects.',limit:'Software quality-assurance and testing duties; not manufacturing or other quality-engineering work.'},
 ] as const;
 function reviewedUsRow(soc:string){
  const rows=usPositionPay.records.filter(r=>r.raw.OCC_CODE===soc),r=rows[0];
