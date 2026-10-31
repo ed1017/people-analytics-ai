@@ -1,0 +1,350 @@
+{
+  "id": "network-market-nonpay-v1",
+  "source": {
+    "status": "verified parent extraction; bounded transcription for implementation review, not automatic role mapping",
+    "preparedAtUtc": "2026-10-31T23:17:00Z",
+    "bls": {
+      "url": "https://www.bls.gov/emp/ind-occ-matrix/occupation.xlsx",
+      "bytes": 413524,
+      "sha256": "08ee182f992d972593e64559ce467bad75967d2228f11ad5e2f86d4ec0ee6c00",
+      "baseYear": 2025,
+      "projectionYear": 2035,
+      "originalCountUnit": "thousands",
+      "normalizedCountUnit": "persons/jobs; source multiplied by1000",
+      "licence": "BLS public domain",
+      "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
+    },
+    "onet": {
+      "url": "https://www.onetcenter.org/dl_files/database/db_31_0_csv/software_skills.csv",
+      "bytes": 3557545,
+      "sha256": "6aabb96b464288db849580e6510530efff3f80e25dde2bb23f1fc36bb526b016",
+      "databaseVersion": "31.0",
+      "release": "August2026",
+      "contentUpdated": "30.3 / May2026",
+      "geography": "US occupational reference",
+      "licence": "CC BY4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor.",
+      "extractScope": "Only In Demand=Y rows; omitted N means not flagged, not no demand. Full occupation totals are separately preserved.",
+      "termsUrl": "https://www.onetcenter.org/license_db.html"
+    }
+  },
+  "records": [
+    {
+      "mappingStatus": "candidate only; explicit duty review required",
+      "bls": {
+        "employmentBase": 181800,
+        "employmentProjected": 195800,
+        "employmentChangeNumeric": 14100,
+        "employmentChangePercent": 7.7,
+        "annualAverageOpenings": 9600,
+        "annualAverageLaborForceExits": 2800,
+        "annualAverageOccupationalTransfers": 5300,
+        "annualAverageOccupationalSeparations": 8200,
+        "occupationCode": "15-1241",
+        "occupationTitle": "Computer network architects",
+        "table12Row": 103,
+        "table110Row": 103,
+        "education": "Bachelor's degree",
+        "experience": "5 years or more",
+        "onJobTraining": "None",
+        "laborForceExitRate": 1.5,
+        "occupationalTransferRate": 2.8,
+        "separationRate": 4.3,
+        "status": "exact Line item in both tables; no aggregation or substitution",
+        "sourceCells": {
+          "Table1.2": {
+            "employmentBase": "D103",
+            "employmentProjected": "E103",
+            "employmentChangeNumeric": "H103",
+            "employmentChangePercent": "I103",
+            "annualAverageOpenings": "K103"
+          },
+          "Table1.10": {
+            "annualAverageLaborForceExits": "K103",
+            "annualAverageOccupationalTransfers": "L103",
+            "annualAverageOccupationalSeparations": "M103"
+          }
+        }
+      },
+      "software": {
+        "occupationCode": "15-1241.00",
+        "occupationTitle": "Computer Network Architects",
+        "exactOccupationRows": 278,
+        "hotTechnologyRows": 101,
+        "inDemandRows": 13,
+        "excludedNotFlaggedRows": 265,
+        "rows": [
+          {
+            "csvRecord": 7235,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Amazon Web Services AWS software",
+            "elementId": "2.E.6.f",
+            "elementName": "Data base user interface and query software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7236,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Ansible software",
+            "elementId": "2.E.1.i",
+            "elementName": "Expert system software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7263,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Border Gateway Protocol BGP",
+            "elementId": "2.E.12.g",
+            "elementName": "Switch or router software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7311,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Firewall software",
+            "elementId": "2.E.14.c",
+            "elementName": "Network security and virtual private network VPN equipment software",
+            "hotTechnology": "N",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7329,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "IBM Terraform",
+            "elementId": "2.E.7.a",
+            "elementName": "Configuration management software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7346,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Linux",
+            "elementId": "2.E.13.c",
+            "elementName": "Operating system software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7361,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Microsoft Azure software",
+            "elementId": "2.E.7.b",
+            "elementName": "Development environment software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7363,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Microsoft Excel",
+            "elementId": "2.E.4.i",
+            "elementName": "Spreadsheet software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7367,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Microsoft Office software",
+            "elementId": "2.E.1.k",
+            "elementName": "Office suite software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7369,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Microsoft PowerShell",
+            "elementId": "2.E.7.b",
+            "elementName": "Development environment software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7418,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Oracle Java",
+            "elementId": "2.E.7.e",
+            "elementName": "Object or component oriented development software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7436,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Python",
+            "elementId": "2.E.7.e",
+            "elementName": "Object or component oriented development software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 7468,
+            "occupationCode": "15-1241.00",
+            "occupationTitle": "Computer Network Architects",
+            "softwareExample": "Structured query language SQL",
+            "elementId": "2.E.6.f",
+            "elementName": "Data base user interface and query software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          }
+        ]
+      }
+    },
+    {
+      "mappingStatus": "candidate only; explicit duty review required",
+      "bls": {
+        "employmentBase": 952700,
+        "employmentProjected": 1019000,
+        "employmentChangeNumeric": 66300,
+        "employmentChangePercent": 7,
+        "annualAverageOpenings": 82000,
+        "annualAverageLaborForceExits": 24800,
+        "annualAverageOccupationalTransfers": 50600,
+        "annualAverageOccupationalSeparations": 75400,
+        "occupationCode": "13-1161",
+        "occupationTitle": "Market research analysts and marketing specialists",
+        "table12Row": 73,
+        "table110Row": 73,
+        "education": "Bachelor's degree",
+        "experience": "None",
+        "onJobTraining": "None",
+        "laborForceExitRate": 2.5,
+        "occupationalTransferRate": 5.1,
+        "separationRate": 7.6,
+        "status": "exact Line item in both tables; no aggregation or substitution",
+        "sourceCells": {
+          "Table1.2": {
+            "employmentBase": "D73",
+            "employmentProjected": "E73",
+            "employmentChangeNumeric": "H73",
+            "employmentChangePercent": "I73",
+            "annualAverageOpenings": "K73"
+          },
+          "Table1.10": {
+            "annualAverageLaborForceExits": "K73",
+            "annualAverageOccupationalTransfers": "L73",
+            "annualAverageOccupationalSeparations": "M73"
+          }
+        }
+      },
+      "software": {
+        "occupationCode": "13-1161.00",
+        "occupationTitle": "Market Research Analysts and Marketing Specialists",
+        "exactOccupationRows": 149,
+        "hotTechnologyRows": 51,
+        "inDemandRows": 9,
+        "excludedNotFlaggedRows": 140,
+        "rows": [
+          {
+            "csvRecord": 4445,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Adobe Creative Cloud software",
+            "elementId": "2.E.4.b",
+            "elementName": "Graphics or photo imaging software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4464,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Canva",
+            "elementId": "2.E.4.b",
+            "elementName": "Graphics or photo imaging software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4490,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Google Analytics",
+            "elementId": "2.E.6.g",
+            "elementName": "Data mining software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4519,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Microsoft Excel",
+            "elementId": "2.E.4.i",
+            "elementName": "Spreadsheet software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4520,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Microsoft Office software",
+            "elementId": "2.E.1.k",
+            "elementName": "Office suite software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4521,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Microsoft Outlook",
+            "elementId": "2.E.16.a",
+            "elementName": "Electronic mail software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4522,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Microsoft PowerPoint",
+            "elementId": "2.E.4.f",
+            "elementName": "Presentation software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4551,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "Salesforce software",
+            "elementId": "2.E.6.c",
+            "elementName": "Customer relationship management CRM software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          },
+          {
+            "csvRecord": 4572,
+            "occupationCode": "13-1161.00",
+            "occupationTitle": "Market Research Analysts and Marketing Specialists",
+            "softwareExample": "TikTok",
+            "elementId": "2.E.4.c",
+            "elementName": "Video creation and editing software",
+            "hotTechnology": "Y",
+            "inDemand": "Y"
+          }
+        ]
+      }
+    }
+  ]
+}
