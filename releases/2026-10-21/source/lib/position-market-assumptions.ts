@@ -266,3 +266,18 @@ export function positionMarketCaptureUnchanged(fields:Record<string,Json>,datase
  const ledger=readPositionMarketLedger(fields[POSITION_MARKET_FIELD],datasetToken,goalId,fields[allocationField]);assert(ledger,'Saved market assumptions cannot be verified.');
  return same(currentPositionMarketEvidence(ledger,capture.draft),positionMarketForCapture(ledger,capture));
 }
+
+/** Bounded browser-supplied saved reference, not authenticated storage or approval. */
+export type PositionMarketChatReference={datasetToken:string;goalId:string;scenarioId:string;allocationRevision:number;allocationSignature:string;adoption:PositionMarketAdoption};
+export function readPositionMarketChatReference(raw:unknown,expected:{datasetToken:string;goalId:string;scenario:{id:string;revision:number}|null;draft:PositionAllocationDraft}):PositionMarketAdoption{
+ assert(exact(raw,['datasetToken','goalId','scenarioId','allocationRevision','allocationSignature','adoption']),'Invalid saved market context.');
+ const value=raw as PositionMarketChatReference;
+ assert(validDatasetToken(expected.datasetToken)&&value.datasetToken===expected.datasetToken&&value.goalId===expected.goalId&&expected.scenario&&value.scenarioId===expected.scenario.id&&value.allocationRevision===expected.scenario.revision&&value.allocationSignature===signature(expected.draft),'Market context belongs to another scenario revision.');
+ requireAdoption(value.adoption);assert(matches(value.adoption,expected.draft),'Market context no longer matches the selected draft.');
+ return structuredClone(value.adoption);
+}
+export function positionMarketChatReference(ledger:PositionMarketLedger|null,capture:PositionScenarioCapture):PositionMarketChatReference|null{
+ const adoption=positionMarketForCapture(ledger,capture);if(!ledger||!adoption)return null;
+ const reference={datasetToken:ledger.datasetToken,goalId:ledger.goalId,scenarioId:capture.scenarioId,allocationRevision:capture.revision,allocationSignature:signature(capture.draft),adoption};
+ readPositionMarketChatReference(reference,{datasetToken:ledger.datasetToken,goalId:ledger.goalId,scenario:{id:capture.scenarioId,revision:capture.revision},draft:capture.draft});return reference;
+}
