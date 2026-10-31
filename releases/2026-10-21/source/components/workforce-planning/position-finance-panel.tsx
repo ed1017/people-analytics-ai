@@ -1,6 +1,7 @@
 'use client';
 import {useId,useMemo,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
+import {POSITION_MARKET_FIELD,readPositionMarketLedger,positionMarketChatReference} from '@/lib/position-market-assumptions';
 import {positionChatContext} from '@/lib/position-chat-context';
 import {PositionScenarioExplanation} from './position-scenario-explanation';
 import type {PositionAllocationDraft} from '@/lib/position-allocation';
@@ -34,7 +35,8 @@ export function PositionFinancePanel({allocation,datasetToken,goalId,savedCaptur
  try{result=assessPositionFinance(input);}catch(e){validation=e instanceof Error?e.message:'Review funding assumptions.';}
  const disabled=!storage.ready||!storage.saved||!matches||!ledger||missingRequestedRevision;
  const goal=storage.data.goals.goals.find(g=>g.id===goalId)?.statement??'';
- const explanationPacket=!disabled&&result&&result.status!=='invalid-scenario'&&savedCapture?positionChatContext({draft:allocation,scenario:{id:savedCapture.scenarioId,revision:savedCapture.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope:edit.finance,addition:edit.addition}},{datasetToken,goalId,goal}):null;
+ const marketLedger=readPositionMarketLedger(fields[POSITION_MARKET_FIELD],datasetToken,goalId,allocationLedger);
+ const explanationPacket=!disabled&&result&&result.status!=='invalid-scenario'&&savedCapture&&marketLedger?positionChatContext({draft:allocation,market:positionMarketChatReference(marketLedger,savedCapture),scenario:{id:savedCapture.scenarioId,revision:savedCapture.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope:edit.finance,addition:edit.addition}},{datasetToken,goalId,goal}):null;
  const records=ledger?.records.filter(row=>row.scenarioId===savedCapture?.scenarioId&&row.allocationRevision===savedCapture?.revision)??[];
  function patch(next:Partial<Edit>){setEdits(current=>({...current,[key]:{...edit,...next}}));setNotice('');setError('');}
  function allowance(value:number|null){patch({finance:{...edit.finance,basis:'illustrative-demo',reference:'User-entered scenario funding allowance; no Finance approval record',incrementalFundingUsd:value,fundedPositionIds:edit.finance.basis==='unknown'?null:edit.finance.fundedPositionIds}});}
