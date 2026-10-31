@@ -1,8 +1,12 @@
 # Active roadmap - October 31
 
+## October 31: network and market-research context released
+
+PR514 is live at runtime `1de45475444159d60326016bf227f01abcf7bddc`, deployment `dpl_5mCHaUvyWtrHuCgYnMcj1xJSqLnn`. Three US Cloud/Infrastructure/Sales Operations vacancies can use national network-architecture or market-research references only after restrictive duty confirmation. Conditional non-pay coverage is 49/197 (software 46, outlook 45, UK difficulty 3; overlapping); pay remains 59. Independent review, 150 affected tests, exact CI and staged/direct public desktop/mobile passed (ten groups and nine mocked explanation requests per width, HTTP 200, clean/drained). All 54 older canonical references remain unchanged. No paid calls or fresh provider acceptance. [Sources, acceptance and remaining duty contracts](network-market-nonpay-context-2026-10-31.md).
+
 ## October 31: conditional non-pay roles released
 
-PR512 is live at runtime `63236723363e885414937737b5819b0e6836ad75`, deployment `dpl_9xzGmqTvJEBbN3y8e15GPBiFGDjD`. A separate non-pay registry adds three US People Analytics/Business Operations vacancies with explicit restrictive duty confirmation, without expanding pay eligibility. Any non-pay coverage is 46/197 (software 43, outlook 42, UK difficulty 3; overlapping), pay 59 unchanged. Independent review, 144 affected tests, exact CI and direct public desktop/mobile passed (ten groups/eight mocked requests each, HTTP 200, clean/drained). All 50 prior references are byte-equivalent. Readiness/chat were mocked; no paid or fresh provider acceptance. [Evidence and limits](conditional-nonpay-position-context-2026-10-31.md).
+PR512 was published at runtime `63236723363e885414937737b5819b0e6836ad75`, deployment `dpl_9xzGmqTvJEBbN3y8e15GPBiFGDjD`. A separate non-pay registry adds three US People Analytics/Business Operations vacancies with explicit restrictive duty confirmation, without expanding pay eligibility. Any non-pay coverage is 46/197 (software 43, outlook 42, UK difficulty 3; overlapping), pay 59 unchanged. Independent review, 144 affected tests, exact CI and direct public desktop/mobile passed (ten groups/eight mocked requests each, HTTP 200, clean/drained). All 50 prior references are byte-equivalent. Readiness/chat were mocked; no paid or fresh provider acceptance. [Evidence and limits](conditional-nonpay-position-context-2026-10-31.md).
 
 ## October 31: UK position hiring difficulty released
 
