@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR485 current - market evidence into position scenarios
+### PR487 current - expanded market-to-position coverage
+
+PR487 is live at runtime `dadc0c19ac1596c2425c839f0c73ad4a0cbd8fa8`, merge `f87749f6a3ed178dc8f6c8ff435d65c245e25ddf`, deployment `dpl_CPTkUfw4NN7TfM7HhBHxkzux3wtL`. Independent review, 115 affected tests, full staged build/TypeScript and exact-head CI `41189286409` passed. Final direct-public desktop/mobile each passed seven journey groups with clean reports. Earlier test hydration/header races and protected-stage teardown artifacts are preserved in the [release evidence](position-market-coverage-2026-10-31.md).
+
+Pay-reference adoption now covers six of 197 modeled vacancies: two existing US software, one US Business Intelligence Analyst using a confirmed broader Data Scientists reference, and three UK software vacancies using native GBP plus an explicit dated user conversion assumption. Original v1 revisions, new currency/source provenance, Track/Review and backup relationships are preserved. The remaining 191 vacancies receive no invented mapping. Applicant availability and role-level hiring time remain incomplete; no paid model calls. Lab validation remains user-owned and the target overlay preview-only.
+
+### PR485 included - market evidence into position scenarios
 
 PR485 is live at runtime `9b96fdc373137ac241b848ce547c1b04576fb88e`, merge `5f4fc3f4ec27dbf989ab3fb54d0fe168a3e0fe2d`, deployment `dpl_2wQkjJuvkBbwSzb8eyggXoEnVKe7`. Independent review, exact-head CI `41157396003`, production-equivalent staging and public desktop/mobile acceptance passed. Each public width completed ten journey groups with no page/transport errors or paid provider calls. [Scope and release evidence](position-market-planning-2026-10-31.md).
 
