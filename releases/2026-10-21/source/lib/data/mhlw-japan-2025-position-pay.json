@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "verifiedDate": "2026-10-31",
+  "currency": "JPY",
+  "statistic": "annualised-cash",
+  "label": "Annualised survey cash earnings",
+  "source": {
+    "url": "https://www.e-stat.go.jp/stat-search/file-download?fileKind=4&statInfId=000040421116",
+    "publisher": "Ministry of Health, Labour and Welfare, Japan",
+    "survey": "Basic Survey on Wage Structure 2025",
+    "table": "General workers, Table 1, detailed occupation and sex, all industries",
+    "publishedDate": "2026-03-24",
+    "sha256": "05380f928b776122821214c1e8e50a963a3a4a178bb3d0a27386ae2509221cdd",
+    "bytes": 130357,
+    "sheet": "男女計、男、女",
+    "populationHeaderCell": "D7",
+    "sexBlockCell": "B11",
+    "unitCells": [
+      "H10",
+      "J10"
+    ]
+  },
+  "crosswalk": {
+    "url": "https://sgteprdstaplog01.blob.core.windows.net/web-app-contents/documents/%E8%81%B7%E6%A5%AD%E5%88%86%E9%A1%9E%E5%AF%BE%E5%BF%9C%E8%A1%A8%EF%BC%88R8.3%EF%BC%89.xlsx",
+    "sha256": "49f548ac63b4c7ff7ddc4e870ea2ca885700851666d92b863f1021a8e30a393e",
+    "bytes": 72636,
+    "sheet": "職業分類対応表",
+    "updatedDate": "2026-03-17",
+    "dateCell": "J2"
+  },
+  "methodology": {
+    "url": "https://shigoto.mhlw.go.jp/User/topics/detail/584",
+    "surveyDefinitionsUrl": "https://www.mhlw.go.jp/toukei/list/chinginkouzou_b.html",
+    "updatedDate": "2026-10-27",
+    "jobTagWageUpdatedDate": "2026-04-28",
+    "annualisation": "(monthly regular cash earnings * 12 + annual bonuses and other special cash earnings) * 1000",
+    "componentUnit": "thousand JPY",
+    "population": "Japan, general workers, both sexes, enterprises with at least 10 employees, all industries in the survey",
+    "cashPeriod": "June 2025 regular cash earnings, including overtime cash payments, before deductions",
+    "bonusPeriod": "Generally January to December 2024; the survey specifies adjusted reference periods for employees hired during that year",
+    "definition": "Annualised survey cash earnings including bonuses; not an observed calendar-year total, median, base salary or total employer cost",
+    "rounding": "Underlying components are published to 0.1 thousand JPY. Job tag displays the derived result rounded to 0.1 ten-thousand JPY. Keep the component-derived value separate."
+  },
+  "licence": {
+    "url": "https://www.mhlw.go.jp/chosakuken/",
+    "terms": "MHLW public data use terms PDL 1.0, subject to separately marked content",
+    "attribution": "Source: Ministry of Health, Labour and Welfare, Basic Survey on Wage Structure 2025, general workers Table 1, accessed 2026-10-31. Annualised cash earnings calculated from published components.",
+    "jobTagTermsUrl": "https://shigoto.mhlw.go.jp/user/tos",
+    "jobTagAttribution": "Occupation crosswalk and rounded comparison: job tag, Ministry of Health, Labour and Welfare. Duty descriptions are concise application-authored paraphrases; no JILPT descriptive text or assessment material is reproduced."
+  },
+  "occupations": {
+    "1104": {
+      "occupationCode": "1104",
+      "title": "Software creators",
+      "titleJa": "ソフトウェア作成者",
+      "cells": {
+        "label": "B22",
+        "monthlyCash": "H22",
+        "bonus": "J22"
+      },
+      "monthlyCashThousandJpy": 390.8,
+      "annualBonusThousandJpy": 1095.1,
+      "annualisedCashJpy": 5784700,
+      "publishedJobTagRoundedJpy": 5785000,
+      "suppressionStatus": "published-numeric",
+      "crosswalkCells": {
+        "jobTagId": "A314",
+        "jobTagTitle": "B314",
+        "mhlwCode": "C314",
+        "wageCode": "I314",
+        "wageTitle": "J314"
+      },
+      "jobTag": {
+        "id": 314,
+        "url": "https://shigoto.mhlw.go.jp/User/Occupation/Detail/314"
+      },
+      "dutyScope": "Design and development of web or open-system software.",
+      "conditionalInternalRoles": [
+        "Backend Software Engineer"
+      ],
+      "mappingLimit": "The published wage applies to the broader statistical occupation, not exclusively to the selected internal role."
+    },
+    "1109": {
+      "occupationCode": "1109",
+      "title": "Other information-processing and communications technicians",
+      "titleJa": "その他の情報処理・通信技術者",
+      "cells": {
+        "label": "B23",
+        "monthlyCash": "H23",
+        "bonus": "J23"
+      },
+      "monthlyCashThousandJpy": 415.8,
+      "annualBonusThousandJpy": 1108.0,
+      "annualisedCashJpy": 6097600,
+      "publishedJobTagRoundedJpy": 6098000,
+      "suppressionStatus": "published-numeric",
+      "crosswalkCells": {
+        "jobTagId": "A325",
+        "jobTagTitle": "B325",
+        "mhlwCode": "C325",
+        "wageCode": "I325",
+        "wageTitle": "J325"
+      },
+      "jobTag": {
+        "id": 325,
+        "url": "https://shigoto.mhlw.go.jp/User/Occupation/Detail/325"
+      },
+      "dutyScope": "Research and development of machine-learning systems.",
+      "conditionalInternalRoles": [
+        "AI Engineer",
+        "Machine Learning Engineer"
+      ],
+      "mappingLimit": "The published wage applies to the broader statistical occupation, not exclusively to the selected internal role."
+    }
+  }
+}

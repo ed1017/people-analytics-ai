@@ -5229,23 +5229,23 @@
     },
     {
       "path": "components/workforce-planning/position-market-assumptions.tsx",
-      "sha256": "9e022b145090590f3768670f7c527e1871953036f58a85c5f2e558fa9325adfc",
-      "bytes": 16934
+      "sha256": "503b7c2e9281468406241f8beebc83087c2ebda81c1b4ce0639304e006d28fbb",
+      "bytes": 19136
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "f83a24e130fb3833cb515ed2f874727f5b2e28492b337bd3fa8a90dbbbb7e416",
-      "bytes": 31240
+      "sha256": "673f0299eeb998bc9499ef5fd6f794272e69e1cf6fcaa1ad385a0cc1f13ab930",
+      "bytes": 36303
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
-      "sha256": "5728ad2f7bf3d7df2408166c0dc7480652c438179f9e73ed4ad7f06b8007d16c",
-      "bytes": 38243
+      "sha256": "337434e97ee657d27896448b3512725816027f2c8ae3cea5d1232e3bb4b66ee0",
+      "bytes": 42831
     },
     {
       "path": "tests/position-market-ui.test.mjs",
-      "sha256": "8f45dea2cf1bca016deac7b97364beebef9ae1439a647a15068bc1b69b4a5345",
-      "bytes": 22783
+      "sha256": "b61092f902c9df3a1902c46791ccf4c44a4a21d8e577653c2b108e7fce390fdc",
+      "bytes": 24728
     },
     {
       "path": "lib/data/ons-ashe2026-position-pay.json",
@@ -5256,6 +5256,11 @@
       "path": "lib/data/oews-may2025-position-pay.json",
       "sha256": "14e5eef8aa1608c728a26c221a5508d4c2e3c0a0766f19311e95f2cdf0a4c111",
       "bytes": 13216
+    },
+    {
+      "path": "lib/data/mhlw-japan-2025-position-pay.json",
+      "sha256": "84fa0f6f70af8f3c9c2bd455851cc01658ee11de1f14ee4bbd41a9489acff3d1",
+      "bytes": 5252
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
