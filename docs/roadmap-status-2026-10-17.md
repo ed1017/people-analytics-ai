@@ -1,12 +1,16 @@
 # Active roadmap - October 31
 
+## October 31: general-chat market lookup released
+
+PR508 now supplies a bounded read-only canonical outlook/software catalogue tool to ordinary chat and Home conversation, while preserving exact saved-scenario context and explicit adoption. Runtime `db929e7bcafb495755f6b251327a7c0531748739`; deployment `dpl_Dkayc368edi2zzCqYRHwMsWGUHpk`. Independent review, 94 packaged tests, CI and direct public desktop/mobile passed. No paid calls or fresh model acceptance. Coverage unchanged: outlook 39/197, software 40/197, pay 59/197. [Evidence and limits](general-chat-market-context-2026-10-31.md).
+
 ## Current live release and active parallel work
 
-### PR506 current - broader occupational outlook
+### PR506 included - broader occupational outlook
 
-PR506 is live at runtime `7bb0d7d9bc938ccafdf18624bd50bc977da2b6b0`, merge `bafc59918718e9568e39b09c1175253a062b820b`, deployment `dpl_5QcPs3AoT5M5G4j2HaY4bw8Jzb3C`. Nine verified BLS rows add outlook to 22 vacancies: outlook now 39/197, software 40/197, pay unchanged 59/197. The fixture contains 17 BLS records; prior references/versions remain unchanged. Independent review, 139 affected tests, build/TypeScript and CI `41244901110` passed. Public desktop/mobile each passed ten groups and seven mocked requests with HTTP 200 and clean reports. [Source and release evidence](position-outlook-expansion-2026-10-31.md).
+PR506 was published at runtime `7bb0d7d9bc938ccafdf18624bd50bc977da2b6b0`, merge `bafc59918718e9568e39b09c1175253a062b820b`, deployment `dpl_5QcPs3AoT5M5G4j2HaY4bw8Jzb3C`. Nine verified BLS rows add outlook to 22 vacancies: outlook now 39/197, software 40/197, pay unchanged 59/197. The fixture contains 17 BLS records; prior references/versions remain unchanged. Independent review, 139 affected tests, build/TypeScript and CI `41244901110` passed. Public desktop/mobile each passed ten groups and seven mocked requests with HTTP 200 and clean reports. [Source and release evidence](position-outlook-expansion-2026-10-31.md).
 
-Next: bounded read-only general-chat catalogue lookup. Current Inventory and Overview saved-scenario explanations already receive explicitly selected context; arbitrary-chat retrieval is not yet established. No paid calls or automatic plan changes.
+PR508 subsequently completed bounded general-chat catalogue lookup. Fresh model tool choice and answer quality remain unverified; no paid calls or automatic plan changes.
 
 ### PR504 included - non-pay context attached to saved positions
 

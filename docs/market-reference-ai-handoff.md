@@ -4,11 +4,15 @@ Updated October 31, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-### PR506 current - broader occupational outlook
+### PR508 current - general-chat market lookup
 
-PR506 is live at runtime `7bb0d7d9bc938ccafdf18624bd50bc977da2b6b0`, merge `bafc59918718e9568e39b09c1175253a062b820b`, deployment `dpl_5QcPs3AoT5M5G4j2HaY4bw8Jzb3C`. Nine verified BLS rows add outlook to 22 vacancies: outlook now 39/197, software 40/197, pay unchanged 59/197. The fixture contains 17 BLS records; prior references/versions remain unchanged. Independent review, 139 affected tests, build/TypeScript and CI `41244901110` passed. Public desktop/mobile each passed ten groups and seven mocked requests with HTTP 200 and clean reports. [Source and release evidence](position-outlook-expansion-2026-10-31.md).
+PR508 is live at runtime `db929e7bcafb495755f6b251327a7c0531748739`, deployment `dpl_Dkayc368edi2zzCqYRHwMsWGUHpk`. Ordinary chat and Home conversation can retrieve the static canonical catalogue using explicit role/occupation and country. Saved-context explanations remain exact-version isolated. No plan attachment or assumption changes occur from lookup. Independent review, 94 packaged tests, exact CI and direct public desktop/mobile passed; all model requests were mocked. [Release evidence](general-chat-market-context-2026-10-31.md).
 
-Next: bounded read-only general-chat catalogue lookup. Current Inventory and Overview saved-scenario explanations already receive explicitly selected context; arbitrary-chat retrieval is not yet established. No paid calls or automatic plan changes.
+### PR506 included - broader occupational outlook
+
+PR506 was published at runtime `7bb0d7d9bc938ccafdf18624bd50bc977da2b6b0`, merge `bafc59918718e9568e39b09c1175253a062b820b`, deployment `dpl_5QcPs3AoT5M5G4j2HaY4bw8Jzb3C`. Nine verified BLS rows add outlook to 22 vacancies: outlook now 39/197, software 40/197, pay unchanged 59/197. The fixture contains 17 BLS records; prior references/versions remain unchanged. Independent review, 139 affected tests, build/TypeScript and CI `41244901110` passed. Public desktop/mobile each passed ten groups and seven mocked requests with HTTP 200 and clean reports. [Source and release evidence](position-outlook-expansion-2026-10-31.md).
+
+PR508 closes the bounded general-chat catalogue retrieval gap. Fresh model tool choice is still unverified; do not describe this as fine-tuning or universal external-data access.
 
 ### PR504 included - non-pay context attached to saved positions
 
@@ -61,4 +65,4 @@ Lab methodology validation remains user-owned. The chart-target overlay is previ
 
 The user requested more non-pay intelligence on October 31. Labor Market already surfaces US employment/location and national growth/openings, Toronto software vacancies, UK professional-group hiring difficulty, and qualitative occupational skills. Employment is not available applicants; projected openings are not current vacancies; O*NET requirements are not postings demand. Internal company time-to-fill is synthetic, not an external benchmark.
 
-The next concrete integration gap is revision-bound non-pay evidence: position Details currently exposes some difficulty/skills, but numerical outlook/difficulty and skills snapshots are not pinned with the saved position explanation context. Require explicit attachment, canonical source/scope validation and backup preservation. Do not auto-adjust costs, hiring time, training duration or readiness. Broader BLS/O*NET/UK source evidence is under review, not yet integrated. Keep the separate People Analytics pay checkout held under this new priority.
+PR504 attached revision-bound outlook/software evidence, PR506 expanded BLS coverage, and PR508 added separate read-only general-chat retrieval. Explicit attachment, canonical scope validation and backup preservation remain required; do not auto-adjust costs, hiring time, training duration or readiness. Detailed UK survey comparisons remain unimplemented: c means suppressed/confidential, u means low reliability, and occupation-response bases are not unique employer counts. The report minimum base of 50 is not a proven CSV suppression threshold. Detailed software (33) and solicitor (49) rows remain held from primary comparisons; accountant (54) is a possible bounded next slice after exact crosswalk/row review. No role-specific available-applicant count or measured US/UK hiring duration has been verified. Keep People Analytics pay held under the non-pay priority.

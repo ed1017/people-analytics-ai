@@ -1,5 +1,9 @@
 # App completeness - October 28, 2026
 
+## October 31: general-chat market lookup released
+
+PR508 now supplies a bounded read-only canonical outlook/software catalogue tool to ordinary chat and Home conversation, while preserving exact saved-scenario context and explicit adoption. Runtime `db929e7bcafb495755f6b251327a7c0531748739`; deployment `dpl_Dkayc368edi2zzCqYRHwMsWGUHpk`. Independent review, 94 packaged tests, CI and direct public desktop/mobile passed. No paid calls or fresh model acceptance. Coverage unchanged: outlook 39/197, software 40/197, pay 59/197. [Evidence and limits](general-chat-market-context-2026-10-31.md).
+
 The core analysis, scenario, saved-plan and manual tracking journey works. This does not establish that every module or data source is complete.
 
 | Status | Scope |
