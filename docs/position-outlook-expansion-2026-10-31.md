@@ -1,6 +1,6 @@
 # Position outlook expansion
 
-Status: implementation candidate, not released. Extends PR504 using nine verified records from the same original BLS workbook; no new pay or applicant-supply claims.
+Status: PR506 live and publicly verified. Extends PR504 using nine verified records from the same original BLS workbook; no new pay or applicant-supply claims.
 
 ## Source contract
 
@@ -28,8 +28,22 @@ Reuse reviewed US role/duty mappings. Data Scientists is a shared broader occupa
 
 The original eight BLS records, O*NET fixture, 29 existing canonical references and their versions must remain unchanged. New references use the same verified source identity; prior attachments continue reconstructing their original reference set. Existing allocation, finance, pay, Track/Review and backup contracts remain unchanged. No automatic attachment, latest-version selection, budget or training assumptions.
 
-Expected conditional eligibility: outlook 17 → 39 of 197 vacancies (22 additional across 12 roles); software stays 40; pay stays 59. This is reference eligibility, not measured hiring feasibility. Tests and actual release acceptance must confirm these counts before a live claim.
+Verified conditional eligibility: outlook 17 → 39 of 197 vacancies (22 additional across 12 roles); software stays 40; pay stays 59. This is reference eligibility, not measured hiring feasibility. Model tests and public release acceptance confirm these counts.
 
 ## Acceptance
 
-Pending independent source/model review, focused and aggregate tests, CI, staged/public desktop and mobile checks. No paid model calls or fresh provider-answer acceptance. UK detailed survey work, user-owned Lab and target overlay are outside this batch.
+Independent source/model review, focused and aggregate tests, CI, staged/public desktop and mobile checks passed. No paid model calls or fresh provider-answer acceptance. UK detailed survey work, user-owned Lab and target overlay are outside this batch.
+
+## Exact release evidence
+
+- PR506 runtime `7bb0d7d9bc938ccafdf18624bd50bc977da2b6b0`; merge `bafc59918718e9568e39b09c1175253a062b820b`; deployment `dpl_5QcPs3AoT5M5G4j2HaY4bw8Jzb3C`.
+- Exact isolated production stage `people-analytics-2gd88zan0-ed-56dc.vercel.app` promoted and confirmed at `www.ed-ai.app`, without a rebuild or guard change.
+- Archive SHA256 `93d084962198706bb8d6070b2e24a3913d8be30f0cf2d4960333361566f78355`, 1,203 verified runtime inputs / 1,058 source-manifest files. Private inputs and dependency locks unchanged.
+- Independent source/model review and 13 focused checks passed. Root aggregate 139 passed; position type graph, full build/TypeScript, isolated committed-source manifest and exact-head CI `41244901110` passed. Fixture line endings normalized; prior record values and 29 reference hashes unchanged.
+- Staged desktop/mobile each passed ten groups and seven locally mocked explanation requests. No errors before cleanup; protected transport reached its 15-second teardown bound and reported already-handled routes only after assertions/browser closure.
+- Direct public 1440px/390px each passed ten groups and seven mocked requests: HTTP 200; zero page, blocked-request, mock or bridge errors; drained teardown. Screenshots inspected. Tests restored real PR504 backups/context1/2, exercised BI taxonomy/shared outlook, source consent, cancel/stale guards, explicit versions, Overview, UX published rounding, unsupported/mixed scope and backup restore.
+- Reports: `position-market-outlook-expansion-{stage,public}-7bb0d7d-{1440,390}.json`; source review `position-outlook-coverage-independent-review.json`; release record `POSITION-OUTLOOK-EXPANSION-RELEASE.json` in executor evidence.
+
+## AI retrieval follow-up
+
+The saved-position explanation path is mounted in both Inventory and Overview's shared planner: `position-scenario-source.tsx` → `PositionAllocationPlanner` → `PositionFinancePanel`. It receives the explicitly selected attachment. The obsolete `overview-position-scenarios.tsx` does not establish that current Overview is unmounted. General chat has not yet gained automatic lookup of this expanded catalogue; a separate bounded read-only integration is in progress. This release is not proof of arbitrary-chat retrieval or paid-model answer acceptance.
