@@ -10,7 +10,7 @@ Next priority is broader verified non-pay occupation coverage. Detailed UK surve
 
 ### PR502 included - budgeting and HR systems references
 
-PR502 is live at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, merge `8893169c57db91d1be5da53716045cbc0ac2e441`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`. Conditional pay-reference coverage is 59 of 197 (40 US, 14 UK, five Japan). Independent review, 113 affected checks, full build/TypeScript and CI `41239788805` passed; public desktop/mobile each passed eight groups with clean reports and preserved saved histories. [Source and release evidence](us-budget-systems-market-reference-2026-10-31.md).
+PR502 was published at runtime `a40f891e0364e4fd42b2775678198c59230c70a9`, merge `8893169c57db91d1be5da53716045cbc0ac2e441`, deployment `dpl_2o9dfFwB6gmu6H8Bi1op7a6os9J4`. Conditional pay-reference coverage is 59 of 197 (40 US, 14 UK, five Japan). Independent review, 113 affected checks, full build/TypeScript and CI `41239788805` passed; public desktop/mobile each passed eight groups with clean reports and preserved saved histories. [Source and release evidence](us-budget-systems-market-reference-2026-10-31.md).
 
 The user has shifted priority to non-pay external intelligence: hiring demand, skills, difficulty and credible supply/hiring-time evidence. A reviewed People Analytics pay candidate is held in a separate checkout, not released. PR504 delivers explicit non-pay context attachments without changing costs, timing or readiness automatically. Broader source evidence is being checked; do not claim available applicants from employment or measured hiring time from vacancy difficulty.
 
