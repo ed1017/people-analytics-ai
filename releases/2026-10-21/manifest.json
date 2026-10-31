@@ -1234,8 +1234,8 @@
     },
     {
       "path": "components/workforce-planning/position-workforce-design-destination.tsx",
-      "sha256": "d4b87e6efe90d1dc0b59232c1631bf795553ee79ffe59179739e215eb926dfd1",
-      "bytes": 4981
+      "sha256": "cf6e2fb25eef6e0842ebc42735891b0db5a2097e3daa613f628fbe3a7dee031d",
+      "bytes": 4974
     },
     {
       "path": "components/workforce-planning/response-portfolio-allocation-section.tsx",
@@ -4839,8 +4839,8 @@
     },
     {
       "path": "lib/decision-backup.ts",
-      "bytes": 6112,
-      "sha256": "692430e7f8b3f4b2130edfab9c2e6e975cc57a788a4cf37194a9649b5f80e275"
+      "bytes": 6500,
+      "sha256": "595c1ae36ed9b2a303392d84177b7025d81a8b2d9bad8ea3a94f3f22cb464e28"
     },
     {
       "path": "tests/decision-backup-store.test.mjs",
@@ -4899,8 +4899,8 @@
     },
     {
       "path": "lib/position-allocation-store.ts",
-      "sha256": "d6553a79f30fad1215b74aa623663b8008420020d7d50b88df577210647c1086",
-      "bytes": 4762
+      "sha256": "24c986aa94ea33d4f1ae4ce88f5a601d89af36bd368fe661214f17f4b887e252",
+      "bytes": 5172
     },
     {
       "path": "lib/position-allocation.ts",
@@ -5009,8 +5009,8 @@
     },
     {
       "path": "components/workforce-planning/position-allocation-planner.tsx",
-      "sha256": "df67f3be1f73b8cc5c0a1d76a5edb80141003c8a67ee204f4537c1dc766614d4",
-      "bytes": 41447
+      "sha256": "c55b93c077b240537aeb0efc542b2964c0879b058e27f5f3b8ab2edd974b8624",
+      "bytes": 41979
     },
     {
       "path": "lib/current-required-staffing-summary.ts",
@@ -5024,8 +5024,8 @@
     },
     {
       "path": "tests/position-planner-handoff.test.mjs",
-      "sha256": "8ceb1fda946c40b8c09b62d9ececca474ae819dd65a11110bab08d3a471d0c2e",
-      "bytes": 3496
+      "sha256": "79c509508b04ea70f395545c7b884367af6f77e9abb2731945e00753bad82469",
+      "bytes": 3542
     },
     {
       "path": "tests/position-scenario-source.test.mjs",
@@ -5214,8 +5214,8 @@
     },
     {
       "path": "lib/position-tracking-goal.ts",
-      "bytes": 4815,
-      "sha256": "a49fec5e2d90f7f78e7d3b935abe348880d77b48df5d79cd5eaa9ac5be795ee6"
+      "bytes": 5431,
+      "sha256": "9c4cd65a6e4c475dcf7ce0bd024249c7c09b89dd4e5729b5eb64448bf0ae0d18"
     },
     {
       "path": "tests/position-tracking-goal-ui.test.mjs",
@@ -5226,6 +5226,26 @@
       "path": "tests/position-tracking-goal.test.mjs",
       "bytes": 7897,
       "sha256": "2e8a16378ccdb1e2cbcf8a18cb39a9cc93bc20c6d3b78ac71d5f7dd88b75d9a1"
+    },
+    {
+      "path": "components/workforce-planning/position-market-assumptions.tsx",
+      "sha256": "fd63d5361d5e48ed7ee77d80ea6f50c6a0198a91591f5737ee70d95d6c16c027",
+      "bytes": 9306
+    },
+    {
+      "path": "lib/position-market-assumptions.ts",
+      "sha256": "52edd0dde1cd90581bb798f9b7076fcb5e97747129bf8b55973262fd3272ebe9",
+      "bytes": 15543
+    },
+    {
+      "path": "tests/position-market-assumptions.test.mjs",
+      "sha256": "22b2dcfd84a2d4616ca5729392e33b7ea8f9067fd9997a4a6f25f71780f86a2c",
+      "bytes": 10032
+    },
+    {
+      "path": "tests/position-market-ui.test.mjs",
+      "sha256": "9d378c0c77578a05bed666aba4f46ef6fdebf4035cd4d44e2fcd2dbaf1889553",
+      "bytes": 7277
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
