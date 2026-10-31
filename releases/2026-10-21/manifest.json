@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "beafba96a83270b3e3462142f8ffc5300e334ab842fd50fd7c60e477f4b12add",
-      "bytes": 13600
+      "sha256": "9ab4d3b4b83dd0d803eff51a9230eaf436bc07fa52063cdf8976643d6d7f1d1c",
+      "bytes": 13879
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -5269,8 +5269,8 @@
     },
     {
       "path": "components/workforce-planning/position-market-context.tsx",
-      "sha256": "fddd1a5c03c14d3740cf859b69730a8457249487c2f768a49ec074e11b638fd1",
-      "bytes": 10799
+      "sha256": "fc51c9979b099f9214d718bb97f0d9368dae4ae95e29afae9e0dc09ee98769ab",
+      "bytes": 12753
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
@@ -5284,13 +5284,13 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "4b7963fd14efd8ef7b2366480c8108024455446dae3bdede3a09a2e426586197",
-      "bytes": 16460
+      "sha256": "8fd9a474bdfa7103ae7885ee86b1616580940c4f0b3facdc4f1cd36aeea5e377",
+      "bytes": 19097
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
-      "sha256": "32de4cd227fbdf8e9570667dbaae1df8217ad5b2e0d350701975d2c4222e2fc3",
-      "bytes": 7684
+      "sha256": "e703f1a6d4bdfb984c80c144f23b3b8860cbe06a47c103e4fada446eea2a8057",
+      "bytes": 10295
     },
     {
       "path": "tests/position-market-context.test.mjs",
@@ -5304,13 +5304,23 @@
     },
     {
       "path": "lib/market-context-lookup.ts",
-      "sha256": "f16c97cbbaa9f79dcfc7fa59784b99a36ec622cf5b0552af5cb0fd70d34693c8",
-      "bytes": 4392
+      "sha256": "2ecfd70ef2d2649690bcaf88f9f44b311f32b9beabb260a2663b35002ef6370a",
+      "bytes": 4979
     },
     {
       "path": "tests/market-context-lookup.test.mjs",
-      "sha256": "f153448cc08c17bf804e9f1c60e0ea27c59176fd45948eed3bcdaa3ca87ecf09",
-      "bytes": 8353
+      "sha256": "58fb877b8a071c6906c85f395fff409cdb8aca4ec03ed1a2d13e995dad447015",
+      "bytes": 8385
+    },
+    {
+      "path": "lib/data/dfe-ess2024-uk-position-hiring.json",
+      "sha256": "a20c1dd4068b0b53fbe6ee2038111b899b413eecc72a893d3e3548ccb9e87de5",
+      "bytes": 3786
+    },
+    {
+      "path": "tests/position-uk-hiring-context.test.mjs",
+      "sha256": "03a412fa3308a9b0f9f59ab3e1fced539fed5fde5eb1872f9017f1169d24465f",
+      "bytes": 20597
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

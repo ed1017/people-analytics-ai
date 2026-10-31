@@ -29,7 +29,7 @@ test('client facts, source replacement and malformed scope are rejected',()=>{
  for(const v of [{...args(),annualOpenings:2},{...args(),sourceUrl:'https://evil.test'},args({kind:'live'}),args({country:42}),args({occupationCode:'x'.repeat(21)})])assert.throws(()=>readMarketContext(v));
 });
 test('outputs are isolated and all supported role lookups stay within bounded output',()=>{
- const catalog=positionMarketCatalogReferences(),before=JSON.stringify(catalog);for(const role of new Set(catalog.flatMap(r=>r.roles))){const r=readMarketContext(args({role}));assert.equal(r.status,'available');assert.ok(Buffer.byteLength(JSON.stringify(r))<=48000);}
+ const catalog=positionMarketCatalogReferences(),before=JSON.stringify(catalog);for(const role of new Set(catalog.filter(r=>r.countryCode==='US').flatMap(r=>r.roles))){const r=readMarketContext(args({role}));assert.equal(r.status,'available');assert.ok(Buffer.byteLength(JSON.stringify(r))<=48000);}
  const r=readMarketContext(args());r.references[0].title='tamper';assert.equal(JSON.stringify(positionMarketCatalogReferences()),before);
 });
 test('static dispatch performs no network read; legacy analytics dispatch remains intact',async()=>{
