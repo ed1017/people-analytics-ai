@@ -2,7 +2,13 @@
 
 ## Current live release and active parallel work
 
-### PR489 current - ranked UK occupation expansion
+### PR491 current - verified US position pay expansion
+
+PR491 is live at runtime `9932e961736f027c3c2ac7dcf25d6c13ac6dde4d`, merge `3fff83aeb95aea1662dc0d4bc368e6453d114a4e`, deployment `dpl_64sEzx63QYUqeAjxMm29iScMDxVd`. Independent review, 145 affected tests, position type graph, full build/TypeScript and exact-head CI `41219477499` passed. Staged desktop/mobile and final direct-public desktop/mobile each passed 14 journey groups; final public reports were clean. The initial protected desktop reload timeout and successful isolated retry remain documented in the [source and release evidence](us-position-market-expansion-2026-10-31.md).
+
+The newly supplied original national workbook was verified through supported Linux Library materialization, resolving the transfer blocker without retrying a denied source. Nine reviewed occupation references add 22 US vacancies: coverage is now 34 of 197 (25 US, nine UK). National USD annual pay requires explicit duties/statistic/on-cost adoption. Existing regional US and UK FX references, original revisions, Track/Review and backups remain intact. The remaining 163 vacancies have no invented pay mapping; applicant supply and role-level hiring time remain incomplete. State-specific data was not integrated. No paid AI calls; Lab validation remains user-owned and the target overlay preview-only.
+
+### PR489 included - ranked UK occupation expansion
 
 PR489 is live at runtime `15579b694d771182cedf848a7626f20ffe823c83`, merge `64ae833708172a358d02c626fd8c4cedc85abdfe`, deployment `dpl_6yD7TBwzsCv41Mjn8L4zddrUfdD8`. Independent source/code review, 132 affected tests, full build/TypeScript and exact-head CI `41192575194` passed. Staged and direct-public desktop/mobile each passed eight functional groups; final public reports and teardown were clean. [Ranked coverage, source blockers and release evidence](market-vacancy-coverage-batch-2026-10-31.md).
 
