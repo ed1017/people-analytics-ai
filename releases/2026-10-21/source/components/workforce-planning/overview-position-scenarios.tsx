@@ -4,6 +4,7 @@ import {useDecisionStorage} from '@/components/decision-store';
 import {POSITION_ALLOCATION_LEDGER_FIELD,readPositionScenarioLedger} from '@/lib/position-allocation-store';
 import {POSITION_FINANCE_LEDGER_FIELD,readPositionFinanceLedger,positionFinanceForAllocation} from '@/lib/position-finance-store';
 import {POSITION_FINANCE_MODEL,assessPositionFinance,unknownPositionFinance,noPositionAddition} from '@/lib/position-finance-assessment';
+import {POSITION_MARKET_FIELD,readPositionMarketLedger,positionMarketChatReference} from '@/lib/position-market-assumptions';
 import {positionChatContext} from '@/lib/position-chat-context';
 import {PositionScenarioExplanation} from './position-scenario-explanation';
 
@@ -28,7 +29,8 @@ export function OverviewPlanFromPositions({datasetToken,goalId,onChoosePositions
  const addition=record?.addition??noPositionAddition();
  const assessment=row&&envelope&&financeLedger?assessPositionFinance({version:1,modelVersion:POSITION_FINANCE_MODEL,allocation:row.draft,finance:envelope,addition}):null;
  const goal=storage.data.goals.goals.find(item=>item.id===goalId)?.statement??'';
- const packet=row&&envelope&&assessment&&storage.saved?positionChatContext({draft:row.draft,scenario:{id:row.scenarioId,revision:row.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope,addition}},{datasetToken,goalId,goal}):null;
+ const marketLedger=ledger?readPositionMarketLedger(fields[POSITION_MARKET_FIELD],datasetToken,goalId,raw):null;
+ const packet=row&&envelope&&assessment&&storage.saved&&marketLedger?positionChatContext({draft:row.draft,market:positionMarketChatReference(marketLedger,row),scenario:{id:row.scenarioId,revision:row.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope,addition}},{datasetToken,goalId,goal}):null;
  return <section aria-labelledby={`${uid}-title`} className="min-w-0 space-y-3 rounded-xl border p-3">
   <h3 id={`${uid}-title`} className="text-lg font-semibold">Plan from positions</h3>
   <p className="text-sm text-muted-foreground">Use a saved position scenario and its funding assumptions. General capacity options use separate assumptions.</p>

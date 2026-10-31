@@ -4934,8 +4934,8 @@
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
-      "bytes": 12863,
-      "sha256": "2076fc8f3b6b72f7260d5ce6ba96d9cf6f7d1e880f300e6fe45969bc33566266"
+      "sha256": "92d9ac01fc646dac1b83ce7ac02b9a97ef30d6b4a27fae7db28344577a165164",
+      "bytes": 13179
     },
     {
       "path": "components/workforce-planning/position-scenario-explanation.tsx",
@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "bytes": 9972,
-      "sha256": "1633075a02f907f6cce31ed5261ed948b1e943fb7d47650fa73b80be3af2ad09"
+      "sha256": "32762bb9bfc10eaaf49b07461129f63c9ccbcb4473bd7d02467e6448c3a15b96",
+      "bytes": 12237
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -4989,8 +4989,8 @@
     },
     {
       "path": "components/workforce-planning/overview-position-scenarios.tsx",
-      "bytes": 5809,
-      "sha256": "c6ba8065d435f5b555d84b7286a123fee5922433ba1e634501a183d9009febf3"
+      "sha256": "e7cd7e2e391518213fd3a23545b06982df5ee57017875b37053ca544040d1e9a",
+      "bytes": 6115
     },
     {
       "path": "tests/overview-position-scenarios.test.mjs",
@@ -5234,8 +5234,8 @@
     },
     {
       "path": "lib/position-market-assumptions.ts",
-      "sha256": "c3fc38a7b7359b2613db1460f35d1e0cb31b8d75a5328e4aafa8a50c3219a432",
-      "bytes": 37274
+      "sha256": "50df212a2236671e865c65ef0cc7fe4c847ccc8007c10366c844793479abfb9d",
+      "bytes": 39100
     },
     {
       "path": "tests/position-market-assumptions.test.mjs",
@@ -5261,6 +5261,11 @@
       "path": "lib/data/mhlw-japan-2025-position-pay.json",
       "sha256": "eadb3991cf57261af24c2d4ec112a087c0203c11120b2bbd0fd0448182bdf7e4",
       "bytes": 6472
+    },
+    {
+      "path": "tests/position-market-chat-context.test.mjs",
+      "sha256": "62abfa624994b4d956671c3880cc8a1d5c31a9ba54b4bcdab50fd5b760d5e11d",
+      "bytes": 6165
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
