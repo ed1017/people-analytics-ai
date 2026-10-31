@@ -2,11 +2,17 @@
 
 ## Current live release and active parallel work
 
-### PR495 current - conditional UK and US role references
+### PR497 current - Japan market-to-position planning
 
-PR495 is live at runtime `8e17f49f6ab2ec39c282178a54f2d73a9d7de9b1`, merge `4bbcc2a8e476caecbdf00aad03f0bd3ab7b42171`, deployment `dpl_5SzQeQsQRzYKg6CxcJFzofgA6nvD`. Independent review, 158 affected tests, position type graph, full build/TypeScript and exact-head CI `41228435697` passed. Direct public desktop/mobile each passed 13 groups with HTTP 200 and clean reports. [Source decisions, remaining evidence requirements and release acceptance](market-reference-next-batch-2026-10-31.md).
+PR497 is live at runtime `f3a75bc7f9e7c504070e2c255296cf2145f502f3`, merge `f4d186e59b4f75a6fbc9448f6b957480d8c58d6b`, deployment `dpl_4gbAMzVta4hqvrskJUaDbrrV3EDV`. Official Japanese occupation crosswalks and wage components support five vacancies: AI, machine learning, backend and cloud infrastructure. Coverage is 52 of 197 (33 US, 14 UK, five Japan); 145 remain unsupported. Annualised cash, explicit dated JPY conversion and employer on-cost stay distinct. No salary median, actual Finance approval or applicant availability is inferred.
 
-Seven additional vacancies now have conditional pay references: five UK professional/advisory/sales roles, US sourcing using the explicitly named buyer aggregate, and US services sales with its sector exclusions. Coverage is 47 of 197 (33 US, 14 UK); 150 remain unsupported. Role-specific duty confirmation, explicit FX/on-cost, immutable original revisions, goal isolation, Track/Review and backups passed. No paid AI calls, inferred state locations or changes to user-owned Lab/preview-only target overlay. Next permitted source investigation checks the Australian workbook's exact wage and reuse contract; India remains the largest source gap at 59 vacancies.
+Independent review, 166 affected checks, 62 independent focused checks, full build/TypeScript and exact-head CI `41231621323` passed. Direct public desktop/mobile each passed 11 groups with HTTP 200 and clean reports, including old backups, cancel/stale handling, saved revisions, Track/Review and backup restore. [Source contract, acceptance and precise remaining evidence needs](japan-position-market-reference-2026-10-31.md). Australia needs the original workbook transfer; Singapore reuse authority remains unresolved; India remains the largest source gap. No paid AI calls. Lab remains user-owned and chart overlay preview-only.
+
+### PR495 included - conditional UK and US role references
+
+PR495 was published at runtime `8e17f49f6ab2ec39c282178a54f2d73a9d7de9b1`, merge `4bbcc2a8e476caecbdf00aad03f0bd3ab7b42171`, deployment `dpl_5SzQeQsQRzYKg6CxcJFzofgA6nvD`. Independent review, 158 affected tests, position type graph, full build/TypeScript and exact-head CI `41228435697` passed. Direct public desktop/mobile each passed 13 groups with HTTP 200 and clean reports. [Source decisions, remaining evidence requirements and release acceptance](market-reference-next-batch-2026-10-31.md).
+
+Its changes are included in PR497. Seven additional vacancies gained conditional pay references at this checkpoint: five UK professional/advisory/sales roles, US sourcing using the explicitly named buyer aggregate, and US services sales with its sector exclusions. Coverage is 47 of 197 (33 US, 14 UK); 150 remain unsupported. Role-specific duty confirmation, explicit FX/on-cost, immutable original revisions, goal isolation, Track/Review and backups passed. No paid AI calls, inferred state locations or changes to user-owned Lab/preview-only target overlay. Next permitted source investigation checks the Australian workbook's exact wage and reuse contract; India remains the largest source gap at 59 vacancies.
 
 Earlier release sections below preserve coverage and source status at those release checkpoints.
 
