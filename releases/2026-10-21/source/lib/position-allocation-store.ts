@@ -1,6 +1,8 @@
 import type {DecisionStore,Json} from './local-decisions';
 // @ts-expect-error Native tests share this canonical TypeScript source.
 import {calculatePositionAllocation,requirePositionAllocationDraft,type PositionAllocationDraft,type PositionAllocationResult} from './position-allocation.ts';
+// @ts-expect-error Native tests share this canonical TypeScript source.
+import {capturePositionMarketPatch,positionMarketCaptureUnchanged} from './position-market-assumptions.ts';
 export const POSITION_ALLOCATION_LEDGER_FIELD='planning.positionAllocationScenariosV1';
 export const POSITION_ALLOCATION_DRAFT_FIELD='planning.positionAllocationDraftV1';
 export const MAX_POSITION_CAPTURES=20;
@@ -36,10 +38,11 @@ export function savePositionScenario({store,datasetToken,goalId,goal,revision,at
   if(!ledger)throw Error('Saved position scenarios are unsupported or damaged. Existing records were retained.');
   const latest=ledger.records.filter(row=>row.scenarioId===scenarioId).at(-1);
   if((latest?.revision??0)!==baseRevision)throw Error('This scenario has a newer saved revision. Reopen it or save a separate scenario.');
-  if(latest&&JSON.stringify(latest.draft)===JSON.stringify(draft)){capture=latest;return {[POSITION_ALLOCATION_LEDGER_FIELD]:ledger as unknown as Json};}
+  if(latest&&JSON.stringify(latest.draft)===JSON.stringify(draft)&&positionMarketCaptureUnchanged(fields,datasetToken,goalId,latest)){capture=latest;return {[POSITION_ALLOCATION_LEDGER_FIELD]:ledger as unknown as Json,...capturePositionMarketPatch(fields,datasetToken,goalId,latest,ledger)};}
   if(ledger.records.length>=MAX_POSITION_CAPTURES)throw Error('The 20-revision position scenario limit has been reached. Back up your saved work; existing scenarios were retained.');
   capture={scenarioId,scenarioNumber:latest?.scenarioNumber??new Set(ledger.records.map(row=>row.scenarioId)).size+1,revision:(latest?.revision??0)+1,sequence:ledger.records.length+1,savedAt:at,draft:structuredClone(draft),result:structuredClone(result)};
-  return {[POSITION_ALLOCATION_LEDGER_FIELD]:{...ledger,records:[...ledger.records,capture]} as unknown as Json,[POSITION_ALLOCATION_DRAFT_FIELD]:structuredClone(draft) as unknown as Json};
+  const next={...ledger,records:[...ledger.records,capture]};
+  return {[POSITION_ALLOCATION_LEDGER_FIELD]:next as unknown as Json,[POSITION_ALLOCATION_DRAFT_FIELD]:structuredClone(draft) as unknown as Json,...capturePositionMarketPatch(fields,datasetToken,goalId,capture,next)};
  };
  if(goalId)store.commitGoalFields(goalId,goal,revision,at,build);else store.commitExplorationFields(revision,at,build);
  return structuredClone(capture!);

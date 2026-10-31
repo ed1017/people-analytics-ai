@@ -71,7 +71,7 @@ export function PositionWorkforceDesignDestination({
       <TalentInventoryScenarios onTrackPositions={onTrackPositions}/>
       <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-semibold">Grouped company position reference</summary><div className="pt-3"><PositionDashboard catalog={structuralActionProps.catalog} loading={positionCatalogLoading} error={positionCatalogError} /></div></details>
       <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-semibold focus-visible:ring-2 focus-visible:ring-ring">Edit individual positions &amp; saved revisions</summary><div className="pt-3"><PositionScenarioEditor /></div></details>
-      <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">External role &amp; location evidence</summary><div className="pt-3"><ExternalWorkforceEvidencePanel /></div></details>
+      <details className="rounded-lg border p-4"><summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Browse other market references</summary><div className="pt-3"><ExternalWorkforceEvidencePanel /></div></details>
 
       <details className="rounded-lg border p-4">
         <summary className="min-h-11 cursor-pointer font-medium focus-visible:ring-2 focus-visible:ring-ring">Grouped inventory tools</summary>

@@ -7,6 +7,8 @@ import {calculatePositionAllocation,createPositionAllocation,requirePositionAllo
 import {POSITION_ALLOCATION_DRAFT_FIELD,POSITION_ALLOCATION_LEDGER_FIELD,readPositionScenarioLedger,savePositionScenario,type PositionScenarioCapture} from '@/lib/position-allocation-store';
 import {InventoryCharts,AllocationVisuals} from './position-allocation-visuals';
 import {PositionFinancePanel} from './position-finance-panel';
+import {PositionMarketAssumptions} from './position-market-assumptions';
+import {updatePositionMarketDraft} from '@/lib/position-market-assumptions';
 import {POSITION_FINANCE_LEDGER_FIELD,readPositionFinanceLedger,positionAllocationSignature} from '@/lib/position-finance-store';
 const control='min-h-11 w-full min-w-0 rounded-lg border bg-background px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring';
 const button='min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50';
@@ -61,10 +63,10 @@ export function PositionInventoryWorkspace({goalId,datasetToken,embedded=false,a
  const selectedSet=new Set(selected),selectedRows=inventory.positions.filter(p=>selectedSet.has(p.id)),selectedVacancies=selectedRows.filter(p=>p.status==='vacant');
  const goal=storage.data.goals.goals.find(g=>g.id===goalId)?.statement??'';
  function guarded(action:()=>void){try{action();setError('');}catch(e){setError(e instanceof Error?e.message:'Position scenario could not be saved.');}}
- function writeDraft(next:PositionAllocationDraft){
+ function writeDraft(next:PositionAllocationDraft,restoreCapture?:PositionScenarioCapture){
   requirePositionAllocationDraft(next);
   if(decisionStore.getDatasetToken()!==datasetToken||decisionStore.getSnapshot().data.goals.activeId!==goalId)throw Error('The goal or dataset changed. Reopen this workspace.');
-  decisionStore.setField(goalId,POSITION_ALLOCATION_DRAFT_FIELD,structuredClone(next));setLocalDraft(structuredClone(next));setPendingStart(null);setNotice('');
+  updatePositionMarketDraft({store:decisionStore,datasetToken,goalId,draft:next,restoreCapture});setLocalDraft(structuredClone(next));setPendingStart(null);setNotice('');
  }
  function applyStart(next:PositionAllocationDraft,example:boolean){writeDraft(next);showPlanner();setOpened(null);setFinanceBinding(null);setInventoryVersion(next.inventory.version);setSelected([...next.input.selectedIds]);setNotice(example?'Opened the 12-vacancy example. All values are editable demo assumptions.':'Selected vacancies are ready to allocate.');}
  function begin(ids:string[],example=false,source=inventory,trigger?:HTMLButtonElement){guarded(()=>{
@@ -97,7 +99,7 @@ export function PositionInventoryWorkspace({goalId,datasetToken,embedded=false,a
  function currentFields(){const snapshot=decisionStore.getSnapshot();if(decisionStore.getDatasetToken()!==datasetToken||snapshot.data.goals.activeId!==goalId)throw Error('The goal or dataset changed. Choose a position revision again.');return (goalId?snapshot.data.workspaces[goalId]:snapshot.data.exploration)?.fields??{};}
  function adoptHandoff(request:PositionPlannerHandoffRequest){
   const {capture,financeRevision}=resolvePositionPlannerHandoff(currentFields(),request,datasetToken,goalId);
-  writeDraft(capture.draft);setOpened({id:capture.scenarioId,revision:capture.revision});setFinanceBinding({requestId:request.requestId,revision:financeRevision});setReopenKey(captureKey(capture));setInventoryVersion(capture.draft.inventory.version);setSelected([...capture.draft.input.selectedIds]);showPlanner();setNotice(`Opened position scenario ${capture.scenarioNumber}, revision ${capture.revision}.`);onOpened?.(capture,financeRevision);
+  writeDraft(capture.draft,capture);setOpened({id:capture.scenarioId,revision:capture.revision});setFinanceBinding({requestId:request.requestId,revision:financeRevision});setReopenKey(captureKey(capture));setInventoryVersion(capture.draft.inventory.version);setSelected([...capture.draft.input.selectedIds]);showPlanner();setNotice(`Opened position scenario ${capture.scenarioNumber}, revision ${capture.revision}.`);onOpened?.(capture,financeRevision);
  }
  useEffect(()=>{
   if(!storage.ready||!handoffRequest||handledRequest.current===handoffRequest.requestId)return;
@@ -121,6 +123,7 @@ export function PositionInventoryWorkspace({goalId,datasetToken,embedded=false,a
   {!storage.saved&&storage.ready&&<p role="alert">Browser changes are unsaved. Resolve storage or reload before saving scenarios.</p>}
   <p role="alert" className="text-sm text-destructive">{error}</p><p role="status" aria-live="polite" className="text-sm">{notice}</p>
   {pendingStart&&pendingStart.datasetToken===datasetToken&&pendingStart.goalId===goalId&&<div role="group" aria-label="Confirm position draft replacement" className="space-y-2 rounded-lg border p-3"><p className="text-sm font-semibold">Replace the current draft with {pendingStart.handoff?'the selected saved revision':pendingStart.example?'the 12-vacancy example':`${pendingStart.draft.input.selectedIds.length} selected positions`}?</p><p className="text-sm">Current draft edits will be replaced. Saved revisions stay unchanged.</p><div className="flex flex-wrap gap-2"><button type="button" className={primary} onClick={confirmStart}>Replace current draft</button><button ref={replacementCancelRef} type="button" className={button} onClick={cancelStart}>Cancel</button></div></div>}
+  {draft&&<PositionMarketAssumptions key={JSON.stringify(draft)} draft={draft} datasetToken={datasetToken} goalId={goalId} onApplied={next=>{setLocalDraft(structuredClone(next));setNotice('Market pay applied. Save a position revision to retain this comparison.');requestAnimationFrame(()=>plannerRef.current?.focus());}}/>}
   {draft&&calculation&&<div ref={plannerRef} tabIndex={-1} aria-label="Current position scenario" className="min-w-0 rounded-xl focus-visible:ring-2 focus-visible:ring-ring"><InteractivePlanner scope={`${draft.input.selectedIds.length} selected positions · ${calculation.vacancies} vacant · ${draft.inventory.source==='aggregate-constrained-model'?'Company model':'Scenario'}`} outcome="Plan how to address these vacancies" metrics={[{label:'Planned routes',value:`${calculation.allocated} / ${calculation.eligible}`},{label:`Assumed ready FTE at month ${draft.input.horizonMonths}`,value:calculation.valid?count(calculation.targetReadyFte):'Review inputs'},{label:'Remaining target FTE',value:calculation.valid?count(calculation.remainingTargetFte):'Review inputs'},{label:'Incremental cash',value:money(calculation.cashTotal)},{label:'Cash budget',value:money(draft.input.budgetUsd)}]} levers={<div className="min-w-0 space-y-3">
     <div className="grid min-w-0 gap-3 sm:grid-cols-2"><NumericLever label="Hire positions" value={draft.input.hire} max={calculation.eligible} onChange={v=>patch('hire',v??0)}/><NumericLever label="Repurpose positions" value={draft.input.repurpose} max={calculation.eligible} onChange={v=>patch('repurpose',v??0)}/><NumericLever label="Train positions" value={draft.input.train} max={calculation.eligible} onChange={v=>patch('train',v??0)}/><NumericLever label="Budget (USD cash)" value={draft.input.budgetUsd} max={10000000} step={1000} nullable onChange={v=>patch('budgetUsd',v)}/><NumericLever label="Horizon (months)" value={draft.input.horizonMonths} min={1} max={24} onChange={v=>patch('horizonMonths',v??1)}/></div>
     {resolvePositionInventory(draft.inventory.version).positions.some(p=>p.fte===null)&&<NumericLever label="Planned FTE per slot with unknown FTE" value={draft.input.assumedFtePerUnknownSlot} min={0.1} max={2} step={0.1} onChange={v=>patch('assumedFtePerUnknownSlot',v??1)}/>}
