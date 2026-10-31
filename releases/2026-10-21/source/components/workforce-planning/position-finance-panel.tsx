@@ -3,6 +3,8 @@ import {useId,useMemo,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {POSITION_MARKET_FIELD,readPositionMarketLedger,positionMarketChatReference} from '@/lib/position-market-assumptions';
 import {positionChatContext} from '@/lib/position-chat-context';
+import {PositionMarketContext} from './position-market-context';
+import {POSITION_MARKET_CONTEXT_FIELD,readPositionMarketContextLedger,positionMarketContextChatReference} from '@/lib/position-market-context';
 import {PositionScenarioExplanation} from './position-scenario-explanation';
 import type {PositionAllocationDraft} from '@/lib/position-allocation';
 import {DEMO_POSITION_INVENTORY} from '@/lib/position-inventory';
@@ -25,6 +27,8 @@ export function PositionFinancePanel({allocation,datasetToken,goalId,savedCaptur
  const [edits,setEdits]=useState<Record<string,Edit>>({}),[selected,setSelected]=useState<Record<string,string>>({}),[notice,setNotice]=useState(''),[error,setError]=useState('');
  const signature=positionAllocationSignature(allocation),matches=Boolean(savedCapture&&positionAllocationSignature(savedCapture.draft)===signature);
  const key=JSON.stringify([datasetToken,goalId,savedCapture?.scenarioId??'',savedCapture?.revision??0]);
+ const [contextSelections,setContextSelections]=useState<Record<string,number|null>>({});
+ const contextRevision=contextSelections[key]??null;
  const [preferredRevision,setPreferredRevision]=useState<number|null|undefined>(initialFinanceRevision);
  const record=ledger&&savedCapture?(preferredRevision===undefined?positionFinanceForAllocation(ledger,savedCapture.scenarioId,savedCapture.revision):preferredRevision===null?null:ledger.records.find(row=>row.scenarioId===savedCapture.scenarioId&&row.allocationRevision===savedCapture.revision&&row.allocationSignature===signature&&row.revision===preferredRevision)??null):null;
  const missingRequestedRevision=preferredRevision!==undefined&&preferredRevision!==null&&matches&&!record;
@@ -36,7 +40,10 @@ export function PositionFinancePanel({allocation,datasetToken,goalId,savedCaptur
  const disabled=!storage.ready||!storage.saved||!matches||!ledger||missingRequestedRevision;
  const goal=storage.data.goals.goals.find(g=>g.id===goalId)?.statement??'';
  const marketLedger=readPositionMarketLedger(fields[POSITION_MARKET_FIELD],datasetToken,goalId,allocationLedger);
- const explanationPacket=!disabled&&result&&result.status!=='invalid-scenario'&&savedCapture&&marketLedger?positionChatContext({draft:allocation,market:positionMarketChatReference(marketLedger,savedCapture),scenario:{id:savedCapture.scenarioId,revision:savedCapture.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope:edit.finance,addition:edit.addition}},{datasetToken,goalId,goal}):null;
+ const contextLedger=readPositionMarketContextLedger(fields[POSITION_MARKET_CONTEXT_FIELD],datasetToken,goalId,allocationLedger);
+ const selectedContext=contextLedger&&savedCapture&&contextRevision!==null?positionMarketContextChatReference(contextLedger,savedCapture,contextRevision):null;
+ const contextValid=!!contextLedger&&(contextRevision===null||!!selectedContext);
+ const explanationPacket=!disabled&&contextValid&&result&&result.status!=='invalid-scenario'&&savedCapture&&marketLedger?positionChatContext({draft:allocation,marketContext:selectedContext,market:positionMarketChatReference(marketLedger,savedCapture),scenario:{id:savedCapture.scenarioId,revision:savedCapture.revision},finance:{version:1,modelVersion:POSITION_FINANCE_MODEL,envelope:edit.finance,addition:edit.addition}},{datasetToken,goalId,goal}):null;
  const records=ledger?.records.filter(row=>row.scenarioId===savedCapture?.scenarioId&&row.allocationRevision===savedCapture?.revision)??[];
  function patch(next:Partial<Edit>){setEdits(current=>({...current,[key]:{...edit,...next}}));setNotice('');setError('');}
  function allowance(value:number|null){patch({finance:{...edit.finance,basis:'illustrative-demo',reference:'User-entered scenario funding allowance; no Finance approval record',incrementalFundingUsd:value,fundedPositionIds:edit.finance.basis==='unknown'?null:edit.finance.fundedPositionIds}});}
@@ -69,6 +76,7 @@ export function PositionFinancePanel({allocation,datasetToken,goalId,savedCaptur
   <div className="flex flex-wrap gap-2"><button type="button" className={`${button} bg-primary text-primary-foreground`} disabled={disabled||Boolean(validation)||result?.status==='invalid-scenario'} onClick={save}>Save funding comparison</button>{edits[key]&&<><button type="button" className={button} onClick={()=>{setEdits(current=>{const next={...current};delete next[key];return next;});setNotice('Funding edits reset.');setError('');}}>Reset funding edits</button><span className="self-center text-xs">Unsaved funding changes</span></>}</div>
   {records.length>0&&<div className="flex flex-wrap items-end gap-2"><label className="min-w-0 flex-1 text-sm">Saved funding comparison<select className={control} value={selected[key]??String(record?.revision??'')} onChange={e=>setSelected(current=>({...current,[key]:e.target.value}))}>{records.map(row=><option key={row.revision} value={row.revision}>Revision {row.revision} · {labels[row.result.status]}</option>)}</select></label><button type="button" className={button} disabled={disabled} onClick={()=>{const row=records.find(r=>String(r.revision)===(selected[key]??String(record?.revision??'')));if(row)reopen(row);}}>Reopen funding</button></div>}
   {error&&<p role="alert" className="text-sm">{error}</p>}{notice&&<p role="status" className="text-sm">{notice}</p>}
+  {savedCapture&&<PositionMarketContext key={`${key}:${signature}`} capture={savedCapture} datasetToken={datasetToken} goalId={goalId} allocationLedger={allocationLedger} selectedRevision={contextRevision} onSelectedRevision={revision=>setContextSelections(old=>({...old,[key]:revision}))} disabled={!matches||!active}/>}
   <PositionScenarioExplanation packet={explanationPacket} active={active}/>
   <details><summary className="min-h-11 cursor-pointer text-xs focus-visible:ring-2 focus-visible:ring-ring">Details</summary><div className="space-y-1 text-sm"><p>{edit.finance.reference??'No Finance approval evidence supplied.'}</p><p>Funding applies to {edit.finance.asOf}, this inventory and a {edit.finance.horizonMonths}-month USD cash horizon. Employee time value is separate.</p>{result?.approvalReasons.length?<p>Approval needed: {result.approvalReasons.map(reason=>(approvalLabels[reason]??reason)).join('; ')}.</p>:null}<p>Saved funding comparisons stay with their exact allocation revision.</p></div></details>
  </section>;
