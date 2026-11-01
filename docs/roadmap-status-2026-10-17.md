@@ -1,10 +1,14 @@
 # Active roadmap - November 1
 
+## November 1: visible market exploration released
+
+PR518 is live at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
+
 ## November 1: modeled position duties released
 
-PR516 is live at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
+PR516 was published at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
 
-Next authorized work: make external market evidence visible in the third Explore entry, preserving risk-first ordering. Implementation is isolated; not yet released.
+Reader discoverability is now released in PR518 above. Further external coverage remains source- and duty-contract constrained.
 
 ## October 31: network and market-research context released
 

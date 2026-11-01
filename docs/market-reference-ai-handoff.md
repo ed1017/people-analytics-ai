@@ -4,9 +4,13 @@ Updated November 1, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-### PR516 current - modeled position duties
+### PR518 current - visible market exploration
 
-PR516 is live at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
+PR518 is live at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
+
+### PR516 included - modeled position duties
+
+PR516 was published at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
 
 ### PR514 included - network and market-research context
 
@@ -86,4 +90,4 @@ PR504 attached revision-bound outlook/software evidence, PR506 expanded BLS cove
 PR512 separates conditional non-pay mappings from pay eligibility. People Analytics pay remains held even though eligible statistical/modeling duties can use non-pay context. PR514 publishes restrictive opt-in 15-1241/13-1161 mappings using a separate bounded fixture, preserving full occupation counts separately from the 22 flagged rows. PR516 now supplies explicit fictional duty templates for the five remaining US vacancies under user authorization. These are separate from external references and do not automatically establish occupational equivalence; no further extraction request is pending. Do not mistake these eligibility counts for confirmed duties or adopted assumptions.
 
 
-Reader discoverability is the next authorized slice: a visible third Explore entry with explicit role/country selection and canonical local evidence. Keep risk first and turnover second. No unsupported market-tightness score, automatic scenario attachment or cross-scope AI submission. This prompt work is not yet released.
+Reader discoverability is released in PR518: a visible third Explore entry with explicit role/country selection and canonical local evidence. Risk remains first and turnover second. There is no unsupported market-tightness score, automatic scenario attachment or cross-scope AI submission. Further source coverage remains constrained by verified duties, compatible evidence and reuse rights.
