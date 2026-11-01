@@ -4884,8 +4884,8 @@
     },
     {
       "path": "components/workforce-planning/position-allocation-visuals.tsx",
-      "sha256": "5b6ef83cccb2b2e564c4fffb32ab5550b89bd1bf42e2546299c807ebc1565644",
-      "bytes": 5271
+      "sha256": "020e4dc5148c793bd5d533909f62e425b3cbb82c7f219c83e229327ba4371d24",
+      "bytes": 8656
     },
     {
       "path": "components/workforce-planning/talent-inventory-scenarios.tsx",
@@ -5009,8 +5009,8 @@
     },
     {
       "path": "components/workforce-planning/position-allocation-planner.tsx",
-      "sha256": "c55b93c077b240537aeb0efc542b2964c0879b058e27f5f3b8ab2edd974b8624",
-      "bytes": 41979
+      "sha256": "af67c69e5ad6bee8af512d1e815d8c7707308267b11d1c03623dde03cb98b607",
+      "bytes": 40086
     },
     {
       "path": "lib/current-required-staffing-summary.ts",
@@ -5761,6 +5761,11 @@
       "path": "tests/position-australia-osca-shortage.test.mjs",
       "sha256": "61c97d4d515e8af696864b817b7864f0fde21ec81351292e68adb80d7aa93620",
       "bytes": 2036
+    },
+    {
+      "path": "tests/hiring-manager-comparison.test.mjs",
+      "sha256": "d07b715a9447dd71cdf4bd45d164dacf4724fde164336cfb27739d8f1cf2eec6",
+      "bytes": 4761
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

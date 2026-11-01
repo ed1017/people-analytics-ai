@@ -51,7 +51,7 @@ jobs:
         run: node --test tests/public-pricing-verifier.test.mjs tests/public-pricing-renewal.test.mjs tests/public-pricing-policy.test.mjs tests/public-planner-ledger.test.mjs tests/public-planner-round.test.mjs
       - name: Verify chart-first positions and intro controls
         working-directory: releases/2026-10-21/source
-        run: node --test tests/position-dashboard.test.mjs tests/position-allocation.test.mjs tests/position-allocation-store.test.mjs tests/talent-inventory-draft-replacement.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
+        run: node --test tests/hiring-manager-comparison.test.mjs tests/position-dashboard.test.mjs tests/position-allocation.test.mjs tests/position-allocation-store.test.mjs tests/talent-inventory-draft-replacement.test.mjs tests/composer-prompt-helpers.test.mjs tests/home-orientation.test.mjs
       - name: Verify position funding and explanation contracts without provider calls
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-finance-assessment.test.mjs tests/position-finance-store.test.mjs tests/position-finance-panel.test.mjs tests/position-chat-context.test.mjs tests/position-chat-routing.test.mjs tests/position-market-chat-context.test.mjs tests/position-scenario-explanation.test.mjs tests/overview-position-scenarios.test.mjs
