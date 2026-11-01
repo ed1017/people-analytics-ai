@@ -463,5 +463,50 @@
       "preservedGoals": 20
     },
     "followOn": "OSCA273233 received and independently conditionally reviewed; candidate108 separate and unpublished."
+  },
+  {
+    "status": "live; direct public acceptance passed",
+    "pr": 543,
+    "merge": "5b49da7c3e8255f6359a786244d338840bc8566f",
+    "runtime": "c9ecdd75364569b8e212e5197b262e481137d216",
+    "deployment": "dpl_5RB2P1jGFAD2aWHkVV2mgm3GazRn",
+    "ci": 41340932569,
+    "coverage": {
+      "live": 108,
+      "candidate": 108,
+      "total": 197,
+      "pay": 59
+    },
+    "newReferences": 1,
+    "newVacancies": 2,
+    "priorReferencesUnchanged": 140,
+    "archiveSha256": "93fd43cba07a6f4fdfd0d285ea4120acf31aaa8f3909b93a270c40b1ac4bc4c8",
+    "runtimeInputs": 1295,
+    "manifestEntries": 1150,
+    "publicPromotion": true,
+    "paidCalls": 0,
+    "acceptance": {
+      "stageGroupsPerWidth": 4,
+      "publicGroupsPerWidth": 4,
+      "widths": [
+        1440,
+        390
+      ],
+      "mockedExplanationsPerRun": 3,
+      "http": 200,
+      "errors": [],
+      "blocked": [],
+      "mockErrors": [],
+      "bridgeErrors": [],
+      "teardown": "drained",
+      "publicAssetReplay": 0,
+      "nativeBackupBytesPerWidth": 1376096,
+      "goals": 20,
+      "captures": 20,
+      "contexts": 18,
+      "priorCapturesPreserved": 19,
+      "priorContextsPreserved": 17,
+      "publicReports": "integration-evidence/position-market-australia-osca-public-c9ecdd7-{1440,390}.json"
+    }
   }
 ]
