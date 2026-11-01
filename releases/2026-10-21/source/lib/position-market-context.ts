@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share canonical source.
+import {franceRecruitmentReferences,type PositionRecruitmentIntentionsFacts} from './position-france-recruitment.ts';
 // @ts-expect-error Native tests share application source.
 import {ukDemandReferences,type PositionOccupationDemandFacts} from './position-uk-demand.ts';
 // @ts-expect-error Native tests share canonical TypeScript.
@@ -25,7 +27,7 @@ export const POSITION_MARKET_CONTEXT_FIELD='planning.positionMarketContextV1';
 export type PositionOutlookFacts={kind:'occupation-outlook';employmentBase:number;employmentProjected:number;employmentChange:number;employmentChangePercent:number;annualOpenings:number;annualExits:number;annualTransfers:number;annualSeparations:number;sourceUnit:'thousands';countUnit:'jobs and annual openings/separations';table12Row:number;table110Row:number};
 export type PositionSoftwareFacts={kind:'in-demand-software';items:{softwareExample:string;elementId:string;elementName:string;inDemand:boolean;hotTechnology:boolean}[];occupationRows:number;flaggedRows:number;shownRows:number;truncated:boolean;ordering:'alphabetical, not ranking';databaseVersion:string;contentLastUpdatedMonth:string};
 export type PositionHiringDifficultyFacts={kind:'hiring-difficulty';vacancies:number;hardToFillVacancies:number;skillShortageVacancies:number;hardToFillPercent:number;skillShortagePercent:number;occupationResponseBase:number;sourceCsvRow:number};
-export type PositionMarketContextReference={id:string;version:string;kind:'occupation-outlook'|'in-demand-software'|'hiring-difficulty'|'occupation-skills'|'occupation-demand';countryCode:string;roles:string[];occupationCode:string;occupation:string;title:string;period:string;geography:string;population:string;unit:string;sourceUrl:string;sourceSha256:string;attribution:string;licence:string;licenceUrl:string;mappingDuties:string;mappingLimit:string;facts:PositionOutlookFacts|PositionSoftwareFacts|PositionHiringDifficultyFacts|PositionOccupationSkillsFacts|PositionOccupationDemandFacts};
+export type PositionMarketContextReference={id:string;version:string;kind:'occupation-outlook'|'in-demand-software'|'hiring-difficulty'|'occupation-skills'|'occupation-demand'|'recruitment-intentions';countryCode:string;roles:string[];occupationCode:string;occupation:string;title:string;period:string;geography:string;population:string;unit:string;sourceUrl:string;sourceSha256:string;attribution:string;licence:string;licenceUrl:string;mappingDuties:string;mappingLimit:string;facts:PositionOutlookFacts|PositionSoftwareFacts|PositionHiringDifficultyFacts|PositionOccupationSkillsFacts|PositionOccupationDemandFacts|PositionRecruitmentIntentionsFacts};
 function canonicalReferences():PositionMarketContextReference[]{
  if(software.source.sha256!=='6aabb96b464288db849580e6510530efff3f80e25dde2bb23f1fc36bb526b016'||outlook.source.sha256!=='08ee182f992d972593e64559ce467bad75967d2228f11ad5e2f86d4ec0ee6c00')throw Error('Market source identity changed.');
  const cards:PositionMarketContextReference[]=[];
@@ -56,6 +58,7 @@ function canonicalReferences():PositionMarketContextReference[]{
  cards.push(...networkMarketReferences());
  cards.push(...coreSkillReferences(cards));
  cards.push(...ukDemandReferences());
+ cards.push(...franceRecruitmentReferences());
  return cards;
 }
 const references=canonicalReferences();
