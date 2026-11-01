@@ -1,0 +1,3243 @@
+{
+  "schemaVersion": 1,
+  "candidateOnly": true,
+  "reviewDate": "2026-11-01",
+  "retrievedDate": "2026-11-01",
+  "requestedDatasetVersion": "v1.2.0",
+  "versionNote": "Explicit API selectedVersion request; returned self links omit version. Portal current v1.2.1 is not claimed.",
+  "sourceGeography": "European occupational classification",
+  "countryApplicability": "DE",
+  "coverage": {
+    "roles": 4,
+    "vacancies": 6
+  },
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International, unless otherwise indicated",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "noticeUrl": "https://esco.ec.europa.eu/en/copyright-notice-esco-skills-competences",
+    "attribution": "European Commission, ESCO v1.2.0, retrieved 1 November 2026. Occupation and skill relations selected and reformatted for duty-confirmed German scenario roles. No endorsement implied. ESCO underlying-source notices retained at linked copyright notice.",
+    "modifications": "Selected four occupations; retained original multilingual labels/descriptions and relation identities/order; added role/duty mapping and separated country applicability from source geography."
+  },
+  "records": [
+    {
+      "roleCode": "DS-SCI",
+      "role": "Data Scientist",
+      "countryApplicability": "DE",
+      "vacancies": 1,
+      "dutyConfirmation": "Work includes finding and combining data sources, ensuring data consistency, building mathematical models and communicating analytical findings.",
+      "originalFile": "esco-data-scientist-occupation-v1.2.0.json",
+      "bytes": 65532,
+      "sha256": "d5683b207659c2c16e866930067fa9bb227fe372347116153634e48e1635654e",
+      "occupationUri": "http://data.europa.eu/esco/occupation/258e46f9-0075-4a2e-adae-1ff0477e0f30",
+      "occupationCode": "2511.4",
+      "preferredLabels": {
+        "no": "forsker innen datavitenskap",
+        "de": "Datenwissenschaftler/Datenwissenschaftlerin",
+        "fi": "datatutkija",
+        "pt": "Cientista de dados",
+        "bg": "изследовател на данни/изследователка на данни",
+        "lt": "duomenų tyrėjas",
+        "lv": "datu zinātnieks",
+        "hr": "znanstvenik/znanstvenica za podatke",
+        "fr": "scientifique des données",
+        "hu": "adattudós",
+        "uk": "дослідник з обробки й аналізу даних/дослідниця з обробки й аналізу даних",
+        "sk": "dátový špecialista/dátová špecialistka",
+        "sl": "strokovnjak /strokovnjakinja za podatke",
+        "ga": "eolaí sonraí",
+        "sv": "forskare inom datavetenskap",
+        "mt": "xjentist tad-data/xjentista tad-data",
+        "el": "επιστήμονας δεδομένων",
+        "en": "data scientist",
+        "is": "gagnasérfræðingur",
+        "it": "data scientist",
+        "es": "científico de datos/científica de datos",
+        "et": "andmeteadur",
+        "cs": "datový vědec/datová vědkyně",
+        "ar": "عالم البيانات / عالمة البيانات",
+        "pl": "specjalista ds. zarządzania danymi",
+        "ro": "expert în analiza informațiilor",
+        "da": "datalog",
+        "nl": "data scientist"
+      },
+      "alternativeLabels": {
+        "de": [
+          "Datenwissenschaftlerin",
+          "Datenwissenschaftler",
+          "Data Scientist"
+        ],
+        "fi": [
+          "hakutietotutkija",
+          "hakutietotutkijat",
+          "datatutkijat"
+        ],
+        "sv": [
+          "forskningsdatavetenskapsman",
+          "dataman",
+          "datavetenskapsforskare",
+          "datavetenskapsman",
+          "forskare"
+        ],
+        "pt": [
+          "Cientista de dados",
+          "Cientista de investigação de dados",
+          "Investigadora de dados",
+          "Investigador de dados"
+        ],
+        "bg": [
+          "изследователка на данни",
+          "изследовател на данни",
+          "изследователи на данни",
+          "изследовател на данни за проучвания",
+          "изследователка на данни за проучвания"
+        ],
+        "el": [
+          "επιστήμων δεδομένων",
+          "data scientist"
+        ],
+        "mt": [
+          "xjenzat tad-data",
+          "xjenzat tad-dejta",
+          "espert tad-dejta",
+          "xjenzata tad-data",
+          "xjenzata tad-dejta",
+          "esperta tad-dejta"
+        ],
+        "lt": [
+          "duomenų specialistas",
+          "duomenų tyrėjas",
+          "duomenų ekspertas",
+          "duomenų tyrėja"
+        ],
+        "en": [
+          "research data scientist",
+          "data expert",
+          "data research scientist"
+        ],
+        "is": [
+          "gagnasérfræðingi",
+          "gagnafræðingur",
+          "sérfræðingur á sviði rannsóknargagna",
+          "gagnasérfræðings",
+          "gagnaverkfræðingur",
+          "gagnasérfræðing"
+        ],
+        "lv": [
+          "pētniecības datu zinātnieks",
+          "datu zinātniece",
+          "datu zinātnieks",
+          "pētniecības datu zinātniece"
+        ],
+        "hr": [
+          "znanstvenik istraživačkih podataka",
+          "znanstvenica za podatke",
+          "znanstvenik za podatke",
+          "znanstvenica istraživačkih podataka"
+        ],
+        "it": [
+          "esperta di dati",
+          "data-scientist",
+          "analista dei dati di ricerca",
+          "esperto di dati"
+        ],
+        "fr": [
+          "scientifiques des données",
+          "expert en analyse des données",
+          "data scientist",
+          "experte en analyse des données",
+          "analyste scientifique des données"
+        ],
+        "hu": [
+          "adattudósok",
+          "data scientist"
+        ],
+        "es": [
+          "especialista en datos",
+          "científica de datos",
+          "científico de datos",
+          "especialista en datos de investigación"
+        ],
+        "et": [
+          "andmeuurijad",
+          "andmeteadlane",
+          "andmeteadlased",
+          "andmeuurija",
+          "andmeteadurid"
+        ],
+        "cs": [
+          "datový vědec",
+          "vědecký pracovník pro zpracování dat",
+          "vědecká pracovnice pro zpracování dat",
+          "datová vědkyně"
+        ],
+        "sk": [
+          "dátová odborníčka",
+          "dátová špecialistka",
+          "dátový špecialista",
+          "dátový výskumník",
+          "dátový odborník",
+          "dátová výskumníčka"
+        ],
+        "sl": [
+          "strokovnjak za obdelavo podatkov",
+          "strokovnjakinja za podatke",
+          "strokovnjakinja za obdelavo podatkov",
+          "strokovnjak za raziskave podatkov",
+          "strokovnjakinja za raziskave podatkov",
+          "strokovnjak za podatke"
+        ],
+        "pl": [
+          "analityk danych",
+          "specjalista w zakresie zarządzania danymi",
+          "specjalista ds. danych",
+          "specjalistka ds. zarządzania danymi",
+          "specjaliści ds. zarządzania danymi",
+          "specjalista w dziedzinie zarządzania danymi"
+        ],
+        "da": [
+          "forsker i datalogi",
+          "dataloger",
+          "videnskabskvinde med speciale i datavidenskab",
+          "videnskabsmand med speciale i datavidenskab"
+        ],
+        "ro": [
+          "expert în analiza științifică a informațiilor",
+          "inginer de date",
+          "ingineră de date",
+          "expertă în analiza științifică a informațiilor"
+        ],
+        "nl": [
+          "business data scientist",
+          "research analist",
+          "research data scientist",
+          "data analyst"
+        ]
+      },
+      "description": {
+        "de": {
+          "literal": "Datenwissenschaftler finden und interpretieren reichhaltige Datenquellen, verwalten große Datenmengen, führen Datenquellen zusammen, sorgen für die Konsistenz der Datensätze und erstellen Visualisierungen, um die Daten zu veranschaulichen. Sie erstellen anhand der Daten mathematische Modelle, präsentieren und vermitteln datenbezogene Erkenntnisse an Experten und Wissenschaftler in ihrem Team sowie ggf. an eine nicht fachkundige Öffentlichkeit und geben Empfehlungen zur Verwendung der Daten ab.",
+          "mimetype": "plain/text"
+        },
+        "no": {
+          "literal": "Forskere innen datavitenskap finner og tolker rike datakilder, administrerer store mengder data, slår sammen datakilder, sikrer konsistente datasett og lager visualiseringer for å hjelpe med å forstå dataene. De bygger matematiske modeller ved hjelp av data, presenterer og kommuniserer datainnsikt og -resultater til spesialister og forskere i temaet, og hvis nødvendig, til et publikum av ikke-eksperter, og anbefaler måter å bruke dataene på.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Datatutkijat etsivät ja tulkitsevat runsaita tietolähteitä, hallinnoivat suuria tietomääriä, yhdistävät tiedonlähteitä, varmistavat tietoaineistojen yhdenmukaisuuden ja luovat visualisointeja tietojen ymmärtämisen tueksi. He laativat matemaattisia malleja käyttäen tietoja, esittelevät ja välittävät tietoa ja löydöksiä tiiminsä asiantuntijoille ja tutkijoille ja tarvittaessa muille kuin asiantuntijoille sekä suosittelevat tietojen soveltamistapoja.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os cientistas de dados pesquisam e interpretam fontes de dados enriquecidos, gerem grandes quantidades de dados, procedem à fusão de fontes de dados, asseguram a consistência dos conjuntos de dados e criam visualizações para ajudar na compreensão dos dados. Constroem modelos matemáticos utilizando os dados, apresentam e comunicam informações e conclusões relativas aos dados aos especialistas e cientistas da sua equipa e, se necessário, a um público não especializado, e recomendam formas de aplicar os dados.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Изследователите на данни намират и тълкуват богати източници на данни, управляват големи количества данни, обединяват източници на данни, осигуряват съгласуваност на наборите от данни и създават визуализации за подпомагане на разбирането на данните. Те изграждат математически модели като използват данни, представят и съобщават констатациите и откритията за данни на специалисти и учени от техния екип и, ако е необходимо, на неспециализирана аудитория, и препоръчват начини за прилагане на данните.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Duomenų tyrėjai randa ir aiškina gausius duomenų šaltinius, valdo didelius duomenų kiekius, sujungia duomenų šaltinius, užtikrina duomenų rinkinių nuoseklumą ir kuria vaizdinę medžiagą, kuri padeda suprasti duomenis. Jie rengia matematinius modelius, naudodamiesi duomenimis, pateikia ir prireikus perduoda jų grupėje dirbantiems specialistams ir mokslininkams, o prireikus – ir ne ekspertų grupei su duomenimis susijusias įžvalgas ir išvadas, ir rekomenduoja, kaip taikyti šiuos duomenis.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Datu zinātnieki atrod un interpretē apjomīgus datu avotus, pārvalda lielus datu apjomus, apvieno datu avotus, nodrošina datu kopu konsekvenci un veido vizualizāciju, lai palīdzētu izprast datus. Izmantojot datus, viņi veido matemātiskus modeļus, prezentē un skaidro savus secinājumus un atklājumus speciālistiem un zinātniekiem savā komandā, un, ja nepieciešams, nespeciālistiem, kā arī iesaka šo datu izmantošanas veidus.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Znanstvenici za podatke prikupljaju i tumače bogate izvore podataka, upravljaju velikim količinama podataka, spajaju izvore podataka, osiguravaju dosljednost skupova podataka i stvaraju vizualizacije za pomoć pri razumijevanju podataka. Izrađuju matematičke modele pomoću podataka, predstavljaju i priopćuju svoja saznanja i nalaze na temelju podataka stručnjacima i znanstvenicima u svojem timu i prema potrebi nestručnoj publici te preporučuju načine za primjenu tih podataka.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les spécialistes des données trouvent et interprètent des sources de données riches, gèrent de grandes quantités de données, fusionnent des sources de données, assurent la cohérence des séries de données et créent des visualisations pour aider à comprendre les données. Ils établissent des modèles mathématiques à l’aide de données, présentent et communiquent des informations et des connaissances en matière de données aux spécialistes et aux scientifiques de leur équipe et, le cas échéant, à un public non spécialisé, et recommandent des moyens d’appliquer les données.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "Az adattudósok gazdag adatforrásokat találnak és értelmeznek, nagy mennyiségű adatot kezelnek, egyesítik az adatforrásokat, biztosítják az adatok konzisztenciáját, valamint adatok megjelenítésével segítik azok megértését. Matematikai modelleket terveznek, felhasználva az adatokat, bemutatják és nyilvánosságra hozzák az adatelemzéseket és a megállapításokat a szakértők és szükség esetén a nem szakértő közönség számára, és javaslatokat tesznek az adatok alkalmazásának módjaira.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Дослідники з обробки й аналізу даних знаходять і інтерпретують масштабні джерела даних, керують великими обсягами даних, об’єднують джерела даних, забезпечують узгодженість наборів даних і створюють візуалізації, які допоможуть зрозуміти ці дані. Вони будують математичні моделі, використовуючи дані, представляють і передають інформацію про дані та висновки фахівцям і вченим у своїй команді та в разі потреби не експертній аудиторії, і рекомендують способи застосування цих даних.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Dátoví špecialisti hľadajú a interpretujú veľké zdroje dát, spravujú veľké množstvá dát, zlučujú zdroje dát, zabezpečujú konzistentnosť dátových súborov a vytvárajú vizualizácie, ktoré majú pomôcť chápať dáta. Vytvárajú matematické modely, pričom využívajú dáta, prezentujú a oznamujú poznatky a zistenia súvisiace s dátami odborníkom a vedeckým pracovníkom vo svojom tíme a v prípade potreby aj laickej verejnosti a odporúčajú spôsoby uplatňovania týchto dát.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Strokovnjaki za podatke iščejo in razlagajo bogate vire podatkov, upravljajo velike količine podatkov, združujejo vire podatkov, zagotavljajo doslednost podatkovnih nizov in ustvarjajo vizualizacije v pomoč pri razumevanju podatkov. Na podlagi podatkov oblikujejo matematične modele, strokovnjakom in znanstvenikom v svoji skupini ter po potrebi tudi nestrokovni javnosti predstavljajo in sporočajo ugotovitve glede podatkov in priporočajo načine za uporabo teh podatkov.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Déanann eolaithe sonraí foinsí méithshonraí a aimsiú agus a léirmhíniú, bainistíonn siad méideanna móra sonraí a bhainistiú, déanann siad foinsí sonraí a chumasc, áirithíonn siad comhsheasmhacht tacar sonraí, agus cruthaíonn siad léirshamhlaithe chun cabhrú leis na sonraí a thuiscint. Tógann siad samhlacha matamaiticiúla trí úsáid a bhaint as sonraí, déanann siad léargais ar shonraí agus tátail a chur i láthair speisialtóirí agus eolaithe ina bhfoireann agus, más gá, cuireann siad iad i láthair lucht féachana nach saineolaithe iad, agus molann siad bealaí chun na sonraí a chur i bhfeidhm.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Forskare inom datavetenskap hittar och tolkar rika datakällor, hanterar stora datamängder, slår samman datakällor, ser till att data är enhetliga och skapar visualiseringar som gör datan förståelig. De bygger matematiska modeller med hjälp av data, presenterar och förmedlar dataanalyser och rön till specialister och forskare i teamet och vid behov till icke-experter samt rekommenderar olika sätt att tillämpa data.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι επιστήμονες δεδομένων εντοπίζουν και ερμηνεύουν πλούσιες πηγές δεδομένων, διαχειρίζονται μεγάλες ποσότητες δεδομένων, συγχωνεύουν πηγές δεδομένων, εξασφαλίζουν τη συνέπεια των συνόλων δεδομένων και δημιουργούν απεικονίσεις που βοηθούν στην κατανόηση των δεδομένων. Κατασκευάζουν μαθηματικά μοντέλα με τη χρήση δεδομένων, παρουσιάζουν και κοινοποιούν πληροφορίες και πορίσματα σχετικά με δεδομένα σε ειδικούς και επιστήμονες στην ομάδα τους και, εφόσον απαιτείται, σε μη εξειδικευμένο κοινό, και προτείνουν τρόπους για την εφαρμογή των δεδομένων.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "Ix-xjentisti tad-data jsibu u jinterpretaw sorsi ta’ data rikki, jamministraw ammonti kbar ta’ data, jamalgamaw sorsi ta’ data, jiżguraw konsistenza tas-settijiet ta’ data, u joħolqu viżwalizzazzjonijiet biex jgħinu fil-fehim tad-data. Jibnu mudelli matematiċi billi jużaw id-data, jippreżentaw u jikkomunikaw għarfien u sejbiet tad-data lil speċjalisti u xjentisti fit-tim tagħhom u jekk meħtieġ, lil udjenza mhux esperta, u jirrakkomandaw modi biex tiġi applikata d-data.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Data scientists find and interpret rich data sources, manage large amounts of data, merge data sources, ensure consistency of data-sets, and create visualisations to aid in understanding data. They build mathematical models using data, present and communicate data insights and findings to specialists and scientists in their team and if required, to a non-expert audience, and recommend ways to apply the data.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Gagnasérfræðingar finna og túlka gagnalindir, hafa umsjón með miklu magni gagna, sameina gagnalindir, tryggja stöðugleika gagnasafna, og framkalla birtingarmyndir til að aðstoða við skilning á gögnum. Þeir nota gögn til þess að byggja upp stærðfræðileg líkön, veita innsýn á gögnum með því að kynna og miðla þeim til sérfræðinga og vísindamanna inna teymisins og ef þörf er á, til ófaglærðra hópa, og ráðleggja þeim leiðir til þess að nota gögnin.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "I data scientist scoprono e interpretano fonti ricche di dati, gestiscono grandi quantità di dati, ne aggregano le fonti, garantiscono la coerenza degli insiemi di dati e creano visualizzazioni per contribuire alla loro comprensione. Costruiscono modelli matematici che utilizzano dati, presentano e comunicano informazioni e conoscenze sui dati agli specialisti e agli scienziati nella loro squadra e, se necessario, a un pubblico non specializzato e raccomandano modalità di applicazione dei dati.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los científicos de datos detectan e interpretan fuentes de datos ricas, gestionan grandes cantidades de datos, fusionan fuentes de datos, garantizan la coherencia de los conjuntos de datos y crean visualizaciones a fin de ayudar a la comprensión de los datos. Se basan en modelos matemáticos que utilizan datos, presentan y comunican información y conclusiones sobre datos a especialistas y científicos en su equipo y, si fuera necesario, a un público no especializado, y recomiendan formas de aplicar los datos.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Andmeteadurid leiavad ja tõlgendavad rikkalikke andmeallikaid, haldavad suuri andmekoguseid, ühendavad andmeallikad, tagavad andmestike järjepidevuse ja visualiseerivad andmeid. Nad koostavad andmetest matemaatilisi mudeleid, esitavad ja edastavad ideid ja leide oma rühma spetsialistidele ja teadlastele ning (kui nõutakse) ka mitteekspertidest sidusrühmale, samuti soovitavad andmete rakendamise meetodeid.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Vědci v oblasti dat vyhledávají a interpretují bohaté zdroje dat, spravují velké množství údajů, slučují zdroje dat, zajišťují konzistentnost datových sad a vytvářejí vizualizaci za účelem lepšího pochopení dat. Vytvářejí matematické modely s využitím údajů, prezentují a sdělují poznatky a zjištění odborníkům a vědcům v jejich týmu a v případě potřeby neodbornému publiku a doporučují způsoby, jak údaje použít.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يقوم علماء البيانات بالبحث عن مصادر البيانات الغنية وتفسيرها وإدارة كميات كبيرة من البيانات ودمج مصادر البيانات وضمان اتساق مجموعات البيانات والتمثيل المرئي للمساعدة في فهم البيانات. إذ يبنون النماذج الرياضية باستخدام البيانات ويقدمون استنتاجات ورؤى بيانات التواصل إلى المتخصصين والعلماء في فريقهم، وإذا لزم الأمر، إلى جمهور غير خبير، ويوصون بطرق لتطبيق البيانات.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Specjaliści ds. zarządzania danymi wyszukują i interpretują bogate źródła danych, zarządzają dużymi ilościami danych, łączą źródła danych, zapewniają spójność zestawów danych oraz tworzą wizualizacje pomocne w zrozumieniu danych. Tworzą modele matematyczne na podstawie danych oraz przedstawiają i przekazują wiedzę i ustalenia wynikające z danych specjalistom i naukowcom ze swojego zespołu oraz, w razie potrzeby, odbiorcom niebędących ekspertami, oraz zalecają sposoby zastosowania tych danych.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Dataloger finder og fortolker rige datakilder, forvalter store datamængder, sammensmelter datakilder, sikrer sammenhæng mellem datasæt og skaber visualiseringer til hjælp for forståelse af data. De opbygger matematiske modeller baseret på data, præsenterer og formidler viden og resultater til specialister og videnskabsfolk i deres team og om nødvendigt til et ikke-sagkyndigt publikum og anbefaler, hvordan dataene kan anvendes.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Experții în analiza informațiilor găsesc și interpretează surse de date bogate, gestionează cantități mari de date, fuzionează surse de date, asigură coerența seturilor de date și creează vizualizări pentru a ajuta la înțelegerea datelor. Construiesc modele matematice utilizând date, prezintă și comunică informații și date specialiștilor și oamenilor de știință din echipa lor și, dacă este necesar, unui public neexpert, și recomandă modalități de aplicare a datelor.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Data scientists zoeken en interpreteren rijke gegevensbronnen, beheren grote hoeveelheden gegevens, voegen gegevensbronnen samen, zorgen voor de consistentie van datasets en creëren visualisaties om te helpen gegevens te begrijpen. Zij bouwen wiskundige modellen op basis van data, presenteren en communiceren gegevensinzichten en bevindingen aan specialisten en wetenschappers in hun team en, indien nodig, aan een niet-deskundig publiek, en bevelen manieren aan om de data toe te passen.",
+          "mimetype": "plain/text"
+        }
+      },
+      "scopeNote": {
+        "en": {
+          "literal": "Excludes people performing engineering and programming activities. \nExcludes people performing managerial and general focus research activities.",
+          "mimetype": "plain/text"
+        }
+      },
+      "status": "released",
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/4a193795-fa63-414e-9f2e-bfdb3924571e",
+          "labelEn": "handle data samples",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/a8d24a95-47b3-4f88-92e7-06600bcd3612",
+          "labelEn": "manage personal professional development",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/93aaf65c-5aad-4e6f-a7ba-ce9bf7c0e6e6",
+          "labelEn": "information categorisation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/f7b071bf-4882-4cfc-ae0a-7e0e0ab94c61",
+          "labelEn": "conduct research across disciplines",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/9a58cd26-58eb-4a1c-b1b6-64037fe9cfa1",
+          "labelEn": "think abstractly",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/79e29b8b-47d1-470d-b7b1-32506bfe7d9a",
+          "labelEn": "collect ICT data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/31c69100-b612-4a61-8db5-fd314318854c",
+          "labelEn": "execute analytical mathematical calculations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/696e3b5b-8b61-45af-ae4c-3ab700f197ec",
+          "labelEn": "information extraction",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/74e49482-75e8-4637-bdb1-fff868d02f7a",
+          "labelEn": "scientific literature",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/fa642fc3-5cc5-41cf-8926-6617a8b976a7",
+          "labelEn": "promote the participation of citizens in scientific and research activities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/25f0ea33-b4a2-4f31-b7b4-7d20e827b180",
+          "labelEn": "data mining",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/cd5efa8c-e44d-4cbc-91c6-796018dbed68",
+          "labelEn": "perform project management",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/cd50d616-1f8b-481e-983f-68d2674ff82d",
+          "labelEn": "integrate gender dimension in research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/833289fa-3646-4010-9d9e-93ba8c9ef2d8",
+          "labelEn": "apply research ethics and scientific integrity principles in research activities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/a584a638-a2c0-4b3c-bdf3-a64f87225be9",
+          "labelEn": "mentor individuals",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/65e58886-bd1e-4c5b-8ca5-8d9b353c8aa1",
+          "labelEn": "data visualisation software",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/713fb616-118e-40bc-9366-4a69879a49d5",
+          "labelEn": "implement data quality processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/f9670490-8aa4-4540-b121-d440a8294aab",
+          "labelEn": "develop data processing applications",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/00b9a3aa-7070-4bb5-8020-f228a97cf42f",
+          "labelEn": "draft scientific or academic papers and technical documentation",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/4fabca9a-7435-4f33-b1da-3cdb00340fdc",
+          "labelEn": "perform scientific research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/2b34764d-637c-48f5-aa70-31e15c965db6",
+          "labelEn": "operate open source software",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/c3c2420c-ce9a-4371-8eed-1db479c3a562",
+          "labelEn": "write scientific publications",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/da930e2f-6047-4616-a598-bba8ecef3039",
+          "labelEn": "manage open publications",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/979cf728-896f-4f2c-8fa8-2698ca0d4930",
+          "labelEn": "publish academic research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/edebd83d-35f6-4ed5-a940-6c203d178c01",
+          "labelEn": "data science",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/0760bfac-9a03-427a-ad84-ccd33a2f2ae8",
+          "labelEn": "mathematical modelling",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/07889c08-7220-47c8-96f7-6068fbea00dc",
+          "labelEn": "normalise data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 27,
+          "uri": "http://data.europa.eu/esco/skill/f6ac6241-adb2-4ce2-b35f-09832cbb11ea",
+          "labelEn": "empirical analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 28,
+          "uri": "http://data.europa.eu/esco/skill/99207709-d076-4cce-ba38-e90d3bb28806",
+          "labelEn": "resource description framework query language",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 29,
+          "uri": "http://data.europa.eu/esco/skill/cc61f9e5-d4fc-470e-8606-1ce865ff8386",
+          "labelEn": "develop professional network with researchers and scientists",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 30,
+          "uri": "http://data.europa.eu/esco/skill/c3e36d05-8ae8-447f-bb2b-6f9409f85389",
+          "labelEn": "deliver visual presentation of data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 31,
+          "uri": "http://data.europa.eu/esco/skill/5f0082ab-2131-49b5-94d6-a1821daf57d6",
+          "labelEn": "apply for research funding",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 32,
+          "uri": "http://data.europa.eu/esco/skill/988f4ac3-a37c-4b0a-a40f-4e0e56b5919e",
+          "labelEn": "promote the transfer of knowledge",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 33,
+          "uri": "http://data.europa.eu/esco/skill/6c08403c-a5bb-4868-b8c2-b7d039c0e511",
+          "labelEn": "design database scheme",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 34,
+          "uri": "http://data.europa.eu/esco/skill/872a1632-f1db-4feb-bb27-0a6a359b7591",
+          "labelEn": "promote open innovation in research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 35,
+          "uri": "http://data.europa.eu/esco/skill/518dc04d-092d-4fa1-bd82-88b7a9278ef7",
+          "labelEn": "manage intellectual property rights",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 36,
+          "uri": "http://data.europa.eu/esco/skill/c544a9f3-5945-4b54-afed-de0697852817",
+          "labelEn": "report analysis results",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 37,
+          "uri": "http://data.europa.eu/esco/skill/50b100ea-74fd-4706-99db-3e4ca55e51b8",
+          "labelEn": "perform data cleansing",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 38,
+          "uri": "http://data.europa.eu/esco/skill/6360a934-cc87-4954-9656-b32db20592e3",
+          "labelEn": "quantitative analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 39,
+          "uri": "http://data.europa.eu/esco/skill/2b1e2927-3542-48da-9063-02925e7562c1",
+          "labelEn": "disseminate results to the scientific community",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 40,
+          "uri": "http://data.europa.eu/esco/skill/39f67488-cfd3-4370-8d7e-da98163102d9",
+          "labelEn": "evaluate research activities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 41,
+          "uri": "http://data.europa.eu/esco/skill/fecf8a0d-62c4-4e71-9b03-0f4fc2ad7bf5",
+          "labelEn": "data models",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 42,
+          "uri": "http://data.europa.eu/esco/skill/2daec0e6-f0c1-43e8-8178-aedba99130ec",
+          "labelEn": "establish data processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 43,
+          "uri": "http://data.europa.eu/esco/skill/9cf681c7-89ec-470c-b651-7fe03786f586",
+          "labelEn": "query languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 44,
+          "uri": "http://data.europa.eu/esco/skill/4463a721-69f3-413d-8321-43e3af13a4f1",
+          "labelEn": "use databases",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 45,
+          "uri": "http://data.europa.eu/esco/skill/08b04e53-ed25-41a2-9f90-0b9cd939ba3d",
+          "labelEn": "manage research data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 46,
+          "uri": "http://data.europa.eu/esco/skill/48db96bf-3314-45c6-bad8-fdb6e20e5639",
+          "labelEn": "data engineering",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 47,
+          "uri": "http://data.europa.eu/esco/skill/68ef0e4d-5542-4e64-84f4-752cce5a3c22",
+          "labelEn": "statistical modeling techniques",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 48,
+          "uri": "http://data.europa.eu/esco/skill/2de4572a-4724-4f76-afc2-72a568a264ac",
+          "labelEn": "speak different languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 49,
+          "uri": "http://data.europa.eu/esco/skill/7ee4c2ea-b349-4bd2-81a3-ec31475d4833",
+          "labelEn": "statistics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 50,
+          "uri": "http://data.europa.eu/esco/skill/348b74cd-49ce-4844-8bdf-ec188b497213",
+          "labelEn": "visual presentation techniques",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 51,
+          "uri": "http://data.europa.eu/esco/skill/4134622c-c3fb-4a41-beb6-6d58ba5107db",
+          "labelEn": "demonstrate disciplinary expertise",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 52,
+          "uri": "http://data.europa.eu/esco/skill/20a8fe89-d4eb-4698-8521-8881c13377e0",
+          "labelEn": "interact professionally in research and professional environments",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 53,
+          "uri": "http://data.europa.eu/esco/skill/b0a3bb25-a02f-43ed-ab1f-994fa66a424a",
+          "labelEn": "online analytical processing",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 54,
+          "uri": "http://data.europa.eu/esco/skill/505e4ef3-7ce4-437d-b7b4-5c608f71c258",
+          "labelEn": "build recommender systems",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 55,
+          "uri": "http://data.europa.eu/esco/skill/1b70a55d-b8a4-49fc-96c6-15ab4cff2522",
+          "labelEn": "use data processing techniques",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 56,
+          "uri": "http://data.europa.eu/esco/skill/f715be1d-5fc4-49d3-82a5-0b8090d12849",
+          "labelEn": "synthesise information",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 57,
+          "uri": "http://data.europa.eu/esco/skill/4f5c1208-62fd-4e5a-a51e-306c06947e11",
+          "labelEn": "manage findable accessible interoperable and reusable data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 58,
+          "uri": "http://data.europa.eu/esco/skill/a80fb090-63f4-4b05-83a5-2f090deb7757",
+          "labelEn": "manage data collection systems",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 59,
+          "uri": "http://data.europa.eu/esco/skill/1e77e42a-181f-4b48-8e74-201ce50ffc29",
+          "labelEn": "interpret current data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 60,
+          "uri": "http://data.europa.eu/esco/skill/4d39b27a-b34f-4c89-8d46-df844d42f728",
+          "labelEn": "increase the impact of science on policy and society",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 61,
+          "uri": "http://data.europa.eu/esco/skill/e9575f7f-053a-439e-8074-f93df3334e92",
+          "labelEn": "data ethics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 62,
+          "uri": "http://data.europa.eu/esco/skill/ff64e9fc-36dd-4035-872a-83aa41dc1ad9",
+          "labelEn": "communicate with a non-scientific audience",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/fbafa41f-cd05-4109-a649-8b44d306d779",
+          "labelEn": "create data models",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/4216e465-7baa-4884-a241-54b197bb9278",
+          "labelEn": "perform data mining",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/9fc400ac-8ed2-4aff-915f-aa4f2609ec7b",
+          "labelEn": "multidisciplinary research",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/0823ccef-813f-4f22-afef-ac0d68615e8f",
+          "labelEn": "computer simulation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/1b7c716e-af95-4cda-a42f-6479c8b139f5",
+          "labelEn": "MDX",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/be20d05c-f6b4-4580-9fcf-f00f4baab562",
+          "labelEn": "make data-driven decisions",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/11c56452-fcec-4b00-9695-cca4728e5048",
+          "labelEn": "marketing analytics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/f597f772-24d3-4cec-813c-cf5a7027c794",
+          "labelEn": "N1QL",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/a1eef0f4-133f-464a-a8f1-68fe3e8cc1b4",
+          "labelEn": "healthcare analytics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/54c9c155-9293-4329-8ed2-2e76e8b519d4",
+          "labelEn": "define data quality criteria",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/cc7370dd-69fa-4c67-a96f-d4d135d38700",
+          "labelEn": "data quality assessment",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/1973c966-f236-40c9-b2d4-5d71a89019be",
+          "labelEn": "use spreadsheets software",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/5b26f08b-88bc-45f0-b901-530d7786466b",
+          "labelEn": "scientific computing",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/c5e8abde-d2ba-4e8e-a65e-720b71180666",
+          "labelEn": "unstructured data",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/46ec0033-3c71-415e-bcff-b065675ba2dc",
+          "labelEn": "integrate ICT data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/143769cb-b61e-47d8-a61e-eedfbec1016c",
+          "labelEn": "business intelligence",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/4cd85845-f31c-4306-994d-e12d45114d83",
+          "labelEn": "teach in academic or vocational contexts",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/45f1ae17-c20d-40fc-9307-7d33b6ca9213",
+          "labelEn": "image recognition",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/9ff9db9d-d14b-426e-83f3-e7449af6c79f",
+          "labelEn": "manage data",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/c7d24594-0c11-4b27-9039-fe0bb903da8e",
+          "labelEn": "LINQ",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/33e584f9-ff7a-4979-bfc0-5a3a374a145a",
+          "labelEn": "social network analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/03a74eee-2dc6-4147-8667-5cdeb65f122d",
+          "labelEn": "manage ICT data classification",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/4d85b881-e490-4b4c-897a-2faa4ef53956",
+          "labelEn": "manage ICT data architecture",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/a57a54b6-2f2e-43e4-9621-b52f4a63cb08",
+          "labelEn": "LDAP",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/98a1dec3-8138-4f46-a596-5e2a83b884b9",
+          "labelEn": "business analytics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/5da8018b-ae85-4cde-ad93-0394369018f3",
+          "labelEn": "SPARQL",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/e46291c7-52b9-4174-bd59-178884861038",
+          "labelEn": "Hadoop",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 27,
+          "uri": "http://data.europa.eu/esco/skill/7e796b51-49d7-4e73-95af-2e7323763f15",
+          "labelEn": "design database in the cloud",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 28,
+          "uri": "http://data.europa.eu/esco/skill/3f4dab51-572b-4e2c-85ef-3b4c3f7094e1",
+          "labelEn": "XQuery",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 29,
+          "uri": "http://data.europa.eu/esco/skill/d38871eb-b988-495e-8fca-345677b597a8",
+          "labelEn": "state estimation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 30,
+          "uri": "http://data.europa.eu/esco/skill/8f6ed69b-29d0-4c01-81ba-f05920a185f3",
+          "labelEn": "digital curation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 31,
+          "uri": "http://data.europa.eu/esco/skill/e464363b-8346-421d-9035-52118b76d8c8",
+          "labelEn": "computational biology",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 32,
+          "uri": "http://data.europa.eu/esco/skill/b363bb5f-2c79-40af-94da-33e06f9dee9f",
+          "labelEn": "apply blended learning",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 33,
+          "uri": "http://data.europa.eu/esco/skill/7159e587-c7cb-4ec0-a662-03e1dee2cccb",
+          "labelEn": "research design",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        }
+      ]
+    },
+    {
+      "roleCode": "SWE-FRONT",
+      "role": "Frontend Software Engineer",
+      "countryApplicability": "DE",
+      "vacancies": 1,
+      "dutyConfirmation": "Work includes implementing, coding, documenting and maintaining software interfaces using front-end development technologies.",
+      "originalFile": "esco-user-interface-developer-occupation-v1.2.0.json",
+      "bytes": 60733,
+      "sha256": "af98cd186b091dd7f5990e828d3950d7479f81c194e8c96047de14ca374a8fa7",
+      "occupationUri": "http://data.europa.eu/esco/occupation/866c7813-2c03-47d7-9bdc-192cfbace57c",
+      "occupationCode": "2512.5",
+      "preferredLabels": {
+        "de": "Entwickler von Benutzeroberflächen/Entwicklerin von Benutzeroberflächen",
+        "no": "brukergrensesnittutvikler",
+        "fi": "käyttöliittymäkehittäjä",
+        "pt": "Programador de interfaces do utilizador/Programadora de interfaces do utilizador",
+        "bg": "разработчик на потребителски интерфейс",
+        "lt": "naudotojo sąsajos kūrėjas",
+        "hr": "programer/programerka korisničkog sučelja",
+        "lv": "lietotāja saskarnes izstrādātājs",
+        "fr": "développeur d’interface utilisateur/développeuse d’interface utilisatrice",
+        "hu": "felhasználói felület fejlesztő",
+        "uk": "розробник інтерфейсу користувача/розробниця інтерфейсу користувача",
+        "sk": "vývojár/vývojárka používateľského rozhrania",
+        "sl": "razvijalec/razvijalka uporabniškega vmesnika",
+        "ga": "forbróir comhéadan úsáideora",
+        "sv": "gränssnittsutvecklare",
+        "mt": "żviluppatur tal-interfaċċa tal-utent",
+        "el": "υπεύθυνος ανάπτυξης διεπαφής χρήστη/υπεύθυνη ανάπτυξης διεπαφής χρήστη",
+        "en": "user interface developer",
+        "is": "viðmótshönnuður",
+        "it": "sviluppatore di interfacce utente/sviluppatrice di interfacce utente",
+        "es": "desarrollador de interfaces de usuario/desarrolladora de interfaces de usuario",
+        "et": "kasutajaliideste arendaja",
+        "cs": "vývojář uživatelského rozhraní/vývojářka uživatelského rozhraní",
+        "ar": "مطور واجهة المستخدم / مطورة واجهة المستخدم",
+        "pl": "twórca interfejsu użytkownika",
+        "da": "udvikler af brugergrænseflader",
+        "ro": "dezvoltator interfața cu utilizatorul",
+        "nl": "user interface developer"
+      },
+      "alternativeLabels": {
+        "de": [
+          "Entwickler von Benutzeroberflächen",
+          "Entwicklerin von Benutzeroberflächen",
+          "User-Interface-Developer"
+        ],
+        "fi": [
+          "front end -kehittäjä",
+          "käyttöliittymien kehittäjä",
+          "frontend-kehittäjät",
+          "käyttöliittymien kehittäjät",
+          "UI-kehittäjä",
+          "front end -kehittäjät",
+          "frontend-kehittäjä",
+          "käyttöliittymäkehittäjät",
+          "UI-kehittäjät"
+        ],
+        "sv": [
+          "utvecklare av klientdel",
+          "UI-utvecklare",
+          "designer av klientdel",
+          "gränssnittsdesigner",
+          "UI-designer"
+        ],
+        "pt": [
+          "Programador de IU",
+          "Programadora de IU",
+          "Programador de interfaces do utilizador",
+          "Programadora de interfaces do utilizador",
+          "Programador de UI",
+          "Programadora de UI"
+        ],
+        "bg": [
+          "фронт енд разработчик",
+          "разработчици на потребителски интерфейс",
+          "разработчик на ПИ"
+        ],
+        "mt": [
+          "żviluppatur tal-interfaċċa għall-utent",
+          "żviluppatur tal-front-end",
+          "żviluppatur tal-interfaċċja għall-utenti",
+          "programmatur tal-interfaċċa għall-utenti"
+        ],
+        "el": [
+          "υπεύθυνος διεπαφής χρηστών",
+          "υπεύθυνη ανάπτυξης διεπαφής χρήστη",
+          "υπεύθυνος ανάπτυξης διεπαφής χρήστη",
+          "υπεύθυνη διεπαφής χρηστών",
+          "υπεύθυνος ανάπτυξης διεπαφών",
+          "υπεύθυνη ανάπτυξης διεπαφών"
+        ],
+        "lt": [
+          "naudotojo sąsajos kūrėja",
+          "naudotojo sąsajos kūrėjas",
+          "naudotojų sąsajos programuotojas"
+        ],
+        "en": [
+          "front end developer",
+          "UI programmer",
+          "user interface developers",
+          "UI developers",
+          "UI developer",
+          "user interface engineer"
+        ],
+        "lv": [
+          "lietotāja saskarņu izstrādātājs",
+          "saskarņu izstrādātājs",
+          "lietotāja saskarnes izstrādātājs",
+          "lietotāja saskarnes izstrādātāja"
+        ],
+        "hr": [
+          "programer sučelja korisnika",
+          "programerka korisničkog sučelja",
+          "programer korisničkog sučelja",
+          "developerka korisničkog sučelja",
+          "developer korisničkog sučelja",
+          "programerka sučelja korisnika"
+        ],
+        "is": [
+          "UI hönnuður",
+          "hönnuð notendaviðmóts",
+          "hönnuðar notendaviðmóts",
+          "verkfræðingur á sviði notendaviðmóts",
+          "framlínuhönnuður",
+          "hönnuði notendaviðmóts"
+        ],
+        "it": [
+          "designer esperto di accessibilità",
+          "ingegnere delle GUI",
+          "sviluppatore di interfacce utente",
+          "sviluppatrice di interfacce utente",
+          "designer esperta di accessibilità"
+        ],
+        "fr": [
+          "développeuse d'interface utilisatrices",
+          "conceptrice d'interface",
+          "concepteur d'interfaces utilisateurs",
+          "développeur IU",
+          "designer d'interface",
+          "développeuse IU",
+          "développeuse d'interface utilisatrice",
+          "développeur d'interface",
+          "conceptrice d'interface utilisatrices",
+          "développeuse d'interface",
+          "conceptrice d'interfaces utilisatrices",
+          "concepteur d'interface",
+          "développeur d'interface utilisateurs",
+          "concepteur d'interface utilisateurs",
+          "développeur d'interface utilisateur"
+        ],
+        "hu": [
+          "front end fejlesztők",
+          "front end fejlesztő",
+          "felhasználói felület fejlesztők",
+          "UI fejlesztő"
+        ],
+        "es": [
+          "desarrolladora de IU",
+          "desarrolladora de interfaces de usuario",
+          "desarrollador de IU",
+          "desarrolladora de frontales",
+          "desarrollador de frontales",
+          "desarrolladora de interfaces",
+          "desarrollador de interfaces",
+          "desarrollador de interfaces de usuario"
+        ],
+        "et": [
+          "kasutajaliideste projekteerija",
+          "kasutajaliideste väljatöötaja",
+          "kasutajaliideste projekteerijad",
+          "kasutajaliideste väljatöötajad",
+          "kasutajaliideste arendajad"
+        ],
+        "cs": [
+          "vývojářka uživatelského rozhraní",
+          "tvůrkyně uživatelského rozhraní",
+          "vývojář uživatelského rozhraní",
+          "tvůrce uživatelského rozhraní"
+        ],
+        "sk": [
+          "vývojár UI",
+          "vývojárka používateľského rozhrania",
+          "vývojár systému popredia",
+          "vývojár používateľského rozhrania",
+          "vývojárka UI",
+          "vývojárka systému popredia"
+        ],
+        "sl": [
+          "razvijalka UI",
+          "razvijalka uporabniških vmesnikov",
+          "razvijalka uporabniškega vmesnika",
+          "razvijalec uporabniških vmesnikov",
+          "razvijalec UI",
+          "razvijalec uporabniškega vmesnika"
+        ],
+        "pl": [
+          "deweloper interfejsów użytkownika",
+          "twórcy interfejsu użytkownika",
+          "projektant interfejsów użytkownika",
+          "twórca UI",
+          "twórca interfejsów użytkownika"
+        ],
+        "da": [
+          "front-end-udvikler",
+          "IT-udvikler af brugergrænseflader",
+          "udviklere af brugergrænseflader",
+          "UI-udvikler"
+        ],
+        "ro": [
+          "dezvoltator front-end",
+          "dezvoltatoare de interfețe",
+          "programator de interfață grafică",
+          "dezvoltatoare interfață utilizator",
+          "programator de interfețe",
+          "dezvoltator interfață utilizator",
+          "dezvoltator de interfețe",
+          "dezvoltatori de interfețe grafice",
+          "dezvoltatori de interfață grafică",
+          "inginer de interfață grafică",
+          "dezvoltator de interfață grafică",
+          "designer al soluțiilor de accesibiliate",
+          "programatoare de interfețe",
+          "dezvoltator de interfețe utilizatorul",
+          "dezvoltatoare de interfețe utilizatorul",
+          "designer interfață utilizator"
+        ],
+        "nl": [
+          "front end developer",
+          "usability engineer",
+          "user interface designer",
+          "UI designer",
+          "interaction designer",
+          "interface designer"
+        ]
+      },
+      "description": {
+        "no": {
+          "literal": "Brukergrensesnittutviklere implementerer, koder, dokumenterer og vedlikeholder grensesnittet til et programvaresystem ved hjelp av teknologi for utvikling av grensesnitt.",
+          "mimetype": "plain/text"
+        },
+        "de": {
+          "literal": "Entwickler von Benutzeroberflächen gestalten die Benutzeroberfläche eines Softwaresystems durch den Einsatz von Entwicklungstechnologien für das Frontend. Sie programmieren, dokumentieren und pflegen die Benutzerschnittstelle eines Softwaresystems.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Käyttöliittymäkehittäjät toteuttavat, koodaavat, dokumentoivat ja ylläpitävät ohjelmistojärjestelmän rajapintaa käyttämällä front-end-kehitysteknologiaa.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os programadores de interfaces do utilizador implementam, codificam, documentam e mantêm a interface de um sistema de software utilizando tecnologias de desenvolvimento de interfaces («front-end»).",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Разработчиците на потребителски интерфейс прилагат, кодират, документират и поддържат интерфейса на дадена софтуерна система чрез използване на технологии за разработване на интерфейс за връзка.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Naudotojo sąsajos kūrėjai įgyvendina, koduoja, dokumentuoja ir prižiūri programinės įrangos sistemos sąsają, naudodami sąsajos kūrimo technologijas.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Programeri korisničkog sučelja postavljaju, kodiraju, dokumentiraju i održavaju sučelje softverskog sustava primjenom tehnologija za razvoj prednjeg dijela sučelja.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Lietotāja saskarnes izstrādātāji ievieš, kodē, dokumentē un uztur programmatūras sistēmas saskarni, izmantojot priekšgalsistēmas izstrādes tehnoloģijas.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les développeurs d’interfaces utilisateurs mettent en œuvre, code, documentent et maintiennent l’interface d’un système logiciel en utilisant des technologies de développement de l’amont.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "A felhasználóifelület-fejlesztők végrehajtják, kódolják, dokumentálják és karbantartják a szoftverrendszer interfészét a front-end fejlesztési technológiák segítségével.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Розробники інтерфейсу користувача впроваджують, кодують, документують і підтримують інтерфейс системи програмного забезпечення за допомогою технологій зовнішньої розробки.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Vývojári používateľského rozhrania implementujú, programujú, dokumentujú a udržiavajú rozhranie softvérového systému pomocou vývojových technológií front-end.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Razvijalci uporabniških vmesnikov uvajajo, programirajo, dokumentirajo in vzdržujejo vmesnik sistema programske opreme z uporabo čelnih razvojnih tehnologij.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Cuireann forbróirí comhéadan úsáideora an comhéadan atá ag córas bogearraí chun feidhme, a chódú, a dhoiciméadú agus a chothabháil agus úsáid á baint as teicneolaíochtaí forbartha tosaigh.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Gränssnittsutvecklare implementerar, kodar, dokumenterar och utför underhåll på gränssnitt av programvarusystem med hjälp av frontutvecklad teknik.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "L-iżviluppaturi tal-interfaċċa tal-utenti jimplimentaw, jikkodifikaw, jiddokumentaw u jżommu l-interfaċċa ta’ sistema ta’ softwer fi stat tajjeb bl-użu ta’ teknoloġiji tal-iżvilupp front-end.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι υπεύθυνοι ανάπτυξης διεπαφής χρήστη εφαρμόζουν, συντάσσουν τον κώδικα, τεκμηριώνουν και συντηρούν τη διεπαφή ενός συστήματος λογισμικού χρησιμοποιώντας τεχνολογίες ανάπτυξης περιβάλλοντος χρήστη.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "User interface developers implement, code, document and maintain the interface of a software system by using front-end development technologies.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Hönnuðir notendaviðmóts innleiða, forrita, skjalfesta og viðhalda viðmóti hugbúnaðarkerfis með því að nota tækniþróun notendaviðmóts.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "Gli sviluppatori di interfacce utente attuano, codificano, documentano e mantengono l’interfaccia di un sistema software utilizzando le tecnologie di sviluppo front-end.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los desarrolladores de interfaces de usuario deben aplicar, codificar, documentar y mantener la interfaz de un sistema informático utilizando tecnologías de desarrollo de aplicaciones para el usuario.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Kasutajaliideste arendajad rakendavad, kodeerivad, dokumenteerivad ja hooldavad tarkvarasüsteemi liidest, kasutades ees-arendustehnoloogiat.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Vývojáři uživatelského rozhraní provádějí, kódují, dokumentují a udržují rozhraní softwaru pomocí technologií pro tvorbu cyklu.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يقوم مطورو واجهة المستخدم بتنفيذ وبرمجة وتوثيق وصيانة واجهة نظام البرامج من خلال استخدام تقنيات التطوير الأمامية.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Twórcy interfejsu użytkownika wdrażają, piszą kod, dokumentują i utrzymują interfejs systemu, korzystając z technologii front-end.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Udviklere af brugergrænseflader implementerer, koder, dokumenterer og vedligeholder et softwaresystems grænseflade ved hjælp af udviklingsteknologier.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Dezvoltatorii de interfețe cu utilizatori implementează, codează, documentează și întrețin interfața unui sistem informatic prin utilizarea tehnologiilor de dezvoltare de tip front-end.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "User interface developers implementeren, coderen, documenteren en onderhouden de interface van een softwaresysteem met behulp van frontend ontwikkelingstechnologieën.",
+          "mimetype": "plain/text"
+        }
+      },
+      "scopeNote": null,
+      "status": "released",
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/8696aff0-18c0-4ba6-a4d0-9a21861b3e5e",
+          "labelEn": "World Wide Web Consortium standards",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/85c11255-469f-41bd-a6d1-382bc4a87783",
+          "labelEn": "interpret technical texts",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/797a4416-0b8d-44f3-8fcd-eb10bd0be6b4",
+          "labelEn": "develop software prototype",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/fc4fcb4b-993f-4f2c-b158-c2171ec18ed8",
+          "labelEn": "draw design sketches",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/c2999f0c-eb37-4cdf-b9b0-82107b628794",
+          "labelEn": "style sheet languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/fd33c66c-70c4-40e6-b87c-5495bd3bf26e",
+          "labelEn": "design user interface",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/a71577b2-7550-4222-88ee-dcbd2d881516",
+          "labelEn": "graphics editor software",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/1019423b-3368-4f83-b24f-19e5fa23e816",
+          "labelEn": "software UI design patterns",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/2b7a79e5-84d8-4880-be66-3d9bb05bea17",
+          "labelEn": "use software design patterns",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/8b94aa1e-89c9-459d-b3b4-1dfab8dec2df",
+          "labelEn": "use software libraries",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/04fe962b-4017-4eb7-9139-7d69b6922bc9",
+          "labelEn": "use an application-specific interface",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/925463a7-d51f-4d5b-9f79-4d28cf30acde",
+          "labelEn": "integrated development environment software",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/f28617ad-afdd-4041-814c-216153a38998",
+          "labelEn": "analyse software specifications",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/f058bf62-70d1-4f5e-be2a-8b26fac24a96",
+          "labelEn": "design graphics",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/7364cc39-b9c0-449f-9416-57723e2fd9c4",
+          "labelEn": "use methodologies for user-centered design",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/69bbd53f-fbb0-4476-b4b2-ef7844464e28",
+          "labelEn": "web programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/21d2f96d-35f7-4e3f-9745-c533d2dd6e97",
+          "labelEn": "computer programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/56a7f561-1d55-43c9-9cd7-36a0a9bc6c50",
+          "labelEn": "ASP.NET",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/0cd6dcf1-5778-42a5-b685-4d01ae4a4871",
+          "labelEn": "Common Lisp",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/9d2e926f-53d9-41f5-98f3-19dfaa687f3f",
+          "labelEn": "tools for software configuration management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/75f839c2-fd9a-4ad3-8921-6e734608568d",
+          "labelEn": "use query languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/be80acfc-b6f2-4411-9b8d-b19d9cd2556a",
+          "labelEn": "Swift (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/c3a03c5a-c260-4c26-9b9a-873abb396f4d",
+          "labelEn": "MATLAB",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/6b6a9252-2ed7-4862-a02f-1578f4a532ea",
+          "labelEn": "Eclipse (integrated development environment software)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/7d10fcb2-b368-48ab-996b-7c9fafcf68ed",
+          "labelEn": "use automatic programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/42ed3bfb-1a01-4c8b-9758-fc6438865734",
+          "labelEn": "Smalltalk (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/901105f8-3a08-453e-b1dc-23619e317fd3",
+          "labelEn": "create flowchart diagram",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/47b9bbcf-356c-4782-83a4-7f5a1b2b51a3",
+          "labelEn": "Assembly (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/300d432b-f457-4cd3-9cb1-1858c7d14954",
+          "labelEn": "OpenEdge Advanced Business Language",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/def007fa-5fed-4a5f-91a2-b0d7e3db1be1",
+          "labelEn": "COBOL",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/4a466c62-db7d-4905-9a41-f23214810acb",
+          "labelEn": "GIMP (graphics editor software)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/1774bd31-8893-44cf-9498-7e3d95508419",
+          "labelEn": "screen reader",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/6417a4cc-6f61-4459-a114-761a7fa0279d",
+          "labelEn": "Puppet (tools for software configuration management)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/de0be6e8-644c-4cc9-9c8d-925dd98dda56",
+          "labelEn": "software interaction design",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/6014921e-1d25-4039-adc2-04852d61880e",
+          "labelEn": "ICT debugging tools",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/abdc7ac8-151f-40c6-bc1a-1e9b4b073290",
+          "labelEn": "augmented reality",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/19a8293b-8e95-4de3-983f-77484079c389",
+          "labelEn": "Java (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/d31fab87-2a7d-485c-b699-2901ca294b15",
+          "labelEn": "use functional programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/dcdd5ddf-82a6-4ac3-8edc-d4b23cae9a88",
+          "labelEn": "VBScript",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/8c88d336-c249-4537-b26e-d679a85c4b9b",
+          "labelEn": "Ajax Framework",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/2c4e11ef-da18-4e19-816b-e6bc19e12424",
+          "labelEn": "use logic programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/993b1e23-f2de-4bd8-b33f-f86dde1c8e9d",
+          "labelEn": "CoffeeScript",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/2bde42ae-e776-41c1-9ded-b07b30bfe985",
+          "labelEn": "Prolog (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/3cd569a2-4f88-4c1e-9995-8dce8c5e51a7",
+          "labelEn": "JavaScript",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 27,
+          "uri": "http://data.europa.eu/esco/skill/86f7126d-97fd-4da5-be96-d1cf6ecd54e6",
+          "labelEn": "Microsoft Visio",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 28,
+          "uri": "http://data.europa.eu/esco/skill/e8b89eb6-51e8-4c3a-babb-88b2e110376b",
+          "labelEn": "Pascal (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 29,
+          "uri": "http://data.europa.eu/esco/skill/51586df8-1c46-4b47-8583-773cb63bf00b",
+          "labelEn": "R",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 30,
+          "uri": "http://data.europa.eu/esco/skill/b633eb55-8f1f-4ae6-ab4c-2022ffe2cb7f",
+          "labelEn": "C++",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 31,
+          "uri": "http://data.europa.eu/esco/skill/e5d1f825-60ed-4bdd-872a-e748c387f777",
+          "labelEn": "CSS",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 32,
+          "uri": "http://data.europa.eu/esco/skill/0d168770-4d9c-4096-b048-a6577818d306",
+          "labelEn": "Apache Maven",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 33,
+          "uri": "http://data.europa.eu/esco/skill/8785ccda-6f9f-4cf3-9033-fda10653d0be",
+          "labelEn": "JSSS",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 34,
+          "uri": "http://data.europa.eu/esco/skill/13bdd41a-2a18-441f-96db-41252c519413",
+          "labelEn": "Visual Basic",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 35,
+          "uri": "http://data.europa.eu/esco/skill/b4dc6e4f-dc7d-445f-8ce2-d7b9d225e282",
+          "labelEn": "AJAX",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 36,
+          "uri": "http://data.europa.eu/esco/skill/12274664-b642-4945-b88f-d7787dc3c9dd",
+          "labelEn": "design interaction model",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 37,
+          "uri": "http://data.europa.eu/esco/skill/69f0167e-75d9-46cf-847f-72a592880ebb",
+          "labelEn": "STAF",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 38,
+          "uri": "http://data.europa.eu/esco/skill/4350c38d-0fe9-4ca7-bab9-40ed7f72b04f",
+          "labelEn": "PHP",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 39,
+          "uri": "http://data.europa.eu/esco/skill/b0ac313d-de44-4344-ada6-76d2177b6d92",
+          "labelEn": "Synfig",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 40,
+          "uri": "http://data.europa.eu/esco/skill/9b9de2a4-d8af-4a7b-933a-a8334ae60067",
+          "labelEn": "JavaScript Framework",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 41,
+          "uri": "http://data.europa.eu/esco/skill/5b9cde20-f1b9-4adc-bfb3-dbf70b14138d",
+          "labelEn": "use object-oriented programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 42,
+          "uri": "http://data.europa.eu/esco/skill/27b913f0-3c52-448b-ad27-fc6ef08fb326",
+          "labelEn": "Adobe Illustrator",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 43,
+          "uri": "http://data.europa.eu/esco/skill/1de3942b-99d8-41e8-9ef0-fbc9e9f6307b",
+          "labelEn": "Drupal",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 44,
+          "uri": "http://data.europa.eu/esco/skill/0af062de-eb43-41e9-9b96-249e2cd22d26",
+          "labelEn": "use markup languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 45,
+          "uri": "http://data.europa.eu/esco/skill/9973a5a2-7822-4161-99e9-95c781eb63f8",
+          "labelEn": "Objective-C",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 46,
+          "uri": "http://data.europa.eu/esco/skill/ccd0a1d9-afda-43d9-b901-96344886e14d",
+          "labelEn": "Python (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 47,
+          "uri": "http://data.europa.eu/esco/skill/14ced458-5f4b-495f-bd3d-9c240614bda0",
+          "labelEn": "Adobe Photoshop",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 48,
+          "uri": "http://data.europa.eu/esco/skill/449d119b-2d66-43a9-9230-7d27f16afbb6",
+          "labelEn": "Xcode",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 49,
+          "uri": "http://data.europa.eu/esco/skill/f47a1998-0beb-43be-9f46-380aa4d183da",
+          "labelEn": "Jenkins (tools for software configuration management)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 50,
+          "uri": "http://data.europa.eu/esco/skill/a4d336a6-9ffd-402a-91cc-f359716ba4e0",
+          "labelEn": "ML (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 51,
+          "uri": "http://data.europa.eu/esco/skill/d56fc2b5-4b0a-4e7e-9bde-a33736f6ff18",
+          "labelEn": "Scratch (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 52,
+          "uri": "http://data.europa.eu/esco/skill/867137fb-ff1b-4ca3-99f3-cb6969aa2c68",
+          "labelEn": "TypeScript",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 53,
+          "uri": "http://data.europa.eu/esco/skill/8369ede5-4200-4a44-be2e-bc60ef959259",
+          "labelEn": "Microsoft Visual C++",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 54,
+          "uri": "http://data.europa.eu/esco/skill/172020d1-e151-445b-8173-e2a5fb16fe51",
+          "labelEn": "utilise computer-aided software engineering tools",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 55,
+          "uri": "http://data.europa.eu/esco/skill/0de61385-de6d-4146-ba32-1cc1bc102220",
+          "labelEn": "Lisp",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 56,
+          "uri": "http://data.europa.eu/esco/skill/eb0e5615-1575-4a86-a1a2-7d39595033c5",
+          "labelEn": "ABAP",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 57,
+          "uri": "http://data.europa.eu/esco/skill/85038d57-1fdd-40de-b908-2c005545a8c3",
+          "labelEn": "SketchBook Pro",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 58,
+          "uri": "http://data.europa.eu/esco/skill/76ef6ed3-1658-4a1a-9593-204d799c6d0c",
+          "labelEn": "NoSQL",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 59,
+          "uri": "http://data.europa.eu/esco/skill/4c016b68-4116-468c-9dc6-42710c239e4a",
+          "labelEn": "C#",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 60,
+          "uri": "http://data.europa.eu/esco/skill/6b3afb82-c4ea-4f14-be54-a757fb762663",
+          "labelEn": "Vagrant",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 61,
+          "uri": "http://data.europa.eu/esco/skill/6f8a40d6-f9ce-43ec-a72f-d4213a53f3ed",
+          "labelEn": "Ansible",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 62,
+          "uri": "http://data.europa.eu/esco/skill/52cf3037-ab53-4806-85ed-7fd21ea7f6a1",
+          "labelEn": "Groovy",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 63,
+          "uri": "http://data.europa.eu/esco/skill/000f1d3d-220f-4789-9c0a-cc742521fb02",
+          "labelEn": "Haskell",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 64,
+          "uri": "http://data.europa.eu/esco/skill/26fa7a33-a426-4cd5-9792-33bf668612e1",
+          "labelEn": "LESS",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 65,
+          "uri": "http://data.europa.eu/esco/skill/5ef0c719-5bcb-49f8-b8eb-824388225333",
+          "labelEn": "use scripting programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 66,
+          "uri": "http://data.europa.eu/esco/skill/1110c92f-3059-445a-9436-0f4200d365f5",
+          "labelEn": "Sass",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 67,
+          "uri": "http://data.europa.eu/esco/skill/bb99af26-71ff-4dca-bde7-1eb1f6194426",
+          "labelEn": "SAP R3",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 68,
+          "uri": "http://data.europa.eu/esco/skill/034c29fa-c3ba-45ea-b8f3-bf8e3705e386",
+          "labelEn": "Erlang",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 69,
+          "uri": "http://data.europa.eu/esco/skill/25b291b5-8245-4d9d-b391-86a8a31d7109",
+          "labelEn": "use concurrent programming",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 70,
+          "uri": "http://data.europa.eu/esco/skill/c7451027-8249-405a-bb1b-342ff0f3fb3b",
+          "labelEn": "Salt (tools for software configuration management)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 71,
+          "uri": "http://data.europa.eu/esco/skill/0ccdfe98-f845-4598-84a1-3dca66e9d9a3",
+          "labelEn": "Ruby (computer programming)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 72,
+          "uri": "http://data.europa.eu/esco/skill/94dd823c-148e-4614-a6e8-99249b16357d",
+          "labelEn": "ICT project management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 73,
+          "uri": "http://data.europa.eu/esco/skill/2522a6ce-3202-4ac8-9f5b-b9cb5a3a83a1",
+          "labelEn": "debug software",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 74,
+          "uri": "http://data.europa.eu/esco/skill/6d289e8b-2cc1-4eda-ab1f-ad1090ef98f0",
+          "labelEn": "WordPress",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 75,
+          "uri": "http://data.europa.eu/esco/skill/401eb8d8-6daa-4f8b-90ad-60afc71eb4f8",
+          "labelEn": "Perl",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 76,
+          "uri": "http://data.europa.eu/esco/skill/ffddfc7c-a9dd-449f-9e96-882dc447c8b6",
+          "labelEn": "Scala",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 77,
+          "uri": "http://data.europa.eu/esco/skill/04f1b938-d4d4-4cb1-a863-982af76b9d93",
+          "labelEn": "SAS language",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 78,
+          "uri": "http://data.europa.eu/esco/skill/58d7a289-dafd-4363-833f-d1dc4140885e",
+          "labelEn": "APL",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 79,
+          "uri": "http://data.europa.eu/esco/skill/013441c1-1f13-47e9-80c4-9a53e8e1bc05",
+          "labelEn": "KDevelop",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 80,
+          "uri": "http://data.europa.eu/esco/skill/9136cbf1-7916-4f1c-bc9a-0318ee1d6016",
+          "labelEn": "human-computer interaction",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        }
+      ]
+    },
+    {
+      "roleCode": "COMMS-GEN",
+      "role": "Communications Specialist",
+      "countryApplicability": "DE",
+      "vacancies": 2,
+      "dutyConfirmation": "Work includes representing the organisation to external stakeholders and the public using communications strategies; not solely internal administration.",
+      "originalFile": "esco-public-relations-officer-occupation-v1.2.0.json",
+      "bytes": 49781,
+      "sha256": "f1dc4bb1789be0c39b59d2afde875127180f54f726edd60843f7fb07a7b49680",
+      "occupationUri": "http://data.europa.eu/esco/occupation/c0489e22-6a1b-4e52-974a-eb71bbb42134",
+      "occupationCode": "2432.9",
+      "preferredLabels": {
+        "no": "PR-kontakt",
+        "de": "Public-Relations-Fachkraft",
+        "fi": "tiedottaja",
+        "pt": "Técnico de relações públicas/Técnica de relações públicas",
+        "bg": "експерт, връзки с обществеността",
+        "lt": "viešųjų ryšių specialistas",
+        "lv": "sabiedrisko attiecību speciālists",
+        "hr": "službenik/službenica za odnose s javnošću",
+        "fr": "chargé des relations publiques/chargée des relations publiques",
+        "hu": "PR-tanácsadó",
+        "uk": "спеціаліст зі зв’язків з громадськістю/спеціалістка зі зв’язків з громадськістю",
+        "sk": "odborník/odborníčka na styk s verejnosťou",
+        "sl": "predstavnik/predstavnica za odnose z javnostmi",
+        "ga": "oifigeach caidrimh phoiblí",
+        "sv": "PR-konsult",
+        "mt": "uffiċjal tar-relazzjonijiet pubbliċi",
+        "el": "υπεύθυνος δημόσιων σχέσεων/υπεύθυνη δημόσιων σχέσεων",
+        "en": "public relations officer",
+        "is": "almannatengslafulltrúi",
+        "it": "responsabile relazioni pubbliche",
+        "es": "encargado de relaciones públicas/encargada de relaciones públicas",
+        "et": "avalike suhete spetsialist",
+        "cs": "PR specialista/PR specialistka",
+        "ar": "مسؤول علاقات عامة / مسؤولة علاقات عامة",
+        "pl": "specjalista ds. public relations",
+        "da": "pressetalsmand",
+        "ro": "ofițer relații publice",
+        "nl": "publicrelationsmedewerker"
+      },
+      "alternativeLabels": {
+        "de": [
+          "Public-Relations-Fachkraft"
+        ],
+        "fi": [
+          "suhdetoimintamies",
+          "PR-mies",
+          "tiedotussihteeri",
+          "PR-koordinaattori"
+        ],
+        "pt": [
+          "Técnico de relações públicas",
+          "Técnica de relações públicas"
+        ],
+        "bg": [
+          "служител, връзки с пресата",
+          "консултант, връзки с обществеността",
+          "пресконсултантка",
+          "прессекретарка",
+          "служител, връзки с обществеността",
+          "служителка, връзки с пресата",
+          "говорителка",
+          "прессекретар",
+          "координаторка, връзки с обществеността",
+          "медиен консултант",
+          "говорител",
+          "координатор, връзки с обществеността",
+          "служителка, връзки с обществеността",
+          "пресконсултант",
+          "консултантка, връзки с обществеността",
+          "медийна консултантка"
+        ],
+        "el": [
+          "συντονίστρια δημόσιων σχέσεων",
+          "συντονιστής δημόσιων σχέσεων",
+          "υπεύθυνη Τύπου",
+          "αρμόδιος δημόσιων σχέσεων",
+          "εκπρόσωπος Τύπου",
+          "υπεύθυνη δημόσιων σχέσεων",
+          "υπεύθυνος Τύπου",
+          "γραμματέας Τύπου",
+          "υπεύθυνος δημόσιων σχέσεων",
+          "υπεύθυνη επικοινωνίας",
+          "αρμόδια δημόσιων σχέσεων",
+          "υπεύθυνος επικοινωνίας"
+        ],
+        "mt": [
+          "konsulent tal-midja",
+          "kelliema",
+          "kelliem",
+          "segretarja tal-istampa",
+          "koordinatur tar-relazzjonijiet pubbliċi",
+          "konsulenta tar-relazzjonijiet pubbliċi",
+          "konsulent tar-relazzjonijiet pubbliċi",
+          "konsulenta tal-midja",
+          "uffiċjal tar-relazzjonijiet tal-istampa",
+          "segretarju tal-istampa",
+          "koordinatriċi tar-relazzjonijiet pubbliċi",
+          "konsulenta tal-istampa",
+          "konsulent tal-istampa"
+        ],
+        "lt": [
+          "atstovas viešiesiems ryšiams",
+          "viešųjų ryšių specialistė",
+          "konsultantas žiniasklaidos klausimais",
+          "spaudos sekretorius",
+          "visuomeninės informacijos specialistas",
+          "atstovas spaudai",
+          "atstovas žiniasklaidai"
+        ],
+        "en": [
+          "media relations officer",
+          "public affairs officer",
+          "communications officer",
+          "media consultant",
+          "press relations officer",
+          "public information officer",
+          "public relations coordinator",
+          "press secretary",
+          "media coordinator",
+          "press consultant"
+        ],
+        "lv": [
+          "sabiedrisko attiecību speciālists",
+          "sabiedrisko attiecību speciāliste"
+        ],
+        "hr": [
+          "službenica za odnose s javnošću",
+          "zastupnik za publicitet",
+          "zastupnica za publicitet",
+          "službenik za odnose s javnošću"
+        ],
+        "fr": [
+          "chargé de communication/chargée de communication",
+          "responsable des relations externes",
+          "chargé des relations publiques",
+          "chargé de communication",
+          "chargée de communication",
+          "chargée des relations publiques"
+        ],
+        "hu": [
+          "közönségkapcsolati felelős",
+          "méditanácsadó",
+          "PR-referens",
+          "szóvivő",
+          "PR-szakreferens",
+          "PR-ügyintéző",
+          "PR-tanácsadó"
+        ],
+        "es": [
+          "encargado de relaciones públicas",
+          "responsable de relaciones públicas",
+          "encargada de relaciones públicas",
+          "directora de relaciones públicas",
+          "asesor en medios de comunicación",
+          "director de relaciones públicas",
+          "asesora en medios de comunicación"
+        ],
+        "cs": [
+          "specialistka v oblasti styku s veřejností",
+          "poradce pro mediální záležitosti",
+          "poradkyně pro mediální záležitosti",
+          "mediální poradkyně",
+          "tiskový tajemník",
+          "tisková tajemnice",
+          "mluvčí",
+          "specialista v oblasti styku s veřejností",
+          "PR specialistka",
+          "PR konzultant",
+          "mediální poradce",
+          "koordinátor styku s veřejností",
+          "koordinátorka styku s veřejností",
+          "PR specialista",
+          "PR konzultantka"
+        ],
+        "sk": [
+          "PR špecialista",
+          "PR špecialistka",
+          "špecialistka pre styk s verejnosťou",
+          "špecialista pre styk s verejnosťou"
+        ],
+        "sl": [
+          "predstavnica za odnose z javnostmi",
+          "predstavnik za odnose z javnostmi"
+        ],
+        "pl": [
+          "specjalista ds. kontaktów z mediami",
+          "rzecznik prasowy",
+          "sekretarz prasowy"
+        ],
+        "da": [
+          "presseattaché"
+        ],
+        "ro": [
+          "purtătoare de cuvânt",
+          "agent relaţii de presă",
+          "specialist în relații publice",
+          "purtător de cuvânt",
+          "secretar de presă",
+          "consultant media",
+          "agent informaţii publice",
+          "agent PR",
+          "agent de mediere",
+          "agent afaceri publice",
+          "coordonator media",
+          "coordonator relaţii publice",
+          "agent relaţii cu media",
+          "consultant de presă",
+          "specialistă în relații publice",
+          "atașat de presă"
+        ],
+        "nl": [
+          "medewerkster public reklations",
+          "PR-medewerker",
+          "medewerker public relations",
+          "publicrelationsmedewerkster",
+          "PR-medewerkster"
+        ]
+      },
+      "description": {
+        "de": {
+          "literal": "Public-Relations-Fachkräfte vertreten ein Unternehmen oder eine Organisation gegenüber anderen Interessenträgern und der Öffentlichkeit. Sie nutzen Kommunikationsstrategien, um über die Tätigkeiten ihrer Kunden zu informieren und deren Image zu verbessern.",
+          "mimetype": "plain/text"
+        },
+        "no": {
+          "literal": "PR-kontakter representerer et selskap eller en organisasjon overfor interessenter og offentligheten. De bruker kommunikasjonsstrategier for å fremme forståelse av sine kunders aktiviteter og image på en fordelaktig måte.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Tiedottajat edustavat yritystä tai organisaatiota sidosryhmille ja suurelle yleisölle. He edistävät viestintästrategioilla myönteistä käsitystä asiakkaidensa toiminnasta ja imagosta.\n\t",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os técnicos de relações públicas representam uma empresa ou organização junto das partes interessadas e do público. Utilizam estratégias de comunicação para promover uma compreensão favorável das atividades e da imagem dos seus clientes.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Експертите по връзки с обществеността представляват дружество или организация пред заинтересованите страни и обществеността. Те използват комуникационни стратегии за увеличаване на познаването на дейностите и имиджа на своите клиенти по благоприятен начин.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Viešųjų ryšių specialistai atstovauja įmonei ar organizacijai palaikant ryšius su suinteresuotaisiais subjektais ir visuomene. Jie naudoja komunikacijos strategijas siekdami palankiomis sąlygomis skatinti supratimą apie savo klientus ir jų įvaizdį.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Službenici za odnose s javnošću predstavljaju poduzeće ili organizaciju dionicima i javnosti. Koriste se komunikacijskim strategijama za promicanje razumijevanja aktivnosti i ugleda svojih klijenata na povoljan način.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Sabiedrisko attiecību speciālisti pārstāv uzņēmumu vai organizāciju saziņā ar ieinteresētajām personām un sabiedrību. Viņi izmanto komunikācijas stratēģijas, lai veicinātu izpratni par savu klientu darbībām un parādītu viņu koptēlu labvēlīgā gaismā.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les agents des relations publiques représentent une entreprise ou une organisation auprès des parties prenantes et du public. Ils utilisent des stratégies de communication pour promouvoir une compréhension des activités et de l’image de leurs clients de manière favorable.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "A PR-tanácsadók egy vállalkozást vagy szervezetet képviselnek az érdekelt felek és a nyilvánosság felé. Kommunikációs stratégiákat alkalmaznak annak érdekében, hogy kedvező módon támogassák ügyfeleik tevékenységeinek és imidzsének megértését.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Спеціалісти зі зв’язків з громадськістю представляють компанію чи організацію зацікавленим сторонам і громадськості. Вони використовують комунікаційні стратегії, щоб сприяти сприятливому розумінню діяльності та іміджу своїх клієнтів.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Odborníci na styk s verejnosťou prezentujú spoločnosť alebo organizáciu zainteresovaným stranám a verejnosti. Využívajú komunikačné stratégie na podporu pochopenia činností a dobrého mena svojich klientov.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Predstavniki za odnose z javnostmi zastopajo družbo ali organizacijo pred deležniki in javnostjo. Uporabljajo komunikacijske strategije za boljše razumevanje dejavnosti in predstavljanje podobe svojih strank na pozitiven način.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Déanann oifigigh chaidrimh phoiblí ionadaíocht thar ceann cuideachta nó eagraíocht do pháirtithe leasmhara agus don phobal. Úsáideann siad straitéisí cumarsáide chun tuiscint ar na gníomhaíochtaí agus íomhá a gcliant a chur chun cinn ar bhealach fabhrach.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "PR-konsulter företräder företag eller organisationer gentemot berörda parter och allmänheten. De använder kommunikationsstrategier för att främja förståelse för kunders aktiviteter och image på ett gynnsamt sätt.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "L-uffiċjali tar-relazzjonijiet pubbliċi jirrappreżentaw kumpanija jew organizzazzjoni għall-partijiet ikkonċernati u għall-pubbliku. Huma jużaw strateġiji ta’ komunikazzjoni biex jippromwovu l-fehim tal-attivitajiet u l-immaġni tal-klijenti tagħhom b’mod favorevoli.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι υπεύθυνοι δημόσιων σχέσεων εκπροσωπούν μια εταιρεία ή έναν οργανισμό στα ενδιαφερόμενα μέρη και το κοινό. Χρησιμοποιούν στρατηγικές επικοινωνίας για την προώθηση της κατανόησης των δραστηριοτήτων και της εικόνας των πελατών τους με ευνοϊκό τρόπο.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Public relations officers represent a company or organisation to stakeholders and the public. They use communications strategies to promote an understanding of the activities and image of their clients in a favourable way.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Almannatengslafulltrúar eru eru fulltrúar fyrirtækis eða stofnunar út á við fyrir hagsmunaaðila og almenning. Þeir nota samskiptaáætlanir til að stuðla að skilningi á starfsemi og ímynd viðskiptavina sinna á jákvæðan hátt.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "I responsabili delle relazioni pubbliche rappresentano una società o un’organizzazione presso i portatori di interessi e il pubblico. Essi utilizzano strategie di comunicazione per promuovere la comprensione delle attività e dell’immagine dei loro clienti in modo favorevole.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los encargados de relaciones públicas representan a una empresa u organización entre las partes interesadas y el público. Utilizan estrategias de comunicación para promover un conocimiento favorable de las actividades y la imagen de sus clientes.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Avalike suhete spetsialistid esindavad ettevõtet või organisatsiooni sidusrühmade ja avalikkuse ees. Nad kasutavad kommunikatsioonistrateegiaid, et edendada oma klientide tegevuse ja maine soodsat mõistmist.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "PR specialisté zastupují společnost nebo organizaci při jednání se zúčastněnými stranami a veřejností. Využívají komunikační strategie na podporu porozumění činnostem a vnímání svých klientů příznivým způsobem.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يمثل مسؤولو العلاقات العامة شركة أو منظمة لأصحاب المصلحة والجمهور. ويستخدمون إستراتيجيات الاتصالات لتعزيز فهم أنشطة وصورة عملائهم بطريقة ملائمة.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Specjaliści ds. public relations reprezentują przedsiębiorstwo lub organizację wobec zainteresowanych stron i społeczeństwa. Stosują strategie komunikacyjne w celu upowszechniania znajomości działań i przedstawiania wizerunku ich klientów w korzystnym świetle.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Pressetalsmænd repræsenterer en virksomhed eller organisation for interessenter og offentligheden. De anvender kommunikationsstrategier for at fremme forståelsen af deres kunders aktiviteter og image på en gunstig måde.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Ofițerii în relații publice reprezintă o întreprindere sau o organizație în relația cu părțile interesate și cu publicul. Utilizează strategii de comunicare pentru a promova înțelegerea activităților și a imaginii clienților lor într-un mod favorabil.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Publicrelationsmedewerkers vertegenwoordigen een bedrijf of organisatie tegenover belanghebbenden en het publiek. Zij gebruiken communicatiestrategieën om op een positieve manier inzicht te geven in de activiteiten en het imago van hun klanten.",
+          "mimetype": "plain/text"
+        }
+      },
+      "scopeNote": null,
+      "status": "released",
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/5fd5c985-eaaa-47aa-8314-62359c54505a",
+          "labelEn": "develop digital content",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/fe30a4b0-1a99-4fc7-afff-b162b8c834ba",
+          "labelEn": "communication principles",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/c606cb12-9c63-4d2d-a58a-934b1dd3a0a8",
+          "labelEn": "develop public relations strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/ce5b1446-b5e3-4f05-a5ac-83f2ee142a44",
+          "labelEn": "analyse external factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/3c834f6e-523a-49ee-8ed1-e073e28ae6fe",
+          "labelEn": "develop communications strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/949ced5f-7536-4614-ac60-563ffc91a2f2",
+          "labelEn": "strategic planning",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/8770350e-746f-4adb-9556-18ca68104be6",
+          "labelEn": "market research",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/66db424f-2abe-420d-8e5b-186607266b61",
+          "labelEn": "corporate social responsibility",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/f5bf985b-ac78-4d23-881a-18a359234528",
+          "labelEn": "corporate sustainability",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/25a7fc25-f2fc-4bfd-9999-943c03d53372",
+          "labelEn": "protect client interests",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/4d313147-b39d-413f-a5e2-b12d5f0dc9e6",
+          "labelEn": "give interviews to media",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/089bab26-a854-40fb-8c04-5be4f693315a",
+          "labelEn": "integrate strategic foundation in daily performance",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/7edc05fe-378b-4c9e-bbb2-e5a29c5a845f",
+          "labelEn": "perform public relations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/d80f7a28-1e75-4247-9104-de8e5f909f0a",
+          "labelEn": "reputation management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/aa56a80c-b4d5-495c-9c15-70b5a7933911",
+          "labelEn": "rhetoric",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/2691f4d8-d090-423f-afd7-9e721f562e8d",
+          "labelEn": "advise on public relations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/574257ea-7b64-4100-b7b6-e27c233fe143",
+          "labelEn": "digital communication and collaboration",
+          "skillType": null
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/7800332c-a8eb-4792-8d72-50d509616154",
+          "labelEn": "draft press releases",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/fd446407-b08e-49da-b8e3-7e7c79618c3f",
+          "labelEn": "conduct public presentations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/5753e2ca-8934-45d3-8e52-3877d373239d",
+          "labelEn": "diplomatic principles",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/b17f4305-741a-4a1c-8fe8-6f11cb3d5c0a",
+          "labelEn": "business communication",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/415abd43-e8e5-4643-b5da-5f11307af57a",
+          "labelEn": "use different communication channels",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/eade4171-3d57-4fb2-9518-44d5a1da4ff5",
+          "labelEn": "build trust",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/d952e003-b5af-4a8a-9d32-921d34dc4907",
+          "labelEn": "advise on public image",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/7053c54a-994e-4b87-865d-a520b5c401c7",
+          "labelEn": "establish relationship with the media",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/1ba59ce0-7fec-434b-8d5c-9b275250a26c",
+          "labelEn": "prepare presentation material",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/9194696f-8a5a-4f7b-bf8a-a680da41c320",
+          "labelEn": "forming of public opinion",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 27,
+          "uri": "http://data.europa.eu/esco/skill/2e046d83-a38a-453c-a26d-64114ed2e036",
+          "labelEn": "organise press conferences",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/89c1d71c-f443-4e60-a7c3-f824ecb10597",
+          "labelEn": "types of media",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/f6d294f4-db62-4fc5-a7b8-778e5071c112",
+          "labelEn": "carry out forum moderation",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/d83e8dbd-257b-4aa9-abb5-e65924eb1797",
+          "labelEn": "ethics of sharing work through social media",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/13e2378e-0d10-450d-843a-b3592575826e",
+          "labelEn": "implement marketing strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/f39a5dcd-1b8b-4eff-a021-a96196fd71eb",
+          "labelEn": "follow the news",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/69f36674-440a-4fa0-89f9-1b70172ebb9d",
+          "labelEn": "advise on communication strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/27ed854c-15b8-4ba2-90e9-ae888a219703",
+          "labelEn": "perform business analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/e1e94871-b7d2-4492-a205-75ea078f9951",
+          "labelEn": "build international relations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/9c6e951f-aa88-4890-983d-e7a6ee49f5bb",
+          "labelEn": "plan marketing campaigns",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/1b1cf435-46ba-4471-afda-5029b36b3862",
+          "labelEn": "government representation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/dff7260b-0879-4d4a-98db-0866c64e08ec",
+          "labelEn": "psychological concepts",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/8c4c49d4-9708-433f-8ca7-bf2c5211ee49",
+          "labelEn": "develop creative ideas",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/6543eef3-d05e-4e97-a7dc-379398a1a798",
+          "labelEn": "work closely with news teams",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/683bc3e3-6ec1-4ad2-8d62-d0ac1fabbe76",
+          "labelEn": "use analytics for commercial purposes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/99ca6ed2-b6b8-4eb0-8180-92e750e546be",
+          "labelEn": "liaise with quality assurance",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/b0560439-14eb-41d1-aa53-1938efc24123",
+          "labelEn": "content marketing strategy",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/7d35602d-bc94-4975-aa7c-f4e8e05ce8e0",
+          "labelEn": "cost management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/bf5d77ad-e18c-48d8-83f0-bc79c011c74a",
+          "labelEn": "develop professional network",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/68698869-c13c-4563-adc7-118b7644f45d",
+          "labelEn": "identify customer's needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/2de4572a-4724-4f76-afc2-72a568a264ac",
+          "labelEn": "speak different languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/91816e1a-d026-4d21-9b1c-59ca5cf488de",
+          "labelEn": "analyse internal factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/5303169c-75d6-4751-9136-a4b88343388c",
+          "labelEn": "social media management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/e2103a1d-4a84-47a9-b4f7-774787573449",
+          "labelEn": "copyright legislation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/0023e7a5-43da-4b68-bee3-726ef21f986d",
+          "labelEn": "apply diplomatic principles",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/c55caed2-de9e-4a25-819e-a0b0e83fba1b",
+          "labelEn": "give live presentation",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/96a67da1-881f-4d09-927e-ac75fcff4d93",
+          "labelEn": "compile content",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/dc72ad0a-c5dc-4abd-bc0d-ca43e82162e1",
+          "labelEn": "build business relationships",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 27,
+          "uri": "http://data.europa.eu/esco/skill/28f98c7e-b89c-4b4d-ae0a-0c5a6328992e",
+          "labelEn": "build community relations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 28,
+          "uri": "http://data.europa.eu/esco/skill/f75b740c-b36c-495e-bc67-efe347bbc6b5",
+          "labelEn": "company policies",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 29,
+          "uri": "http://data.europa.eu/esco/skill/ae6af2c6-890d-40a7-9849-326a8c21df76",
+          "labelEn": "coordinate advertising campaigns",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 30,
+          "uri": "http://data.europa.eu/esco/skill/66fda9e5-f9f7-4342-b4f1-23355bcdd0b9",
+          "labelEn": "develop promotional tools",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 31,
+          "uri": "http://data.europa.eu/esco/skill/cd74c564-57af-4aa2-b775-13e7609ffca1",
+          "labelEn": "liaise with politicians",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        }
+      ]
+    },
+    {
+      "roleCode": "HR-TR",
+      "role": "Total Rewards Specialist",
+      "countryApplicability": "DE",
+      "vacancies": 2,
+      "dutyConfirmation": "Work includes determining salaries, calculating employee benefits and analysing compensation or reward arrangements; not routine payroll processing alone.",
+      "originalFile": "esco-compensation-analyst-occupation-v1.2.0.json",
+      "bytes": 25601,
+      "sha256": "992d290cc0457af3b29d92c0c617630c2a54b8a320dbc64a70f3be0d84a02b8d",
+      "occupationUri": "http://data.europa.eu/esco/occupation/1fce1be0-bf52-449b-9a2b-3f2cc710290a",
+      "occupationCode": "2423.7",
+      "preferredLabels": {
+        "no": "kompensasjonsanalytiker",
+        "de": "Vergütungsanalyst/Vergütungsanalystin",
+        "fi": "palkitsemiskonsultti",
+        "pt": "analista de compensação",
+        "bg": "анализатор на компенсациите",
+        "lt": "kompensacijų analitikas",
+        "lv": "atalgojuma analītiķis",
+        "hr": "analitičar/analitičarka za nagrađivanje",
+        "fr": "analyste de la rémunération",
+        "hu": "kompenzációs elemző",
+        "uk": "аналітик у сфері оплати праці/аналітикиня у сфері оплати праці",
+        "sk": "kompenzačný analytik/kompenzačná analytička",
+        "sl": "analitik/analitičarka na področju nagrajevanja zaposlenih",
+        "ga": "anailísí cúitimh",
+        "sv": "kompensationsanalytiker",
+        "mt": "analist tal-kumpens/analista tal-kumpens",
+        "el": "αναλυτής αποζημιώσεων/αναλύτρια αποζημιώσεων",
+        "en": "compensation analyst",
+        "is": "bótasérfræðingur",
+        "it": "analista retributivo/analista retributiva",
+        "es": "analista de compensaciones",
+        "et": "tasuanalüütik",
+        "cs": "analytik odměňování/analytička odměňování",
+        "ar": "محلل التعويضات",
+        "pl": "analityk wynagrodzeń",
+        "ro": "analist în materie de compensare",
+        "da": "kompensationsanalytiker",
+        "nl": "beloningsanalist"
+      },
+      "alternativeLabels": {
+        "cs": [
+          "analytik odměňování",
+          "analytička odměňování"
+        ],
+        "de": [
+          "Vergütungsanalyst",
+          "Vergütungsanalystin"
+        ],
+        "uk": [
+          "аналітикиня у сфері оплати праці",
+          "аналітик у сфері оплати праці"
+        ],
+        "mt": [
+          "analist tal-kumpens",
+          "analista tal-kumpens"
+        ],
+        "el": [
+          "αναλυτής αποζημιώσεων",
+          "αναλύτρια αποζημιώσεων"
+        ],
+        "sk": [
+          "kompenzačný analytik",
+          "kompenzačná analytička"
+        ],
+        "en": [
+          "global compensation analyst",
+          "benefits and compensation analyst",
+          "compensation consultant",
+          "variable compensation analyst",
+          "manager of compensation",
+          "total rewards analyst",
+          "HR compensation analyst",
+          "compensation coordinator",
+          "compensation and benefits analyst",
+          "compensation lead",
+          "compensation advisor",
+          "compensation administrator",
+          "international compensation analyst",
+          "incentive compensation analyst",
+          "compensation manager"
+        ],
+        "it": [
+          "analista retributivo",
+          "analista retributiva"
+        ]
+      },
+      "description": {
+        "no": {
+          "literal": "Kompensasjonsanalytikere anerkjenner og belønner bidrag og atferd som støtter selskapets forretningsmål og bedriftsverdier.",
+          "mimetype": "plain/text"
+        },
+        "de": {
+          "literal": "Vergütungsanalysten/Vergütungsanalystinnen erkennen und belohnen Beiträge und Verhaltensweisen, die für die Geschäftsziele und Werte des Unternehmens förderlich sind.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Palkitsemiskonsultit tunnistavat ja palkitsevat työpanoksen ja käyttäytymisen, jotka tukevat yrityksen liiketoimintatavoitteita ja arvoja.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os analistas de compensação reconhecem e recompensam as contribuições e os comportamentos que apoiam os objetivos comerciais e os valores corporativos da empresa.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Анализаторите на компенсации установяват и възнаграждават приноса и поведението, които подкрепят бизнес целите и корпоративните ценности на дружеството.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Kompensacijų analitikai pripažįsta indėlį ir veiksmus, kuriais remiami įmonės veiklos tikslai ir įmonės vertybės, ir už juos atlygina.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Analitičari za nagrađivanje prepoznaju i nagrađuju doprinose i ponašanja kojima se podupiru poslovni ciljevi i korporativne vrijednosti poduzeća.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Atalgojuma analītiķi novērtē un atalgo ieguldījumu un rīcību, kas sekmē uzņēmuma uzņēmējdarbības mērķu sasniegšanu un popularizē korporatīvās vērtības.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les analystes de la rémunération reconnaissent et récompensent les contributions et les comportements qui soutiennent les objectifs opérationnels et les valeurs de l’entreprise.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "A kompenzációs elemzők felismerik és jutalmazzák azokat a hozzájárulásokat és magatartásformákat, amelyek támogatják a vállalat üzleti célkitűzéseit és vállalati értékeit.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Аналітики у сфері оплати праці розпізнають і винагороджують поведінку та вчинки, які сприяють досягненню бізнес-цілей і підтримують корпоративні цінності компанії.",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Kompenzační analytici a kompenzačné analytičky rozpoznávajú a odmeňujú príspevky a správanie, ktoré podporujú obchodné ciele spoločnosti a podnikové hodnoty.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Analitiki na področju nagrajevanja zaposlenih prepoznajo in nagrajujejo prispevke in ravnanja, ki podpirajo poslovne cilje in vrednote podjetja.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Aithníonn agus cúitíonn anailísithe cúitimh ionchur agus iompar a thacaíonn le cuspóirí gnó agus luachanna corparáideacha an ghnólachta.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Kompensationsanalytiker erkänner och belönar bidrag och beteenden som stöder företagets affärsmål och värderingar.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "L-analisti tal-kumpens jirrikonoxxu u jippremjaw il-kontributi u l-imġibiet li jappoġġaw l-objettivi tan-negozju u l-valuri korporattivi ta’ kumpanija.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι αναλυτές/αναλύτριες αποζημιώσεων αναγνωρίζουν και ανταμείβουν συνεισφορές και συμπεριφορές που υποστηρίζουν τους επιχειρηματικούς στόχους και τις εταιρικές αξίες της επιχείρησης.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Compensation analysts recognise and reward contributions and behaviors that support company’s business objectives and corporate values.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Bótasérfræðingar bera kennsl á og umbuna framlög og hegðun sem styðja markmið  og gildi fyrirtækisins.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "Gli analisti retributivi riconoscono e premiano i contributi e i comportamenti che sostengono gli obiettivi e i valori societari.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los analistas de compensaciones reconocen y recompensan contribuciones y comportamientos que favorecen los objetivos de negocio y los valores corporativos.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Tasuanalüütikud tunnustavad ja premeerivad ettevõtte ärieesmärke ja väärtusi toetavat panust ja käitumist.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Analytici odměňování oceňují a odměňují úkony a chování, které podporují obchodní cíle společnosti a firemní hodnoty.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يقوم محللو التعويضات بتقدير ومكافأة المساهمات والسلوكيات التي تدعم أهداف أعمال الشركة وقيمها.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Analitycy wynagrodzeń uznają i nagradzają wkład i zachowania, które wspierają cele biznesowe i wartości korporacyjne przedsiębiorstwa.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Analiștii în materie de compensare recunosc și recompensează contribuțiile și comportamentele care sprijină obiectivele de afaceri și valorile corporative ale întreprinderii.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Kompensationsanalytikere anerkender og belønner bidrag og adfærd, der støtter virksomhedens forretningsmål og værdier.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Beloningsanalisten erkennen en belonen bijdragen en gedragingen die de bedrijfsdoelstellingen en bedrijfswaarden ondersteunen.",
+          "mimetype": "plain/text"
+        }
+      },
+      "scopeNote": null,
+      "status": "released",
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/633a3637-2c6b-40ae-ac38-289eb2a62aa6",
+          "labelEn": "business analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/2136f9d2-ebb5-4c1f-aa2d-cee24417c5c7",
+          "labelEn": "promote equal pay",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/4e02ce5a-7321-426b-a809-6c507f30ef52",
+          "labelEn": "business valuation techniques",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/56c59e98-f133-48ad-9d01-f357a8e2c218",
+          "labelEn": "estimate profitability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/99474c7c-7096-4ff9-9e87-03db28727b00",
+          "labelEn": "calculate compensation payments",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/e437eba1-3e22-41f2-8703-741e94785cba",
+          "labelEn": "human resource management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/d9a3cb06-d6e0-4a64-88a6-9a8e11a99c93",
+          "labelEn": "labour market",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/a4e50b95-8962-4408-81f9-f5de71461276",
+          "labelEn": "calculate employee benefits",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/88b406d0-72e2-4087-be19-d5992d259473",
+          "labelEn": "personnel management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/99571e68-801f-49af-a897-5f75996642e1",
+          "labelEn": "financial analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/48b68726-0fd6-4e03-a5eb-82236516ee7a",
+          "labelEn": "provide cost benefit analysis reports",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/66db424f-2abe-420d-8e5b-186607266b61",
+          "labelEn": "corporate social responsibility",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/9e84a506-df06-4be3-874a-fa01293e3dd5",
+          "labelEn": "business processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/97b713f0-b9e8-4903-8dee-7e0b4019a1c0",
+          "labelEn": "employment law",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/8a43795b-bb38-4f29-91df-a6c92ad4643c",
+          "labelEn": "analyse financial performance of a company",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/f75b740c-b36c-495e-bc67-efe347bbc6b5",
+          "labelEn": "company policies",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/6789defa-dc57-42a8-b2ed-2b8c349aa3e2",
+          "labelEn": "determine salaries",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/811bdb9d-5bf7-4b5a-a3f5-4fc2002f6d57",
+          "labelEn": "financial capability",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/96a6b597-fc62-487e-87f2-de5b67950a3a",
+          "labelEn": "calculate dividends",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/c6e308b4-8799-4461-a9bd-560bdecb0dbb",
+          "labelEn": "human resources department processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/f77b73f0-8c65-4389-a3ae-3a57a73ad148",
+          "labelEn": "develop employee retention programs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/be252635-341e-4b1c-b94f-aef362b645ed",
+          "labelEn": "business loans",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/3ee090a1-9d1c-44ed-bd93-f6b7c9b68a97",
+          "labelEn": "manage payroll reports",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/2d008d5a-b7bd-46f7-bbb1-5d70a0af9c84",
+          "labelEn": "control financial resources",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/4b2db903-cd8e-48ce-97fb-a92db4def54e",
+          "labelEn": "financial forecasting",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/c9f4efcd-e16a-4515-a0cb-60c6c479853d",
+          "labelEn": "actuarial science",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/0f9f8352-0488-4a1e-9171-2c5466c17f41",
+          "labelEn": "analyse unemployment rates",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/339ac029-066a-4985-9f9d-b3d7c8fea0bb",
+          "labelEn": "manage staff",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/0fbaceff-df05-4ef7-b735-188dc183b56b",
+          "labelEn": "carry out job analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        }
+      ]
+    }
+  ],
+  "guards": [
+    "No German observed demand, frequency, proficiency, pay or applicant-supply claim",
+    "Essential/optional source relationships retained; not numeric importance or ranking",
+    "Unknown skillType remains null; no guessed skill-versus-knowledge class",
+    "Explicit duty confirmation; no automatic consent from title or modeled duties",
+    "Stable source order and URI; canonical hash-bound snapshot, no latest reinterpretation"
+  ],
+  "heldRoles": [
+    "People Analytics Analyst",
+    "Program Manager",
+    "Strategy Analyst",
+    "Customer Success Specialist"
+  ]
+}

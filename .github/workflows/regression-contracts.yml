@@ -88,6 +88,9 @@ jobs:
       - name: Verify Japan skill levels and valuation software
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-japan-skills.test.mjs tests/position-corporate-development-market.test.mjs tests/position-market-skill-levels-ui.test.mjs tests/market-chat-message.test.mjs
+      - name: Verify European taxonomy and Japan architecture skills
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-esco-japan-extension.test.mjs tests/position-market-taxonomy-ui.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

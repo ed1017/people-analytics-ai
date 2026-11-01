@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "ab988f965907ecc6fd0ea743d6b2961d4f3a8bdf250309024a9063141fc61817",
-      "bytes": 16198
+      "sha256": "a2285ae3733859efac1347d3d9ece28942144e0873029b2d2afc4c450008757e",
+      "bytes": 16532
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -5269,8 +5269,8 @@
     },
     {
       "path": "components/workforce-planning/position-market-context.tsx",
-      "sha256": "725d800dc7951244ee0734bd85620fb3eddb228f9dd22506acbd1331cda403e9",
-      "bytes": 25655
+      "sha256": "e826b9b2800d483446fe9a3a2a5a35f78e39e16c656fdb54be97a3e5644b9813",
+      "bytes": 28472
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "8672c7a490b96063bab867166007b6971b4ede6f64effb5b1a43811626f78c97",
-      "bytes": 21103
+      "sha256": "de765f6147756973cfe4a582daa819a4b73f27df4f220d41c0c6852ce3f5c956",
+      "bytes": 21550
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5299,13 +5299,13 @@
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "c266512c00419a252fa18d4f12cd7d881779f703891c1a42e443f2d86f1b881b",
+      "sha256": "bb4c9fe95a0ba9bec441f2c53f2cc87c7964cad4e76d1f5620391455d975d26f",
       "bytes": 10281
     },
     {
       "path": "lib/market-context-lookup.ts",
-      "sha256": "7fd83cd59df95d7b8c7fe719e56d89fd102ce406cffb89366b32bd494b1dc273",
-      "bytes": 6870
+      "sha256": "1c04dcf92f42c0fc80da82180331b5d9474a6f6d43221f481d6ecd0ef8925bc7",
+      "bytes": 7529
     },
     {
       "path": "tests/market-context-lookup.test.mjs",
@@ -5344,8 +5344,8 @@
     },
     {
       "path": "tests/position-network-market-context.test.mjs",
-      "sha256": "497d92f45e5aad42d701f49f63337abe6ec2ccedbe73a8eb7db4d0fbcf6604b8",
-      "bytes": 23796
+      "sha256": "242abf6bd8001355e5c737c50e7af53b74336ffe2aea3b5f629a24e25c944c4e",
+      "bytes": 23878
     },
     {
       "path": "components/workforce-planning/position-modeled-duties.tsx",
@@ -5369,8 +5369,8 @@
     },
     {
       "path": "tests/position-modeled-duties.test.mjs",
-      "sha256": "2219b82aa7f75142b51271e9f9f314919ad4352cb41e8beec90d12e7755371c7",
-      "bytes": 9714
+      "sha256": "517bca9c7557d097677524a5040bf9b2a8ae71279232139bfe644f9dc53fb9f4",
+      "bytes": 9755
     },
     {
       "path": "components/home-market-context-explorer.tsx",
@@ -5389,8 +5389,8 @@
     },
     {
       "path": "tests/position-it-systems-market.test.mjs",
-      "sha256": "cba324e2c385e479ceac15691a25c73d59a777137158c9f6d9e905dd270a364e",
-      "bytes": 8403
+      "sha256": "7784c61d0fd34f38ae92b52de8f20f7a4d993de63dbea5eaf4208894e55bf1ce",
+      "bytes": 8526
     },
     {
       "path": "lib/market-chat-message.ts",
@@ -5419,8 +5419,8 @@
     },
     {
       "path": "tests/position-core-skills.test.mjs",
-      "sha256": "c4f023c858203727088ce7257e22806a304f4b5cdc9567ececc3d678e7956273",
-      "bytes": 10281
+      "sha256": "5e5e98ba3561a1d3181d60647b6d02fddccba8aa05be1233d9370f848d990a0e",
+      "bytes": 10363
     },
     {
       "path": "tests/position-market-skills-ui.test.mjs",
@@ -5449,8 +5449,8 @@
     },
     {
       "path": "tests/position-uk-demand.test.mjs",
-      "sha256": "5306807cd0fbb69d3df32cdcf7282d7296c0f143942e26bd3a355b8a0bbb59a4",
-      "bytes": 9961
+      "sha256": "422e03a2d69f10f4a84623f44768c3dd0bc683c8161ee9ed09d53d1ff23901c4",
+      "bytes": 10002
     },
     {
       "path": "lib/data/france-recruitment-intentions-2026.json",
@@ -5469,8 +5469,8 @@
     },
     {
       "path": "tests/position-france-recruitment.test.mjs",
-      "sha256": "0a5175b22cad287edfc4e0a998617aa28a0edeffe8c1886bf3b213db055c9d14",
-      "bytes": 8455
+      "sha256": "d77d63ced2faf48c89baa0cf8129eb9457b3e0477bf9db313acc4f722a05e504",
+      "bytes": 8496
     },
     {
       "path": "tests/position-market-recruitment-ui.test.mjs",
@@ -5504,18 +5504,53 @@
     },
     {
       "path": "tests/position-corporate-development-market.test.mjs",
-      "sha256": "7e7000e9c936f6a10cb72174af203709b73037edccbacdf7f7b4eabdda35a808",
-      "bytes": 6194
+      "sha256": "10b9107023288edac3aa0bbfd7f0211d1a7e63c3765f057b03c661be1c425e3e",
+      "bytes": 6235
     },
     {
       "path": "tests/position-japan-skills.test.mjs",
-      "sha256": "5624296b34ef83558503d358736c19d54a30828ae393a23550e888959e2dbf7d",
-      "bytes": 7477
+      "sha256": "de7aa8562114741bd3399fab6ef5f18680d4b8be1f75114602e4cc6c0aade33f",
+      "bytes": 7572
     },
     {
       "path": "tests/position-market-skill-levels-ui.test.mjs",
-      "sha256": "f6c6da685c18afb31707bf7b1ab870b327914281974a6924b9513c6bfd5b2675",
+      "sha256": "6e3347bb54042f7e24e93c51e4b8fa62c6c97b7083ce62b1b777a730518fdb5a",
       "bytes": 6304
+    },
+    {
+      "path": "lib/data/esco-germany-skills-v120.json",
+      "sha256": "0296ea9717cfdab4773ba7189f1fd94a2b600b608b993ca233edde7b08a41581",
+      "bytes": 161052
+    },
+    {
+      "path": "lib/data/japan-data-architect-skills-v7.json",
+      "sha256": "64a96e8eaeec6e170890016d8353111cb422e2d521e83fbb97d86ee34407ae3f",
+      "bytes": 6468
+    },
+    {
+      "path": "lib/position-esco-skills.ts",
+      "sha256": "5fe3026b0d03ca65143ccc99ae9114ecc9dfc592cc11005a0df0c2277dd612d3",
+      "bytes": 4714
+    },
+    {
+      "path": "lib/position-japan-data-architect.ts",
+      "sha256": "d37c84a2a82beed25a1830a5a3d96e390bc9b460942bbcea9a0f17e427b953cd",
+      "bytes": 1571
+    },
+    {
+      "path": "scripts/verify-esco-japan-sources.py",
+      "sha256": "b775c67a9b42618e3f3d171a203898ecd40cb6644054111712c2afcfc3eb9a63",
+      "bytes": 1662
+    },
+    {
+      "path": "tests/position-esco-japan-extension.test.mjs",
+      "sha256": "bf68cfa5995a7935b74d52ba23531681dc86aeaa00eb5cf5ee706a03cc4cfc6f",
+      "bytes": 8446
+    },
+    {
+      "path": "tests/position-market-taxonomy-ui.test.mjs",
+      "sha256": "ad020c9ef26f485ff4c7be5c92eaee4997e35b025792e8d827297813b9ff5cb2",
+      "bytes": 5851
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

@@ -1,0 +1,264 @@
+{
+  "candidateOnly": true,
+  "reviewDate": "2026-11-01",
+  "profileId": "523",
+  "titleJa": "データエンジニア",
+  "profileUrl": "https://shigoto.mhlw.go.jp/User/Occupation/Detail/523",
+  "role": "Data Architect",
+  "country": "JP",
+  "vacancies": 2,
+  "sourceVersion": "7.00",
+  "sourceFilename": "IPD_DL_numeric_7_00.csv",
+  "sourceSha256": "0284e82309b70fa7f7597e849c175099ab9e1ef7717e8f81d547400ec34c4e23",
+  "csvRecord": 496,
+  "dutyConfirmation": "Work includes designing and building data collection, storage and access platforms, databases or cloud data infrastructure. It is not solely enterprise governance or routine pipeline operation.",
+  "referenceScope": "Broader Data Engineer occupational skill means; not a Data Architect-only population.",
+  "dutyEvidence": "Official description explicitly includes design and construction of information infrastructure for collecting, accumulating and using data, creating databases and developing cloud information systems.",
+  "skills": [
+    {
+      "column": 22,
+      "id": "IPD_04_03_01_001",
+      "nameJa": "読解力",
+      "raw": "4.280"
+    },
+    {
+      "column": 23,
+      "id": "IPD_04_03_01_002",
+      "nameJa": "傾聴力",
+      "raw": "4.040"
+    },
+    {
+      "column": 24,
+      "id": "IPD_04_03_01_003",
+      "nameJa": "文章力",
+      "raw": "3.720"
+    },
+    {
+      "column": 25,
+      "id": "IPD_04_03_01_004",
+      "nameJa": "説明力",
+      "raw": "3.800"
+    },
+    {
+      "column": 26,
+      "id": "IPD_04_03_01_005",
+      "nameJa": "外国語を読む",
+      "raw": "2.860"
+    },
+    {
+      "column": 27,
+      "id": "IPD_04_03_01_006",
+      "nameJa": "外国語を聞く",
+      "raw": "2.080"
+    },
+    {
+      "column": 28,
+      "id": "IPD_04_03_01_007",
+      "nameJa": "外国語で書く",
+      "raw": "2.000"
+    },
+    {
+      "column": 29,
+      "id": "IPD_04_03_01_008",
+      "nameJa": "外国語で話す",
+      "raw": "1.760"
+    },
+    {
+      "column": 30,
+      "id": "IPD_04_03_01_009",
+      "nameJa": "数学的素養",
+      "raw": "3.280"
+    },
+    {
+      "column": 31,
+      "id": "IPD_04_03_01_010",
+      "nameJa": "科学的素養",
+      "raw": "2.760"
+    },
+    {
+      "column": 32,
+      "id": "IPD_04_03_01_011",
+      "nameJa": "論理と推論（批判的思考）",
+      "raw": "3.420"
+    },
+    {
+      "column": 33,
+      "id": "IPD_04_03_01_012",
+      "nameJa": "新しい情報の応用力",
+      "raw": "3.520"
+    },
+    {
+      "column": 34,
+      "id": "IPD_04_03_01_013",
+      "nameJa": "学習方法の選択・実践",
+      "raw": "3.300"
+    },
+    {
+      "column": 35,
+      "id": "IPD_04_03_01_014",
+      "nameJa": "継続的観察と評価",
+      "raw": "3.420"
+    },
+    {
+      "column": 36,
+      "id": "IPD_04_03_01_015",
+      "nameJa": "他者の反応の理解",
+      "raw": "3.360"
+    },
+    {
+      "column": 37,
+      "id": "IPD_04_03_01_016",
+      "nameJa": "他者との調整",
+      "raw": "3.660"
+    },
+    {
+      "column": 38,
+      "id": "IPD_04_03_01_017",
+      "nameJa": "説得",
+      "raw": "3.340"
+    },
+    {
+      "column": 39,
+      "id": "IPD_04_03_01_018",
+      "nameJa": "交渉",
+      "raw": "3.180"
+    },
+    {
+      "column": 40,
+      "id": "IPD_04_03_01_019",
+      "nameJa": "指導",
+      "raw": "3.620"
+    },
+    {
+      "column": 41,
+      "id": "IPD_04_03_01_020",
+      "nameJa": "対人援助サービス",
+      "raw": "3.200"
+    },
+    {
+      "column": 42,
+      "id": "IPD_04_03_01_021",
+      "nameJa": "複雑な問題解決",
+      "raw": "3.400"
+    },
+    {
+      "column": 43,
+      "id": "IPD_04_03_01_022",
+      "nameJa": "要件分析（仕様作成）",
+      "raw": "3.780"
+    },
+    {
+      "column": 44,
+      "id": "IPD_04_03_01_023",
+      "nameJa": "カスタマイズと開発",
+      "raw": "3.360"
+    },
+    {
+      "column": 45,
+      "id": "IPD_04_03_01_024",
+      "nameJa": "道具、機器、設備の選択",
+      "raw": "3.500"
+    },
+    {
+      "column": 46,
+      "id": "IPD_04_03_01_025",
+      "nameJa": "設置と設定",
+      "raw": "3.740"
+    },
+    {
+      "column": 47,
+      "id": "IPD_04_03_01_026",
+      "nameJa": "プログラミング",
+      "raw": "3.700"
+    },
+    {
+      "column": 48,
+      "id": "IPD_04_03_01_027",
+      "nameJa": "計器監視",
+      "raw": "2.620"
+    },
+    {
+      "column": 49,
+      "id": "IPD_04_03_01_028",
+      "nameJa": "操作と制御",
+      "raw": "3.040"
+    },
+    {
+      "column": 50,
+      "id": "IPD_04_03_01_029",
+      "nameJa": "保守点検",
+      "raw": "2.660"
+    },
+    {
+      "column": 51,
+      "id": "IPD_04_03_01_030",
+      "nameJa": "故障等の原因特定",
+      "raw": "3.300"
+    },
+    {
+      "column": 52,
+      "id": "IPD_04_03_01_031",
+      "nameJa": "修理",
+      "raw": "2.820"
+    },
+    {
+      "column": 53,
+      "id": "IPD_04_03_01_032",
+      "nameJa": "クオリティチェック",
+      "raw": "3.460"
+    },
+    {
+      "column": 54,
+      "id": "IPD_04_03_01_033",
+      "nameJa": "合理的な意思決定",
+      "raw": "3.200"
+    },
+    {
+      "column": 55,
+      "id": "IPD_04_03_01_034",
+      "nameJa": "企業・組織の活動の分析",
+      "raw": "2.740"
+    },
+    {
+      "column": 56,
+      "id": "IPD_04_03_01_035",
+      "nameJa": "企業・組織の活動の評価",
+      "raw": "2.740"
+    },
+    {
+      "column": 57,
+      "id": "IPD_04_03_01_036",
+      "nameJa": "時間管理",
+      "raw": "3.520"
+    },
+    {
+      "column": 58,
+      "id": "IPD_04_03_01_037",
+      "nameJa": "資金管理",
+      "raw": "2.240"
+    },
+    {
+      "column": 59,
+      "id": "IPD_04_03_01_038",
+      "nameJa": "資材管理",
+      "raw": "2.440"
+    },
+    {
+      "column": 60,
+      "id": "IPD_04_03_01_039",
+      "nameJa": "人材管理",
+      "raw": "2.640"
+    }
+  ],
+  "held": [
+    {
+      "role": "Talent Management Specialist",
+      "reason": "Available profiles432 HR administration,537 HR manager,364 external HR consultant do not establish matching internal talent-specialist duties."
+    },
+    {
+      "role": "UK AI Engineer",
+      "reason": "No approved AI-ENG modeled-duty template establishes software-development predominance; generic title insufficient for2134."
+    }
+  ],
+  "unchangedSemantics": "Same JILPT Article9 credit/version/retrieval requirements and source0-7 mean scale; sample/year unknown; no employee proficiency or training-time inference."
+}
