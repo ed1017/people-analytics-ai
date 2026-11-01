@@ -1,6 +1,9 @@
 # Australian Solution Architect reference — 1 November 2026
 
-**Candidate: 108/197 non-pay vacancies; live remains 106/197. Pay remains 59/197.** One reviewed OSCA reference conditionally covers two modeled Australian AI Architect vacancies. It does not change modeled duties, staffing, pay, funding, readiness or timing. Publication and final browser acceptance are pending.
+**Live and publicly accepted: 108/197 non-pay vacancies; 89 remain. Pay: 59/197.** PR543 merge `5b49da7c3e8255f6359a786244d338840bc8566f`, runtime `c9ecdd75364569b8e212e5197b262e481137d216`, deployment `dpl_5RB2P1jGFAD2aWHkVV2mgm3GazRn`, successful CI41340932569. Staged and direct-public acceptance passed four groups at both 1440 and 390 widths, three mocked explanations per run, HTTP 200 only, empty error arrays and drained teardown. Public runs had zero stage replay. No paid calls.
+
+The remaining **89** comprise **77 source/access/rights** and **12 duty/source-fit** gaps. See [the exact country/action table](nonpay-remaining89-2026-11-01.md), [source and release contract](australia-solution-architect-2026-11-01.md), and [published vacancy register](data/nonpay-vacancy-coverage-2026-11-01.json). Existing source and saved-record history remain intact; no global-source exhaustion claim is made.
+
 
 ## Exact source
 
@@ -24,6 +27,14 @@ The [official ABS occupation description](https://www.abs.gov.au/statistics/clas
 
 This additive reference preserves the preceding 140 canonical reference objects and saved versions. Selection, explicit duty acknowledgment, review/cancel and exact-revision attachment remain separate from merely displaying the source. Mixed roles/countries do not inherit eligibility. Saved chat snapshots, source revisions, backups, goal isolation and Track/Review relationships remain intact. General lookup and scenario explanations retain OSCA taxonomy, national scope, NS rating and Clear confidence; they must not infer state-level shortage, applicant counts, proficiency or time-to-fill. Raw E/F values do not enter canonical AI facts.
 
-## Candidate validation
+## Pre-release validation (historical checkpoint)
 
 Independent source and code reviews passed. The affected suite passed **507/507 checks** and the TypeScript graph returned zero errors. These checks are candidate evidence, not proof of production deployment or fresh model-answer quality. Exact CI, deployment identity, staged/public desktop/mobile acceptance and any harness limitations will be recorded after their gates complete. No paid model calls are included. The publicly accepted register remains 106/197 until verified publication of this separate 108 candidate.
+
+## Verified PR543 release
+
+Merge `5b49da7c3e8255f6359a786244d338840bc8566f`; runtime `c9ecdd75364569b8e212e5197b262e481137d216`; deployment `dpl_5RB2P1jGFAD2aWHkVV2mgm3GazRn`; successful exact CI41340932569. Archive SHA-256 `93fd43cba07a6f4fdfd0d285ea4120acf31aaa8f3909b93a270c40b1ac4bc4c8`; 1,295 runtime inputs and 1,150 manifest entries.
+
+Staged acceptance passed four groups at desktop1440 and mobile390, with three locally mocked explanations each, empty error arrays and drained teardown. Staged native backups are 1,376,096 bytes and preserve 20 goals, 20 captures and 18 contexts. Full public verification subsequently passed four groups at each width; the publicly accepted milestone is now 108/197. No paid calls. See [the remaining89 assessment](nonpay-remaining89-2026-11-01.md).
+
+Final direct-public reports: `integration-evidence/position-market-australia-osca-public-c9ecdd7-{1440,390}.json`. Public and staged runs each passed four groups with three mocked explanations per run, HTTP 200 only, clean error arrays and drained teardown; public replay was zero. Inspected public screenshots and native backups preserve 20 goals, 20 captures and 18 contexts, including all earlier 19 captures and 17 contexts. Public backups are 1,376,096 bytes each. No fresh paid-model-output acceptance is claimed.

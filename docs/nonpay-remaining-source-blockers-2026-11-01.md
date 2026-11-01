@@ -1,5 +1,14 @@
 # Remaining source handoff - current PR539 status
 
+## Current publicly accepted release — PR543
+
+**Live and publicly accepted: 108/197 non-pay vacancies; 89 remain. Pay: 59/197.** PR543 merge `5b49da7c3e8255f6359a786244d338840bc8566f`, runtime `c9ecdd75364569b8e212e5197b262e481137d216`, deployment `dpl_5RB2P1jGFAD2aWHkVV2mgm3GazRn`, successful CI41340932569. Staged and direct-public acceptance passed four groups at both 1440 and 390 widths, three mocked explanations per run, HTTP 200 only, empty error arrays and drained teardown. Public runs had zero stage replay. No paid calls.
+
+The remaining **89** comprise **77 source/access/rights** and **12 duty/source-fit** gaps. See [the exact country/action table](nonpay-remaining89-2026-11-01.md), [source and release contract](australia-solution-architect-2026-11-01.md), and [published vacancy register](data/nonpay-vacancy-coverage-2026-11-01.json). Existing source and saved-record history remain intact; no global-source exhaustion claim is made.
+
+## Earlier accepted milestones and historical evidence
+
+
 ## Current Australian release — PR541
 
 **Live and publicly accepted: 106/197 non-pay vacancies; 91 remain. Pay: 59/197.** PR541 merged as `43cdeb453b26e3cd2b0293e5bfea07da9a950516` and published exact runtime `9279edee6cf0171cf592f04cbdd9d32801d84ea3` through deployment `dpl_GDVznzWNzeWAkeM7GQeDP8TMTW63` after successful CI41339206030. Stage and direct-public acceptance each passed seven groups at both 1440 and 390 widths: HTTP 200, nine locally mocked explanations per run, zero recorded errors, drained teardown, and zero public asset replay. All 20 saved goals and earlier records were preserved. No paid model calls were made.
