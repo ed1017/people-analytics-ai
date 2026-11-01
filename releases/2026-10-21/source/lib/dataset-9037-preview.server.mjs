@@ -35,7 +35,7 @@ export async function load9037PreviewBinding(options){
  const selected=Object.freeze({datasetId:provider.datasetId,digest:provider.digest,generation:1});
  const router=new DatasetRouter({[provider.datasetId]:provider},{read:async()=>selected,compareAndSwap:async()=>false});
  const integration=createLocalDatasetIntegration({router,candidateDatasetId:provider.datasetId,candidateProvider:provider,analytics});
- return Object.freeze({router,handle:request=>{
+ return Object.freeze({router,turnoverHistory:filters=>analytics.turnoverHistory(filters),handle:request=>{
   if(!preview9037RequestAllowed(options,request))return Promise.resolve(Response.json({error:'Preview request unavailable.'},{status:503}));
   return integration.handle(request);
  }});
