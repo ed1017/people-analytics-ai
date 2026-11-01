@@ -1,71 +1,16 @@
 {
   "payEligible": 59,
-  "changeFromCandidate80": {
-    "priorRegister": "integration-evidence/nonpay-candidate-esco-japan-register-20261101.json",
-    "added": [
-      {
-        "id": "MODEL2-BU-CONS--AI-ENG--L2--0001",
-        "countryCode": "GB",
-        "role": "AI Engineer",
-        "canonicalReferences": [
-          {
-            "id": "ncs-career-profile:ai-engineer:GB",
-            "version": "ncs-ai-engineer-career-profile-20261101-v1:1f055d65412e10ea6cdc1e0f9135a0436a8101546b2f36e6aaeb5eafa841e701:conditional-duties-v1",
-            "kind": "career-profile-skills"
-          }
-        ]
-      },
-      {
-        "id": "MODEL2-BU-CONS--PMO-PGM--L8--0001",
-        "countryCode": "DE",
-        "role": "Program Manager",
-        "canonicalReferences": [
-          {
-            "id": "esco-skills:1213.4:Program Manager:DE",
-            "version": "esco-reviewed-followup-v120-v1:661a76e94cf2764a1596f2413e657bef4c362d440676049a2885df5fdfb2d53d:conditional-duties-v1",
-            "kind": "occupational-skills-taxonomy"
-          }
-        ]
-      },
-      {
-        "id": "MODEL2-BU-CONS--PROC-SOURCING--L10--0001",
-        "countryCode": "FR",
-        "role": "Sourcing Specialist",
-        "canonicalReferences": [
-          {
-            "id": "esco-skills:3323.2:Sourcing Specialist:FR",
-            "version": "esco-reviewed-followup-v120-v1:9db90e44f0066ec458a0506ec7cbd8e11cc6bb1b95cf78dd307df68040cc07eb:conditional-duties-v1",
-            "kind": "occupational-skills-taxonomy"
-          }
-        ]
-      },
-      {
-        "id": "MODEL2-BU-CORP--STRAT-ANA--L5--0001",
-        "countryCode": "DE",
-        "role": "Strategy Analyst",
-        "canonicalReferences": [
-          {
-            "id": "esco-skills:2421.1:Strategy Analyst:DE",
-            "version": "esco-reviewed-followup-v120-v1:f04235ce9f90d681bcb6e0e10fc5c18ccb7ec1c575e2e3be3d9e3820cde2a5a4:conditional-duties-v1",
-            "kind": "occupational-skills-taxonomy"
-          }
-        ]
-      }
-    ],
-    "lost": 0,
-    "priorSourceVersionsUnchanged": true
-  },
-  "generatedAt": "2026-11-01T07:34:32.966Z",
-  "label": "public-verified84",
-  "sourceCommit": "2f1529ddbee9ba77f1ae50830a8e18b7ab248e90",
-  "checkedHead": "2f1529ddbee9ba77f1ae50830a8e18b7ab248e90",
-  "sourceVerification": "Entire canonical lib subtree byte-identical to requested frozen commit; worktree clean.",
-  "liveStatusBasis": "PR533 direct public desktop/mobile acceptance passed; release source is byte-identical to audited2f1529d.",
+  "generatedAt": "2026-11-01T08:40:57.881Z",
+  "label": "live96",
+  "sourceCommit": "c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1",
+  "checkedHead": "c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1",
+  "sourceVerification": "Recomputed from candidate canonical source; prior source versions preserved.",
+  "liveStatusBasis": "PR536 exact deployment verified; seven direct public groups passed at both desktop and mobile widths.",
   "definition": "Supported means at least one canonical non-pay occupational reference is eligible by current country and role mapping; not complete market evidence, verified actual duties or adopted assumptions.",
   "dutyConfirmationConclusion": {
     "eligibleReferencesRequireExplicitAdoption": true,
     "unmatchedBlockedOnlyByScenarioCheckbox": 0,
-    "meaning": "All113 unmatched positions lack an implemented reviewed applicable source/crosswalk or usable permitted source. Scenario duty confirmation does not create a source or mapping."
+    "meaning": "Coverage is eligible reviewed reference availability, not actual duty confirmation or adoption."
   },
   "inventoryVersion": "company-position-model-v2",
   "inventoryAsOf": "2026-09-30",
@@ -81,8 +26,8 @@
   },
   "total": 197,
   "uniqueIds": 197,
-  "supported": 84,
-  "unmatched": 113,
+  "supported": 96,
+  "unmatched": 101,
   "byCountry": {
     "AU": {
       "total": 9,
@@ -111,22 +56,14 @@
     },
     "CA": {
       "total": 15,
-      "supported": 0,
-      "unmatched": 15,
+      "supported": 10,
+      "unmatched": 5,
       "unmatchedByRole": {
-        "Cloud Architect": 2,
-        "Talent Acquisition Specialist": 2,
         "Strategy Analyst": 1,
-        "Data Engineer": 1,
         "Business Operations Specialist": 1,
         "Sales Account Executive": 1,
-        "Transformation Consultant": 1,
-        "HR Business Partner": 1,
-        "Growth Marketing Specialist": 1,
         "Sales Operations Specialist": 1,
-        "AI Architect": 1,
-        "Technology Consultant": 1,
-        "Applied Data Scientist": 1
+        "AI Architect": 1
       }
     },
     "DE": {
@@ -140,11 +77,9 @@
     },
     "FR": {
       "total": 7,
-      "supported": 6,
-      "unmatched": 1,
-      "unmatchedByRole": {
-        "Financial Planning and Analysis Analyst": 1
-      }
+      "supported": 7,
+      "unmatched": 0,
+      "unmatchedByRole": {}
     },
     "GB": {
       "total": 20,
@@ -224,10 +159,9 @@
     },
     "US": {
       "total": 51,
-      "supported": 48,
-      "unmatched": 3,
+      "supported": 49,
+      "unmatched": 2,
       "unmatchedByRole": {
-        "Product Manager": 1,
         "Customer Success Specialist": 2
       }
     }
@@ -345,7 +279,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -357,9 +291,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:21231:Cloud Architect",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "21231",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes requirements analysis, architecture or system models, and integrated-system design or testing.",
+          "mappingLimit": "Exclude: Routine cloud administration or support without substantive design. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match. The P.Eng. entry concerns regulated professional engineering practice and approval of engineering drawings/reports, not every cloud role.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -371,19 +326,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -748,7 +691,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -766,7 +709,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -783,8 +726,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -919,7 +862,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -931,9 +874,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:12101:Talent Acquisition Specialist",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "12101",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes staffing requirements, candidate screening, interviews or selection, and recruitment offers.",
+          "mappingLimit": "Exclude: Vendor sourcing, procurement or unrelated administration. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -945,19 +909,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -1335,7 +1287,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -1353,7 +1305,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -1370,8 +1322,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -1534,16 +1486,15 @@
       },
       "remainingBlocker": {
         "classes": [
-          "access-403",
-          "original-source-needed",
           "duty-mapping-unverified"
         ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
+        "reason": "Independent Statistics Canada NOC classification is now available, but Strategy Analyst lacks an accepted duty fit in the reviewed eight-profile subset. The earlier COPS/OaSIS access failures do not describe this independent classification source.",
+        "nextAction": "Review a genuinely suitable NOC profile against unchanged primary duties; do not broaden the role to fit a neighbouring occupation. COPS/OaSIS original access remains a separate unresolved route.",
         "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
+          "integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json",
+          "integration-evidence/canada-noc-independent-20261101/README.md"
         ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
+        "scope": "Conditional profile review remains necessary; no claim all independent sources are exhausted."
       },
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
@@ -1921,7 +1872,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -1939,7 +1890,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -1956,8 +1907,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -2092,7 +2043,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -2104,9 +2055,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:21223:Data Engineer",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "21223",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work substantively includes database architecture, data-model or DBMS design and integration, or data-administration policies and standards.",
+          "mappingLimit": "Exclude: Generic pipeline operations without database architecture, DBMS or data-administration duties. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -2118,19 +2090,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -2202,7 +2162,7 @@
       "countryCode": "FR",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -2214,9 +2174,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "esco-skills:2411.1.4:Financial Planning and Analysis Analyst:FR",
+          "version": "esco-budget-skills-v120-v1:bb2ebba4f43b163be7ca89ffb45a916a4d4c0074392e3dea39047d2172d18513:conditional-duties-v1",
+          "kind": "occupational-skills-taxonomy",
+          "occupationCode": "2411.1.4",
+          "sourceUrl": "https://ec.europa.eu/esco/api/resource/occupation?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Foccupation%2F4e4a291d-1d38-4c5a-812a-5827d0691b11&selectedVersion=v1.2.0",
+          "sourceSha256": "bb2ebba4f43b163be7ca89ffb45a916a4d4c0074392e3dea39047d2172d18513",
+          "mappingDuties": "Confirm substantive budget preparation and review, expenditure monitoring and financial-performance reporting. Exclude roles primarily performing investment or valuation analysis, accounting or audit.",
+          "mappingLimit": "Budget analyst is a narrower budgeting reference, not the full FP&A occupation. Optional portfolio or public-finance relations remain optional taxonomy content, not confirmed duties or FP&A requirements. European occupational taxonomy, not country-specific measured hiring demand, shortages, available applicants or employee proficiency. Essential and optional are source relation categories, not quantitative importance, demand or training-duration ratings. Duty confirmation is required; the role title alone does not establish equivalence. Original relation order is not a ranking. Null skill type stays unclassified. This selected v1.2.0 response is pinned; unversioned self links do not establish a newer release. Attachment does not change cost, timing, pay or readiness.",
+          "countryApplicability": "FR",
+          "sourceGeography": "European occupational classification; applied conditionally to a French scenario",
+          "sourcePopulation": "ESCO occupation concepts and their essential/optional skill and knowledge relations",
+          "sourcePeriod": "ESCO v1.2.0",
+          "unit": "categorical occupation-skill relations",
+          "attribution": "European Commission, ESCO v1.2.0, retrieved 1 November 2026. Budget analyst occupation and skill relations selected and reformatted for a duty-confirmed French FP&A scenario. No endorsement implied. Underlying-source notices retained at linked copyright notice.",
+          "licence": "Creative Commons Attribution 4.0 International, unless otherwise indicated",
+          "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-skills-taxonomy"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -2228,17 +2209,7 @@
           "integration-evidence\\fr-bmo-2026\\manifest.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "duty-mapping-unverified"
-        ],
-        "reason": "FP&A existing role scope covers operating budgets, expenditure variances and cost planning, excluding investment research. Available ESCO Financial Analyst taxonomy includes investment banking/fundamental analysis among essential relations; it is not adopted as actual FP&A requirements.",
-        "nextAction": "Find a defensible budget/financial-planning source or review an explicitly broader reference without changing the existing duties or inferring investment responsibilities.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/esco-remaining-european-candidates.json"
-        ],
-        "scope": "Source exists but current role equivalence remains unapproved."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -2495,7 +2466,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -2513,7 +2484,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -2530,8 +2501,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -2693,16 +2664,15 @@
       },
       "remainingBlocker": {
         "classes": [
-          "access-403",
-          "original-source-needed",
           "duty-mapping-unverified"
         ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
+        "reason": "Independent Statistics Canada NOC classification is now available, but Business Operations Specialist lacks an accepted duty fit in the reviewed eight-profile subset. The earlier COPS/OaSIS access failures do not describe this independent classification source.",
+        "nextAction": "Review a genuinely suitable NOC profile against unchanged primary duties; do not broaden the role to fit a neighbouring occupation. COPS/OaSIS original access remains a separate unresolved route.",
         "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
+          "integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json",
+          "integration-evidence/canada-noc-independent-20261101/README.md"
         ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
+        "scope": "Conditional profile review remains necessary; no claim all independent sources are exhausted."
       },
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
@@ -3080,7 +3050,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -3098,7 +3068,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -3115,8 +3085,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -3250,7 +3220,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -3262,9 +3232,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:21231:Cloud Architect",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "21231",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes requirements analysis, architecture or system models, and integrated-system design or testing.",
+          "mappingLimit": "Exclude: Routine cloud administration or support without substantive design. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match. The P.Eng. entry concerns regulated professional engineering practice and approval of engineering drawings/reports, not every cloud role.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -3276,19 +3267,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -3653,7 +3632,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -3671,7 +3650,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -3688,8 +3667,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -3824,7 +3803,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -3836,9 +3815,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:12101:Talent Acquisition Specialist",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "12101",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes staffing requirements, candidate screening, interviews or selection, and recruitment offers.",
+          "mappingLimit": "Exclude: Vendor sourcing, procurement or unrelated administration. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -3850,19 +3850,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -4240,7 +4228,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -4258,7 +4246,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -4275,8 +4263,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -4387,16 +4375,15 @@
       },
       "remainingBlocker": {
         "classes": [
-          "access-403",
-          "original-source-needed",
           "duty-mapping-unverified"
         ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
+        "reason": "Independent Statistics Canada NOC classification is now available, but Sales Account Executive lacks an accepted duty fit in the reviewed eight-profile subset. The earlier COPS/OaSIS access failures do not describe this independent classification source.",
+        "nextAction": "Review a genuinely suitable NOC profile against unchanged primary duties; do not broaden the role to fit a neighbouring occupation. COPS/OaSIS original access remains a separate unresolved route.",
         "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
+          "integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json",
+          "integration-evidence/canada-noc-independent-20261101/README.md"
         ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
+        "scope": "Conditional profile review remains necessary; no claim all independent sources are exhausted."
       },
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
@@ -4716,7 +4703,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated May 2026",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
           "licence": "CC BY4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -4751,8 +4738,8 @@
           "sourceGeography": "United States national",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -4834,7 +4821,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -4846,9 +4833,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:11201:Transformation Consultant",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "11201",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes assessing managerial methods or organizational effectiveness and proposing operational or process improvements.",
+          "mappingLimit": "Exclude: Implementation coordination alone. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -4860,19 +4868,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -5121,7 +5117,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -5139,7 +5135,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -5156,8 +5152,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -5189,7 +5185,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -5201,9 +5197,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:11200:HR Business Partner",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "11200",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes developing or evaluating HR policies or programs and advising management or employees.",
+          "mappingLimit": "Exclude: Clerical HR administration alone. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -5215,19 +5232,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -5496,7 +5501,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -5514,7 +5519,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -5531,8 +5536,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -5564,7 +5569,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -5576,9 +5581,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:11202:Growth Marketing Specialist",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "11202",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes marketing strategy, digital campaign development or implementation, and campaign analysis.",
+          "mappingLimit": "Exclude: Sales-account administration alone. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -5590,19 +5616,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -5790,7 +5804,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -5808,7 +5822,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -5825,8 +5839,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -5886,16 +5900,15 @@
       },
       "remainingBlocker": {
         "classes": [
-          "access-403",
-          "original-source-needed",
           "duty-mapping-unverified"
         ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
+        "reason": "Independent Statistics Canada NOC classification is now available, but Sales Operations Specialist lacks an accepted duty fit in the reviewed eight-profile subset. The earlier COPS/OaSIS access failures do not describe this independent classification source.",
+        "nextAction": "Review a genuinely suitable NOC profile against unchanged primary duties; do not broaden the role to fit a neighbouring occupation. COPS/OaSIS original access remains a separate unresolved route.",
         "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
+          "integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json",
+          "integration-evidence/canada-noc-independent-20261101/README.md"
         ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
+        "scope": "Conditional profile review remains necessary; no claim all independent sources are exhausted."
       },
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
@@ -6044,7 +6057,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -6062,7 +6075,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -6079,8 +6092,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -6140,16 +6153,15 @@
       },
       "remainingBlocker": {
         "classes": [
-          "access-403",
-          "original-source-needed",
           "duty-mapping-unverified"
         ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
+        "reason": "Independent Statistics Canada NOC classification is now available, but AI Architect lacks an accepted duty fit in the reviewed eight-profile subset. The earlier COPS/OaSIS access failures do not describe this independent classification source.",
+        "nextAction": "Review a genuinely suitable NOC profile against unchanged primary duties; do not broaden the role to fit a neighbouring occupation. COPS/OaSIS original access remains a separate unresolved route.",
         "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
+          "integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json",
+          "integration-evidence/canada-noc-independent-20261101/README.md"
         ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
+        "scope": "Conditional profile review remains necessary; no claim all independent sources are exhausted."
       },
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
@@ -6298,7 +6310,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -6316,7 +6328,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -6333,8 +6345,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -6366,7 +6378,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -6378,9 +6390,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:21222:Technology Consultant",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "21222",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes analysis and improvement of IT systems or internal processes, with systems design, testing or quality procedures.",
+          "mappingLimit": "Exclude: Generic commercial advice or helpdesk-only work. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -6392,19 +6425,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -6540,7 +6561,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -6558,7 +6579,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -6575,8 +6596,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -6608,7 +6629,7 @@
       "countryCode": "CA",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -6620,9 +6641,30 @@
         "availableModeledTemplates": [],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "statcan-noc-duties:21211:Applied Data Scientist",
+          "version": "statcan-noc2021-v1-canada-duty-guidance-selected-v1:50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f:conditional-duties-v1",
+          "kind": "occupational-duty-guidance",
+          "occupationCode": "21211",
+          "sourceUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+          "sourceSha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+          "mappingDuties": "Actual work includes advanced statistical or machine-learning modeling, experimentation, data preparation and algorithm development.",
+          "mappingLimit": "Exclude: Reporting-only analytics. Classification duties may describe some or all work within the occupation. Entry guidance retains source qualifications, not universal employer requirements. No applicant supply, hiring demand, time-to-fill, proficiency or wage measurement. Actual duties require confirmation; modeled duties alone do not establish a match.",
+          "countryApplicability": "CA",
+          "sourceGeography": "Canada occupational classification",
+          "sourcePopulation": "Occupations described by the Canadian NOC classification; not a sampled workforce",
+          "sourcePeriod": "NOC 2021 Version 1.0; released 28 September 2021",
+          "unit": "qualitative duties and entry guidance",
+          "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product.",
+          "licence": "Statistics Canada Open Licence",
+          "licenceUrl": "https://www.statcan.gc.ca/en/terms-conditions/open-licence"
+        }
+      ],
+      "sourceKinds": [
+        "occupational-duty-guidance"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -6634,19 +6676,7 @@
           "integration-evidence\\ca-de-sg-nonpay-audit-20261101\\audit.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "access-403",
-          "original-source-needed",
-          "duty-mapping-unverified"
-        ],
-        "reason": "OaSIS2025 catalogue metadata identifies Open Government Licence Canada, but direct catalogue access returned403. Corrected original skill ratings/definitions/NOC duty files are not held; no denied-route retry.",
-        "nextAction": "Obtain permitted corrected original files listed in the audit and validate exact NOC2021 duty mappings and scale definitions.",
-        "evidenceArtifacts": [
-          "integration-evidence/ca-esco-skills-audit-20261101/audit.json"
-        ],
-        "scope": "Metadata is not usable numeric source evidence; no claim other sources exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -6813,7 +6843,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -6831,7 +6861,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -6848,8 +6878,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -7035,7 +7065,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated May 2026",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
           "licence": "CC BY4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -7070,8 +7100,8 @@
           "sourceGeography": "United States national",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -7238,7 +7268,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -7256,7 +7286,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -7273,8 +7303,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -7402,7 +7432,7 @@
       "countryCode": "US",
       "fte": 1,
       "budgeted": true,
-      "status": "unmatched",
+      "status": "supported",
       "vacancyStatus": "recruiting",
       "fteBasis": "modeled-vacancy-assumption",
       "locationBasis": "modeled-country-assignment",
@@ -7421,9 +7451,30 @@
         ],
         "mappingConsent": "Required explicitly per reference; register does not adopt or confirm duties"
       },
-      "canonicalReferences": [],
-      "sourceKinds": [],
-      "requiresExplicitDutyConfirmation": false,
+      "canonicalReferences": [
+        {
+          "id": "gsa-career-profile:product-management:US",
+          "version": "gsa-product-management-career-profile-20261101-v1:aedce3f29625cc63fd315e57fb4ca1c670878d4a671f5f8508667364e4d552fa:conditional-duties-v1",
+          "kind": "career-profile-skills",
+          "occupationCode": "GSA-PRODUCT-MGMT",
+          "sourceUrl": "https://digitalcorps.gsa.gov/opportunity/",
+          "sourceSha256": "aedce3f29625cc63fd315e57fb4ca1c670878d4a671f5f8508667364e4d552fa",
+          "mappingDuties": "Confirm the planned role concerns digital product or service discovery, user-needs research, prioritisation and requirements with delivery teams, and evaluation of product outcomes. Use this as a federal early-career task reference, not a claim of equivalent seniority or national occupational requirements.",
+          "mappingLimit": "Work in this track may include these tasks; they are not mandatory or exhaustive requirements. Federal early-career fellowship guidance, not nationally representative occupational requirements, private-sector or seniority equivalence, fellowship eligibility, measured skills, hiring demand or available applicants. No pay, readiness, training-duration or hiring-time estimate. Source order is not ranking. Publication/update date is unavailable; capture date is not publication date. GSA-PRODUCT-MGMT is an internal profile key, not an official occupation code. Only selected government-authored task text is included; images, trademarks and external materials are excluded.",
+          "countryApplicability": "US",
+          "sourceGeography": "U.S. federal early-career digital-service guidance",
+          "sourcePopulation": "Illustrative work in the U.S. Digital Corps Product Management fellowship track",
+          "sourcePeriod": "Captured 1 November 2026; source publication date unavailable",
+          "unit": "qualitative illustrative tasks",
+          "attribution": "U.S. General Services Administration, U.S. Digital Corps, Product Management track, accessed 1 November 2026. Selected task text reformatted for planning reference; no endorsement implied.",
+          "licence": "U.S. federal government text; GSA website policy",
+          "licenceUrl": "https://www.gsa.gov/website-information/website-policies"
+        }
+      ],
+      "sourceKinds": [
+        "career-profile-skills"
+      ],
+      "requiresExplicitDutyConfirmation": true,
       "adoptionStatus": "not assessed; this is a source-eligibility register, not browser saved-plan state",
       "priorGap": {
         "file": "integration-evidence/nonpay-source-gap-status-20261101.json",
@@ -7435,17 +7486,7 @@
           "integration-evidence\\us-corporate-development-software-candidate.json"
         ]
       },
-      "remainingBlocker": {
-        "classes": [
-          "no-reviewed-crosswalk"
-        ],
-        "reason": "Product discovery/prioritization and customer adoption/support modeled duties do not establish an existing external occupation match.",
-        "nextAction": "Find suitable occupation evidence without redefining duties or treating CSM as sales.",
-        "evidenceArtifacts": [
-          "integration-evidence\\us-corporate-development-software-candidate.json"
-        ],
-        "scope": "Latest listed reviewed-source gap; not a claim that all official alternatives are exhausted."
-      },
+      "remainingBlocker": null,
       "blockedOnlyByMissingScenarioDutyConfirmation": false
     },
     {
@@ -7593,7 +7634,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -7611,7 +7652,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -7628,8 +7669,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -7796,7 +7837,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -7814,7 +7855,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -7831,8 +7872,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -7942,7 +7983,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -7960,7 +8001,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -7977,8 +8018,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8195,7 +8236,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8213,7 +8254,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8230,8 +8271,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8341,7 +8382,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8359,7 +8400,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8376,8 +8417,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8487,7 +8528,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8505,7 +8546,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8522,8 +8563,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8633,7 +8674,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8651,7 +8692,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8668,8 +8709,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8779,7 +8820,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8797,7 +8838,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8814,8 +8855,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -8925,7 +8966,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -8943,7 +8984,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -8960,8 +9001,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9071,7 +9112,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9088,8 +9129,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9198,7 +9239,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated May 2026",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. This use does not imply endorsement by the U.S. Department of Labor. Modifications: exact In Demand=Y rows extracted; N rows omitted, with full occupation counts retained.",
           "licence": "CC BY4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9233,8 +9274,8 @@
           "sourceGeography": "United States national",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9344,7 +9385,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9362,7 +9403,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -9379,8 +9420,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9490,7 +9531,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9508,7 +9549,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -9525,8 +9566,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9636,7 +9677,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9654,7 +9695,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -9671,8 +9712,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -9899,7 +9940,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -9917,7 +9958,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -9934,8 +9975,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10045,7 +10086,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10063,7 +10104,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10080,8 +10121,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10191,7 +10232,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10209,7 +10250,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10226,8 +10267,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10337,7 +10378,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10355,7 +10396,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10372,8 +10413,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10483,7 +10524,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10501,7 +10542,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10518,8 +10559,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10629,7 +10670,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10647,7 +10688,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10664,8 +10705,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10775,7 +10816,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10793,7 +10834,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10810,8 +10851,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -10921,7 +10962,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -10939,7 +10980,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -10956,8 +10997,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11067,7 +11108,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11085,7 +11126,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11102,8 +11143,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11213,7 +11254,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11231,7 +11272,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11248,8 +11289,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11359,7 +11400,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11377,7 +11418,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11394,8 +11435,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11612,7 +11653,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11630,7 +11671,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11647,8 +11688,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11758,7 +11799,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11776,7 +11817,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11793,8 +11834,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -11904,7 +11945,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -11922,7 +11963,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -11939,8 +11980,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -12050,7 +12091,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -12068,7 +12109,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -12085,8 +12126,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -12196,7 +12237,7 @@
           "sourcePopulation": "Software examples associated with this O*NET occupation",
           "sourcePeriod": "Database 31.0; software updated 2026-05",
           "unit": "categorical source flags",
-          "attribution": "O*NET® Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET® is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
+          "attribution": "O*NET\u00ae Database 31.0, U.S. Department of Labor, Employment and Training Administration. O*NET\u00ae is a trademark of USDOL/ETA. Application-selected occupational subset; not endorsed by USDOL/ETA.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         },
@@ -12214,7 +12255,7 @@
           "sourcePopulation": "Total occupational employment including self-employment",
           "sourcePeriod": "2025-2035",
           "unit": "jobs; projected annual openings and separations",
-          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025–2035. Selected and normalized by this application; no endorsement implied.",
+          "attribution": "U.S. Bureau of Labor Statistics, Employment Projections 2025\u20132035. Selected and normalized by this application; no endorsement implied.",
           "licence": "BLS public domain data",
           "licenceUrl": "https://www.bls.gov/opub/copyright-information.htm"
         },
@@ -12231,8 +12272,8 @@
           "sourceGeography": "United States occupational reference; no city/state breakdown",
           "sourcePopulation": "Analyst ratings of skills for this US occupation",
           "sourcePeriod": "O*NET 31.0",
-          "unit": "importance 1–5; level 0–7",
-          "attribution": "O*NET® Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
+          "unit": "importance 1\u20135; level 0\u20137",
+          "attribution": "O*NET\u00ae Database 31.0 / U.S. Department of Labor, Employment and Training Administration. No endorsement implied. Modified by filtering to reviewed occupations and skills, retaining source fields and coordinates.",
           "licence": "CC BY 4.0",
           "licenceUrl": "https://creativecommons.org/licenses/by/4.0/"
         }
@@ -12664,11 +12705,150 @@
     }
   ],
   "publication": {
-    "pr": 533,
-    "runtime": "d63590c8624fd92b6eab51daa86c9ecce3d19406",
-    "deployment": "dpl_EygB6pjkQXvFBNFGKoW4kpbMg9Rs",
-    "merge": "e7306c7c840633427ac8588762046a91929da501",
-    "ci": 41286136750,
-    "archiveSha256": "7ccf2ccb046a40bf9aefcf3c3df2cd4db40a296577f1f3d672a8316122b388d7"
-  }
+    "pr": 536,
+    "runtime": "c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1",
+    "deployment": "dpl_ArAgSAsFCgmywFKtp1YFvcYc6mQQ",
+    "merge": "0291e64ea6a188e7db74762d809ccc63acb64a35",
+    "ci": 41289621631,
+    "archiveSha256": "f5bf19b8d7d63f656e1b2ca3d767c074d2fef5eb5e9447bca76c6035622965e5"
+  },
+  "changeFromPrevious": {
+    "priorSupported": 84,
+    "added": [
+      {
+        "id": "MODEL2-BU-CLIENTOPS--CLOUD-ARCH--L5--0003",
+        "countryCode": "CA",
+        "role": "Cloud Architect"
+      },
+      {
+        "id": "MODEL2-BU-CLIENTOPS--HR-TA--L5--0006",
+        "countryCode": "CA",
+        "role": "Talent Acquisition Specialist"
+      },
+      {
+        "id": "MODEL2-BU-CONS--DE-ENG--L6--0003",
+        "countryCode": "CA",
+        "role": "Data Engineer"
+      },
+      {
+        "id": "MODEL2-BU-CONS--FIN-FPNA--L10--0001",
+        "countryCode": "FR",
+        "role": "Financial Planning and Analysis Analyst"
+      },
+      {
+        "id": "MODEL2-BU-CORP--CLOUD-ARCH--L5--0005",
+        "countryCode": "CA",
+        "role": "Cloud Architect"
+      },
+      {
+        "id": "MODEL2-BU-CORP--HR-TA--L5--0003",
+        "countryCode": "CA",
+        "role": "Talent Acquisition Specialist"
+      },
+      {
+        "id": "MODEL2-BU-DATAAI--CONS-TRANS--L10--0001",
+        "countryCode": "CA",
+        "role": "Transformation Consultant"
+      },
+      {
+        "id": "MODEL2-BU-DATAAI--HR-HRBP--L2--0001",
+        "countryCode": "CA",
+        "role": "HR Business Partner"
+      },
+      {
+        "id": "MODEL2-BU-DATAAI--MKT-GROWTH--L4--0006",
+        "countryCode": "CA",
+        "role": "Growth Marketing Specialist"
+      },
+      {
+        "id": "MODEL2-BU-DIGITAL--CONS-TECH--L9--0001",
+        "countryCode": "CA",
+        "role": "Technology Consultant"
+      },
+      {
+        "id": "MODEL2-BU-DIGITAL--DS-APPLIED--L7--0003",
+        "countryCode": "CA",
+        "role": "Applied Data Scientist"
+      },
+      {
+        "id": "MODEL2-BU-DIGITAL--PROD-PM--L1--0003",
+        "countryCode": "US",
+        "role": "Product Manager"
+      }
+    ],
+    "lost": 0
+  },
+  "changeFromCandidate80": {
+    "priorRegister": "integration-evidence/nonpay-candidate-esco-japan-register-20261101.json",
+    "added": [
+      {
+        "id": "MODEL2-BU-CONS--AI-ENG--L2--0001",
+        "countryCode": "GB",
+        "role": "AI Engineer",
+        "canonicalReferences": [
+          {
+            "id": "ncs-career-profile:ai-engineer:GB",
+            "version": "ncs-ai-engineer-career-profile-20261101-v1:1f055d65412e10ea6cdc1e0f9135a0436a8101546b2f36e6aaeb5eafa841e701:conditional-duties-v1",
+            "kind": "career-profile-skills"
+          }
+        ]
+      },
+      {
+        "id": "MODEL2-BU-CONS--PMO-PGM--L8--0001",
+        "countryCode": "DE",
+        "role": "Program Manager",
+        "canonicalReferences": [
+          {
+            "id": "esco-skills:1213.4:Program Manager:DE",
+            "version": "esco-reviewed-followup-v120-v1:661a76e94cf2764a1596f2413e657bef4c362d440676049a2885df5fdfb2d53d:conditional-duties-v1",
+            "kind": "occupational-skills-taxonomy"
+          }
+        ]
+      },
+      {
+        "id": "MODEL2-BU-CONS--PROC-SOURCING--L10--0001",
+        "countryCode": "FR",
+        "role": "Sourcing Specialist",
+        "canonicalReferences": [
+          {
+            "id": "esco-skills:3323.2:Sourcing Specialist:FR",
+            "version": "esco-reviewed-followup-v120-v1:9db90e44f0066ec458a0506ec7cbd8e11cc6bb1b95cf78dd307df68040cc07eb:conditional-duties-v1",
+            "kind": "occupational-skills-taxonomy"
+          }
+        ]
+      },
+      {
+        "id": "MODEL2-BU-CORP--STRAT-ANA--L5--0001",
+        "countryCode": "DE",
+        "role": "Strategy Analyst",
+        "canonicalReferences": [
+          {
+            "id": "esco-skills:2421.1:Strategy Analyst:DE",
+            "version": "esco-reviewed-followup-v120-v1:f04235ce9f90d681bcb6e0e10fc5c18ccb7ec1c575e2e3be3d9e3820cde2a5a4:conditional-duties-v1",
+            "kind": "occupational-skills-taxonomy"
+          }
+        ]
+      }
+    ],
+    "lost": 0,
+    "priorSourceVersionsUnchanged": true
+  },
+  "publicationHistory": [
+    {
+      "pr": 533,
+      "runtime": "d63590c8624fd92b6eab51daa86c9ecce3d19406",
+      "deployment": "dpl_EygB6pjkQXvFBNFGKoW4kpbMg9Rs",
+      "merge": "e7306c7c840633427ac8588762046a91929da501",
+      "ci": 41286136750,
+      "archiveSha256": "7ccf2ccb046a40bf9aefcf3c3df2cd4db40a296577f1f3d672a8316122b388d7"
+    },
+    {
+      "pr": 535,
+      "runtime": "cd50fbd5ac370b0465507d56085dd5b922967b05",
+      "deployment": "dpl_9FrQeoEUvUVtzBU8Jx97RTxUgphh",
+      "merge": "103d3b5e3c5851c69ac2eb5d6827321da1292264",
+      "ci": 41288740951,
+      "archiveSha256": "17776bdd4768f276c6efe618231544507508241aece44df5b1d54a17dd460c29"
+    }
+  ]
 }

@@ -238,5 +238,127 @@
     "merge": "e7306c7c840633427ac8588762046a91929da501",
     "publicDeploymentIdentityVerified": true,
     "mergedReleaseTreeIdentical": true
+  },
+  {
+    "status": "live; direct public acceptance passed",
+    "pr": 535,
+    "runtime": "cd50fbd5ac370b0465507d56085dd5b922967b05",
+    "deployment": "dpl_9FrQeoEUvUVtzBU8Jx97RTxUgphh",
+    "stage": "people-analytics-chmh8vaxn-ed-56dc.vercel.app",
+    "merge": "103d3b5e3c5851c69ac2eb5d6827321da1292264",
+    "ci": 41288740951,
+    "ciConclusion": "success",
+    "coverage": {
+      "candidate": 86,
+      "priorLive": 84,
+      "total": 197,
+      "pay": 59,
+      "live": 86
+    },
+    "publicPromotion": true,
+    "publicDeploymentIdentityVerified": true,
+    "mergedReleaseTreeIdentical": true,
+    "paidCalls": 0,
+    "priorReferencesUnchanged": 121,
+    "newReferences": 2,
+    "archiveSha256": "17776bdd4768f276c6efe618231544507508241aece44df5b1d54a17dd460c29",
+    "runtimeInputs": 1269,
+    "manifestEntries": 1124,
+    "privateInputsUnchanged": true,
+    "review": "passed; corrected too-long GSA internal profile key and added exact-code lookup regression",
+    "tests": {
+      "historicalMarketChecks": 257,
+      "newContext": 8,
+      "GSA": 6,
+      "budget": 4,
+      "UI": 7,
+      "typeGraph": "passed",
+      "stagedGroupsPerWidth": 4,
+      "stagedHTTP": 200,
+      "stagedErrors": 0,
+      "mockedRequestsPerRun": 4,
+      "stagedTeardown": "drained",
+      "publicGroupsPerWidth": 4,
+      "publicHTTP": 200,
+      "publicErrors": 0,
+      "publicAssetReplay": 0,
+      "publicTeardown": "drained",
+      "publicScreenshots": "inspected desktop and mobile"
+    },
+    "harnessCorrection": "Initial checks expected five tasks before expansion; corrected harness verifies three collapsed then five expanded. Initial failures retained. No app change.",
+    "publicReports": [
+      "position-market-product-budget-public-cd50fbd-1440.json",
+      "position-market-product-budget-public-cd50fbd-390.json"
+    ]
+  },
+  {
+    "status": "live; direct public acceptance passed",
+    "pr": 536,
+    "runtime": "c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1",
+    "deployment": "dpl_ArAgSAsFCgmywFKtp1YFvcYc6mQQ",
+    "stage": "people-analytics-i0mwusbxa-ed-56dc.vercel.app",
+    "ci": 41289621631,
+    "ciConclusion": "success",
+    "coverage": {
+      "candidate": 96,
+      "priorLive": 86,
+      "total": 197,
+      "pay": 59,
+      "live": 96
+    },
+    "paidCalls": 0,
+    "priorReferencesUnchanged": 123,
+    "newReferences": 8,
+    "newEligibleVacancies": 10,
+    "archiveSha256": "f5bf19b8d7d63f656e1b2ca3d767c074d2fef5eb5e9447bca76c6035622965e5",
+    "runtimeInputs": 1274,
+    "manifestEntries": 1129,
+    "privateInputsUnchanged": true,
+    "review": {
+      "targetedTests": 20,
+      "exactSourceRecords": 168,
+      "outcome": "passed"
+    },
+    "tests": {
+      "historicalMarketChecks": 298,
+      "module": 6,
+      "context": 8,
+      "UI": 6,
+      "sharedUI": 55,
+      "typeGraph": "passed",
+      "stagedGroupsPerWidth": 7,
+      "stagedHTTP": 200,
+      "stagedErrors": 0,
+      "stagedTeardown": "drained",
+      "stagedScreenshots": "inspected",
+      "mockedRequestsPerRun": 7,
+      "publicGroupsPerWidth": 7,
+      "publicHTTP": 200,
+      "publicErrors": 0,
+      "publicAssetReplay": 0,
+      "publicTeardown": "drained",
+      "publicScreenshots": "inspected desktop and mobile",
+      "publicMockedRequestsPerRun": 7
+    },
+    "sourceScope": "Statistics Canada NOC2021 v1.0 occupational guidance; not observed demand or candidate availability",
+    "publicPromotion": true,
+    "harnessCorrection": "Initial staged fixture used a 19-goal baseline then requested two new goals, correctly hitting the existing20-goal cap. Original five passing groups and failure reports retained. Bounded corrected Track/backup continuation passed both remaining groups at both widths using one new goal. Full public harness reordered to one new goal. No app or limit changes.",
+    "merge": "0291e64ea6a188e7db74762d809ccc63acb64a35",
+    "publicDeploymentIdentityVerified": true,
+    "mergedReleaseTreeIdentical": true,
+    "stagedReports": [
+      "position-market-canada-duty-stage-c0ba3d6-1440.json",
+      "position-market-canada-duty-stage-c0ba3d6-390.json",
+      "position-market-canada-duty-stage-c0ba3d6-track-1440.json",
+      "position-market-canada-duty-stage-c0ba3d6-track-390.json"
+    ],
+    "publicReports": [
+      "position-market-canada-duty-public-c0ba3d6-1440.json",
+      "position-market-canada-duty-public-c0ba3d6-390.json"
+    ],
+    "publicBackups": [
+      "position-market-canada-duty-public-c0ba3d6-1440-backup.json",
+      "position-market-canada-duty-public-c0ba3d6-390-backup.json"
+    ]
   }
 ]

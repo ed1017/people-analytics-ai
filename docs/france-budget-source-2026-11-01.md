@@ -11,3 +11,7 @@ Confirmation requires substantive budget preparation/review, expenditure monitor
 Reuse follows the existing ESCO contract: European Commission attribution, CC BY 4.0 unless otherwise indicated, source version and processing disclosure, and the [ESCO copyright notice](https://esco.ec.europa.eu/en/copyright-notice-esco-skills-competences) retaining underlying-source notices. This is European occupational taxonomy applied conditionally to a French scenario, not local survey evidence. No importance, demand, scarcity, pay, proficiency or training-time values are inferred.
 
 This adapter is prepared separately from catalogue integration. It does not establish a public release or change a saved plan by itself. Onisep website prose is not used: its website permission requirement and unavailable separate ODbL original remain distinct from this permitted ESCO source.
+
+## Public release appendix - PR535
+
+Released and publicly accepted at runtime `cd50fbd5ac370b0465507d56085dd5b922967b05`, deployment `dpl_9FrQeoEUvUVtzBU8Jx97RTxUgphh`; CI41288740951 succeeded. Four direct public groups per desktop/mobile width passed, with no recorded errors and inspected screenshots. Together the two new references increase eligible non-pay coverage84 to86; pay59 is unchanged. Prior121 references remain unchanged. The preparation statements above describe historical source work, not current release status. See [reconciliation](nonpay-release-reconciliation-2026-11-01.md). No paid calls or fresh model-output acceptance.
