@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "a4be13806e37c8e4c126d0786109444bf6ed69b38a5a1550888753306bc5641d",
-      "bytes": 20587
+      "sha256": "6469f1567916411ba97b573a7a2ddb5c9f3a73b157d111d77715bf7502fca29c",
+      "bytes": 20667
     },
     {
       "path": "components/home-data-status.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "5a480eefd1d37e7c1539b9129f6ad285b31f2fb14764327535f6495bab077329",
-      "bytes": 109153
+      "sha256": "6114210f6f007c918f4b58c4917c8f6c4c69b6845f8d64aa178194247928bcf7",
+      "bytes": 110276
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4099,8 +4099,8 @@
     },
     {
       "path": "components/home-prompt-categories.tsx",
-      "sha256": "ae9106822792167bf0779f24cdfbb98c98cb59b29cef1c161132aed2ff10a6a7",
-      "bytes": 2413
+      "sha256": "e11aa84d80a6e00c38a7779097435a7df35da10e6c6a8f4ce96796bcd5f5702f",
+      "bytes": 1944
     },
     {
       "path": "lib/home-prompt-categories.ts",
@@ -4109,8 +4109,8 @@
     },
     {
       "path": "tests/home-prompt-categories.test.mjs",
-      "sha256": "83d22b425a3343a7dc08602e36ff367039eeb9503dbbad2ad9cf2b820fe0eaae",
-      "bytes": 2953
+      "sha256": "a21c56fa1e323579d8d93f1b809e001d99982f4f94b4644a9e53e4c6c520fdf0",
+      "bytes": 2976
     },
     {
       "path": "components/chart-pointer-tooltip.tsx",
@@ -5374,13 +5374,13 @@
     },
     {
       "path": "components/home-market-context-explorer.tsx",
-      "sha256": "0939450d710e5f5dd7b169185c7ce1989c86e10f458718aff95e797e2f858a37",
+      "sha256": "a4c9014b95c1ac4009f5b2607f6414534b9b17e21721f60f69346f9462270656",
       "bytes": 5059
     },
     {
       "path": "tests/home-market-context-explorer.test.mjs",
-      "sha256": "171d545669f0b5f16d34248c89b181f88cd0a8b5df1933f89c1414c5f471bad6",
-      "bytes": 6717
+      "sha256": "128014d681e4d9dde37c532c19363a80530344108df9d2986046c655ea7ba5b9",
+      "bytes": 7242
     },
     {
       "path": "lib/data/it-systems-nonpay-mapping-v1.json",
