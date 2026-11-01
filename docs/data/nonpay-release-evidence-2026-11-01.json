@@ -360,5 +360,64 @@
       "position-market-canada-duty-public-c0ba3d6-1440-backup.json",
       "position-market-canada-duty-public-c0ba3d6-390-backup.json"
     ]
+  },
+  {
+    "status": "live; direct public acceptance passed",
+    "pr": 539,
+    "runtime": "a392375404726fe2c46513b02c975732f5abdfff",
+    "deployment": "dpl_82Pirma7qFuzApbwUcmk6b5HhLFu",
+    "stagedUrl": "https://people-analytics-r0qax0qjz-ed-56dc.vercel.app",
+    "archiveSha256": "bbb96d99b536b68db1c80c1fbd66c9556fef1f6e14d871e1ef306415d02ca1cb",
+    "ciRun": 41335955581,
+    "candidateNonpayCoverage": 102,
+    "liveNonpayCoverageAtPreparation": 96,
+    "payCoverage": 59,
+    "vacancies": 197,
+    "newModeledTemplates": 11,
+    "newModeledVacancies": 13,
+    "newExternalMappings": 6,
+    "localMarketTests": {
+      "files": 61,
+      "passed": 478,
+      "failed": 0
+    },
+    "independentReview": "No blocking issue; exact source hashes and selected records checked",
+    "privateRuntimeInputsUnchanged": true,
+    "paidProviderCalls": 0,
+    "publicPromotion": true,
+    "australia": "Recovered originals; separate follow-on, no coverage included",
+    "intermediateBuild": {
+      "runtime": "1033aca1b37d1b19505a8c22bf2432b264c5d012",
+      "deployment": "dpl_BKtBYy5KKD1u3XCatUDQXfdPyCJE",
+      "stagedUrl": "https://people-analytics-qhmzgr6sp-ed-56dc.vercel.app",
+      "archiveSha256": "01fbc8041c24b77e73366c0e505a9fcbed701835a0c79061a4544f60aad06e0c",
+      "ciRun": 41334806212
+    },
+    "ciConclusion": "success",
+    "merge": "097bea9600c3909ed8445b7ba470f4c34c51dfc8",
+    "publicDeploymentIdentityVerified": true,
+    "liveNonpayCoverage": 102,
+    "tests": {
+      "marketFiles": 61,
+      "marketPassed": 478,
+      "copyFocusedPassed": 8,
+      "finalStagedGroupsPerWidth": 3,
+      "publicGroupsPerWidth": 10,
+      "publicMockedExplanationsPerWidth": 19,
+      "publicErrors": 0,
+      "publicHttp": 200,
+      "publicAssetReplay": 0,
+      "teardown": "drained",
+      "screenshots": "desktop and mobile inspected"
+    },
+    "stagedVerification": "Intermediate readers and six source-planning flows verified with preserved harness-failure receipts; final exact build passed Strategy wording/consent plus Track/Review/reload and backup at both widths. No claim of one uninterrupted full staged run.",
+    "publicReports": [
+      "position-modeled-duty-expansion-public-a392375-1440.json",
+      "position-modeled-duty-expansion-public-a392375-390.json"
+    ],
+    "publicBackups": [
+      "position-modeled-duty-expansion-public-a392375-1440-backup.json",
+      "position-modeled-duty-expansion-public-a392375-390-backup.json"
+    ]
   }
 ]
