@@ -4,6 +4,15 @@ import type {ChatEvidenceSeries} from '@/lib/chat-evidence-series';
 /** Discrete sampled periods; no line interpolates missing months or projects future values. */
 export function ChatEvidenceChart({series}:{series:ChatEvidenceSeries}){
  const scope=series.scope.replace(/^(?:Selected workforce snapshot:\s*)+/,'');
+ if(series.axis==='quarterly'&&series.quarterly){
+  const q=series.quarterly,quarters=[...new Set(q.rows.map(r=>r.quarter))],groups=[...new Set(q.rows.map(r=>r.groupCode))],max=Math.max(1,...q.rows.map(r=>r.ratePct??0)),format=(n:number)=>n.toLocaleString('en-US',{maximumFractionDigits:2});
+  return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-3 text-sm">
+   <figcaption className="font-semibold">{series.title}</figcaption><p>{scope} — through {series.asOf}</p>
+   <div role="region" aria-label="Quarterly turnover comparison; scroll for all quarters" tabIndex={0} className="overflow-x-auto focus-visible:ring-2 focus-visible:ring-ring"><table className="w-full whitespace-nowrap"><thead><tr><th scope="col" className="p-2 text-left">Group</th>{quarters.map(q=><th key={q} scope="col" className="p-2 text-right">{q}</th>)}</tr></thead><tbody>{groups.map(g=><tr key={g}><th scope="row" className="p-2 text-left font-medium">{q.rows.find(r=>r.groupCode===g)!.groupLabel}</th>{quarters.map(quarter=>{const row=q.rows.find(r=>r.groupCode===g&&r.quarter===quarter);return <td key={quarter} className="min-w-24 p-2 text-right tabular-nums">{row?.ratePct!=null?<>{format(row.ratePct)}%<div aria-hidden="true" className="h-2 bg-muted"><div className="h-2 bg-primary" style={{width:`${row.ratePct/max*100}%`}}/></div></>:<span title={row?.reason??'Unavailable'}>Unavailable</span>}</td>;})}</tr>)}</tbody></table></div>
+   <p>Synthetic workforce data. Rates are for each quarter, not annualized. Unavailable is not zero.</p>
+   <AssumptionsDisclosure><p>{q.definition}</p><p>Q1 2024 lacks January grouped exits. Later incomplete quarters are unavailable. All bars share a zero baseline.</p><div className="overflow-x-auto"><table className="w-full whitespace-nowrap"><thead><tr><th>Group</th><th>Quarter</th><th>Exits</th><th>Average headcount</th><th>Status</th></tr></thead><tbody>{q.rows.map(r=><tr key={r.groupCode+r.quarter}><td className="p-1">{r.groupLabel}</td><td className="p-1">{r.quarter}</td><td className="p-1 text-right">{r.exitCount??'Unavailable'}</td><td className="p-1 text-right">{r.averageMonthEndHeadcount===null?'Unavailable':format(r.averageMonthEndHeadcount)}</td><td className="p-1">{r.reason??'Complete quarter'}</td></tr>)}</tbody></table></div></AssumptionsDisclosure>
+  </figure>;
+ }
  if(series.axis==='aggregate'&&series.aggregate){
   const a=series.aggregate,max=Math.max(1,...a.rows.map(r=>r.value)),format=(v:number)=>v.toLocaleString('en-US',{maximumFractionDigits:2});
   return <figure aria-label={series.title+' for this answer'} className="my-3 min-w-0 space-y-2 rounded-lg border p-3 text-sm">

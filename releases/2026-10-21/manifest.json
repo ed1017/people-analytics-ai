@@ -354,8 +354,8 @@
     },
     {
       "path": "components/chat-evidence-chart.tsx",
-      "sha256": "09a5530dd70bf537589a95eee788a7b3aa2fa07564cad3507f23567b67f0a2da",
-      "bytes": 6185
+      "sha256": "7126709e82d84879c0e990794a79c9e5d1adbab03af64dcfc289d8bedd4fb1d3",
+      "bytes": 8558
     },
     {
       "path": "components/compact-chart.tsx",
@@ -1469,8 +1469,8 @@
     },
     {
       "path": "lib/chat-evidence-series.ts",
-      "sha256": "58f82117bdca63ed6f20fd3afe90571b82e66902f1789475b4d63b8e43a4f097",
-      "bytes": 13444
+      "sha256": "84ef86544ff5b85afc2f69e2ba04b43d89d60e5f0bde23f45a5b7ba3d31241b0",
+      "bytes": 14603
     },
     {
       "path": "lib/chat-model.ts",
@@ -1654,8 +1654,8 @@
     },
     {
       "path": "lib/dataset-9037-company-analytics.mjs",
-      "sha256": "7934105b14e130c0ebf0cf1d824658a1014a28d0c07ed9927d3a32739cde146e",
-      "bytes": 3946
+      "sha256": "61f081a360e2f2da6b0c6c7fc3702a3b2db78f8f579f36ec0f346dc370351d35",
+      "bytes": 3984
     },
     {
       "path": "lib/dataset-9037-development-options.mjs",
@@ -1669,8 +1669,8 @@
     },
     {
       "path": "lib/dataset-9037-joint-dashboard.mjs",
-      "sha256": "36748ac695dee708c0f5dab9c9accca55b8f60bd0235a80d41cecb1a397b3544",
-      "bytes": 9327
+      "sha256": "4db8f3af303c9eea4345b3ce1789a32eb95e377506590657ff502b76e93309f3",
+      "bytes": 9729
     },
     {
       "path": "lib/dataset-9037-offline-provider.mjs",
@@ -1689,8 +1689,8 @@
     },
     {
       "path": "lib/dataset-9037-preview.server.mjs",
-      "sha256": "fa53fe709e9da6d8cd0d4888d6e335b9d1c88d66e799831a5c11d456d3b46f88",
-      "bytes": 3379
+      "sha256": "6b46c6241e1f35ee103680756eb5097e4f09a78f8f8d5f27d6a6f011566adbfe",
+      "bytes": 3439
     },
     {
       "path": "lib/dataset-9037-request-policy.mjs",
@@ -3129,8 +3129,8 @@
     },
     {
       "path": "lib/public-9037.server.mjs",
-      "sha256": "84d0ec004f0f9c9f045ebb6dc6ad799f550be046eb693b9ad8fa592d0ce02565",
-      "bytes": 3084
+      "sha256": "91d88bc48115f5ed89cb46eea1b0eb37667c48cdd68fcd342cef5dc9494d40b2",
+      "bytes": 3368
     },
     {
       "path": "lib/public-ai-application.server.mjs",
@@ -3189,8 +3189,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "d0a7bdbc99a26ae621881c55354fe43156940b494b23029d9dc8817018982ef4",
-      "bytes": 14225
+      "sha256": "3695e2f9dbf791165c83e53c7ccb3933fafce9a11d408381c6ed390eba8c7a74",
+      "bytes": 15228
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3974,8 +3974,8 @@
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
-      "sha256": "38c7209d47c19d7bd8b99dcca8637ee5b3802be2bee09b457e1a2972fedfed3c",
-      "bytes": 32321
+      "sha256": "2a634786b9d7ab00926cb7723dcd9fb1819e8d092e866d03b6039518e8b2b2c7",
+      "bytes": 33720
     },
     {
       "path": "tests/public-planner-ledger.test.mjs",
@@ -5776,6 +5776,21 @@
       "path": "tests/planner-results-placement.test.mjs",
       "sha256": "b8135120f2799ee0857e3d3f81fe1938923cdf1b046678ed3897ed922dafea8e",
       "bytes": 2796
+    },
+    {
+      "path": "lib/home-quarterly-turnover.mjs",
+      "sha256": "1139b31e03ea47414aae36751fc79523736139d090931a349bea7b885cc5de78",
+      "bytes": 6653
+    },
+    {
+      "path": "lib/public-quarterly-turnover.server.mjs",
+      "sha256": "65120807883567fdb11b8076e02037cc2f33f19b809000b132880115bf8088c1",
+      "bytes": 4943
+    },
+    {
+      "path": "tests/dashboard-turnover-history.test.mjs",
+      "sha256": "24416b9a0fdeb1b40b0e898f3eb6835164a0ace48f53c177c709fc844523d056",
+      "bytes": 5835
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

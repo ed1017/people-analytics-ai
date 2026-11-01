@@ -12,7 +12,10 @@ export async function loadPublic9037Binding(options){
  for(const path of LOCAL_COMPANY_GET_ROUTES){const r=await source.handle(new Request('https://'+options.hostname+path,{headers:{'x-workforce-dataset':privateToken}}));if(!r.ok)throw Error('Public source verification failed');documents.push(projectPublic9037(path,await r.json(),'public-projection-digest-placeholder'));}
  const digest=createHash('sha256').update(JSON.stringify({version:PUBLIC_9037.contract,fields:public9037Fields,documents})).digest('hex');
  const reply=(value,status=200)=>Response.json(value,{status,headers:{'x-workforce-dataset':PUBLIC_9037.token,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
- return Object.freeze({router:Object.freeze({bootstrapToken:async()=>PUBLIC_9037.token,current:()=>({datasetId:PUBLIC_9037.datasetId,digest,token:PUBLIC_9037.token,generation:PUBLIC_9037.generation})}),async handle(request){
+ return Object.freeze({router:Object.freeze({bootstrapToken:async()=>PUBLIC_9037.token,current:()=>({datasetId:PUBLIC_9037.datasetId,digest,token:PUBLIC_9037.token,generation:PUBLIC_9037.generation})}),async turnoverHistory(filters){
+  const scope=Object.freeze({...filters}),rows=await source.turnoverHistory(scope);
+  return Object.freeze({contract:'public-group-turnover-history-v1',datasetToken:PUBLIC_9037.token,bundleDigest:digest,asOf:PUBLIC_9037.cutoff,filters:scope,rows});
+ },async handle(request){
   if(!request||!public9037RequestAllowed(options,request))return reply({error:'Unavailable in the public synthetic release.'},503);
   const received=request.headers.get('x-workforce-dataset');if(received&&received!==PUBLIC_9037.token)return reply({error:'Dataset changed. Refresh evidence before continuing.'},409);
   const u=new URL(request.url),path=u.pathname;
