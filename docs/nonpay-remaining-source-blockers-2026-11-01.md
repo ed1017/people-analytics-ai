@@ -1,5 +1,7 @@
 # Publicly accepted 96: remaining 101 source handoff
 
+Final follow-up: [feasible alternatives and grouped terminal inputs](nonpay-final-feasible-alternatives-2026-11-01.md). Coverage remains 96/197; no additional mapping was accepted.
+
 Evidence-only reconciliation, 1 November 2026. **PR536 is publicly accepted at 96/197, leaving 101.** Seven direct public groups passed at each width; PR535 is the prior accepted86 milestone. All 101 unmatched IDs were checked against `nonpay-candidate96-register-20261101.json`; source commit `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1`. The integration-evidence companion JSON retains every exact ID, source URL, blocker class and next action.
 
 | Country | Remaining | Blocker classes |
