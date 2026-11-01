@@ -275,3 +275,10 @@ test('expired or missing injected pricing never configures or admits an actual c
   assert.equal(f.attempts,0);assert.equal(f.specs.length,0);assert.equal(f.reserved,0);
  }
 });
+
+test('configuration advertises non-expiring verified policies without any provider or reservation call',async()=>{
+ const later=Date.parse('2040-01-01');
+ const f=fixture(()=>{throw Error('No provider call allowed');},{now:()=>later,policyForRoute:route=>({...publicPlannerPriceCandidate(route),validUntil:null})});
+ const r=await f.app(http('/api/public-ai-capabilities',undefined,'nonexpiring-status',hostname,'GET'));
+ assert.equal(r.status,200);assert.equal((await r.json()).status,'configured');assert.equal(f.attempts,0);assert.equal(f.specs.length,0);
+});

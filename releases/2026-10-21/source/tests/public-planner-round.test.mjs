@@ -181,3 +181,11 @@ test('bounded Home policy covers full context and enforced output; no discounted
  const y=setup({p,db});await assert.rejects(y.run.complete(spec('home-solution'),meta(1,'another-request')));assert.equal(y.calls.length,0);assert.equal(db.reserved,19888466);
  assert.throws(()=>readPublicPlannerPolicy({...p,reserveMicroUsd:4685999}));
 });
+
+test('non-expiring verified policy still reserves every round and enforces budget',async()=>{
+ const f=setup({p:policy('chat',{validUntil:null}),db:ledger(2),now:()=>Date.parse('2040-01-01')});
+ await f.run.complete(spec(),meta());
+ await assert.rejects(f.run.complete(spec(),meta(2)),/planner_admission_unavailable/);
+ assert.equal(f.calls.length,1);assert.equal(f.db.reserved,2);assert.equal(f.db.attempts,2);
+ for(const validUntil of [undefined,'','infinity'])assert.throws(()=>readPublicPlannerPolicy(policy('chat',{validUntil})));
+});
