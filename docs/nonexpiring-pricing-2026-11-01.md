@@ -36,3 +36,7 @@ The guarded migration applied successfully. Post-checks preserve cap100000000 mi
 The existing authenticated Vercel cron was manually triggered once at2026-11-01T22:42:26.180Z. It fetched official documents and appended verification4bc6d7ae47ae451e58d753e1ea0bd3c64d39046169fa2653f4b4b5b7b0df74e3 at22:42:26.997Z, validUntil:null. Public endpoint returned configured for all five AI routes; desktop1440/mobile390 confirmed the actual GET and zero provider requests. Short-lived capability receipts still expire after30seconds and are refreshed normally; this is separate from pricing validity.
 
 No new paid model answer was tested. The assistant testing-spend pause remains in force. The production cap was not changed by this request. The old layout stage must not be promoted; PR547 now incorporates the released repair and requires a new combined stage.
+
+## Subsequent combined layout deployment
+
+PR547 subsequently merged as `ff56a8a4d0ab459fa372d1bbcb6c37079a1d8a08`. Runtime `0c4ffadc1dc28cfe5a9d18ed648f6625bbb293ef`, deployment `dpl_CAMuB5UZhJG1CgEpsoahvWj434qo`, supersedes the repair-only deployment while retaining all pricing files unchanged. Exact CI `41358746382`, independent integration review and staged/public desktop/mobile lifecycle checks passed. Public capabilities remained configured for all five routes. No additional renewal, migration, cap change or paid model call was needed. See the position-layout release record for full artifact and lifecycle details.
