@@ -38,12 +38,13 @@ function fixture(mutate=()=>{}){
  const requests=[];
  const binding={router:{current:()=>identity,bootstrapToken:()=>P.token},turnoverHistory:async f=>{requests.push(f);const data={turnover_history:history()};mutate(data);return {contract:'public-group-turnover-history-v1',datasetToken:P.token,bundleDigest:identity.digest,asOf:P.cutoff,filters:f,rows:data.turnover_history};},handle:async request=>{
   const f=Object.fromEntries(new URL(request.url).searchParams);requests.push(f);
-  const data={data_meta:public9037Metadata(identity.digest),filter_options:{business_units:[{value:'BU-CORP',label:'Corporate'},{value:'BU-TECH',label:'Technology'}]},workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:f,effective:f,label:'United States; All business units; All levels',basis:'Synthetic fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'},turnover_history:history()};mutate(data);return Response.json(data,{headers:{'x-workforce-dataset':P.token}});
+  const data={data_meta:public9037Metadata(identity.digest),filter_options:{business_units:[{value:'BU-CORP',label:'Demo BU-CORP'},{value:'BU-TECH',label:'Technology'}]},workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:f,effective:f,label:'United States; All business units; All levels',basis:'Synthetic fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'},turnover_history:history()};mutate(data);return Response.json(data,{headers:{'x-workforce-dataset':P.token}});
  }};
  return {requests,run:()=>readPublicQuarterlyTurnover({binding,identity,hostname:'people-analytics-test-ed-56dc.vercel.app',filters,selection,signal:new AbortController().signal,requestId:'quarter-test'})};
 }
 test('verified scoped reader and answer/chart share arithmetic without model or raw cells',async()=>{
  const f=fixture(),result=await f.run();assert.equal(f.requests.length,3);assert.ok(f.requests.every(r=>r.country==='US'));assert.match(result.answer,/2026-Q1: 15%/);assert.match(result.answer,/2026-Q4: unavailable/);
+ assert.equal(result.charts[0].quarterly.rows[0].groupCode,'BU-CORP');assert.equal(result.charts[0].quarterly.rows[0].groupLabel,'Corporate Services');assert.match(result.answer,/Corporate Services:/);
  assert.equal(readChatEvidenceSeries(result.charts,'quarter-test',P.token).length,1);
  assert.ok(readQuarterlyTurnover(result.charts[0].quarterly));
  const bad=structuredClone(result.charts);bad[0].quarterly.rows[0].ratePct=99;assert.deepEqual(readChatEvidenceSeries(bad,'quarter-test',P.token),[]);

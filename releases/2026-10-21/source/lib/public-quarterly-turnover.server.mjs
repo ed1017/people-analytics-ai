@@ -4,7 +4,7 @@ import {PUBLIC_9037 as P} from './public-9037-contract.mjs';
 import {public9037Metadata} from './public-9037-projection.mjs';
 import {boundedJson} from './public-qa-stream.server.mjs';
 import {readDashboardScopeReceipt} from './dashboard-scope.ts';
-import {catalogSourceLabel,countryDisplayLabel} from './catalog-display.ts';
+import {catalogDisplayLabel,countryDisplayLabel} from './catalog-display.ts';
 import {QUARTERLY_DEFINITION,calculateQuarterlyTurnover,readQuarterlyTurnover} from './home-quarterly-turnover.mjs';
 
 /** Only scoped aggregate dashboard responses; no model values or employee records. */
@@ -30,7 +30,7 @@ export async function readPublicQuarterlyTurnover({binding,hostname,identity,fil
   const scoped={...filters,[selection.groupBy]:group.value};must(typeof binding.turnoverHistory==='function');
   const data=await binding.turnoverHistory(scoped);current();
   must(data?.contract==='public-group-turnover-history-v1'&&data.datasetToken===P.token&&data.bundleDigest===identity.digest&&data.asOf===P.cutoff&&same(data.filters,scoped));
-  const groupLabel=(selection.groupBy==='country'?countryDisplayLabel(group.label,group.value):catalogSourceLabel(group.label)).replace(/[\\`*_[\]<>]/g,'');
+  const groupLabel=(selection.groupBy==='country'?countryDisplayLabel(group.label,group.value):catalogDisplayLabel(group.label)).replace(/[\\`*_[\]<>]/g,'');
   rows.push(...calculateQuarterlyTurnover(data.rows,selection,P.cutoff).map(row=>({...row,groupCode:group.value,groupLabel})));
  }
  const quarterly={groupBy:selection.groupBy,metric:selection.metric,asOf:P.cutoff,definition:QUARTERLY_DEFINITION,rows};must(readQuarterlyTurnover(quarterly));

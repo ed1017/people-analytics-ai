@@ -5784,8 +5784,8 @@
     },
     {
       "path": "lib/public-quarterly-turnover.server.mjs",
-      "sha256": "65120807883567fdb11b8076e02037cc2f33f19b809000b132880115bf8088c1",
-      "bytes": 4943
+      "sha256": "b33b6cd70429968f3b82850eed9902c5d9fbee662e805028e441254dee6f7b5b",
+      "bytes": 4945
     },
     {
       "path": "tests/dashboard-turnover-history.test.mjs",
