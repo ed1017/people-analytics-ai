@@ -48,10 +48,10 @@ export function readPublicPlannerPolicy(raw){
  const limits=PUBLIC_PLANNER_ROUTE_LIMITS[raw.route];
  must(limits&&raw.model===limits.model&&/^[a-zA-Z0-9_-]{1,80}$/.test(raw.id)&&raw.contextTokens===1050000&&integer(raw.maxOutputTokens,1,limits.outputTokens)&&integer(raw.maxInputBytes,1,1500000)&&integer(raw.maxRounds,1,limits.rounds)&&integer(raw.timeoutMs,1,60000)&&integer(raw.inputMicroUsdPerMillion,1,100000000)&&integer(raw.outputMicroUsdPerMillion,1,100000000)&&integer(raw.safetyBasisPoints,10000,20000)&&integer(raw.reserveMicroUsd,1,5000000),'planner_policy_unconfigured');
  const verified=Date.parse(raw.verifiedAt),until=Date.parse(raw.validUntil);
- must(typeof raw.verifiedAt==='string'&&typeof raw.validUntil==='string'&&Number.isFinite(verified)&&Number.isFinite(until)&&until>verified&&until-verified<=86400000&&raw.reserveMicroUsd>=plannerWorstChargeMicroUsd(raw),'planner_policy_unconfigured');
+ must(typeof raw.verifiedAt==='string'&&Number.isFinite(verified)&&(raw.validUntil===null||(typeof raw.validUntil==='string'&&Number.isFinite(until)&&until>verified&&until-verified<=86400000))&&raw.reserveMicroUsd>=plannerWorstChargeMicroUsd(raw),'planner_policy_unconfigured');
  return frozen(structuredClone(raw));
 }
-const live=(p,now)=>Number.isFinite(now)&&now>=Date.parse(p.verifiedAt)&&now+p.timeoutMs+30000<Date.parse(p.validUntil);
+const live=(p,now)=>Number.isFinite(now)&&now>=Date.parse(p.verifiedAt)&&(p.validUntil===null||now+p.timeoutMs+30000<Date.parse(p.validUntil));
 function textInput(item){
  if(!object(item))return false;
  if(item.type==='function_call')return Object.keys(item).every(k=>['type','id','call_id','name','arguments','status','async','caller'].includes(k))&&typeof item.call_id==='string'&&typeof item.name==='string'&&typeof item.arguments==='string'&&(item.async===undefined||item.async===false)&&(item.caller===undefined||item.caller===null||exact(item.caller,['type'])&&item.caller.type==='direct');
@@ -160,7 +160,7 @@ export async function publicPlannerReadiness({enabled=false,policy,readLedgerSta
   try{
    stopped.throwIfAborted();
    const row=await awaitPublicQaBinding(Promise.resolve().then(()=>readLedgerStatus(stopped)),stopped);
-   return !stopped.aborted&&live(p,now())&&exact(row,['id','cap_micro_usd','reserved_micro_usd','enabled','policy_id','per_call_micro_usd','pricing_valid_until'])&&row.id===PUBLIC_PLANNER_LEDGER&&row.cap_micro_usd===PUBLIC_PLANNER_CAP_MICRO_USD&&integer(row.reserved_micro_usd,0,row.cap_micro_usd)&&row.enabled===true&&row.policy_id===ledgerPolicyId&&row.per_call_micro_usd===ledgerPerCallMicroUsd&&integer(ledgerPerCallMicroUsd,p.reserveMicroUsd,5000000)&&Date.parse(row.pricing_valid_until)===Date.parse(p.validUntil)&&row.cap_micro_usd-row.reserved_micro_usd>=p.reserveMicroUsd;
+   return !stopped.aborted&&live(p,now())&&exact(row,['id','cap_micro_usd','reserved_micro_usd','enabled','policy_id','per_call_micro_usd','pricing_valid_until'])&&row.id===PUBLIC_PLANNER_LEDGER&&row.cap_micro_usd===PUBLIC_PLANNER_CAP_MICRO_USD&&integer(row.reserved_micro_usd,0,row.cap_micro_usd)&&row.enabled===true&&row.policy_id===ledgerPolicyId&&row.per_call_micro_usd===ledgerPerCallMicroUsd&&integer(ledgerPerCallMicroUsd,p.reserveMicroUsd,5000000)&&(p.validUntil===null?row.pricing_valid_until===null:Date.parse(row.pricing_valid_until)===Date.parse(p.validUntil))&&row.cap_micro_usd-row.reserved_micro_usd>=p.reserveMicroUsd;
   }finally{clearTimeout(timer);controller.abort();}
  }catch{return false;}
 }

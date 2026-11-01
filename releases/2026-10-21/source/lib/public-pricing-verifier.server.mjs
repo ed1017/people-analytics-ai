@@ -2,10 +2,10 @@ import {createHash} from 'node:crypto';
 
 // Public documents only. No provider endpoint, credentials, ledger port or caller URLs.
 export const PUBLIC_PRICING_SOURCES = Object.freeze([
- Object.freeze({id:'pricing',url:'https://developers.openai.com/api/docs/pricing.md',sha256:'93d302a9b7a384877533bc3ab5bb48eebf4b56bd6add0f194095054b2a13f952'}),
+ Object.freeze({id:'pricing',url:'https://developers.openai.com/api/docs/pricing.md',sha256:'56e3da9bb29246cad60003e01f3fdc6b536149a09f5effe5e79af020a4922cfc'}),
  Object.freeze({id:'sol',url:'https://developers.openai.com/api/docs/models/gpt-6.1-sol.md',sha256:'ebcc1b0ae6c729a64411dacf303c0ae8b91b11a9be176dc8997b2652bec4b9b0'}),
  Object.freeze({id:'luna',url:'https://developers.openai.com/api/docs/models/gpt-5.6-luna.md',sha256:'bf9fdb1c3b6466c37fb856e5f8e5973ff088164b6c7792d3fb15e0d9927bd781'}),
- Object.freeze({id:'cache',url:'https://developers.openai.com/api/docs/guides/prompt-caching.md',sha256:'2da1ea8a2404b306773bee6aa1027ca36c9d0bc2f8a4ea3df83166d3da9d7e6c'}),
+ Object.freeze({id:'cache',url:'https://developers.openai.com/api/docs/guides/prompt-caching.md',sha256:'8c672dafd6a332d4b9ad7464aefa3ca4f6b0fffa8bf66bb5ee087e1b39152711'}),
 ]);
 export const PUBLIC_PRICING_MAX_BYTES=262144;
 export const PUBLIC_PRICING_TIMEOUT_MS=15000;

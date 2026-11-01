@@ -15,6 +15,6 @@ export function pricingPolicyForRoute(record,route,now=Date.now()){
  const p=matches[0];
  if(p.model!==candidate.model||p.inputMicroPerMillion!==candidate.inputMicroUsdPerMillion||p.outputMicroPerMillion!==candidate.outputMicroUsdPerMillion||p.reserveMicroUsd!==candidate.reserveMicroUsd||p.maxOutputTokens<candidate.maxOutputTokens)return reject();
  const policy=readPublicPlannerPolicy({...candidate,verifiedAt:record.verifiedAt,validUntil:record.validUntil});
- if(now<Date.parse(policy.verifiedAt)||now+policy.timeoutMs+30000>=Date.parse(policy.validUntil))return reject();
+ if(now<Date.parse(policy.verifiedAt)||(policy.validUntil!==null&&now+policy.timeoutMs+30000>=Date.parse(policy.validUntil)))return reject();
  return policy;
 }

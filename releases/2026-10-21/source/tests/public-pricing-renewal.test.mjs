@@ -10,7 +10,7 @@ const documents=Object.fromEntries(PUBLIC_PRICING_SOURCES.map(s=>[s.id,JSON.pars
 const verifiedAt='2026-10-27T00:00:00.000Z',now=()=>Date.parse(verifiedAt),secret='test-scheduler-secret-not-a-real-key-12345';
 const proof=()=>({verified:true,verifiedAt,...parsePublicPlannerPricing(documents)});
 const request=(init={},url=`https://www.ed-ai.app${PRICING_RENEWAL_PATH}`)=>new Request(url,{headers:{authorization:`Bearer ${secret}`},...init});
-const receipt=(p,replayed=false)=>({recorded:true,replayed,version:p.eventId,verifiedAt:p.observedAt,validUntil:new Date(Date.parse(p.observedAt)+86400000).toISOString()});
+const receipt=(p,replayed=false)=>({recorded:true,replayed,version:p.eventId,verifiedAt:p.observedAt,validUntil:null});
 function harness(options={}){let verifies=0,renewals=[];const handle=createPricingRenewalHandler({production:true,cronSecret:secret,now,verify:async()=>{verifies++;return proof();},renew:async(p,signal)=>{assert.ok(signal instanceof AbortSignal);renewals.push(p);return receipt(p);},...options});return {handle,renewals,get verifies(){return verifies;}};}
 
 test('only exact authenticated production GET reaches verification or renewal',async()=>{
@@ -19,8 +19,8 @@ test('only exact authenticated production GET reaches verification or renewal',a
  for(const options of [{production:false},{cronSecret:undefined},{cronSecret:''},{cronSecret:'short'}]){const h=harness(options);assert.notEqual((await h.handle(request())).status,200);assert.equal(h.verifies,0);}
 });
 
-test('complete unchanged official proof produces deterministic event and only a 24-hour receipt',async()=>{
- for(const host of ['www.ed-ai.app','ed-ai.app']){const h=harness();const response=await h.handle(request({},`https://${host}${PRICING_RENEWAL_PATH}`));assert.equal(response.status,200);assert.deepEqual(await response.json(),{ok:true,status:'renewed',validUntil:'2026-10-28T00:00:00.000Z'});assert.equal(h.verifies,1);assert.equal(h.renewals.length,1);const p=h.renewals[0];assert.deepEqual(Object.keys(p),['eventId','pricingDigest','observedAt','sources','matches']);assert.equal(p.eventId,createHash('sha256').update(`${APPROVED_PRICING_DIGEST}:${verifiedAt}`).digest('hex'));assert.equal(p.matches,true);assert.equal(p.pricingDigest,APPROVED_PRICING_DIGEST);assert.equal(p.observedAt,verifiedAt);assert.deepEqual(p.sources,proof().sources);}
+test('complete unchanged official proof produces deterministic event and an explicitly non-expiring receipt',async()=>{
+ for(const host of ['www.ed-ai.app','ed-ai.app']){const h=harness();const response=await h.handle(request({},`https://${host}${PRICING_RENEWAL_PATH}`));assert.equal(response.status,200);assert.deepEqual(await response.json(),{ok:true,status:'renewed',validUntil:null});assert.equal(h.verifies,1);assert.equal(h.renewals.length,1);const p=h.renewals[0];assert.deepEqual(Object.keys(p),['eventId','pricingDigest','observedAt','sources','matches']);assert.equal(p.eventId,createHash('sha256').update(`${APPROVED_PRICING_DIGEST}:${verifiedAt}`).digest('hex'));assert.equal(p.matches,true);assert.equal(p.pricingDigest,APPROVED_PRICING_DIGEST);assert.equal(p.observedAt,verifiedAt);assert.deepEqual(p.sources,proof().sources);}
 });
 
 test('only the exact configured production deployment host is added, never an arbitrary project wildcard',async()=>{
