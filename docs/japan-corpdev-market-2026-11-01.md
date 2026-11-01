@@ -21,3 +21,9 @@ One US vacancy conditionally uses O*NET 31.0 Financial and Investment Analysts 1
 Source attachment remains explicit, scoped and revision-bound. Original chat messages, source versions, plans, goals, Track/Review and backups remain intact. US-only candidate passed 59 focused/existing tests; Japan backend six tests and shared UI 37 tests passed. Independent combined review, exact CI, staged and public desktop/mobile acceptance remain pending. No paid model requests; mocked request validation is not fresh model-answer acceptance.
 
 Final combined backend checks passed 65/65; shared UI/entrypoint checks passed 37/37. Independent combined source/code review passed, including all 117 raw Japan means, translated labels, bounds, saved chat countries and previous reference identity. Focused TypeScript has zero diagnostics; line-ending normalization resolved the review hygiene finding without changing behavior. CI/staging/public checks remain pending.
+
+## Verified public release
+
+PR530 merged as `eb6be1431964b0c0b2f84664ce449b3c8916196f`. Runtime `d4610117d9bfcbdc3bbd73d6d889f3dd6d4acd2b`, deployment `dpl_7nzMU7TQSHi65heMmuR5L9B3SzXj`, exact CI `41282988104` succeeded. The same isolated deployment passed 11 staged and 11 direct public checks at each desktop/mobile width, HTTP200, no recorded errors, clean teardown. Screenshots inspected. Ten explanation requests per width were locally mocked; no paid model acceptance is claimed. Public non-pay coverage is 72/197; pay remains59.
+
+Initial CI caught an outdated software-count assertion (47 rather than48); the corrected five-test suite and independent review passed. Initial browser harness expected a hyphen where the UI used an en dash; the harness was corrected and full acceptance rerun. Neither issue changed source data or calculations.

@@ -1,0 +1,55 @@
+{
+  "status": "independently reviewed conditional qualitative profile",
+  "sourceUrl": "https://nationalcareers.service.gov.uk/job-profiles/artificial-intelligence-ai-engineer",
+  "capturedAt": "2026-11-01",
+  "sourcePublishedOrUpdatedDate": null,
+  "originalFile": "original.html",
+  "sha256": "1f055d65412e10ea6cdc1e0f9135a0436a8101546b2f36e6aaeb5eafa841e701",
+  "sourceTitle": "Artificial intelligence (AI) engineer",
+  "alternateTitle": "Machine learning engineer",
+  "publisher": "National Careers Service / Department for Education",
+  "geography": "England careers guidance; qualitative occupational profile, not a UK national survey",
+  "licence": "Open Government Licence v3.0 except where otherwise stated",
+  "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "rightsEvidence": "Original page footer explicitly names OGLv3 and Crown copyright; no third-party attribution adjacent to selected skills/tasks. Linked GOV.UK terms allow OGL reproduction. Standalone National Archives licence fetch returned403; stopped, no retry/alternate route.",
+  "termsUrl": "https://www.gov.uk/help/terms-conditions",
+  "informationSourcesUrl": "https://nationalcareers.service.gov.uk/help/information-sources",
+  "rightsExclusions": "Do not copy logos, photos, third-party apprenticeship/course listings or personal case studies. No endorsement.",
+  "proposedAttribution": "Contains National Careers Service information, Crown copyright, licensed under the Open Government Licence v3.0. Selected qualitative skills and tasks captured1November2026; no endorsement implied.",
+  "skills": [
+    "maths knowledge",
+    "analytical thinking skills",
+    "to be thorough and pay attention to detail",
+    "knowledge of engineering science and technology",
+    "the ability to write computer programs",
+    "the ability to come up with new ways of doing things",
+    "knowledge of systems analysis and development",
+    "persistence and determination",
+    "to have a thorough understanding of computer systems and applications"
+  ],
+  "tasks": [
+    "work with businesses to understand the problems they want to solve",
+    "develop machine learning models and algorithms",
+    "run tests on prototypes and analyse data to make improvements",
+    "find and fix problems or 'bugs'",
+    "assess the risks associated with new machine learning programs",
+    "work as part of a team to roll out AI solutions",
+    "stay up to date with the latest advancements in AI"
+  ],
+  "ordering": "source order; not ranking",
+  "ratings": null,
+  "vacancyIds": [
+    "MODEL2-BU-CONS--AI-ENG--L2--0001"
+  ],
+  "role": "AI Engineer",
+  "countryCode": "GB",
+  "mappingCondition": "Confirm that the planned role develops machine-learning models or algorithms, tests and debugs them, evaluates associated risks and contributes to deployment. Exclude roles limited to using AI tools, product coordination or AI governance without engineering duties.",
+  "mappingBasis": "Exact official occupation title; actual duties require explicit confirmation. No pre-existing GB modeled template is required or manufactured.",
+  "limitations": [
+    "Qualitative careers profile, not measured worker skills or skill gaps.",
+    "No numeric importance, level, scarcity, demand, pay, readiness or hiring-time facts.",
+    "Source publication/update date unavailable; use capture date without presenting it as publication date.",
+    "National Careers Service is England-specific; do not imply a UK-wide measured labour-market statistic."
+  ],
+  "id": "ncs-ai-engineer-career-profile-20261101-v1"
+}
