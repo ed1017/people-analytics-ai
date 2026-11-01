@@ -5419,8 +5419,8 @@
     },
     {
       "path": "tests/position-core-skills.test.mjs",
-      "sha256": "5e5e98ba3561a1d3181d60647b6d02fddccba8aa05be1233d9370f848d990a0e",
-      "bytes": 10363
+      "sha256": "6358527f839cfa985fcb0d3ae586d7691e48e7f1ca6b6aa61a3a8a0e073929ba",
+      "bytes": 10431
     },
     {
       "path": "tests/position-market-skills-ui.test.mjs",
