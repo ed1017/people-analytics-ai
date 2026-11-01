@@ -17,7 +17,7 @@ import * as parity from '../releases/2026-10-21/source/lib/scenario-planning-par
 import * as inputDisplay from '../releases/2026-10-21/source/lib/workforce-input-display.ts';
 const require=createRequire(import.meta.url);
 function component(path,modules={}){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../releases/2026-10-21/source/components/'+path,import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:id=>modules[id]??require(id)});return exports;}
-const planner=component('interactive-planner.tsx',{'./interactive-planner.module.css':{default:{}},'./decision-style.module.css':{default:{}},'@/lib/catalog-display':catalogDisplay});
+const planner=component('interactive-planner.tsx',{'./planner-results':{useSplitPlannerResults:()=>false,PlannerResults:({children})=>children},'./interactive-planner.module.css':{default:{}},'./decision-style.module.css':{default:{}},'@/lib/catalog-display':catalogDisplay});
 const cost=component('staffing-option-cost.tsx',{'@/lib/guided-plan-summary':summary});
 const table=component('staffing-options-table.tsx');
 const decision=component('scenario-decision-summary.tsx',{'@/lib/staffing-choice-summary':choice,'@/lib/swp-demo':demo});
