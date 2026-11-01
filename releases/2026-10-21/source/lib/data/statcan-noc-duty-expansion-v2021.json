@@ -1,0 +1,921 @@
+{
+  "id": "statcan-noc2021-canada-duty-expansion-v1",
+  "source": {
+    "url": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1/noc-2021-v1.0-elements.csv",
+    "catalogueUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+    "sha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+    "bytes": 5129133,
+    "encoding": "UTF-8",
+    "csvRecordConvention": "Header is logical record 1"
+  },
+  "licence": {
+    "name": "Statistics Canada Open Licence",
+    "url": "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+    "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product."
+  },
+  "releaseDate": "2021-09-28",
+  "capturedAt": "2026-11-01",
+  "reviewedDesignSha256": "04c404caf3c5067c317fa460c00ba33afdc44fea016e967390abfb8d970c499d",
+  "mappings": [
+    {
+      "roleId": "OPS-BUS",
+      "country": "CA",
+      "code": "11201",
+      "rows": [
+        1817,
+        1818,
+        1819,
+        1820,
+        1823
+      ],
+      "condition": "Organizational service-process assessment and recommendations for improved methods and procedures; broader business-management consulting reference, not a claim of external consultancy or management authority."
+    },
+    {
+      "roleId": "STRAT-ANA",
+      "country": "CA",
+      "code": "11201",
+      "rows": [
+        1817,
+        1818,
+        1819,
+        1820,
+        1823
+      ],
+      "condition": "Organizational strategic-choice analysis, evaluation of operational implications and improvement recommendations; broader reference, not investment analysis or transaction execution. Preserve some-or-all duty qualifier."
+    },
+    {
+      "roleId": "AI-ARCH",
+      "country": "CA",
+      "code": "21231",
+      "rows": [
+        6191,
+        6192,
+        6193,
+        6194,
+        6195
+      ],
+      "condition": "Applied software/system requirements, interface specifications, design evaluation and integration. Not AI research, network-only architecture, or AI-specific measured requirements."
+    },
+    {
+      "roleId": "SALES-AE",
+      "country": "CA",
+      "code": "64101",
+      "rows": [
+        21239,
+        21364,
+        21365,
+        21366,
+        21367,
+        21368,
+        21369
+      ],
+      "condition": "Non-technical business-service prospecting, proposals, commercial terms and contracts. Explicit business services example at row21239; technical input coordination does not make the role technical sales."
+    }
+  ],
+  "occupation": {
+    "code": "64101",
+    "title": "Sales and account representatives - wholesale trade (non-technical)",
+    "records": [
+      {
+        "csvRecord": 21214,
+        "elementType": "Illustrative example(s)",
+        "text": "advertising time sales representative "
+      },
+      {
+        "csvRecord": 21215,
+        "elementType": "Illustrative example(s)",
+        "text": "food products sales representative "
+      },
+      {
+        "csvRecord": 21216,
+        "elementType": "Illustrative example(s)",
+        "text": "freight sales agent "
+      },
+      {
+        "csvRecord": 21217,
+        "elementType": "Illustrative example(s)",
+        "text": "graphic design sales representative "
+      },
+      {
+        "csvRecord": 21218,
+        "elementType": "Illustrative example(s)",
+        "text": "hotel accommodations sales executive "
+      },
+      {
+        "csvRecord": 21219,
+        "elementType": "Illustrative example(s)",
+        "text": "liquor sales representative "
+      },
+      {
+        "csvRecord": 21220,
+        "elementType": "Illustrative example(s)",
+        "text": "magazine sales representative "
+      },
+      {
+        "csvRecord": 21221,
+        "elementType": "Illustrative example(s)",
+        "text": "oil distributor "
+      },
+      {
+        "csvRecord": 21222,
+        "elementType": "Illustrative example(s)",
+        "text": "security services sales consultant "
+      },
+      {
+        "csvRecord": 21223,
+        "elementType": "Illustrative example(s)",
+        "text": "transfer company agent "
+      },
+      {
+        "csvRecord": 21224,
+        "elementType": "Illustrative example(s)",
+        "text": "wholesale trade representatives supervisor "
+      },
+      {
+        "csvRecord": 21225,
+        "elementType": "All examples",
+        "text": "advertising agency broker "
+      },
+      {
+        "csvRecord": 21226,
+        "elementType": "All examples",
+        "text": "advertising space representative - print media "
+      },
+      {
+        "csvRecord": 21227,
+        "elementType": "All examples",
+        "text": "advertising time sales representative "
+      },
+      {
+        "csvRecord": 21228,
+        "elementType": "All examples",
+        "text": "alarm system sales representative "
+      },
+      {
+        "csvRecord": 21229,
+        "elementType": "All examples",
+        "text": "alcoholic beverage sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21230,
+        "elementType": "All examples",
+        "text": "aluminum products sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21231,
+        "elementType": "All examples",
+        "text": "auctioneer "
+      },
+      {
+        "csvRecord": 21232,
+        "elementType": "All examples",
+        "text": "automotive parts sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21233,
+        "elementType": "All examples",
+        "text": "automotive parts salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21234,
+        "elementType": "All examples",
+        "text": "beer sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21235,
+        "elementType": "All examples",
+        "text": "booking agent - wholesale "
+      },
+      {
+        "csvRecord": 21236,
+        "elementType": "All examples",
+        "text": "building maintenance services sales representative "
+      },
+      {
+        "csvRecord": 21237,
+        "elementType": "All examples",
+        "text": "business equipment sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21238,
+        "elementType": "All examples",
+        "text": "business forms sales representative "
+      },
+      {
+        "csvRecord": 21239,
+        "elementType": "All examples",
+        "text": "business services sales representative "
+      },
+      {
+        "csvRecord": 21240,
+        "elementType": "All examples",
+        "text": "canvas product sales representative "
+      },
+      {
+        "csvRecord": 21241,
+        "elementType": "All examples",
+        "text": "cartage and storage salesperson "
+      },
+      {
+        "csvRecord": 21242,
+        "elementType": "All examples",
+        "text": "catalogue agent - wholesale "
+      },
+      {
+        "csvRecord": 21243,
+        "elementType": "All examples",
+        "text": "classified ad salesperson "
+      },
+      {
+        "csvRecord": 21244,
+        "elementType": "All examples",
+        "text": "cleaning services sales representative "
+      },
+      {
+        "csvRecord": 21245,
+        "elementType": "All examples",
+        "text": "collection agency sales representative "
+      },
+      {
+        "csvRecord": 21246,
+        "elementType": "All examples",
+        "text": "commercial agent - wholesale "
+      },
+      {
+        "csvRecord": 21247,
+        "elementType": "All examples",
+        "text": "commercial and industrial equipment and supplies sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21248,
+        "elementType": "All examples",
+        "text": "commercial salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21249,
+        "elementType": "All examples",
+        "text": "computer services sales representative "
+      },
+      {
+        "csvRecord": 21250,
+        "elementType": "All examples",
+        "text": "concrete products salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21251,
+        "elementType": "All examples",
+        "text": "consumer sales representative "
+      },
+      {
+        "csvRecord": 21252,
+        "elementType": "All examples",
+        "text": "courier services sales representative "
+      },
+      {
+        "csvRecord": 21253,
+        "elementType": "All examples",
+        "text": "credit bureau sales representative "
+      },
+      {
+        "csvRecord": 21254,
+        "elementType": "All examples",
+        "text": "delivery services sales agent "
+      },
+      {
+        "csvRecord": 21255,
+        "elementType": "All examples",
+        "text": "delivery services sales representative "
+      },
+      {
+        "csvRecord": 21256,
+        "elementType": "All examples",
+        "text": "design sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21257,
+        "elementType": "All examples",
+        "text": "display advertising sales representative "
+      },
+      {
+        "csvRecord": 21258,
+        "elementType": "All examples",
+        "text": "district sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21259,
+        "elementType": "All examples",
+        "text": "export company sales representative "
+      },
+      {
+        "csvRecord": 21260,
+        "elementType": "All examples",
+        "text": "export sales representative "
+      },
+      {
+        "csvRecord": 21261,
+        "elementType": "All examples",
+        "text": "exporter "
+      },
+      {
+        "csvRecord": 21262,
+        "elementType": "All examples",
+        "text": "feed product sales representative "
+      },
+      {
+        "csvRecord": 21263,
+        "elementType": "All examples",
+        "text": "field salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21264,
+        "elementType": "All examples",
+        "text": "financial services sales representative "
+      },
+      {
+        "csvRecord": 21265,
+        "elementType": "All examples",
+        "text": "financial services salesperson "
+      },
+      {
+        "csvRecord": 21266,
+        "elementType": "All examples",
+        "text": "fleet sales representative "
+      },
+      {
+        "csvRecord": 21267,
+        "elementType": "All examples",
+        "text": "food products sales representative "
+      },
+      {
+        "csvRecord": 21268,
+        "elementType": "All examples",
+        "text": "food services sales representative "
+      },
+      {
+        "csvRecord": 21269,
+        "elementType": "All examples",
+        "text": "freight forwarding services sales representative "
+      },
+      {
+        "csvRecord": 21270,
+        "elementType": "All examples",
+        "text": "freight sales agent "
+      },
+      {
+        "csvRecord": 21271,
+        "elementType": "All examples",
+        "text": "freight services sales representative "
+      },
+      {
+        "csvRecord": 21272,
+        "elementType": "All examples",
+        "text": "freight traffic agent "
+      },
+      {
+        "csvRecord": 21273,
+        "elementType": "All examples",
+        "text": "fur trader "
+      },
+      {
+        "csvRecord": 21274,
+        "elementType": "All examples",
+        "text": "graphic arts sales representative "
+      },
+      {
+        "csvRecord": 21275,
+        "elementType": "All examples",
+        "text": "graphic design sales representative "
+      },
+      {
+        "csvRecord": 21276,
+        "elementType": "All examples",
+        "text": "group travel sales representative "
+      },
+      {
+        "csvRecord": 21277,
+        "elementType": "All examples",
+        "text": "hotel accommodations sales executive "
+      },
+      {
+        "csvRecord": 21278,
+        "elementType": "All examples",
+        "text": "hotel services sales representative "
+      },
+      {
+        "csvRecord": 21279,
+        "elementType": "All examples",
+        "text": "hotel supply sales representative "
+      },
+      {
+        "csvRecord": 21280,
+        "elementType": "All examples",
+        "text": "import company sales representative "
+      },
+      {
+        "csvRecord": 21281,
+        "elementType": "All examples",
+        "text": "import sales representative "
+      },
+      {
+        "csvRecord": 21282,
+        "elementType": "All examples",
+        "text": "importer "
+      },
+      {
+        "csvRecord": 21283,
+        "elementType": "All examples",
+        "text": "import-export tradesperson - wholesale "
+      },
+      {
+        "csvRecord": 21284,
+        "elementType": "All examples",
+        "text": "industrial tool sales representative "
+      },
+      {
+        "csvRecord": 21285,
+        "elementType": "All examples",
+        "text": "institutional food services sales representative "
+      },
+      {
+        "csvRecord": 21286,
+        "elementType": "All examples",
+        "text": "insulation salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21287,
+        "elementType": "All examples",
+        "text": "janitorial services sales representative "
+      },
+      {
+        "csvRecord": 21288,
+        "elementType": "All examples",
+        "text": "laundry services sales representative "
+      },
+      {
+        "csvRecord": 21289,
+        "elementType": "All examples",
+        "text": "leasing services sales representative "
+      },
+      {
+        "csvRecord": 21290,
+        "elementType": "All examples",
+        "text": "lighting fixture sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21291,
+        "elementType": "All examples",
+        "text": "liquor sales representative "
+      },
+      {
+        "csvRecord": 21292,
+        "elementType": "All examples",
+        "text": "liquor sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21293,
+        "elementType": "All examples",
+        "text": "lumber sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21294,
+        "elementType": "All examples",
+        "text": "magazine sales representative "
+      },
+      {
+        "csvRecord": 21295,
+        "elementType": "All examples",
+        "text": "magazine sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21296,
+        "elementType": "All examples",
+        "text": "manufacturer's agent - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21297,
+        "elementType": "All examples",
+        "text": "manufacturer's representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21298,
+        "elementType": "All examples",
+        "text": "media time sales representative "
+      },
+      {
+        "csvRecord": 21299,
+        "elementType": "All examples",
+        "text": "membership sales representative "
+      },
+      {
+        "csvRecord": 21300,
+        "elementType": "All examples",
+        "text": "motor vehicle and equipment sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21301,
+        "elementType": "All examples",
+        "text": "non-technical sales specialist - wholesale "
+      },
+      {
+        "csvRecord": 21302,
+        "elementType": "All examples",
+        "text": "novelty products salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21303,
+        "elementType": "All examples",
+        "text": "novelty sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21304,
+        "elementType": "All examples",
+        "text": "ocean and lake container transportation sales representative "
+      },
+      {
+        "csvRecord": 21305,
+        "elementType": "All examples",
+        "text": "office equipment sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21306,
+        "elementType": "All examples",
+        "text": "office furniture sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21307,
+        "elementType": "All examples",
+        "text": "oil distributor "
+      },
+      {
+        "csvRecord": 21308,
+        "elementType": "All examples",
+        "text": "paper industry sales consultant "
+      },
+      {
+        "csvRecord": 21309,
+        "elementType": "All examples",
+        "text": "periodicals sales representative "
+      },
+      {
+        "csvRecord": 21310,
+        "elementType": "All examples",
+        "text": "periodicals sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21311,
+        "elementType": "All examples",
+        "text": "petroleum product sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21312,
+        "elementType": "All examples",
+        "text": "photographic services sales representative "
+      },
+      {
+        "csvRecord": 21313,
+        "elementType": "All examples",
+        "text": "plastic product sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21314,
+        "elementType": "All examples",
+        "text": "postal services commercial sales representative "
+      },
+      {
+        "csvRecord": 21315,
+        "elementType": "All examples",
+        "text": "printing services sales representative "
+      },
+      {
+        "csvRecord": 21316,
+        "elementType": "All examples",
+        "text": "publication distributor - wholesale "
+      },
+      {
+        "csvRecord": 21317,
+        "elementType": "All examples",
+        "text": "publication sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21318,
+        "elementType": "All examples",
+        "text": "publisher's sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21319,
+        "elementType": "All examples",
+        "text": "pulp and paper product sales representative "
+      },
+      {
+        "csvRecord": 21320,
+        "elementType": "All examples",
+        "text": "pump and compressor sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21321,
+        "elementType": "All examples",
+        "text": "radio advertising time sales representative "
+      },
+      {
+        "csvRecord": 21322,
+        "elementType": "All examples",
+        "text": "recordings contact person "
+      },
+      {
+        "csvRecord": 21323,
+        "elementType": "All examples",
+        "text": "recycling sales representative "
+      },
+      {
+        "csvRecord": 21324,
+        "elementType": "All examples",
+        "text": "regional sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21325,
+        "elementType": "All examples",
+        "text": "reservation agent - wholesale "
+      },
+      {
+        "csvRecord": 21326,
+        "elementType": "All examples",
+        "text": "restaurant equipment sales representative "
+      },
+      {
+        "csvRecord": 21327,
+        "elementType": "All examples",
+        "text": "rubber product sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21328,
+        "elementType": "All examples",
+        "text": "sales agent - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21329,
+        "elementType": "All examples",
+        "text": "sales consultant - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21330,
+        "elementType": "All examples",
+        "text": "sales coordinator - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21331,
+        "elementType": "All examples",
+        "text": "sales executive - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21332,
+        "elementType": "All examples",
+        "text": "sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21333,
+        "elementType": "All examples",
+        "text": "salesperson - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21334,
+        "elementType": "All examples",
+        "text": "security services sales consultant "
+      },
+      {
+        "csvRecord": 21335,
+        "elementType": "All examples",
+        "text": "security services sales consultant - wholesale "
+      },
+      {
+        "csvRecord": 21336,
+        "elementType": "All examples",
+        "text": "security services sales representative "
+      },
+      {
+        "csvRecord": 21337,
+        "elementType": "All examples",
+        "text": "security services sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21338,
+        "elementType": "All examples",
+        "text": "security system salesperson "
+      },
+      {
+        "csvRecord": 21339,
+        "elementType": "All examples",
+        "text": "shipping sales representative "
+      },
+      {
+        "csvRecord": 21340,
+        "elementType": "All examples",
+        "text": "sign and display leasing agent "
+      },
+      {
+        "csvRecord": 21341,
+        "elementType": "All examples",
+        "text": "sign and display sales representative "
+      },
+      {
+        "csvRecord": 21342,
+        "elementType": "All examples",
+        "text": "storage services sales representative "
+      },
+      {
+        "csvRecord": 21343,
+        "elementType": "All examples",
+        "text": "supplier - wholesale "
+      },
+      {
+        "csvRecord": 21344,
+        "elementType": "All examples",
+        "text": "telephone equipment sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21345,
+        "elementType": "All examples",
+        "text": "television advertising time sales representative "
+      },
+      {
+        "csvRecord": 21346,
+        "elementType": "All examples",
+        "text": "television advertising time salesperson "
+      },
+      {
+        "csvRecord": 21347,
+        "elementType": "All examples",
+        "text": "textbook sales representative "
+      },
+      {
+        "csvRecord": 21348,
+        "elementType": "All examples",
+        "text": "tobacco product sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21349,
+        "elementType": "All examples",
+        "text": "tour operator - wholesale "
+      },
+      {
+        "csvRecord": 21350,
+        "elementType": "All examples",
+        "text": "tour package sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21351,
+        "elementType": "All examples",
+        "text": "transfer company agent "
+      },
+      {
+        "csvRecord": 21352,
+        "elementType": "All examples",
+        "text": "travelling salesperson - wholesale "
+      },
+      {
+        "csvRecord": 21353,
+        "elementType": "All examples",
+        "text": "truck and trailer sales representative - wholesale (non-technical) "
+      },
+      {
+        "csvRecord": 21354,
+        "elementType": "All examples",
+        "text": "vending machine sales representative "
+      },
+      {
+        "csvRecord": 21355,
+        "elementType": "All examples",
+        "text": "vending machine services sales representative "
+      },
+      {
+        "csvRecord": 21356,
+        "elementType": "All examples",
+        "text": "wholesale purveyor "
+      },
+      {
+        "csvRecord": 21357,
+        "elementType": "All examples",
+        "text": "wholesale trade representative "
+      },
+      {
+        "csvRecord": 21358,
+        "elementType": "All examples",
+        "text": "wholesale trade representatives supervisor "
+      },
+      {
+        "csvRecord": 21359,
+        "elementType": "All examples",
+        "text": "wine sales representative - wholesale "
+      },
+      {
+        "csvRecord": 21360,
+        "elementType": "Exclusion(s)",
+        "text": "Advertising, marketing and public relations managers  (See 10022 Advertising, marketing and public relations managers)"
+      },
+      {
+        "csvRecord": 21361,
+        "elementType": "Exclusion(s)",
+        "text": "Retail salespersons and visual merchandisers  (See 64100 Retail salespersons and visual merchandisers)"
+      },
+      {
+        "csvRecord": 21362,
+        "elementType": "Exclusion(s)",
+        "text": "Royalties manager - arts  (See 50011 Managers - publishing, motion pictures, broadcasting and performing arts)"
+      },
+      {
+        "csvRecord": 21363,
+        "elementType": "Exclusion(s)",
+        "text": "Technical sales specialists - wholesale trade  (See 62100 Technical sales specialists - wholesale trade)"
+      },
+      {
+        "csvRecord": 21364,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      {
+        "csvRecord": 21365,
+        "elementType": "Main duties",
+        "text": "Promote sales to existing clients "
+      },
+      {
+        "csvRecord": 21366,
+        "elementType": "Main duties",
+        "text": "Identify and solicit potential clients "
+      },
+      {
+        "csvRecord": 21367,
+        "elementType": "Main duties",
+        "text": "Provide clients with presentations on the benefits and uses of goods or services "
+      },
+      {
+        "csvRecord": 21368,
+        "elementType": "Main duties",
+        "text": "Estimate or quote prices, credit or contract terms, warranties and delivery dates "
+      },
+      {
+        "csvRecord": 21369,
+        "elementType": "Main duties",
+        "text": "Prepare or oversee preparation of sales or other contracts "
+      },
+      {
+        "csvRecord": 21370,
+        "elementType": "Main duties",
+        "text": "Consult with clients after sale or signed contracts to resolve problems and to provide ongoing support "
+      },
+      {
+        "csvRecord": 21371,
+        "elementType": "Main duties",
+        "text": "Review and adapt to information regarding product innovations, competitors and market conditions "
+      },
+      {
+        "csvRecord": 21372,
+        "elementType": "Main duties",
+        "text": "Represent companies that export and import products or services to and from foreign countries "
+      },
+      {
+        "csvRecord": 21373,
+        "elementType": "Main duties",
+        "text": "May conduct sales transactions through Internet-based electronic commerce "
+      },
+      {
+        "csvRecord": 21374,
+        "elementType": "Main duties",
+        "text": "May supervise the activities of other sales representatives. "
+      },
+      {
+        "csvRecord": 21375,
+        "elementType": "Employment requirements",
+        "text": "Completion of secondary school is required. "
+      },
+      {
+        "csvRecord": 21376,
+        "elementType": "Employment requirements",
+        "text": "A university degree or completion of a college or other program may be required. "
+      },
+      {
+        "csvRecord": 21377,
+        "elementType": "Employment requirements",
+        "text": "Experience in sales or in an occupation related to the product or service is usually required. "
+      },
+      {
+        "csvRecord": 21378,
+        "elementType": "Employment requirements",
+        "text": "Fluency in a foreign language and/or foreign country work or travel experience may be required for sales representatives seeking employment with companies that import or export goods or services. "
+      },
+      {
+        "csvRecord": 21379,
+        "elementType": "Employment requirements",
+        "text": "Supervisors and senior sales representatives require experience. "
+      },
+      {
+        "csvRecord": 21380,
+        "elementType": "Employment requirements",
+        "text": "Voluntary certification is available from the Canadian Professional Sales Association. "
+      },
+      {
+        "csvRecord": 21381,
+        "elementType": "Additional information",
+        "text": "Progression to sales management positions is possible with additional training or experience. "
+      }
+    ]
+  }
+}

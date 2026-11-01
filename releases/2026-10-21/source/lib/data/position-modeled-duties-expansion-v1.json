@@ -1,0 +1,214 @@
+{
+  "id": "position-modeled-duties-expansion-v1",
+  "basis": "fictional-planning-assumption",
+  "description": "Additional country-specific modeled company duties, authored from fictional role and skill context. Not observed employee work or external occupational facts.",
+  "templates": [
+    {
+      "id": "modeled-duty:STRAT-ANA:CA",
+      "version": "position-modeled-duties-expansion-v1:STRAT-ANA:CA",
+      "roleId": "STRAT-ANA",
+      "role": "Strategy Analyst",
+      "countryCode": "CA",
+      "basis": "fictional-planning-assumption",
+      "title": "Strategy options and business cases",
+      "duties": [
+        "Analyze business performance and market scenarios to identify strategic choices.",
+        "Compare the financial and operational implications of proposed growth or service changes.",
+        "Prepare evidence-based recommendations and communicate assumptions to stakeholders.",
+        "Track agreed strategic initiatives and investigate deviations from their intended outcomes."
+      ],
+      "exclusions": [
+        "No transaction execution, investment advice or final strategy approval.",
+        "Not routine reporting alone or a general management position."
+      ]
+    },
+    {
+      "id": "modeled-duty:OPS-BUS:CA",
+      "version": "position-modeled-duties-expansion-v1:OPS-BUS:CA",
+      "roleId": "OPS-BUS",
+      "role": "Business Operations Specialist",
+      "countryCode": "CA",
+      "basis": "fictional-planning-assumption",
+      "title": "Business process and service coordination",
+      "duties": [
+        "Map internal service workflows and identify delays, handoff issues and rework.",
+        "Coordinate operational improvement tasks and maintain process documentation.",
+        "Monitor service volumes and delivery measures, investigating exceptions with responsible teams.",
+        "Recommend practical process changes and check implementation progress."
+      ],
+      "exclusions": [
+        "No general-manager authority or automatic ownership of budgets and staffing.",
+        "Not primarily sales analysis, software engineering or external management consulting."
+      ]
+    },
+    {
+      "id": "modeled-duty:SALES-AE:CA",
+      "version": "position-modeled-duties-expansion-v1:SALES-AE:CA",
+      "roleId": "SALES-AE",
+      "role": "Sales Account Executive",
+      "countryCode": "CA",
+      "basis": "fictional-planning-assumption",
+      "title": "Business service sales",
+      "duties": [
+        "Identify prospective business customers and clarify their service needs.",
+        "Present relevant service proposals and coordinate technical input from delivery specialists.",
+        "Negotiate commercial terms within approved limits and progress opportunities toward signed agreements.",
+        "Maintain opportunity records and hand agreed requirements to delivery teams."
+      ],
+      "exclusions": [
+        "No authority to approve exceptional pricing or contractual risk independently.",
+        "Not post-sale support only, investment sales or a technical engineering role."
+      ]
+    },
+    {
+      "id": "modeled-duty:SALES-OPS:CA",
+      "version": "position-modeled-duties-expansion-v1:SALES-OPS:CA",
+      "roleId": "SALES-OPS",
+      "role": "Sales Operations Specialist",
+      "countryCode": "CA",
+      "basis": "fictional-planning-assumption",
+      "title": "Sales process and pipeline support",
+      "duties": [
+        "Maintain consistent opportunity stages, account records and sales reporting definitions.",
+        "Review pipeline completeness, conversion patterns and forecast inputs with sales teams.",
+        "Coordinate sales-process improvements and explain changes to account teams.",
+        "Prepare operational sales reports and investigate data-quality exceptions."
+      ],
+      "exclusions": [
+        "No individual prospecting, closing quota or ownership of customer support.",
+        "Not assumed to perform predictive modeling, market research or pricing approval."
+      ]
+    },
+    {
+      "id": "modeled-duty:AI-ARCH:CA",
+      "version": "position-modeled-duties-expansion-v1:AI-ARCH:CA",
+      "roleId": "AI-ARCH",
+      "role": "AI Architect",
+      "countryCode": "CA",
+      "basis": "fictional-planning-assumption",
+      "title": "AI solution architecture",
+      "duties": [
+        "Translate service requirements into an AI application design with clear system and data interfaces.",
+        "Compare model and integration options against quality, latency, cost and operational constraints.",
+        "Define evaluation criteria and review prototype results with engineering and data teams.",
+        "Document deployment dependencies, human oversight and operational monitoring requirements."
+      ],
+      "exclusions": [
+        "Not a research scientist or a general enterprise/network architect by title alone.",
+        "No automatic security certification, model safety guarantee or production approval."
+      ]
+    },
+    {
+      "id": "modeled-duty:OPS-BUS:GB",
+      "version": "position-modeled-duties-expansion-v1:OPS-BUS:GB",
+      "roleId": "OPS-BUS",
+      "role": "Business Operations Specialist",
+      "countryCode": "GB",
+      "basis": "fictional-planning-assumption",
+      "title": "Business process and service coordination",
+      "duties": [
+        "Map internal service workflows and identify delays, handoff issues and rework.",
+        "Coordinate operational improvement tasks and maintain process documentation.",
+        "Monitor service volumes and delivery measures, investigating exceptions with responsible teams.",
+        "Recommend practical process changes and check implementation progress."
+      ],
+      "exclusions": [
+        "No general-manager authority or automatic ownership of budgets and staffing.",
+        "Not primarily sales analysis, software engineering or external management consulting."
+      ]
+    },
+    {
+      "id": "modeled-duty:OPS-CLIENT:GB",
+      "version": "position-modeled-duties-expansion-v1:OPS-CLIENT:GB",
+      "roleId": "OPS-CLIENT",
+      "role": "Client Operations Specialist",
+      "countryCode": "GB",
+      "basis": "fictional-planning-assumption",
+      "title": "Client service operations",
+      "duties": [
+        "Coordinate client service requests, delivery schedules and internal handoffs.",
+        "Track service commitments and escalate unresolved delivery issues to accountable teams.",
+        "Maintain client delivery records and communicate progress and exceptions.",
+        "Review recurring service issues and recommend workflow improvements."
+      ],
+      "exclusions": [
+        "No prospecting, sales quota, contract negotiation or revenue ownership is assumed.",
+        "Not investment/client-account advice or technical system engineering."
+      ]
+    },
+    {
+      "id": "modeled-duty:CORPDEV-ANA:GB",
+      "version": "position-modeled-duties-expansion-v1:CORPDEV-ANA:GB",
+      "roleId": "CORPDEV-ANA",
+      "role": "Corporate Development Analyst",
+      "countryCode": "GB",
+      "basis": "fictional-planning-assumption",
+      "title": "Corporate development and transactions",
+      "duties": [
+        "Screen acquisition opportunities against the company strategy.",
+        "Develop valuation and transaction analyses using explicit assumptions.",
+        "Coordinate financial and commercial due diligence and summarize transaction risks."
+      ],
+      "exclusions": [
+        "Not generic management consulting or routine operations analysis.",
+        "No investment recommendation, transaction approval or occupational match is implied."
+      ]
+    },
+    {
+      "id": "modeled-duty:HR-PA:DE",
+      "version": "position-modeled-duties-expansion-v1:HR-PA:DE",
+      "roleId": "HR-PA",
+      "role": "People Analytics Analyst",
+      "countryCode": "DE",
+      "basis": "fictional-planning-assumption",
+      "title": "Workforce analysis and decision support",
+      "duties": [
+        "Validate workforce measures, definitions and reporting populations with HR stakeholders.",
+        "Analyze workforce trends and differences across roles, locations and periods using appropriate statistical methods.",
+        "Explain findings and limitations to HR leaders and identify questions needing further evidence.",
+        "Maintain reproducible workforce analyses with privacy-aware aggregation and access controls."
+      ],
+      "exclusions": [
+        "No automated hiring, dismissal or individual employee scoring.",
+        "Predictive modeling, production data science and causal impact estimation are not assumed requirements."
+      ]
+    },
+    {
+      "id": "modeled-duty:CSM-GEN:DE",
+      "version": "position-modeled-duties-expansion-v1:CSM-GEN:DE",
+      "roleId": "CSM-GEN",
+      "role": "Customer Success Specialist",
+      "countryCode": "DE",
+      "basis": "fictional-planning-assumption",
+      "title": "Customer adoption and support",
+      "duties": [
+        "Guide customer onboarding and product adoption.",
+        "Coordinate support issues and explain available product capabilities.",
+        "Monitor customer feedback and communicate adoption obstacles to product teams."
+      ],
+      "exclusions": [
+        "No sales quota, prospecting, closing or revenue ownership is assumed.",
+        "Not automatically mapped to service sales representatives."
+      ]
+    },
+    {
+      "id": "modeled-duty:HR-TM:JP",
+      "version": "position-modeled-duties-expansion-v1:HR-TM:JP",
+      "roleId": "HR-TM",
+      "role": "Talent Management Specialist",
+      "countryCode": "JP",
+      "basis": "fictional-planning-assumption",
+      "title": "Talent development and succession coordination",
+      "duties": [
+        "Coordinate talent reviews and document development needs with managers and HR partners.",
+        "Help employees and managers translate development needs into practical learning and career plans.",
+        "Maintain succession and internal-mobility information using agreed criteria.",
+        "Monitor participation and follow-up actions, reporting gaps in development support."
+      ],
+      "exclusions": [
+        "No unilateral promotion, succession appointment or employment decisions.",
+        "Not recruitment sourcing, compensation design, or ownership of all HR strategy."
+      ]
+    }
+  ]
+}

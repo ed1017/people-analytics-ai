@@ -1,4 +1,5 @@
 import source from './data/position-modeled-duties-v1.json' with {type:'json'};
+import expansion from './data/position-modeled-duties-expansion-v1.json' with {type:'json'};
 import type {DecisionStore,Json} from './local-decisions';
 // @ts-expect-error Native tests share application source.
 import {catalogDisplayLabel} from './catalog-display.ts';
@@ -13,7 +14,7 @@ import {resolvePositionInventory} from './position-inventory.ts';
 import {validDatasetToken} from './dataset-identity.mjs';
 export const POSITION_MODELED_DUTIES_FIELD='planning.positionModeledDutiesV1';
 export type PositionModeledDutyTemplate={id:string;version:string;roleId:string;role:string;countryCode:string;basis:'fictional-planning-assumption';title:string;duties:string[];exclusions:string[]};
-const templates:PositionModeledDutyTemplate[]=source.templates.map(t=>{if(t.basis!=='fictional-planning-assumption'||catalogDisplayLabel(t.roleId)!==t.role)throw Error('Modeled duty identity changed.');return {...t,basis:'fictional-planning-assumption'};});
+const templates:PositionModeledDutyTemplate[]=[...source.templates,...expansion.templates].map(t=>{if(t.basis!=='fictional-planning-assumption'||catalogDisplayLabel(t.roleId)!==t.role)throw Error('Modeled duty identity changed.');return {...t,basis:'fictional-planning-assumption'};});
 function must(v:unknown,message='Modeled duties cannot be verified.'):asserts v{if(!v)throw Error(message);}
 function exact(v:unknown,keys:string[]):asserts v is Record<string,unknown>{must(!!v&&typeof v==='object'&&!Array.isArray(v)&&Object.getPrototypeOf(v)===Object.prototype&&Object.keys(v).sort().join()===keys.sort().join());}
 function validAt(v:unknown):v is string{return typeof v==='string'&&/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString()===v;}
