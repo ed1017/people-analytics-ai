@@ -2,7 +2,7 @@
 
 Prepared 1 November 2026 from existing audit files; no new network research in this pass.
 
-**Potential coverage is 84 of 197 modeled vacancies, leaving 113.** This combines the frozen 80-vacancy ESCO/Japan register, one reviewed UK AI Engineer profile and three reviewed ESCO follow-ups (Germany Program Manager and Strategy Analyst; France Sourcing Specialist). Additions remain pending until public release acceptance. This document is not a declaration that 84 is live, that all 197 are finished, or that every official alternative has been exhausted. The release owner records the live milestone separately.
+**Publicly verified coverage is 84 of 197 modeled vacancies, leaving 113.** This combines the frozen 80-vacancy ESCO/Japan register, one reviewed UK AI Engineer profile and three reviewed ESCO follow-ups (Germany Program Manager and Strategy Analyst; France Sourcing Specialist). These additions passed public release acceptance in PR532 and PR533. This document does not claim that all197 are finished or that every official alternative has been exhausted. The release owner records the live milestone separately.
 
 Coverage means at least one eligible conditional occupational reference, not complete market evidence or confirmed actual duties. Skills taxonomy, career guidance, survey means and recruitment intentions are distinct measures. Pay coverage is separate. Vacancy IDs, countries and duties remain modeled; source availability is not reader consent.
 
@@ -44,6 +44,6 @@ Coverage means at least one eligible conditional occupational reference, not com
 
 ## AI continuation contract
 
-Start with `integration-evidence/nonpay-candidate-esco-japan-register-20261101.json` (80 eligible, 117 unmatched). Subtract only these four reviewed IDs from its unmatched set: UK `MODEL2-BU-CONS--AI-ENG--L2--0001`; Germany `MODEL2-BU-CONS--PMO-PGM--L8--0001` and `MODEL2-BU-CORP--STRAT-ANA--L5--0001`; France `MODEL2-BU-CONS--PROC-SOURCING--L10--0001`. The result must retain 113 unique IDs with the country totals above. This arithmetic is potential coverage, not a replacement for canonical/public verification.
+Start with `integration-evidence/nonpay-candidate-esco-japan-register-20261101.json` (80 eligible, 117 unmatched). Subtract only these four reviewed IDs from its unmatched set: UK `MODEL2-BU-CONS--AI-ENG--L2--0001`; Germany `MODEL2-BU-CONS--PMO-PGM--L8--0001` and `MODEL2-BU-CORP--STRAT-ANA--L5--0001`; France `MODEL2-BU-CONS--PROC-SOURCING--L10--0001`. The result must retain 113 unique IDs with the country totals above. The arithmetic was independently reconciled to the final canonical register and public release; retain the original audit provenance.
 
 Reviewed addition evidence: `integration-evidence/uk-ai-profile-20261101/candidate.json` and `releases/2026-10-21/source/lib/data/esco-followup-skills-v120.json`. Prior per-ID blocker history is `integration-evidence/nonpay-source-gap-status-20261101.json`; read it as historical, since some candidates were subsequently accepted. Never overwrite a live register with research status. Preserve original bytes, source versions, rights decisions, duty conditions and explicit reader confirmation. Do not retry denied routes, create accounts, contact rights holders or purchase data without the relevant authorization. No secret or private-data export is needed.

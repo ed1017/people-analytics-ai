@@ -1,6 +1,16 @@
 # Active roadmap - November 1
 
-## Current verified milestone: France, November 1, 2026
+## Current release state - 1 November 2026
+
+**Live: 84/197 non-pay vacancies; pay: 59/197.** PR533 is publicly verified at runtime `d63590c8624fd92b6eab51daa86c9ecce3d19406`, deployment `dpl_EygB6pjkQXvFBNFGKoW4kpbMg9Rs`. PR529 (66), PR530 (72), PR531 (80) and PR532 (81) are released predecessors. No release candidate remains pending in this batch.
+
+See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md), [all 197 vacancy records](data/nonpay-vacancy-coverage-2026-11-01.json) and [remaining source actions](nonpay-remaining-source-blockers-2026-11-01.md). The remaining 113 have specific source-access, reuse-rights or duty-fit blockers; reviewing a gap does not count as coverage. This does not claim that every possible global source is exhausted.
+
+Reader cards, canonical lookup and saved-revision explanation payloads share source facts and limitations. Explicit duty confirmation is still required. There was **no fresh paid-model-output acceptance**; tests used canonical payload inspection and mocked responses. Skills taxonomy and career guidance are not measured local hiring demand, available applicants or employee proficiency.
+
+The dated sections below are historical snapshots. Their earlier coverage and next-step wording does not override this header.
+
+## Historical verified milestone: France, November 1, 2026
 
 PR529 is live and publicly verified at runtime `679faf34c70f8b04afd3a63db57bb223a56e1267` (deployment `dpl_34hXBL8g9ahysU27DR9Y6Jes35Zz`). Non-pay coverage is **66/197**, pay **59/197**. Three conditional French IT occupation-family references report national recruitment intentions and anticipated difficulty. Exact CI and staged/direct public desktop/mobile ten-group checks passed. Reader chat cards and exact saved-revision AI context share source facts. No paid model calls.
 
