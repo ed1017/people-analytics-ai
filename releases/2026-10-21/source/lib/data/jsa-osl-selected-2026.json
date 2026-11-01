@@ -1,0 +1,69 @@
+{
+  "id": "jsa-osl-2026-selected-v1",
+  "capturedAt": "2026-11-01",
+  "releasePeriod": "2026 assessment",
+  "provenance": "Parent Linux extraction worker verified original workbook hashes and selected rows. Consumer received bounded evidence; local adapter author did not read original workbook bytes. Original workbook notes were not locally inspected. Definitions and scope independently checked against the official 2026 methodology and group-driver report; group 2713 accepted as distinct published group-driver context, not dependent on a 271311 record.",
+  "methodologyUrl": "https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_osl_methodology.pdf",
+  "licence": "Creative Commons Attribution 4.0",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "rightsPolicyUrl": "https://www.jobsandskills.gov.au/copyright-and-disclaimer",
+  "attribution": "\u00a9 Commonwealth of Australia, Jobs and Skills Australia, 2026 Occupation Shortage List. Selected records extracted; conditional role mappings added.",
+  "rightsExclusions": "Third-party content, coat of arms, trademarks, images/photos excluded. No website framing or facsimile reproduction.",
+  "sources": {
+    "unit-group": {
+      "url": "https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_unit_group_shortage_list_-_4_digit_anzsco.xlsx",
+      "sha256": "0eab13fc886e4b8e7852a56dfe6863b8e32101996e5e7c167495b9a030e4ec39",
+      "nationalHeaderCell": "C7",
+      "headerRow": 8,
+      "sheet": "2026 Unit group Shortage List",
+      "bytes": 81658
+    },
+    "occupation": {
+      "url": "https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_occupation_shortage_list_-_6_digit_anzsco_and_osca.xlsx",
+      "sha256": "9d35938318b7032f95a1f203962f83d00800622a98a8f2df17d8ace90fedcedd",
+      "nationalHeaderCell": "C7",
+      "headerRow": 8,
+      "sheet": "2026 OSL (ANZSCO 2022)",
+      "bytes": 151746
+    }
+  },
+  "records": [
+    {
+      "raw": {
+        "B": "Corporate Treasurer",
+        "C": "NS",
+        "F": "2",
+        "E": "1",
+        "D": "Clear",
+        "A": "221212"
+      },
+      "excelRow": 144,
+      "level": "occupation"
+    },
+    {
+      "raw": {
+        "B": "Management Consultant",
+        "C": "NS",
+        "F": "2",
+        "E": "1",
+        "D": "Clear",
+        "A": "224713"
+      },
+      "excelRow": 177,
+      "level": "occupation"
+    },
+    {
+      "raw": {
+        "B": "Solicitors",
+        "C": "S",
+        "F": "2",
+        "E": "1",
+        "D": "Suitability gap",
+        "A": "2713"
+      },
+      "excelRow": 137,
+      "level": "unit-group"
+    }
+  ],
+  "methodologyEvidence": "Official catalogue https://www.jobsandskills.gov.au/data/occupation-shortage link9 resolved to this exact PDF; web tool read 27-page methodology on 2026-11-01 (turn509view1/turn511view0). No local PDF bytes/hash capture. Record: integration-evidence/jsa-osl-final-alternate-formats-20261101.md."
+}

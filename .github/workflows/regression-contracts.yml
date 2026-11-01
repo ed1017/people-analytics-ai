@@ -106,6 +106,9 @@ jobs:
       - name: Verify modeled duties and conditional international references
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-modeled-duties-expansion.test.mjs tests/position-canada-duty-expansion.test.mjs tests/position-people-analytics-esco.test.mjs tests/position-uk-business-analyst-career.test.mjs tests/position-duty-source-expansion-contract.test.mjs
+      - name: Verify Australian categorical shortage references
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-australia-shortage.test.mjs tests/position-australia-shortage-ui.test.mjs tests/position-australia-shortage-context.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs
