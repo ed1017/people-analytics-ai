@@ -33,7 +33,7 @@ export function HomeMixResults({state,candidateId,onSelect,disabled}:{state:Home
    </fieldset>
    {candidateId&&<p>A proposed revision only. Review the mix and assumptions, then use Apply changes or Attach Action Plan. Previous attachments remain unchanged.</p>}
    {report.missing.length>0&&<details><summary className="min-h-11 cursor-pointer py-2">Unresolved search assumptions ({report.missing.length})</summary><ul className="list-disc pl-5">{report.missing.map((item,index)=><li key={index}>{item.reason}</li>)}</ul></details>}
-   <details><summary className="min-h-11 cursor-pointer py-2">Search provenance and limits</summary><p>Best only within the stated bounds; no global optimum or operational approval.</p>{report.limitations.map(text=><p key={text} className="my-1 text-xs">{demoCopy(text)}</p>)}<ul className="list-disc pl-5">{Object.entries(report.assumptionOrigins).map(([field,origin])=><li key={field}>{field}: {report.reference.input[field as keyof typeof report.reference.input]||'Unknown'} · {demoCopy(origin.kind)}. {origin.basis&&demoCopy(origin.basis)}</li>)}</ul></details>
+   <details><summary className="min-h-11 cursor-pointer py-2">Comparison method and limits</summary><p>Best only within the stated bounds; no global optimum or operational approval.</p>{report.limitations.map(text=><p key={text} className="my-1 text-xs">{demoCopy(text)}</p>)}<ul className="list-disc pl-5">{Object.entries(report.assumptionOrigins).map(([field,origin])=><li key={field}>{field}: {report.reference.input[field as keyof typeof report.reference.input]||'Unknown'} · {demoCopy(origin.kind)}. {origin.basis&&demoCopy(origin.basis)}</li>)}</ul></details>
   </>}
  </section>;
 }

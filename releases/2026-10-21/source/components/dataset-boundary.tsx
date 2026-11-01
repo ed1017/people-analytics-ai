@@ -20,9 +20,9 @@ export function DatasetBoundary({ children, initialToken }: { children: React.Re
     return () => window.clearTimeout(timer);
   }, [status, initialToken, pending, newerLayout]);
   if (failed) return <p role="alert">Saved goal context could not be verified for this dataset. Earlier storage is unchanged. Reload after resolving browser storage.</p>;
-  if (pending || newerLayout) return <p role="status">Loading evidence for the selected dataset…</p>;
+  if (pending || newerLayout) return <p role="status">Loading data for the selected dataset…</p>;
   return <>
-    {transitioned && <p role="status">Dataset changed. Saved goals and requirements are retained. Earlier evidence and planning drafts remain in their previous dataset workspace.</p>}
+    {transitioned && <p role="status">Dataset changed. Saved goals and requirements are retained. Earlier data and planning drafts remain in their previous dataset workspace.</p>}
     <Fragment key={status}>{children}</Fragment>
   </>;
 }

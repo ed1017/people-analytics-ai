@@ -11,11 +11,11 @@ export function WorkforceSolutionEvidence({review, page, editsBlocked, onReview}
 }) {
   const evidence = workforceReviewEvidence(review);
   const relevant = page === "skills" ? "skills" : ["learning-development", "development-planning"].includes(page) ? "learning" : page === "talent-acquisition" ? "hiring" : null;
-  return <section aria-label="Evidence used for this workforce solution" className="space-y-3">
-    <h4 className="font-semibold">Evidence used for this workforce solution</h4>
+  return <section aria-label="Sources used for this workforce plan" className="space-y-3">
+    <h4 className="font-semibold">Sources used for this workforce plan</h4>
     <p className="text-sm">Destination: {evidence.businessUnit} · {evidence.role}. Workforce snapshot: {evidence.asOf ?? "Unknown"}. Synthetic company evidence, retained with this calculation.</p>
     <p className="text-xs">Internal readiness and recruiting history cover the role company-wide, not just the destination BU. Global filters and newer page charts do not change this saved evidence. Readiness has no independent assessment date.</p>
-    {!evidence.scopeMatches && <p role="status" className="text-sm">Saved evidence scope could not be matched. Review the inputs and explicitly recalculate before relying on these signals.</p>}
+    {!evidence.scopeMatches && <p role="status" className="text-sm">The saved data scope could not be matched. Review the inputs and explicitly recalculate before relying on these signals.</p>}
     {(!relevant || relevant === "skills") && <details key={`skills-${page}`} open={relevant === "skills"} className="rounded border p-3">
       <summary className="cursor-pointer font-medium">Skills · whole-role readiness</summary>
       <div className="mt-3 space-y-3 text-sm">
