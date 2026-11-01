@@ -36,7 +36,7 @@ export async function create9037CompanyAnalytics({aggregateBytes, expectedAggreg
   const joint=jointBytes===null?null:await create9037JointDashboard({jointBytes,provider,rows});
   const analytics = Object.freeze({datasetId:provider.datasetId, bundleDigest:provider.digest,
     captureDigest:expectedAggregateDigest, scope:joint?'company-get-and-dashboard-filters':'company-get-only',
-    ...(joint?{dashboardAggregateDigest:joint.digest,dashboardMetricContract:joint.metricContract,dashboardResponse:joint.dashboardResponse}:{}),
+    ...(joint?{dashboardAggregateDigest:joint.digest,dashboardMetricContract:joint.metricContract,dashboardResponse:joint.dashboardResponse,turnoverHistory:joint.turnoverHistory}:{}),
     async read(name, params=[]) {
       if(name==='dashboard'&&joint)return joint.read(params);
       must(Object.hasOwn(rows, name) && Array.isArray(params) && (name==='dashboard' ? params.length===3 && params.every(v=>v===null) : params.length===0), 'Uncaptured analytics scope');

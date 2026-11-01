@@ -78,7 +78,8 @@ export async function create9037JointDashboard({jointBytes,provider,rows}){
   const selected=indices.map(i=>cells[i]),series=expectedDates.map((snapshot_date,mi)=>({snapshot_date,headcount:selected.reduce((n,r)=>n+r[3][mi][0],0),fte:round(selected.reduce((n,r)=>n+r[3][mi][1],0)/10000)}));
   const last=series[32],numerator=sum(selected,2),denominatorSum=series.slice(24).reduce((n,r)=>n+r.headcount,0),rate=denominatorSum>0?round(900*numerator/denominatorSum):null;
   const overview={snapshot_date:joint.cutoff,headcount:last.headcount,fte:last.fte,labor_cost_usd:round(sum(selected,0)/100,2),open_positions:sum(selected,1),voluntary_turnover_ytd_pct:rate};
-  return {overview,trend:series,filter_options:options,turnover:{contract:JOINT_TURNOVER_CONTRACT,voluntary_exits:numerator,calendar_months:9,sum_month_end_headcount:denominatorSum,average_month_end_headcount:denominatorSum/9,status:rate===null?'unavailable-zero-denominator':'available',rate_pct:rate}};
+  const turnover_history=series.map((row,mi)=>({month:row.snapshot_date.slice(0,7)+'-01',total_exits:mi===0?null:indices.reduce((n,ci)=>n+(flows.get(mi*960+ci)?.[1]??0),0),voluntary_exits:mi===0?null:indices.reduce((n,ci)=>n+(flows.get(mi*960+ci)?.[2]??0),0),headcount:row.headcount}));
+  return {overview,trend:series,filter_options:options,turnover_history,turnover:{contract:JOINT_TURNOVER_CONTRACT,voluntary_exits:numerator,calendar_months:9,sum_month_end_headcount:denominatorSum,average_month_end_headcount:denominatorSum/9,status:rate===null?'unavailable-zero-denominator':'available',rate_pct:rate}};
  }
  const company=scope({country:'all',org:'all',level:'all'});
  must(same(company.overview,old.overview)&&same(company.trend,old.trend),'sealed company parity');
@@ -91,9 +92,10 @@ export async function create9037JointDashboard({jointBytes,provider,rows}){
  deepFreeze(joint);deepFreeze(cells);
  function dashboardResponse(filters){
   const s=scope(filters),label=fields.map((k,i)=>filters[k]==='all'?['All countries','All business units','All levels'][i]:options[['countries','business_units','levels'][i]].find(r=>r.value===filters[k]).label).join('; ');
-  const {turnover,...payload}=s;
+  const {turnover,turnover_history,...payload}=s;
   return deepFreeze({...payload,workforce_filter_scope:{version:2,status:'verified_aggregate',requested:{...filters},effective:{...filters},label,basis:'Pinned complete synthetic joint cube; exact calendar, group flows and sealed company totals reconciled. Not an RPC or real-world attestation.',artifactDigest:expectedJointDigest,metricContract:JOINT_TURNOVER_CONTRACT,stockStatus:s.overview.headcount===0?'known-empty':'positive'},turnover_evidence:turnover});
  }
  return Object.freeze({digest:expectedJointDigest,metricContract:JOINT_TURNOVER_CONTRACT,dashboardResponse,
+  turnoverHistory(filters){return deepFreeze(scope(filters).turnover_history);},
  read(params){must(Array.isArray(params)&&params.length===3,'filter tuple');const filters=Object.fromEntries(fields.map((k,i)=>[k,params[i]===null?'all':params[i]])),s=scope(filters);return deepFreeze([{payload:{overview:s.overview,trend:s.trend,filter_options:s.filter_options}}]);}});
 }

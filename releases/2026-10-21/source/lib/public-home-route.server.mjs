@@ -1,3 +1,5 @@
+import {quarterlyTurnoverIntent} from './home-quarterly-turnover.mjs';
+import {readPublicQuarterlyTurnover} from './public-quarterly-turnover.server.mjs';
 import {homeDatasetQueryTool,readDatasetQuestions} from './home-dataset-query.mjs';
 import {policyEstimateTool} from './home-policy-estimate.mjs';
 import {isHomeAssociationQuestion,readPublicHomeAssociation} from './public-home-association.server.mjs';
@@ -85,6 +87,12 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
     const result=await readPublicHomeAssociation({binding,hostname,identity,filters:parsed.filters,text:parsed.message.text,signal});current();
     const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
     return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),charts:[],candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
+   }
+   const quarterly=natural&&!staffingScenarioOnly?quarterlyTurnoverIntent(parsed.message.text,parsed.state.turns):null;
+   if(quarterly){
+    const result=quarterly.answer?{answer:quarterly.answer,charts:[]}:await readPublicQuarterlyTurnover({binding,hostname,identity,filters:parsed.filters,selection:quarterly,signal,requestId:parsed.requestId});current();
+    const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=quarterly.answer?[quarterly.answer]:[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
+    return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
    }
    const contextId=hash({identity,request:parsed}),requestTime=new Date();let round=0,completion;
    const currentContext=()=>{current();return contextId;};
