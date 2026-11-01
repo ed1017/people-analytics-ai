@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "b8c952a4dcc2894d797672a1b600d548eefe6619ce1cd6e79aac5845a7f02909",
-      "bytes": 112973
+      "sha256": "c97dd9cc39a3aea93d23dfe38b653bdf96dd6b3f5f30eb025b7fb24ac07c7af2",
+      "bytes": 113629
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4129,8 +4129,8 @@
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "8c37a7c492175f43090540405ee66df6c7b56fd426692ad008d4a5c2f89e5511",
-      "bytes": 1958
+      "sha256": "4830a7f4ae628b09fd01a16857060f9f31115752c36705a81115c8976d10e272",
+      "bytes": 3315
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4934,8 +4934,8 @@
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
-      "sha256": "cc5f7b4a62578d64e3a1c233b0cf1931946488b2b42b6eb1bcd0a0bf083c54ee",
-      "bytes": 15322
+      "sha256": "3dc00ad58b9ade2e0b945d06b9ea27702adc5f37911685f43311bd7e45a7a311",
+      "bytes": 15573
     },
     {
       "path": "components/workforce-planning/position-scenario-explanation.tsx",
@@ -4974,8 +4974,8 @@
     },
     {
       "path": "tests/position-finance-panel.test.mjs",
-      "bytes": 12730,
-      "sha256": "2e9fd156edd7541f0fee67e2ff3fd96cb443474108fa75c562184045c09089c4"
+      "bytes": 12886,
+      "sha256": "9c97e18c52717941d78345b108f701c1bb1fa16200b04eb93e8de6b615e23242"
     },
     {
       "path": "tests/position-finance-store.test.mjs",
@@ -5009,8 +5009,8 @@
     },
     {
       "path": "components/workforce-planning/position-allocation-planner.tsx",
-      "sha256": "af67c69e5ad6bee8af512d1e815d8c7707308267b11d1c03623dde03cb98b607",
-      "bytes": 40086
+      "sha256": "7b6bd19661ebfc7c11e8f41de6e2e0a646041ff1df5704fdebc394ecc0b06ef2",
+      "bytes": 40165
     },
     {
       "path": "lib/current-required-staffing-summary.ts",
@@ -5766,6 +5766,16 @@
       "path": "tests/hiring-manager-comparison.test.mjs",
       "sha256": "d07b715a9447dd71cdf4bd45d164dacf4724fde164336cfb27739d8f1cf2eec6",
       "bytes": 4761
+    },
+    {
+      "path": "components/planner-results.tsx",
+      "sha256": "fc53b20de49799598acf44d31a40b4c49aa1766c08903e64591863affcf520d9",
+      "bytes": 890
+    },
+    {
+      "path": "tests/planner-results-placement.test.mjs",
+      "sha256": "c4f91c3c193684eea05d0cbe9a8542ea2e178b93a298831177cc9165b41932bb",
+      "bytes": 2797
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
