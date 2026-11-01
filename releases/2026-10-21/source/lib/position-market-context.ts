@@ -1,4 +1,6 @@
 // @ts-expect-error Native tests share canonical source.
+import {escoFollowupReferences} from './position-esco-followup.ts';
+// @ts-expect-error Native tests share canonical source.
 import {careerProfileReferences,type PositionCareerProfileSkillsFacts} from './position-career-profile-skills.ts';
 // @ts-expect-error Native tests share canonical source.
 import {escoSkillReferences,type PositionOccupationalSkillsTaxonomyFacts} from './position-esco-skills.ts';
@@ -73,6 +75,7 @@ function canonicalReferences():PositionMarketContextReference[]{
  cards.push(...japanSkillReferences());
  cards.push(...escoSkillReferences(),...japanDataArchitectReferences());
  cards.push(...careerProfileReferences());
+ cards.push(...escoFollowupReferences());
  return cards;
 }
 const references=canonicalReferences();

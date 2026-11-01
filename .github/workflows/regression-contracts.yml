@@ -94,6 +94,9 @@ jobs:
       - name: Verify qualitative England AI career profile
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-career-profile-skills.test.mjs tests/position-uk-career-profile-ui.test.mjs
+      - name: Verify programme procurement and strategy taxonomy
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-esco-followup.test.mjs tests/position-market-taxonomy-ui.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

@@ -1,0 +1,1866 @@
+{
+  "id": "esco-reviewed-followup-v120-v1",
+  "requestedDatasetVersion": "v1.2.0",
+  "versionNote": "Explicit API selectedVersion request; returned self links omit version. Portal current v1.2.1 is not claimed.",
+  "retrievedDate": "2026-11-01",
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International, unless otherwise indicated",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "noticeUrl": "https://esco.ec.europa.eu/en/copyright-notice-esco-skills-competences",
+    "attribution": "European Commission, ESCO v1.2.0, retrieved 1 November 2026. Three occupation and skill relation sets selected and reformatted for duty-confirmed German or French scenario roles. No endorsement implied. Underlying-source notices retained at linked copyright notice."
+  },
+  "records": [
+    {
+      "countryApplicability": "DE",
+      "roleCode": "PMO-PGM",
+      "role": "Program Manager",
+      "vacancies": 1,
+      "reviewStatus": "strong-duty-match",
+      "dutyCondition": "Confirm coordination and oversight of several simultaneous projects, their compatibility, shared resources and programme outcomes.",
+      "originalFile": "esco-programme-manager-occupation-v1.2.0.json",
+      "sha256": "661a76e94cf2764a1596f2413e657bef4c362d440676049a2885df5fdfb2d53d",
+      "bytes": 40713,
+      "occupationUri": "http://data.europa.eu/esco/occupation/c94f3565-d987-431f-a46b-6f4e018e0bd7",
+      "occupationCode": "1213.4",
+      "preferredLabels": {
+        "no": "programsjef",
+        "de": "Programmmanager/Programmmanagerin",
+        "fi": "ohjelmajohtaja",
+        "pt": "Gestor de programa/Gestora de programa",
+        "bg": "програмен ръководител",
+        "lt": "programos vadovas",
+        "hr": "voditelj/voditeljica programa",
+        "lv": "plānošanas struktūrvienības vadītājs",
+        "fr": "directeur de projets/directrice de projets",
+        "hu": "programmenedzser",
+        "uk": "менеджер програм/менеджерка програм",
+        "sk": "programový manažér/programová manažérka",
+        "sl": "programski vodja/programska vodja",
+        "ga": "bainisteoir clár",
+        "sv": "programchef",
+        "el": "διαχειριστής προγράμματος/διαχειρίστρια προγράμματος",
+        "mt": "maniġer tal-programm",
+        "en": "programme manager",
+        "is": "Stefnu- og áætlanagerðarstjóri",
+        "it": "responsabile di programma",
+        "es": "gestor de programas/gestora de programas",
+        "et": "programmijuht",
+        "cs": "programový manažer/programová manažerka",
+        "ar": "مدير البرنامج / مديرة البرنامج",
+        "pl": "kierownik programu",
+        "da": "programchef",
+        "ro": "manager de program",
+        "nl": "programmamanager"
+      },
+      "alternativeLabels": {
+        "de": [
+          "Programmmanagerin",
+          "Programmmanager",
+          "Programmkoordinatorin",
+          "Programmkoordinator"
+        ],
+        "fi": [
+          "suunnittelujohtaja"
+        ],
+        "sv": [
+          "programansvarig",
+          "programsamordnare",
+          "programdirektör"
+        ],
+        "pt": [
+          "Gestora de programa",
+          "Diretor de programa",
+          "Coordenadora de programa",
+          "Gestor de programa",
+          "Coordenador de programa",
+          "Diretora de programa"
+        ],
+        "mt": [
+          "koordinatriċi tal-programm",
+          "direttur tal-programm",
+          "direttriċi tal-programm",
+          "maniġer tal-portafoll tal-proġetti",
+          "koordinatur tal-programm"
+        ],
+        "el": [
+          "υπεύθυνη έργου",
+          "διαχειριστής προγράμματος",
+          "συντονίστρια προγράμματος",
+          "διευθυντής έργου",
+          "συντονιστής προγράμματος",
+          "υπεύθυνος έργου",
+          "διαχειρίστρια προγράμματος",
+          "διευθύντρια έργου",
+          "συντονιστής έργου",
+          "συντονίστρια έργου",
+          "διευθύντρια προγράμματος",
+          "διευθυντής προγράμματος"
+        ],
+        "lt": [
+          "programos vadovė",
+          "programos koordinatorius",
+          "projekto vadybininkas",
+          "programos direktorius"
+        ],
+        "en": [
+          "program director",
+          "programme management coordinator",
+          "projects portfolio manager",
+          "program management coordinator",
+          "programme director"
+        ],
+        "hr": [
+          "voditeljica programa",
+          "voditelj programa",
+          "direktorica programa",
+          "direktor programa"
+        ],
+        "lv": [
+          "plānošanas struktūrvienības vadītāja",
+          "plānošanas struktūrvienības vadītājs"
+        ],
+        "it": [
+          "coordinatrice di programma",
+          "programme manager",
+          "program manager",
+          "manager di programma",
+          "coordinatore di programma"
+        ],
+        "fr": [
+          "directrice de projets",
+          "directeur de projets"
+        ],
+        "hu": [
+          "programigazgató",
+          "projektportfólió-menedzser",
+          "programkoordinátor"
+        ],
+        "es": [
+          "coordinadora de programa",
+          "coordinador de programa",
+          "gestor de programa",
+          "gestora de programa"
+        ],
+        "cs": [
+          "programový koordinátor",
+          "manažerka projektového portfolia",
+          "manažerka portfolia projektů",
+          "manažer projektového portfolia",
+          "manažerka programů",
+          "manažer programů",
+          "programová koordinátorka",
+          "manažer portfolia projektů",
+          "programový vedoucí",
+          "programový ředitel",
+          "programový manažer",
+          "programová ředitelka",
+          "programová manažerka"
+        ],
+        "sk": [
+          "programový manažér",
+          "programová manažérka"
+        ],
+        "sl": [
+          "programska direktorica",
+          "koordinatorka programov",
+          "programska vodja",
+          "programski direktor",
+          "programski vodja",
+          "vodja programov",
+          "koordinator programov"
+        ],
+        "pl": [
+          "koordynatorka programu",
+          "koordynator programu",
+          "dyrektor programu"
+        ],
+        "ro": [
+          "manager de program",
+          "șef de program"
+        ],
+        "nl": [
+          "portfoliomanager",
+          "programmadirectrice",
+          "programmacoördinatrice",
+          "programmadirecteur",
+          "programmacoördinator"
+        ]
+      },
+      "description": {
+        "no": {
+          "literal": "Programsjefer samordner og har tilsyn med flere prosjekter som løper samtidig. De sørger for at det er samsvar mellom prosjekter, og at hvert av prosjektene under prosjektledernes ledelse blir lønnsomme og utfyller hverandre.",
+          "mimetype": "plain/text"
+        },
+        "de": {
+          "literal": "Programmmanager/Programmmanagerinnen koordinieren und beaufsichtigen mehrere Projekte gleichzeitig. Sie gewährleisten die Praktikabilität und Kompatibilität der Projekte, wobei sich sicherstellen, dass jedes der Projekte unter der Leitung von Projektmanagern/-managerinnen profitabel ist; und sich die Projekte gegenseitig begünstigen.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Ohjelmajohtajat koordinoivat ja valvovat useita samanaikaisesti meneillään olevia hankkeita. He varmistavat hankkeen toimivuuden ja yhteensopivuuden. Näin taataan, että jokainen hankepäälliköiden hallinnoimista hankkeista on kannattava ja että ne vaikuttavat toisiinsa suotuisasti.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os gestores de programa coordenam e supervisionam vários projetos que funcionam em simultâneo. Asseguram a viabilidade e a compatibilidade entre os projetos, garantindo que, de um modo geral, os projetos sob a gestão de gestores de projetos são rentáveis e equilibrados entre si.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Програмните ръководители координират и контролират няколко проекта, работейки по тях едновременно. Те осигуряват приложимостта и съвместимостта между проектите, като следят дали всеки един от проектите, управлявани от ръководителите на проекти, ще носи доходи и ще въздейства на друг.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Programų vadovai koordinuoja ir prižiūri kelis tuo pat metu vykdomus projektus. Jie užtikrina projektų įgyvendinamumą ir suderinamumą, užtikrindami, kad apskritai kiekvienas iš projektų vadovo valdomų projektų būtų pelningas ir vienas kitam turėtų teigiamos įtakos.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Voditelji programa koordiniraju i nadgledaju nekoliko projekata koji rade istodobno. Osiguravaju provedivost i kompatibilnost projekata osiguravajući da svaki od projekata kojim upravljaju voditelji projekata bude profitabilan i da međusobno utječu jedni na druge.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Plānošanas struktūrvienības vadītāji koordinē un pārrauga vairākus projektus, strādājot pie tiem vienlaicīgi. Viņi nodrošina realizējamību un saderību starp dažādiem projektiem, proti, nodrošinot, lai kopumā katrs projekts, kas ir projektu vadītāju pārvaldībā, būtu rentabls un savstarpēji saskaņots.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les directeurs de projets/directrices de projets coordonnent et supervisent plusieurs projets concomitants. Ils/elles garantissent l’applicabilité et la compatibilité entre les projets, en veillant à ce que, dans l’ensemble, chacun des projets relevant de la gestion des directeurs/directrices de projets s’avère rentable et s’appuie sur un autre projet.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "A programmenedzserek több, egymással párhuzamosan működő projektet koordinálnak és felügyelnek. Biztosítják a megvalósíthatóságot és az egyeztetést olyan projektek között, biztosítva, hogy a projektmenedzserek irányítása alatt álló projektek mindegyike jövedelmező és egymásra épülő legyen.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Менеджери програм координують і контролюють декілька проєктів, що втілюються одночасно. Вони забезпечують функціонування і сумісність проєктів, гарантуючи, що кожен із проєктів під керуванням менеджерів програм буде прибутковим і взаємодіятиме з іншими.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Programoví manažéri koordinujú a dohliadajú na viaceré projekty, ktoré sa realizujú súčasne. Zabezpečujú realizovateľnosť a kompatibilitu medzi projektmi s cieľom zabezpečiť ziskovosť každého projektu, ktorý je riadený projektovým manažérom.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Programski vodje/programske vodje usklajujejo in nadzorujejo več projektov, ki delujejo hkrati. Zagotavljajo izvedljivost in združljivost projektov in skrbijo, da je na splošno vsak od projektov, ki jih upravlja programski vodja/programska vodja, donosen in da drug drugemu zagotavljajo spodbudo.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Déanann bainisteoirí clár comhordú agus maoirseacht ar roinnt tionscadal a oibríonn go comhuaineach. Cinntíonn siad inoibritheacht agus comhoiriúnacht idir tionscadail chun a chinntiú, ar an iomlán, maidir le gach ceann de na tionscadail atá á mbainistiú ag bainisteoirí tionscadail, go mbíonn siad brabúsach agus go dtéann siad chun tairbhe dá chéile.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Programchefer samordnar och övervakar flera projekt som genomförs samtidigt. De säkerställer att projekten fungerar och är kompatibla samt säkerställer att alla projekt som förvaltas av projektledarna blir lönsamma och kan fungera som en hävstång för varandra.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "Il-maniġers tal-programm jikkoordinaw u jissorveljaw diversi proġetti li jaħdmu simultanjament. Huma jiżguraw it-tħaddim tajjeb u l-kompatibbiltà fost il-proġetti li jiżguraw li, b’mod ġenerali, kull wieħed mill-proġetti taħt il-ġestjoni tal-maniġers tal-proġett, isir profitt u jiġi mmassimizzat wieħed fuq l-ieħor.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι διαχειριστές προγράμματος συντονίζουν και επιβλέπουν διάφορα έργα ταυτόχρονα. Διασφαλίζουν τη λειτουργικότητα και τη συμβατότητα μεταξύ των έργων και εξασφαλίζουν εν γένει ότι καθένα από τα έργα που βρίσκεται υπό την ευθύνη διαχειριστή προγράμματος, θα αποβεί κερδοφόρο και αξιοποιήσιμο για το άλλο.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Programme managers coordinate and oversee several projects working simultaneously. They ensure workability and compatibility among projects ensuring that overall, each one of the projects under the management of project managers, turn out profitable and leveraging one to the other.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Stjórnendur áætlunar samræma og hafa umsjón með nokkrum verkefnum samtímis. Þeir tryggja að öll verkefni séu framkvæmanleg og samhæfð öðrum verkefnum þannig að yfir það heila, sé hvert verkefni sem er undir stjórn framkvæmdastjóra áætlunar, reynist arðbært og að þau styðji hvert annað.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "I responsabili di programma coordinano e supervisionano diversi progetti contemporaneamente. Garantiscono la praticabilità e la compatibilità dei progetti, assicurando che, nel complesso, ciascuno dei progetti di competenza dei responsabili di progetto sia redditizio e utile per gli altri.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los gestores de programas coordinan y supervisan varios proyectos de forma simultánea. Garantizan la viabilidad y la compatibilidad entre proyectos asegurándose de que, en general, cada uno de los proyectos de los que se encargan los gestores de proyectos resulta rentable y la información de unos se puede aprovechar para otros.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Programmijuhid kooskõlastavad ja kontrollivad mitut samal ajal töös olevat projekti. Nad tagavad projektide teostatavuse ja ühilduvuse, tagades, et kõik projektijuhtidel käsil olevad projektid osutuksid kasumlikuks ja võimendaksid üksteist.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Programoví manažeři koordinují a dohlížejí na několik projektů současně. Zajišťují funkčnost projektů a jejich slučitelnost a také to, aby každý z projektů byl celkově pod vedením projektových manažerů ziskový a měl pozitivní dopad i na ostatní projekty.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يتولى مديرو البرامج تنسيق العديد من المشاريع التي تعمل في الوقت نفسه والإشراف عليها. فهم يضمنون القدرة على العمل والتوافق بين المشروعات ممّا يضمن أن كل مشروع من المشروعات بإدارة مديري المشروعات، يدّر أرباحًا ويستفيد كل مشروع من الآخر.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Kierownicy programów koordynują i nadzorują kilka projektów pracujących jednocześnie. Zapewniają oni wykonalność i zgodność między projektami, zapewniając, aby każdy z projektów w ramach zarządzania przez osoby zarządzające projektami okazał się opłacalny i wpływał na inny.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Managerii de program coordonează și supraveghează mai multe proiecte aflate în desfășurare simultan. Asigură fezabilitatea și compatibilitatea proiectelor asigurând că, în general, fiecare dintre proiectele gestionate de managerii de proiect se dovedește a fi rentabil și compatibil cu celelalte.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Programchefer koordinerer og fører tilsyn med flere projekter, der løber af stablen samtidigt. De sikrer, at projekterne er praktisk gennemførlige og indbyrdes kompatible, og at hvert projekt, under ledelse af projektledere, samlet set er rentable og gensidigt afbalancerede.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Programmamanagers coördineren en houden toezicht op meerdere projecten die gelijktijdig lopen. Zij garanderen de werkbaarheid en de compatibiliteit tussen projecten door ervoor te zorgen dat elk van de projecten onder leiding van de projectmanagers rendabel is en een hefboomeffect teweegbrengt.",
+          "mimetype": "plain/text"
+        }
+      },
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/2db2d9a8-298d-4d1a-a194-d3282e70d6cb",
+          "labelEn": "evaluate project plans",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/f5dd06b8-5d17-4932-9d03-957d0c4f5051",
+          "labelEn": "perform resource planning",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/48b68726-0fd6-4e03-a5eb-82236516ee7a",
+          "labelEn": "provide cost benefit analysis reports",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/339ac029-066a-4985-9f9d-b3d7c8fea0bb",
+          "labelEn": "manage staff",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/953c0b65-537a-42fe-a90b-26cd36c64361",
+          "labelEn": "manage logistics",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/66db424f-2abe-420d-8e5b-186607266b61",
+          "labelEn": "corporate social responsibility",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/b9a92958-73a3-4f7a-b653-da32f354c62e",
+          "labelEn": "utilise economies of scale in projects",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/c881ddd2-9c0e-4743-bd24-36be650493dd",
+          "labelEn": "manage several projects",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/06d09f70-6ca8-4078-be72-4c2c2a11ee61",
+          "labelEn": "program management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/65ca5e3c-940c-46b2-b277-aff394cfdd4c",
+          "labelEn": "establish daily priorities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/e95058a6-e139-42e7-a470-72038a606649",
+          "labelEn": "assess financial viability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/c927ec6e-9082-4b22-afd3-0c4e219eaf73",
+          "labelEn": "ensure equipment maintenance",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/1dd23dba-dd00-45ab-abf4-642902538317",
+          "labelEn": "perform risk analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/f14ff4b7-be1e-4b55-b39b-520005f8a97e",
+          "labelEn": "liaise with managers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/c5a135be-218d-48e6-a422-5225a576dcd8",
+          "labelEn": "manage project metrics",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/020b3c27-bae1-4b85-9d6f-eccee0f5ed99",
+          "labelEn": "manage supplies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/7111b95d-0ce3-441a-9d92-4c75d05c4388",
+          "labelEn": "project management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/21c5790c-0930-4d74-b3b0-84caf5af12ea",
+          "labelEn": "manage budgets",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/b9bf9e17-ae47-417b-bbb1-e8b7c263ccac",
+          "labelEn": "identify legal requirements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/22902bf9-cc3f-495b-811a-c441e28e23f6",
+          "labelEn": "manage project information",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/c73ea1b8-e121-4f91-b8f0-dee4ee28d6ec",
+          "labelEn": "plan schedule",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/9013b46e-5a9b-4929-8918-fcadfdfd37ce",
+          "labelEn": "supervise daily information operations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/f5f5b244-6cea-4fbc-8a50-8f712791bc09",
+          "labelEn": "follow company standards",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/69f23426-9279-4fe6-a283-24c2aa4c855d",
+          "labelEn": "ensure equipment availability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/91816e1a-d026-4d21-9b1c-59ca5cf488de",
+          "labelEn": "analyse internal factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/8a43795b-bb38-4f29-91df-a6c92ad4643c",
+          "labelEn": "analyse financial performance of a company",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/ad28c970-6bc7-4fff-9c01-0f4d67769de3",
+          "labelEn": "develop revenue generation strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/4cfc7ef6-e251-4c93-bd5e-fd6936dee11c",
+          "labelEn": "manage profitability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/f2c63b7a-ed6c-4890-9f8c-7685d172624c",
+          "labelEn": "implement corporate governance",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/dccbdbb8-7266-4fb4-a4cf-29056f102f12",
+          "labelEn": "budget for financial needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/f60c9e52-95fc-4ca1-a73c-18a491153b63",
+          "labelEn": "make strategic business decisions",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/1d25213c-ab01-45c5-8bb3-f2fd9702a919",
+          "labelEn": "integrate headquarter's guidelines into local operations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/0c9da986-721e-4f75-b566-0c6c212a8f60",
+          "labelEn": "make investment decisions",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/2d008d5a-b7bd-46f7-bbb1-5d70a0af9c84",
+          "labelEn": "control financial resources",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/ee7f90cc-922e-4da7-a7ae-83c2688fed10",
+          "labelEn": "align efforts towards business development",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/56c59e98-f133-48ad-9d01-f357a8e2c218",
+          "labelEn": "estimate profitability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/ce5b1446-b5e3-4f05-a5ac-83f2ee142a44",
+          "labelEn": "analyse external factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/4bd6e2ad-bf69-4198-b3ac-3baabd9da46e",
+          "labelEn": "support managers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/2a2fa8e8-aaf3-4abf-a60b-af6415f1c6d4",
+          "labelEn": "strive for company growth",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/f1155d3f-fbca-4298-a31c-f6955653bacf",
+          "labelEn": "shape organisational teams based on competencies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/802e6973-3270-4cf0-86e4-a6835caf1ba6",
+          "labelEn": "project management methodology (PM²)",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/bb663409-5c88-4e3a-bc16-01aa1c8ce171",
+          "labelEn": "plan health and safety procedures",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/a9c205ef-365a-4ae4-b905-cb48ba761ff0",
+          "labelEn": "impart business plans to collaborators",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/5f1d1319-7954-4a9b-90c7-57668e3a0d4b",
+          "labelEn": "interpret financial statements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/8bc75dce-beba-40f9-93fc-66c9708ed74b",
+          "labelEn": "advise on efficiency improvements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        }
+      ],
+      "sourceStatus": "released"
+    },
+    {
+      "countryApplicability": "FR",
+      "roleCode": "PROC-SOURCING",
+      "role": "Sourcing Specialist",
+      "vacancies": 1,
+      "reviewStatus": "strong-duty-match",
+      "dutyCondition": "Confirm procurement supplier identification/selection, tender or bid assessment and purchasing or contracting processes; exclude recruitment sourcing.",
+      "originalFile": "esco-purchaser-occupation-v1.2.0.json",
+      "sha256": "9db90e44f0066ec458a0506ec7cbd8e11cc6bb1b95cf78dd307df68040cc07eb",
+      "bytes": 36125,
+      "occupationUri": "http://data.europa.eu/esco/occupation/29fa406d-de89-4515-be8d-0fe7bda993f1",
+      "occupationCode": "3323.2",
+      "preferredLabels": {
+        "no": "innkjøper",
+        "de": "Einkäufer/Einkäuferin",
+        "fi": "ostaja",
+        "pt": "Comprador/Compradora",
+        "bg": "агент, снабдяване",
+        "lt": "tiekimo specialistas",
+        "hr": "nabavljač/nabavljačica",
+        "lv": "iepirkšanas speciālists",
+        "fr": "acheteur/acheteuse",
+        "hu": "anyaggazdálkodó, felvásárló",
+        "uk": "фахівець із закупівель/фахівчиня із закупівель",
+        "sk": "nákupca/nákupkyňa",
+        "sl": "komercialist/komercialistka za nabavo",
+        "ga": "ceannaitheoir",
+        "sv": "inköpare",
+        "el": "υπάλληλος αγορών",
+        "mt": "xerrej/xerrejja",
+        "en": "purchaser",
+        "is": "innkaupafulltrúi",
+        "it": "approvvigionatore/approvvigionatrice",
+        "es": "jefe de compras/jefa de compras",
+        "et": "ostuagent",
+        "cs": "nákupčí",
+        "ar": "مشتري / مشترية",
+        "pl": "zaopatrzeniowiec",
+        "da": "indkøber",
+        "ro": "agent achiziții",
+        "nl": "inkoper"
+      },
+      "alternativeLabels": {
+        "de": [
+          "Einkaufsfachkauffrau",
+          "Beschaffungsfachkaufmann",
+          "Beschaffungsfachkauffrau",
+          "Einkäufer",
+          "Einkaufsfachkaufmann",
+          "Einkäuferin"
+        ],
+        "fi": [
+          "sisäänostaja"
+        ],
+        "pt": [
+          "Compradora",
+          "Comprador"
+        ],
+        "bg": [
+          "специалист, доставки"
+        ],
+        "el": [
+          "υπεύθυνη αγορών",
+          "υπεύθυνος αγορών"
+        ],
+        "mt": [
+          "akkwirenta",
+          "aġent tal-akkwist",
+          "maniġer tax-xiri",
+          "xerrej",
+          "akkwirent",
+          "xerrejja",
+          "uffiċjal tal-akkwist",
+          "aġent tax-xiri"
+        ],
+        "lt": [
+          "pirkimo specialistas",
+          "tiekimo vadovas",
+          "tiekimo specialistė",
+          "pirkimo vadybininkas",
+          "logistikos ir tiekimo specialistas"
+        ],
+        "en": [
+          "purchasing and supply office worker",
+          "purchasing and supply office clerk",
+          "purchasing and supply agent",
+          "senior purchaser",
+          "assistant purchaser",
+          "senior buyer",
+          "purchasing assistant",
+          "purchasing  office clerk",
+          "purchasing office worker",
+          "supply agent",
+          "purchasing agent",
+          "purchasing and supply officer",
+          "buyer",
+          "graduate purchaser",
+          "supply officer",
+          "trainee purchaser",
+          "procurement agent",
+          "procurement officer",
+          "buying agent",
+          "procurement and supply officer",
+          "purchasing and supply assistant",
+          "procurer",
+          "procurement and supply agent",
+          "purchasing officer"
+        ],
+        "hr": [
+          "administrator nabave",
+          "referent za nabavu",
+          "koordinator nabave",
+          "voditelj nabave",
+          "administratorica nabave",
+          "specijalistica za nabavu",
+          "voditeljica odjela nabave",
+          "koordinatorica nabave",
+          "službenik za nabavu",
+          "službenica za nabavu",
+          "referentica za nabavu",
+          "nabavljačica",
+          "referent nabave",
+          "voditelj odjela nabave",
+          "referentica nabave",
+          "voditeljica nabave",
+          "specijalist za nabavu",
+          "nabavna agentica",
+          "nabavljač",
+          "nabavni agent"
+        ],
+        "lv": [
+          "iepirkumu speciālists",
+          "iepirkšanas speciāliste",
+          "iepirkšanas speciālists",
+          "preču iepircējs",
+          "sagādnieks"
+        ],
+        "it": [
+          "approvvigionatrice",
+          "responsabile di acquisto indiretto",
+          "tecnico acquisti",
+          "responsabile reparto acquisti",
+          "approvvigionatore",
+          "addetta agli acquisti merci",
+          "addetto agli acquisti merci",
+          "agente acquistatrice all'ingrosso",
+          "agente acquistatore all'ingrosso"
+        ],
+        "fr": [
+          "acheteur de commerce",
+          "acheteuse",
+          "acheteur",
+          "acheteuse approvisionneuse",
+          "acheteuse de commerce",
+          "acheteur approvisionneur"
+        ],
+        "hu": [
+          "beszerző",
+          "felvásárló",
+          "anyaggazdálkodó",
+          "beszerzési előadó",
+          "beszerzési ügyintéző",
+          "árubeszerző",
+          "anyagbeszerző"
+        ],
+        "es": [
+          "encargado de proveedores",
+          "jefa de compras",
+          "jefe de compras",
+          "agente de compras",
+          "encargada de proveedores",
+          "responsable de licitaciones  y selección de proveedores"
+        ],
+        "sk": [
+          "nákupkyňa",
+          "nákupca"
+        ],
+        "sl": [
+          "nabavni referent",
+          "komercialistka za nabavo",
+          "komercialist za nabavo",
+          "nabavna referentka"
+        ],
+        "da": [
+          "ansvarlig for indkøbsansvarlig",
+          "indkøbsassistent",
+          "indkøbsagent",
+          "indkøbschef"
+        ],
+        "nl": [
+          "aankoper",
+          "inkoper media",
+          "industrieel inkoper",
+          "internationaal inkoper",
+          "purchaser",
+          "technisch inkoper",
+          "strategisch inkoper",
+          "administratief medewerker inkoop",
+          "inkoopster",
+          "tactisch inkoper",
+          "inkoper bevoorrading",
+          "administratief medewerkster inkoop"
+        ]
+      },
+      "description": {
+        "de": {
+          "literal": "Einkäufer wählen und erwerben Lagervorräte, Rohmaterialien, Dienstleistungen oder Waren. Sie organisieren Ausschreibungsverfahren und wählen Lieferanten aus.",
+          "mimetype": "plain/text"
+        },
+        "no": {
+          "literal": "Kjøpere velger og kjøper beholdning, materialer, tjenester eller varer. De organiserer anbudsprosedyrer og velger leverandører.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Ostajat valitsevat ja ostavat varastoja, materiaaleja, palveluita tai tavaroita. He järjestävät tarjouskilpailuja ja valitsevat toimittajat.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os compradores selecionam e compram matérias-primas, materiais, serviços ou produtos. Organizam propostas e selecionam os fornecedores.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Агентите по снабдяване избират и закупуват запаси, материали, услуги или стоки. Те организират тръжни процедури и избират доставчици.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Tiekimo specialistai atrenka ir perka žaliavas, medžiagas, paslaugas arba prekes. Jie organizuoja konkursų procedūras ir atrenka tiekėjus.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Iepirkšanas speciālisti izvēlas un iegādājas krājumus, materiālus, pakalpojumus vai preces. Viņi organizē iepirkuma procedūras un atlasa piegādātājus.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Nabavljači odabiru i kupuju zalihe, materijale, usluge ili proizvode. Organiziraju postupke javnog nadmetanja i odabiru dobavljače.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les acheteurs sélectionnent et achètent les stocks, les matières premières, les services ou les biens. Ils organisent les procédures d’appel d’offres et sélectionnent les fournisseurs.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "Az anyaggazdálkodó, felvásárló készleteket, anyagokat, szolgáltatásokat vagy árukat választ ki és vásárol fel. Közbeszerzési eljárásokat szervez és kiválasztja a beszállítókat.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Фахівці із закупівель займаються вибором і закупівлею запасів, матеріалів, послуг або товарів. Вони організовують тендерні процедури та обирають постачальників.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Nákupcovia vyberajú a nakupujú zásoby, materiály, služby alebo tovar. Organizujú postupy verejného obstarávania a vyberajú dodávateľov.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Komercialisti za nabavo izberejo in kupujejo zaloge, materiale, storitve ali blago. Organizirajo razpisne postopke in izbirajo dobavitelje.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Roghnaíonn agus ceannaíonn ceannaitheoirí stoc, ábhair, seirbhísí nó earraí. Eagraíonn siad nósanna imeachta tairisceana agus roghnaíonn siad soláthraithe.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Inköpare väljer ut och köper varor, material, tjänster eller varor. De anordnar anbudsförfaranden och väljer ut leverantörer.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι υπάλληλοι αγορών επιλέγουν και αγοράζουν αποθέματα, υλικά, υπηρεσίες ή αγαθά. Διοργανώνουν διαδικασίες υποβολής προσφορών και επιλέγουν προμηθευτές.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "Ix-xerrejja jagħżlu u jixtru l-istokk, il-materjali, is-servizzi jew l-oġġetti. Huma jorganizzaw proċeduri ta’ sejħiet għall-offerti u jagħżlu l-fornituri.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Purchasers select and purchase stock, materials, services or goods. They organise tender procedures and select suppliers.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Innkaupafulltrúar velja og kaupa birgðir, efni, þjónustu eða vörur. Þeir skipuleggja útboðsaðferðir og velja birgja.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "Gli approvvigionatori selezionano e acquistano scorte, materiali, servizi o beni. Organizzano gare d’appalto e selezionano i fornitori.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los jefes de compras seleccionan y compran material, servicios o bienes. Organizan procedimientos de licitación y seleccionan proveedores.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Ostuagendid valivad ja ostavad laovarusid, materjale, teenuseid või kaupu. Nad korraldavad pakkumismenetlusi ja valivad tarnijaid.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Nákupčí vybírají a nakupují zásoby, materiál, služby nebo zboží. Organizují výběrová řízení a vybírají dodavatele.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يختار المشترون الأسهم والمواد والخدمات والسلع ويشترونها. وهم يُنظِّمون إجراءات المناقصة ويختارون المورّدين.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Zaopatrzeniowcy wybierają i kupują zapasy, materiały, usługi lub towary. Organizują procedury przetargowe i wybierają dostawców.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Agenții de achiziții selectează și achiziționează stocuri, materiale, servicii sau produse. Organizează licitații și selectează furnizori.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Indkøbere udvælger og køber lagre, materialer, tjenesteydelser eller varer. De organiserer udbudsprocedurer og udvælger leverandører.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Inkopers selecteren en kopen voorraden, materialen, diensten of goederen in. Zij organiseren aanbestedingsprocedures en selecteren leveranciers.",
+          "mimetype": "plain/text"
+        }
+      },
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/650f44e2-cb4c-41ba-9095-581fe6bea4b1",
+          "labelEn": "coordinate purchasing activities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/c4118654-695f-44bc-b9d3-1b26f3a955f8",
+          "labelEn": "international import export regulations",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/3cd35f5d-ce6d-4f14-9a09-53d7a28d834c",
+          "labelEn": "maintain relationship with suppliers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/11747665-0e98-4f27-bd0d-536862cd5746",
+          "labelEn": "identify suppliers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/92721092-fe7c-4689-96bd-4f02385bc0e7",
+          "labelEn": "manage contracts",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/c7d64df4-7af3-4269-add6-97833bd5448e",
+          "labelEn": "manage purchasing cycle",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/f929c89e-c363-4132-a918-e021d57b307c",
+          "labelEn": "supply chain management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/66dd1398-6be6-4a0d-a0d0-4a8b3941963a",
+          "labelEn": "export control principles",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/d15ce60f-ddab-41ce-ba56-398451b77b60",
+          "labelEn": "have computer literacy",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/dc1ba31e-260e-4eb0-a5cb-6aa1e839e7c0",
+          "labelEn": "communicate price changes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/31eecea5-c1ef-4e5c-96a9-808ff4e43813",
+          "labelEn": "track price trends",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/a6ae7a34-5a5c-48dd-9b82-8beccca63e3c",
+          "labelEn": "ensure compliance with purchasing and contracting regulations",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/2de4572a-4724-4f76-afc2-72a568a264ac",
+          "labelEn": "speak different languages",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/96ec2d53-4f41-4172-8ef2-70742c4bb540",
+          "labelEn": "assess supplier risks",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/2239694b-771a-4586-8b54-2794e361a9ae",
+          "labelEn": "maintain relationship with customers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/4b2c4de9-43d7-4905-9d58-bc2e7d84b2e1",
+          "labelEn": "manage tender processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/9e9a4209-c7cf-4f6e-973e-dc2ffadccc74",
+          "labelEn": "perform procurement processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/73225018-7139-433b-bdba-2b90774761d9",
+          "labelEn": "issue purchase orders",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/04cda8e8-e06b-4c91-bbb5-27414dc1cf14",
+          "labelEn": "embargo regulations",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/ae25d3a9-a85f-415c-a601-806013ea8229",
+          "labelEn": "compare contractors' bids",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/5e50a0f1-4089-4df6-a15b-34b39d3aeab4",
+          "labelEn": "conduct performance measurement",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/6c97d04d-7239-4dc7-90ef-3e812ba2b124",
+          "labelEn": "perform procurement market analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/9b862976-aa05-4bde-8ed6-8f39790edd0f",
+          "labelEn": "procurement legislation",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/77931759-69af-4637-8b26-c8376f9240e2",
+          "labelEn": "international business",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/d207a30b-2f80-4138-9b77-f88d549b8768",
+          "labelEn": "identify new business opportunities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/bc067d2e-e151-408f-8e34-24effd2b7fd6",
+          "labelEn": "use e-procurement",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/5d26851b-270a-4fbe-abeb-2bfd6eba3e2d",
+          "labelEn": "analyse logistic changes",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/d9a9cb71-a62e-4800-a518-cfb61f8b15cd",
+          "labelEn": "category specific expertise",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/6962058d-9808-4820-a6bc-d7cabce60cde",
+          "labelEn": "implement sustainable procurement",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/3bc08c26-2f98-4730-bbb6-ec4a8566e3cf",
+          "labelEn": "procurement lifecycle",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/8029637c-00eb-4764-ae88-387611176c4b",
+          "labelEn": "analyse logistic needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/6dd4ce8c-1813-429d-9f06-3382c4833ca3",
+          "labelEn": "assess procurement needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/9bbe0d37-822c-4096-8b56-8729e5783b4b",
+          "labelEn": "implement procurement of innovation",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/71152876-b629-4a99-b9ea-0f25a0d07e4e",
+          "labelEn": "negotiate sales contracts",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/bf9879fa-f1fc-4f17-8dcb-ece29ea61682",
+          "labelEn": "report accounts of the professional activity",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/750caee5-12a0-46ba-b8aa-1e56370deaf9",
+          "labelEn": "analyse consumer buying trends",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/96d549bb-3e62-4c45-92a7-f114df089581",
+          "labelEn": "analyse supply chain strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        }
+      ],
+      "sourceStatus": "released"
+    },
+    {
+      "countryApplicability": "DE",
+      "roleCode": "STRAT-ANA",
+      "role": "Strategy Analyst",
+      "vacancies": 1,
+      "reviewStatus": "broader-pending-second-review",
+      "dutyCondition": "Confirm analysis of the company strategic position relative to markets/stakeholders and organisational change needs; not solely operational reporting.",
+      "originalFile": "esco-business-analyst-occupation-v1.2.0.json",
+      "sha256": "f04235ce9f90d681bcb6e0e10fc5c18ccb7ec1c575e2e3be3d9e3820cde2a5a4",
+      "bytes": 50331,
+      "occupationUri": "http://data.europa.eu/esco/occupation/60082a99-d8ef-4e84-9290-78902681b6ed",
+      "occupationCode": "2421.1",
+      "preferredLabels": {
+        "no": "forretningsanalytiker",
+        "de": "Unternehmensanalyst/Unternehmensanalystin",
+        "fi": "liiketoiminta-analyytikko",
+        "pt": "Analista de organização e métodos",
+        "bg": "експерт, стопанска дейност",
+        "lt": "verslo analitikas",
+        "lv": "uzņēmējdarbības analītiķis",
+        "hr": "poslovni i organizacijski analitičar / poslovna i organizacijska analitičarka",
+        "fr": "analyste de gestion",
+        "hu": "gazdasági elemző",
+        "uk": "бізнес-аналітик/бізнес-аналітикиня",
+        "sk": "biznis analytik/analytička",
+        "sl": "poslovni analitik/poslovna analitičarka",
+        "ga": "anailísí gnó",
+        "sv": "företagsanalytiker",
+        "mt": "analist tan-negozju",
+        "el": "επιχειρηματικός αναλυτής/επιχειρηματική αναλύτρια",
+        "en": "business analyst",
+        "is": "viðskiptasérfræðingur",
+        "it": "analista di business",
+        "es": "analista de negocios",
+        "et": "ärianalüütik",
+        "cs": "obchodní analytik/obchodní analytička",
+        "ar": "محلل الأعمال / محللة الأعمال",
+        "pl": "analityk biznesowy",
+        "da": "virksomhedsanalytiker",
+        "ro": "analist de afaceri",
+        "nl": "businessanalist"
+      },
+      "alternativeLabels": {
+        "de": [
+          "UnternehmensberaterIn",
+          "Unternehmensberaterin",
+          "Unternehmensanalyst",
+          "Unternehmensberater",
+          "UnternehmensanalystIn",
+          "Unternehmensanalystin"
+        ],
+        "fi": [
+          "business analyst",
+          "liiketoiminnan suunnittelija"
+        ],
+        "bg": [
+          "бизнесконсултант",
+          "консултантка по мениджмънт",
+          "организаторка, стопански дейности",
+          "консултант по мениджмънт",
+          "бизнесконсултантка",
+          "бизнес консултантка",
+          "експерт, търговия",
+          "бизнес консултант",
+          "бизнесанализатор",
+          "консултантка по управление",
+          "организатор, стопански дейности",
+          "анализатор, ефективност на търговската дейност",
+          "експерт по стандартизация",
+          "анализаторка на системите за управление",
+          "бизнесанализаторка",
+          "анализаторка, ефективност на търговската дейност",
+          "консултант по управление",
+          "анализатор на системите за управление"
+        ],
+        "mt": [
+          "espert tal-istandardizzazzjoni",
+          "esperta tal-istandardizzazzjoni",
+          "konsulent tal-immaniġġjar",
+          "konsulenta tan-negozju",
+          "konsulenta tal-immaniġġjar",
+          "żviluppatur organizzazzjonali",
+          "żviluppatriċi organizzazzjonali",
+          "konsulent tan-negozju"
+        ],
+        "el": [
+          "σύμβουλος επιχειρήσεων",
+          "επιχειρησιακή σύμβουλος",
+          "σύμβουλος διαχείρισης",
+          "επιχειρησιακός αναλυτής",
+          "business analyst",
+          "επιχειρηματική αναλύτρια",
+          "σύμβουλος οργάνωσης επιχειρήσεων",
+          "σύμβουλος διοίκησης επιχειρήσεων",
+          "επιχειρηματικός σύμβουλος",
+          "επιχειρησιακός σύμβουλος",
+          "επιχειρησιακή αναλύτρια",
+          "σύμβουλος επιχείρησης",
+          "επιχειρηματική σύμβουλος",
+          "επιχειρηματικός αναλυτής"
+        ],
+        "lt": [
+          "organizacijos vystymosi konsultantas",
+          "organizacijų vystymo specialistas",
+          "verslo analitikė",
+          "verslo konsultantas"
+        ],
+        "en": [
+          "standardisation expert",
+          "business strategy analyst",
+          "standardization expert",
+          "business development analyst",
+          "business strategy consultant",
+          "management consultant",
+          "standardisation manager",
+          "organisational developer"
+        ],
+        "hr": [
+          "analitičar organizacije i metoda",
+          "poslovni i organizacijski analitičar",
+          "analitičarka organizacije i metoda",
+          "poslovna i organizacijska analitičarka"
+        ],
+        "lv": [
+          "biznesa analītiķis",
+          "uzņēmējdarbības analītiķis",
+          "uzņēmējdarbības analītiķe"
+        ],
+        "it": [
+          "addetto al controllo di gestione",
+          "addetta al controllo di gestione"
+        ],
+        "fr": [
+          "contrôleur de gestion",
+          "contrôleuse de gestion",
+          "contrôleur de gestion/contrôleuse de gestion"
+        ],
+        "hu": [
+          "üzleti elemző",
+          "szabványosítási tanácsadó",
+          "üzleti tanácsadó",
+          "szervezetfejlesztési tanácsadó",
+          "gazdasági tanácsadó"
+        ],
+        "es": [
+          "consultor empresarial",
+          "consultora empresarial"
+        ],
+        "cs": [
+          "obchodní analytička",
+          "obchodní konzultantka",
+          "obchodní konzultant",
+          "obchodní analytik"
+        ],
+        "sk": [
+          "biznis analytička",
+          "biznis analytik"
+        ],
+        "sl": [
+          "poslovni analitik",
+          "poslovna analitičarka"
+        ],
+        "pl": [
+          "negocjator biznesowy",
+          "specjalista ds. rozwoju biznesu",
+          "analityk biznesu",
+          "konsultant biznesowy"
+        ],
+        "ro": [
+          "analist de business",
+          "analist afaceri"
+        ]
+      },
+      "description": {
+        "de": {
+          "literal": "Unternehmensanalysten recherchieren und bewerten die strategische Position von Unternehmen in Bezug auf Märkte und Interessenträger. Sie analysieren aus zahlreichen Perspektiven, wie das Unternehmen seine strategische Position und seine interne Unternehmensstruktur verbessern kann, und legen ihre Einschätzung dar. Sie beurteilen den Veränderungsbedarf, Kommunikationsmethoden, Technologien, IT-Tools, neue Normen und Zertifizierungen.",
+          "mimetype": "plain/text"
+        },
+        "no": {
+          "literal": "Forretningsanalytikere undersøker og forstår den strategiske stillingen til virksomheter og selskaper i forbindelse med deres markeder og interessenter. De analyserer og rapporterer hvordan selskapet, fra mange perspektiver, kan forbedre sin strategiske posisjon og interne bedriftsstruktur. De vurderer behov for endringer, kommunikasjonsmetoder, teknologi, IT-verktøy, nye standarder og sertifiseringer.",
+          "mimetype": "plain/text"
+        },
+        "fi": {
+          "literal": "Liiketoiminta-analyytikot tekevät tutkimusta ja ovat perillä liiketoiminnan ja yritysten strategisesta asemasta suhteessa markkinoihin ja sidosryhmiin. He analysoivat ja esittävät monista näkökulmista näkemyksiään siitä, miten yritys voi parantaa strategista asemaansa ja sisäistä yritysrakennetta. He arvioivat muutostarpeita, viestintämenetelmiä, teknologiaa, tietoteknisiä välineitä, uusia standardeja ja sertifiointeja.",
+          "mimetype": "plain/text"
+        },
+        "pt": {
+          "literal": "Os analistas de organização e métodos estudam e compreendem a posição estratégica de negócios e de empresas relativamente aos seus mercados e às suas partes interessadas. Analisam e apresentam os seus pareceres sobre a forma como a empresa pode melhorar, numa variedade de perspetivas, a sua posição estratégica e a sua estrutura empresarial interna. Avaliam as necessidades de mudança, os métodos de comunicação, as tecnologias, as ferramentas informáticas, novas normas e certificações.",
+          "mimetype": "plain/text"
+        },
+        "bg": {
+          "literal": "Експертите по стопанска дейност проучват и разбират стратегическата позиция на предприятията и дружествата спрямо техните пазари и заинтересовани страни. Те анализират и представят вижданията си за това как дружеството, от много гледни точки, може да подобри стратегическото си положение и вътрешната си корпоративна структура. Оценяват необходимостта от промени, методи на общуване, технологии, ИТ инструменти, нови стандарти и сертификати.",
+          "mimetype": "plain/text"
+        },
+        "lt": {
+          "literal": "Verslo analitikai nagrinėja ir stengiasi suprasti įmonių ir bendrovių strateginę padėtį tiek, kiek ji susijusi su jų rinkomis ir suinteresuotaisiais subjektais. Jie analizuoja ir pateikia savo nuomonę apie tai, kaip įmonė įvairiais aspektais gali pagerinti savo strateginę padėtį ir vidaus organizacinę struktūrą. Jie vertina pokyčių, komunikacijos metodų, technologijų, IT priemonių, naujų standartų ir sertifikavimo poreikius.",
+          "mimetype": "plain/text"
+        },
+        "lv": {
+          "literal": "Uzņēmējdarbības analītiķi pēta un izprot uzņēmumu stratēģisko stāvokli saistībā ar to tirgiem un ieinteresētajām personām. Viņi analizē un sniedz vērtējumu par to, kā, no dažādām perspektīvām raugoties, uzņēmums var uzlabot savu stratēģisko stāvokli un iekšējo korporatīvo struktūru. Tāpat viņi izvērtē nepieciešamību pēc pārmaiņām, saziņas metodes, tehnoloģijas, IT rīkus, jaunus standartus un sertifikācijas.",
+          "mimetype": "plain/text"
+        },
+        "hr": {
+          "literal": "Poslovni i organizacijski analitičari istražuju i razumiju strateški položaj poduzetnika i trgovačkih društava u odnosu na njihova tržišta i njihove dionike. Analiziraju i iznose svoja stajališta o tome kako poduzeće, iz različitih perspektiva. može poboljšati svoj strateški položaj i unutarnju korporativnu strukturu. Ocjenjuju potrebe za promjenama, komunikacijskim metodama, tehnologijom, informatičkim alatima, novim standardima i certifikatima.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les analystes de gestion recherchent et comprennent la position stratégique des entreprises par rapport à leurs marchés et à leurs parties prenantes. Ils analysent et présentent leurs points de vue sur la manière dont la société, à partir de nombreuses perspectives, peut améliorer sa position stratégique et sa structure interne. Ils évaluent les besoins en matière de changement, de méthodes de communication, de technologie, d’outils informatiques, de nouvelles normes et certifications.",
+          "mimetype": "plain/text"
+        },
+        "hu": {
+          "literal": "A gazdasági elemzők vállalkozások és vállalatok stratégiai helyzetét kutatják és ismerik meg piacaikkal és érdekelt feleikkel kapcsolatban. Elemzik és ismertetik nézeteiket arról, hogy a vállalat – számos szempontból – hogyan tudná javítani stratégiai pozícióját és belső vállalati struktúráját. A változások, a kommunikációs módszerek, a technológia, az informatikai eszközök, az új szabványok és tanúsítványok iránti igényeket értékelik.",
+          "mimetype": "plain/text"
+        },
+        "uk": {
+          "literal": "Бізнес-аналітики досліджують і розуміють стратегічне становище підприємств і компаній по відношенню до їхніх ринків і зацікавлених сторін. Вони проводять аналіз і представляють свої погляди на те, як компанія з багатьох точок зору може покращити свою стратегічну позицію та внутрішню корпоративну структуру. Вони оцінюють потреби в змінах, методи комунікації, технології, ІТ-інструменти, нові стандарти та сертифікати.\n\t",
+          "mimetype": "plain/text"
+        },
+        "sk": {
+          "literal": "Biznis analytici skúmajú a chápu strategickú pozíciu podnikov a spoločností vo vzťahu k príslušným trhom a zainteresovaným stranám. Analyzujú a prezentujú svoje názory na to, ako môže spoločnosť z mnohých hľadísk zlepšiť svoju strategickú pozíciu a vnútornú štruktúru. Posudzujú potreby zmeny, metódy komunikácie, technológie, nástroje IT, nové normy a certifikácie.",
+          "mimetype": "plain/text"
+        },
+        "sl": {
+          "literal": "Poslovni analitiki raziskujejo in razumejo strateški položaj podjetij in družb glede na njihove trge in deležnike. Analizirajo in predstavijo svoja stališča o tem, kako lahko družba z več vidikov izboljša svoj strateški položaj in notranjo korporativno strukturo. Ocenjujejo potrebe po spremembah, načinih komunikacije, tehnologiji, orodjih informacijske tehnologije, novih standardih in certificiranju.",
+          "mimetype": "plain/text"
+        },
+        "ga": {
+          "literal": "Déanann anailísithe gnó taighde agus baineann siad tuiscint as suíomh straitéiseach gnólachtaí agus cuideachtaí ó thaobh a margaí agus a bpáirtithe leasmhara. Déanann siad anailís agus cuireann siad a dtuairimí in iúl maidir le conas is féidir leis an gcuideachta, ó go leor dearcthaí, feabhas a chur ar a suíomh straitéiseach agus a struchtúr corparáideach inmheánach. Déanann siad measúnú ar an ngá le hathrú, ar mhodhanna cumarsáide, teicneolaíocht, uirlisí teicneolaíochta, caighdeáin agus deimhnithe nua.",
+          "mimetype": "plain/text"
+        },
+        "sv": {
+          "literal": "Företagsanalytiker undersöker och förstår verksamheters och företags strategiska position i förhållande till deras marknader och intressenter. De analyserar och presenterar sina synpunkter om hur företaget ur många perspektiv kan förbättra sin strategiska position och interna struktur. De bedömer behoven av förändring, kommunikationsmetoder, teknik, it-verktyg, nya standarder och certifieringar.",
+          "mimetype": "plain/text"
+        },
+        "el": {
+          "literal": "Οι επιχειρηματικοί αναλυτές ασχολούνται με την έρευνα και την κατανόηση της στρατηγικής θέσης των επιχειρήσεων και των εταιρειών σε σχέση με τις αντίστοιχες αγορές και τα ενδιαφερόμενα μέρη. Αναλύουν και παρουσιάζουν τις απόψεις τους σχετικά με τον τρόπο με τον οποίο η εταιρεία, από πολλές απόψεις, μπορεί να βελτιώσει τη στρατηγική της θέση και την εσωτερική της εταιρική δομή. Αξιολογούν τις ανάγκες αλλαγής, τις μεθόδους επικοινωνίας, την τεχνολογία, τα εργαλεία ΤΠ, τα νέα πρότυπα και τις πιστοποιήσεις.",
+          "mimetype": "plain/text"
+        },
+        "mt": {
+          "literal": "L-analisti tan-negozju jirriċerkaw u jifhmu l-pożizzjoni strateġika tan-negozji u tal-kumpaniji fir-rigward tas-swieq tagħhom u tal-partijiet interessati tagħhom. Huma janalizzaw u jippreżentaw l-opinjonijiet tagħhom dwar kif il-kumpanija tista’ ttejjeb il-pożizzjoni strateġika tagħha u l-istruttura korporattiva interna minn ħafna perspettivi. Huma jivvalutaw il-ħtiġijiet għal bidla, metodi ta’ komunikazzjoni, teknoloġija, għodod tal-IT, standards u ċertifikazzjonijiet ġodda.",
+          "mimetype": "plain/text"
+        },
+        "en": {
+          "literal": "Business analysts research and understand the strategic position of businesses and companies in relation to their markets and their stakeholders. They analyse and present their views on how the company, from many perspectives, can improve its strategic position and internal corporate structure. They assess needs for change, communication methods, technology, IT tools, new standards and certifications.",
+          "mimetype": "plain/text"
+        },
+        "is": {
+          "literal": "Viðskiptasérfræðingar rannsaka og skilja skipulega stöðu fyrirtækja og félaga í tengslum við markaði þeirra og hagsmunaaðila. Þeir greina og leggja fram álit sitt á því hvernig fyrirtækið, frá mörgum sjónarhornum, getur bætt skipulega stöðu sína og innra skipulag fyrirtækisins. Þeir meta þarfir fyrir breytingu, samskiptaaðferðir, tækni, upplýsingatæknibúnað, nýja staðla og vottanir.",
+          "mimetype": "plain/text"
+        },
+        "it": {
+          "literal": "Gli analisti di business ricercano e comprendono la posizione strategica delle imprese e delle aziende in relazione ai loro mercati e alle loro parti interessate. Analizzano e presentano i loro pareri sul modo in cui l’impresa può migliorare la propria posizione strategica e la propria struttura societaria interna sotto molti punti di vista. Valutano le necessità di cambiamento, metodi di comunicazione, tecnologia, strumenti informatici, nuove norme e certificazioni.",
+          "mimetype": "plain/text"
+        },
+        "es": {
+          "literal": "Los analistas de negocios investigan y entienden la posición estratégica de los negocios y las empresas en relación con sus mercados y sus accionistas. Analizan y presentan sus puntos de vista sobre el modo en que la empresa puede mejorar, desde muchas perspectivas, su posición estratégica y su estructura empresarial interna. Evalúan las necesidades de cambio, los métodos de comunicación, la tecnología, las herramientas informáticas, las nuevas normas y las certificaciones.",
+          "mimetype": "plain/text"
+        },
+        "et": {
+          "literal": "Ärianalüütikud uurivad ja mõistavad ettevõtete strateegilist positsiooni seoses turgude ja sidusrühmadega. Nad analüüsivad ja esitavad arvamusi, kuidas ettevõte saab mitmest aspektist parandada oma strateegilist positsiooni ja sisestruktuuri. Nad hindavad muutuste, teabevahetusmeetodite, tehnika, IT-vahendite, uute standardite ja sertifitseerimise vajadusi.",
+          "mimetype": "plain/text"
+        },
+        "cs": {
+          "literal": "Obchodní analytici zkoumají a snaží se porozumět strategickému postavení podniků a společností ve vztahu k jejich trhům a zúčastněným stranám. Analyzují a prezentují své názory na to, jak může společnost z mnoha hledisek zlepšit svou strategickou pozici a vnitřní organizační strukturu. Posuzují potřebu změn, způsoby komunikace, technologie, nástroje IT, nové normy a certifikace.",
+          "mimetype": "plain/text"
+        },
+        "ar": {
+          "literal": "يبحث محللو الأعمال ويفهمون الوضع الإستراتيجي للمؤسسات التجارية والشركات فيما يتعلق بالأسواق وأصحاب المصلحة لديهم. ويحللون ويقدمون وجهات نظرهم حول كيفية تحسين الشركة، من وجهات نظر كثيرة، لموقعها الإستراتيجي وهيكل الشركة الداخلي. ويقيمون احتياجات التغيير وطرق التواصل والتكنولوجيا وأدوات تكنولوجيا المعلومات والمعايير والشهادات الجديدة.",
+          "mimetype": "plain/text"
+        },
+        "pl": {
+          "literal": "Analitycy biznesowi badają i interpretują sytuację strategiczną przedsiębiorstw względem ich rynków i zainteresowanych stron. Analizują to, w jaki sposób przedsiębiorstwo może, z różnych perspektyw, poprawić swoją sytuację strategiczną i wewnętrzną strukturę korporacyjną i przedstawiają swoje opinie na ten temat. Oceniają potrzebę zmiany, metody komunikacji, technologie, narzędzia informatyczne, nowe normy i certyfikaty.",
+          "mimetype": "plain/text"
+        },
+        "da": {
+          "literal": "Virksomhedsanalytikere forsker og forstår forretningers og virksomheders strategiske stilling i forhold til deres markeder og deres interessenter. De analyserer og fremlægger deres synspunkter om, hvordan virksomheden ud fra mange synsvinkler kan forbedre sin strategiske position og interne selskabsstruktur. De vurderer behovene for ændringer, kommunikationsmetoder, teknologi, it-værktøjer, nye standarder og certificeringer.",
+          "mimetype": "plain/text"
+        },
+        "ro": {
+          "literal": "Analiștii de afaceri studiază și înțeleg poziția strategică a întreprinderilor și a societăților în raport cu piețele lor și cu părțile interesate. Analizează și își prezintă opiniile cu privire la modul în care întreprinderea, din mai multe perspective, își poate îmbunătăți poziția strategică și structura corporativă internă. Evaluează nevoile de schimbare, metodele de comunicare, tehnologia, instrumentele informatice, noile standarde și certificări.",
+          "mimetype": "plain/text"
+        },
+        "nl": {
+          "literal": "Businessanalisten onderzoeken en hebben inzicht in de strategische positie van bedrijven ten opzichte van hun markten en stakeholders. Zij analyseren en presenteren hun visie op de wijze waarop de onderneming, vanuit vele perspectieven, haar strategische positie en interne bedrijfsstructuur kan verbeteren. Zij beoordelen de behoeften aan verandering, communicatiemethoden, technologie, IT-tools, nieuwe standaarden en certificeringen.",
+          "mimetype": "plain/text"
+        }
+      },
+      "relations": [
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/8a43795b-bb38-4f29-91df-a6c92ad4643c",
+          "labelEn": "analyse financial performance of a company",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/5f1d1319-7954-4a9b-90c7-57668e3a0d4b",
+          "labelEn": "interpret financial statements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/ff599c4c-f7bc-44fc-b75f-eea4b7178692",
+          "labelEn": "management systems standards",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/f14ff4b7-be1e-4b55-b39b-520005f8a97e",
+          "labelEn": "liaise with managers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/3c03ee71-4a23-448f-b79e-81fd75d27dca",
+          "labelEn": "apply change management",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/8bc75dce-beba-40f9-93fc-66c9708ed74b",
+          "labelEn": "advise on efficiency improvements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/fa465db3-56e8-4b5d-a781-e2a313a4ed2d",
+          "labelEn": "conduct qualitative research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/f60c9e52-95fc-4ca1-a73c-18a491153b63",
+          "labelEn": "make strategic business decisions",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/27ed854c-15b8-4ba2-90e9-ae888a219703",
+          "labelEn": "perform business analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/4b3ae518-6746-4487-8d3b-4cfc063a43d0",
+          "labelEn": "use business simulation tools",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/ee7f90cc-922e-4da7-a7ae-83c2688fed10",
+          "labelEn": "align efforts towards business development",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/ce5b1446-b5e3-4f05-a5ac-83f2ee142a44",
+          "labelEn": "analyse external factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/98a1dec3-8138-4f46-a596-5e2a83b884b9",
+          "labelEn": "business analytics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/629685b8-5f9e-4522-8cff-b3e2c4ec625a",
+          "labelEn": "digital data processing",
+          "skillType": null
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/91816e1a-d026-4d21-9b1c-59ca5cf488de",
+          "labelEn": "analyse internal factors of companies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/6eff134b-e34f-4d6e-a6e8-5e47cf2228d0",
+          "labelEn": "risk management",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/dc72ad0a-c5dc-4abd-bc0d-ca43e82162e1",
+          "labelEn": "build business relationships",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/ed3f3dba-3a35-4ed5-b113-67f4d10ef4c8",
+          "labelEn": "scientific research methodology",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/65e58886-bd1e-4c5b-8ca5-8d9b353c8aa1",
+          "labelEn": "data visualisation software",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/8770350e-746f-4adb-9556-18ca68104be6",
+          "labelEn": "market research",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/5da3c765-10a3-49eb-934c-ec401ceb1a34",
+          "labelEn": "analyse business plans",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/633a3637-2c6b-40ae-ac38-289eb2a62aa6",
+          "labelEn": "business analysis",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/43d1d56b-ce62-4fe8-8f18-35d92ec73023",
+          "labelEn": "identify undetected organisational needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/8316979b-df5a-4dc7-98ef-61ec6a10df84",
+          "labelEn": "conduct quantitative research",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/b17f4305-741a-4a1c-8fe8-6f11cb3d5c0a",
+          "labelEn": "business communication",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/c2617b44-886a-485e-8393-bc0fc6339539",
+          "labelEn": "management consulting",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0,
+          "uri": "http://data.europa.eu/esco/skill/812590e4-7108-4016-baba-957dcf8213ae",
+          "labelEn": "keep updated on the political landscape",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1,
+          "uri": "http://data.europa.eu/esco/skill/79c36c91-28a5-44b7-ab9b-7093b2d4b21e",
+          "labelEn": "advise on financial matters",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2,
+          "uri": "http://data.europa.eu/esco/skill/11c56452-fcec-4b00-9695-cca4728e5048",
+          "labelEn": "marketing analytics",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3,
+          "uri": "http://data.europa.eu/esco/skill/d77d7685-04fb-43a4-a1ac-09a10811f646",
+          "labelEn": "corporate law",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4,
+          "uri": "http://data.europa.eu/esco/skill/69f36674-440a-4fa0-89f9-1b70172ebb9d",
+          "labelEn": "advise on communication strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5,
+          "uri": "http://data.europa.eu/esco/skill/bdf5ca62-9053-4652-b5e4-4eb95c271945",
+          "labelEn": "organisational learning",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6,
+          "uri": "http://data.europa.eu/esco/skill/f975091a-e5a5-4472-ac17-11680e53e98f",
+          "labelEn": "seek innovation in current practices",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7,
+          "uri": "http://data.europa.eu/esco/skill/c544a9f3-5945-4b54-afed-de0697852817",
+          "labelEn": "report analysis results",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8,
+          "uri": "http://data.europa.eu/esco/skill/341c4478-c976-4ff0-a102-cfd92174d873",
+          "labelEn": "business law",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9,
+          "uri": "http://data.europa.eu/esco/skill/d53b04fb-1bbb-4a25-92f8-8ceb308d276f",
+          "labelEn": "define organisational standards",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10,
+          "uri": "http://data.europa.eu/esco/skill/ccbd0898-e225-4abc-8992-57a23b0e2eec",
+          "labelEn": "support implementation of quality management systems",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11,
+          "uri": "http://data.europa.eu/esco/skill/f1155d3f-fbca-4298-a31c-f6955653bacf",
+          "labelEn": "shape organisational teams based on competencies",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 12,
+          "uri": "http://data.europa.eu/esco/skill/1212ac42-2564-4fce-80e1-6ce4ea4d9bf5",
+          "labelEn": "advise on personnel management",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 13,
+          "uri": "http://data.europa.eu/esco/skill/bd698bbe-7003-4508-b422-46c2ff4d5e95",
+          "labelEn": "business strategy concepts",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 14,
+          "uri": "http://data.europa.eu/esco/skill/8d4271ca-c9fd-40b3-875f-15f78332a49e",
+          "labelEn": "quality standards",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 15,
+          "uri": "http://data.europa.eu/esco/skill/4a460161-eaea-4fe2-bd0e-164ccc635be1",
+          "labelEn": "financial statements",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 16,
+          "uri": "http://data.europa.eu/esco/skill/3a5231a0-8c30-48ee-b671-08e2debd4441",
+          "labelEn": "organisational policies",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 17,
+          "uri": "http://data.europa.eu/esco/skill/66d47084-9437-48b2-819b-c4c8214ed650",
+          "labelEn": "interview people",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 18,
+          "uri": "http://data.europa.eu/esco/skill/7b3abd38-61ae-42a4-88bb-0884784f9ee1",
+          "labelEn": "advise client on technical possibilities",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 19,
+          "uri": "http://data.europa.eu/esco/skill/d2dc31f1-720c-4757-bc1b-9e563d264dcf",
+          "labelEn": "advise on organisational culture",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 20,
+          "uri": "http://data.europa.eu/esco/skill/07e51c60-763a-4335-b4ec-70a15f66d328",
+          "labelEn": "propose ICT solutions to business problems",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 21,
+          "uri": "http://data.europa.eu/esco/skill/143769cb-b61e-47d8-a61e-eedfbec1016c",
+          "labelEn": "business intelligence",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 22,
+          "uri": "http://data.europa.eu/esco/skill/62bf2e21-2613-47f1-a624-fe0fc925e671",
+          "labelEn": "market entry strategies",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 23,
+          "uri": "http://data.europa.eu/esco/skill/49047409-9307-4b41-9b04-a9615f049044",
+          "labelEn": "investment banking",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 24,
+          "uri": "http://data.europa.eu/esco/skill/98301d4a-2cc3-439d-8d7f-0b6ac76302bb",
+          "labelEn": "business process modelling",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 25,
+          "uri": "http://data.europa.eu/esco/skill/28ad7c97-9fb3-4b1d-846a-654e529ab8ac",
+          "labelEn": "sustainable manufacturing",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge"
+        },
+        {
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 26,
+          "uri": "http://data.europa.eu/esco/skill/0efbe2dc-2770-47ec-b8f4-d1bdff6ac0a4",
+          "labelEn": "advise on risk management",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill"
+        }
+      ],
+      "sourceStatus": "released"
+    }
+  ]
+}

@@ -23,3 +23,7 @@ Run `python releases/2026-10-21/source/scripts/verify-esco-japan-sources.py --ev
 ## Release gates
 
 Candidate only; not yet public. Backend checks: 76 passed, followed by 6 after strengthening held-role assertions. UI checks: 35 passed. Independent review: 19 checks plus original-source verification passed. Exact-commit CI, isolated staging and desktop/mobile public acceptance remain required.
+
+## Verified public release
+
+PR531 merged as `de664e7d65d05f48dd1eea71aaff3f5a770a20f5`. Runtime `8b2ea1dd7c61ff204aac9b490c8ed63c1e9722fc`, deployment `dpl_EFwzPaC8jEoSxvNQeQ852aU7XZBp`, exact CI `41283412695` succeeded. Seven staged and seven direct public flow groups passed at each desktop/mobile width; HTTP200, no recorded errors, clean teardown. Actual screenshots inspected, including a settled desktop capture below the sticky header. Seven explanation requests per width were mocked; no paid model acceptance is claimed. Live non-pay coverage80/197, pay59/197.
