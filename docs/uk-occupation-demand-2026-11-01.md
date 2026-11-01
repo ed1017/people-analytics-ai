@@ -2,7 +2,7 @@
 
 ## Scope and decision
 
-The user requested the next non-pay expansion after PR525/526. This batch adds published Skills England demand classifications for existing reviewed UK occupation mappings. Expected coverage is 61 of 197 vacancies, up from 50; UK coverage rises from 3 to 14 of 20. Pay remains 59 of 197. No duties are invented or changed to obtain a match.
+The user requested the next non-pay expansion after PR525/526. This batch adds published Skills England demand classifications for existing reviewed UK occupation mappings. Verified live coverage is 61 of 197 vacancies, up from 50; UK coverage rises from 3 to 14 of 20. Pay remains 59 of 197. No duties are invented or changed to obtain a match.
 
 Newly eligible: Legal Counsel 3; HR Business Partner 1; Business Intelligence Analyst 1; Software Engineer, Frontend Software Engineer and Backend Software Engineer 1 each; Cybersecurity Engineer 1; Quality Assurance Engineer 1; Sales Account Executive 1. Existing HR officers/accountants receive an additional reference. All mappings retain their explicit duty acknowledgement. Corporate Development 3, AI Engineer 1, Business Operations 1 and Client Operations 1 remain unsupported in the UK.
 
@@ -32,4 +32,14 @@ France Travail BMO2026 original workbook was recovered: 3,755,481 bytes, SHA256 
 
 ## Validation and release
 
-Implementation passes 55 affected backend tests, 15 existing hiring tests and 33 shared UI/chat tests; focused TypeScript has zero diagnostics. Independent extraction reproduced all nine selected raw rows. Final review and browser acceptance are pending. No live release is claimed here yet. No paid provider calls, credentials/access changes, source-denial bypass, Lab validation or chart-overlay promotion are authorized by this batch.
+PR527 runtime `13529d2a74c1af166b8713f2ac902aa91d916322`; merge `4128b7ab02fb66defb55348b0afe991ca85effd6`. Exact deployment `dpl_EviE3unKvTZFURht5Wc3TBfoWDRd` (`people-analytics-r8qlf41hv-ed-56dc.vercel.app`) was built without domains, tested and promoted unchanged. Public deployment identity is confirmed; direct public desktop/mobile acceptance passed the same ten groups, HTTP 200, eight mocked responses each, no replay, empty error arrays and drained teardown.
+
+Independent extraction verified all nine raw records against the 368-row original. Review corrected the five indicator period labels to official methodology and confirmed the existing duty crosswalks. No numerical source values or prior references changed. Fourteen focused tests passed after the metadata correction. The full affected market workflow passed 133 tests; focused TypeScript had zero diagnostics. Exact CI 41276975592 passed every step, including 3,095 historical tests, generated artifacts and TypeScript. Hosted prebuild, compilation and input audit passed.
+
+Initial CI41276728249 found an obsolete test expecting every UK Frontend reference to be absent. The test now explicitly rejects US-only outlook/software/core-skill references and requires the exact UK demand reference, retaining mixed-role guards. The final exact head was rebuilt and tested; the earlier isolated deployment was never promoted.
+
+Final source archive SHA256 `885748f33ac1f92e3f01bed081f92fefd75195682222412bbc3d3d00cd1a2020`, 1,233 runtime inputs and 1,088 manifest entries; private inputs unchanged. Staged desktop 1440/mobile 390 each passed ten journey groups: actual pre-upgrade chat/backup preservation, three published categories, source periods, consent/cancel, stale attachment, immutable revisions, Inventory/Overview context, reload, unsupported/foreign/mixed scope, restore and Track copy. HTTP 200 throughout, eight mocked responses each, all error arrays empty and teardown drained. Focused category/details images were inspected.
+
+Staging used exact authenticated GET-response replay for protected assets; public checks used direct requests without replay.
+
+All model traffic was intercepted or blocked; canonical tool/context behavior was tested, not fresh model answer quality. No paid calls, new credentials/access, denied-route workarounds, Lab validation or chart-overlay promotion occurred.
