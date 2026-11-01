@@ -1,12 +1,16 @@
 # Market-to-position AI handoff
 
-Updated October 31, 2026. This is the concise continuation record for coding agents and explanation-context work. Read the linked source records instead of treating this document as a new numerical dataset or model acceptance result.
+Updated November 1, 2026. This is the concise continuation record for coding agents and explanation-context work. Read the linked source records instead of treating this document as a new numerical dataset or model acceptance result.
 
 ## Current release and owned work
 
-### PR514 current - network and market-research context
+### PR516 current - modeled position duties
 
-PR514 is live at runtime `1de45475444159d60326016bf227f01abcf7bddc`, deployment `dpl_5mCHaUvyWtrHuCgYnMcj1xJSqLnn`. Three US Cloud/Infrastructure/Sales Operations vacancies can use national network-architecture or market-research references only after restrictive duty confirmation. Conditional non-pay coverage is 49/197 (software 46, outlook 45, UK difficulty 3; overlapping); pay remains 59. Independent review, 150 affected tests, exact CI and staged/direct public desktop/mobile passed (ten groups and nine mocked explanation requests per width, HTTP 200, clean/drained). All 54 older canonical references remain unchanged. No paid calls or fresh provider acceptance. [Sources, acceptance and remaining duty contracts](network-market-nonpay-context-2026-10-31.md).
+PR516 is live at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
+
+### PR514 included - network and market-research context
+
+PR514 was published at runtime `1de45475444159d60326016bf227f01abcf7bddc`, deployment `dpl_5mCHaUvyWtrHuCgYnMcj1xJSqLnn`. Three US Cloud/Infrastructure/Sales Operations vacancies can use national network-architecture or market-research references only after restrictive duty confirmation. Conditional non-pay coverage is 49/197 (software 46, outlook 45, UK difficulty 3; overlapping); pay remains 59. Independent review, 150 affected tests, exact CI and staged/direct public desktop/mobile passed (ten groups and nine mocked explanation requests per width, HTTP 200, clean/drained). All 54 older canonical references remain unchanged. No paid calls or fresh provider acceptance. [Sources, acceptance and remaining duty contracts](network-market-nonpay-context-2026-10-31.md).
 
 ### PR512 included - conditional non-pay roles
 
@@ -79,4 +83,7 @@ The user requested more non-pay intelligence on October 31. Labor Market already
 
 PR504 attached revision-bound outlook/software evidence, PR506 expanded BLS coverage, and PR508 added separate read-only general-chat retrieval. Explicit attachment, canonical scope validation and backup preservation remain required; do not auto-adjust costs, hiring time, training duration or readiness. PR510 now delivers detailed UK survey rows3571 and2421 for three eligible HR/accounting vacancies. Remaining cells retain source boundaries: c means suppressed/confidential, u means low reliability, and occupation-response bases are not unique employer counts. The report minimum base of 50 is not a proven CSV suppression threshold. Detailed software (33) and solicitor (49) rows remain held from primary comparisons; accountant (54) and HR officers (67) passed exact crosswalk/row review and are live in PR510. No role-specific available-applicant count or measured US/UK hiring duration has been verified. Keep People Analytics pay held under the non-pay priority.
 
-PR512 separates conditional non-pay mappings from pay eligibility. People Analytics pay remains held even though eligible statistical/modeling duties can use non-pay context. PR514 publishes restrictive opt-in 15-1241/13-1161 mappings using a separate bounded fixture, preserving full occupation counts separately from the 22 flagged rows. Five remaining US vacancies require actual duty contracts, documented in the PR514 source record; no further extraction request is pending. Do not mistake these eligibility counts for confirmed duties or adopted assumptions.
+PR512 separates conditional non-pay mappings from pay eligibility. People Analytics pay remains held even though eligible statistical/modeling duties can use non-pay context. PR514 publishes restrictive opt-in 15-1241/13-1161 mappings using a separate bounded fixture, preserving full occupation counts separately from the 22 flagged rows. PR516 now supplies explicit fictional duty templates for the five remaining US vacancies under user authorization. These are separate from external references and do not automatically establish occupational equivalence; no further extraction request is pending. Do not mistake these eligibility counts for confirmed duties or adopted assumptions.
+
+
+Reader discoverability is the next authorized slice: a visible third Explore entry with explicit role/country selection and canonical local evidence. Keep risk first and turnover second. No unsupported market-tightness score, automatic scenario attachment or cross-scope AI submission. This prompt work is not yet released.

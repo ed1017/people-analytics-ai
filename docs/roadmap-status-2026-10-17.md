@@ -1,8 +1,14 @@
-# Active roadmap - October 31
+# Active roadmap - November 1
+
+## November 1: modeled position duties released
+
+PR516 is live at runtime `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`. Four explicitly fictional duty templates cover five US vacancies, with review/cancel/save, exact-version reopen/clear, canonical explanation context and backup/Track-copy preservation. They do not create occupational matches: external non-pay coverage remains 49/197 and pay 59/197. Independent review, 137 affected tests, focused/full TypeScript, exact CI and public desktop/mobile passed (eleven groups/fifteen mocked requests each, HTTP 200, clean/drained). No paid or fresh provider acceptance. [Contract and release evidence](modeled-position-duties-2026-10-31.md).
+
+Next authorized work: make external market evidence visible in the third Explore entry, preserving risk-first ordering. Implementation is isolated; not yet released.
 
 ## October 31: network and market-research context released
 
-PR514 is live at runtime `1de45475444159d60326016bf227f01abcf7bddc`, deployment `dpl_5mCHaUvyWtrHuCgYnMcj1xJSqLnn`. Three US Cloud/Infrastructure/Sales Operations vacancies can use national network-architecture or market-research references only after restrictive duty confirmation. Conditional non-pay coverage is 49/197 (software 46, outlook 45, UK difficulty 3; overlapping); pay remains 59. Independent review, 150 affected tests, exact CI and staged/direct public desktop/mobile passed (ten groups and nine mocked explanation requests per width, HTTP 200, clean/drained). All 54 older canonical references remain unchanged. No paid calls or fresh provider acceptance. [Sources, acceptance and remaining duty contracts](network-market-nonpay-context-2026-10-31.md).
+PR514 was published at runtime `1de45475444159d60326016bf227f01abcf7bddc`, deployment `dpl_5mCHaUvyWtrHuCgYnMcj1xJSqLnn`. Three US Cloud/Infrastructure/Sales Operations vacancies can use national network-architecture or market-research references only after restrictive duty confirmation. Conditional non-pay coverage is 49/197 (software 46, outlook 45, UK difficulty 3; overlapping); pay remains 59. Independent review, 150 affected tests, exact CI and staged/direct public desktop/mobile passed (ten groups and nine mocked explanation requests per width, HTTP 200, clean/drained). All 54 older canonical references remain unchanged. No paid calls or fresh provider acceptance. [Sources, acceptance and remaining duty contracts](network-market-nonpay-context-2026-10-31.md).
 
 ## October 31: conditional non-pay roles released
 

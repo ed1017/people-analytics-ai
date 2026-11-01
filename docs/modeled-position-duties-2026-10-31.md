@@ -1,6 +1,6 @@
 # Modeled position duties
 
-Status: approved implementation in progress; not released.
+Status: PR516 published and public acceptance passed on November 1, 2026.
 
 ## Approved scope and provenance
 
@@ -31,4 +31,17 @@ Test template content/version pins, exact role/country and mixed-selection handl
 
 The separate India research found no implementation-ready professional-role dataset: public PLFS aggregates are occupation-major-division context, not role-level availability or demand. More detailed occupation microdata requires registration/commercial access outside this task. Jobspiq's source coverage, collection rights and deduplication remain unresolved. Do not publish either as precise national role evidence. Existing country-source constraints remain in the market AI handoff; no denied access route is retried.
 
-Release identifiers and actual acceptance results will be recorded after verification.
+## Verified release
+
+- PR516 runtime/head `355b10bdd3021a1ee2b38363bcfc0a2b2bf8adf3`; merge `c7bfb351bae999ba5f56bb7b187fa85828c30cfc`.
+- Exact CI [41255070750](https://github.com/ed1017/people-analytics-ai/actions/runs/41255070750) passed. Independent code review and 32 focused checks passed; the combined affected suite passed 137 checks. The focused TypeScript graph has zero diagnostics and the complete staged build passed TypeScript/generated checks. The exported local tree's five missing headcount-experiment errors were not present in the complete staged build.
+- Production-equivalent stage `people-analytics-681q5shfr-ed-56dc.vercel.app`, deployment `dpl_6MGyK8HZoGsvwpkAYV7VURX2EBjV`, was promoted after staged acceptance. Public hostname identity verified. Archive SHA256 `b27f7aa41672c7cabdba0910628ae5818ca2bf4476d04a4d5386bfead6b4c52a`; 1,217 runtime inputs and 1,072 manifest files; private inputs unchanged.
+- Initial staged 1440px/390px runs passed ten groups (all templates, explicit consent/cancel, stale/repeated clicks, exact versions, reload, Overview, unsupported selections and actual backup restore). The final Track-copy prerequisite timed out because the QA helper required persisted goal defaults in General exploration. Source confirms those defaults remain React-local when goal ID is empty. The helper now retains exact active-scope and one-second full-storage stability, requiring goal-only defaults only for a goal. No application change was needed.
+- Bounded stage continuation restored each accepted staged backup and completed the remaining exploration duty adoption, Track-copy cancel/confirm and unchanged-original-workspace assertions. Independent review accepted the helper correction and preserved comparisons. Both runs had HTTP 200 and no pre-teardown errors; the protected bridge subsequently timed out during cleanup, reporting nine desktop/ten mobile already-handled or closed-context errors. These are recorded separately from functional acceptance, not described as a clean uninterrupted full-stage run.
+- Full direct public 1440px/390px runs each passed eleven workflow groups and fifteen mocked explanation requests, HTTP 200, no page/bridge/mock errors and drained teardown. Actual prior-release backup restore and final goal copying were exercised. Desktop/mobile screenshots inspected. Public document/source GETs used no staged asset replay.
+- Reports: `integration-evidence/position-modeled-duties-stage-355b10b-{1440,390}.json`, `position-modeled-duties-stage-355b10b-track-{1440,390}.json`, and `position-modeled-duties-public-355b10b-{1440,390}.json`. Earlier failures remain preserved. The existing Finance VM test loader also needed the new child component stub; all original assertions remain, with a new canonical duty-version integration test.
+- Readiness/chat were mocked; no paid requests, fresh model-answer acceptance or fine-tuning is claimed. External reference fixtures and mapping modules are unchanged from PR514; no funding/cost/readiness changes are implied by duty adoption.
+
+## Next reader-facing request
+
+The user requested external intelligence in a visible prompt or KPI so readers can discover it. The next authorized slice will preserve capacity risk first and turnover second, replacing only the third Explore shortcut with a compact role/country evidence entry. Use the existing canonical catalogue directly; missing scope/evidence stays neutral. No source here establishes an arbitrary red/green market-tightness threshold. This follow-on is not part of PR516 and is not yet released.
