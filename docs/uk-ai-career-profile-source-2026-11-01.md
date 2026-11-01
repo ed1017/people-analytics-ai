@@ -12,4 +12,10 @@ Scope is **England careers guidance**, conditionally applicable to the UK scenar
 
 Use requires explicit confirmation that the planned role develops machine-learning models or algorithms, tests/debugs them, assesses related risks and contributes to deployment. AI-tool use, product coordination or governance without engineering duties does not satisfy the condition. No template is created or rewritten, and no consent is inferred.
 
-The new `career-profile-skills` kind reuses existing source selection, review/cancel, explicit attachment versions, goal/dataset isolation, backup validation and canonical AI lookup. The earlier 117 references retain their exact serialized content; the standalone candidate increases eligible modeled vacancies from 80 to 81, subject to release acceptance. This document does not declare the candidate live.
+The new `career-profile-skills` kind reuses existing source selection, review/cancel, explicit attachment versions, goal/dataset isolation, backup validation and canonical AI lookup. The earlier 117 references retain their exact serialized content; the released slice increased eligible modeled vacancies from 80 to 81. Verified public release evidence follows.
+
+## Verified public release
+
+PR532 merged as `4679d227e80ea5e94d3af50f734a6ca16f72c800`. Runtime `4aa7980b9b03dfbc8bdbd45d4942b180b01218d2`, deployment `dpl_BWtvoQQC7WN1b1Bt4JRUeXYoUw2Y`, exact CI `41285137537` succeeded. Ten staged and ten direct public groups passed at each desktop/mobile width, HTTP200, no errors, clean teardown; actual screenshots inspected. Eight explanation requests per width were mocked. No paid model output was evaluated. Live coverage81/197; pay59 unchanged.
+
+Two historical catalogue tests initially included the new reference kind in their pinned old subsets. Explicit kind exclusions preserved the old counts/hashes; independent correction review and all251 market checks across28 files passed before the final build. Superseded candidates were not promoted.

@@ -1,3 +1,7 @@
+# Historical coverage-audit snapshot
+
+Current verified coverage is84/197; see [final release reconciliation](nonpay-release-reconciliation-2026-11-01.md) and [current register](data/nonpay-vacancy-coverage-2026-11-01.json). The frozen states below retain their original audit meaning and do not override the final release.
+
 # Nonpay vacancy coverage — 1 November 2026
 
 This is a release-state record, not a claim that all 197 vacancies have complete market evidence. Root release owner updates live milestones after public acceptance.
