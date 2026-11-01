@@ -1,8 +1,12 @@
 # Active roadmap - November 1
 
+## November 1: persistent market conversation messages released
+
+PR523 is live at runtime `f3befbf46df84fc0b1a985000a990a939ffdb6b3`, deployment `dpl_ALoUwWjZZMQfq2oDstoQpLALxnC6`. Market selectors/results are individual persisted conversation messages, preserving earlier selections across later cards, replies and reloads. Close/Reset controls are removed, with plain data/source labels across main navigation, risk and planning controls. Explicit general-chat follow-ups carry the chosen card scope; changed scope blocks submission and preserves the draft. Source values, saved plans and coverage remain unchanged (50/197 non-pay, 59/197 pay). Independent review, 33 focused tests, 32 risk/editorial regressions, exact CI (including 3,095 historical tests), production build and direct public desktop/mobile acceptance passed (ten groups each, HTTP 200, no errors, clean/drained). Four mocked replies per width test transport/state; no paid or fresh model-answer acceptance. [Contract and release evidence](market-conversation-messages-2026-11-01.md).
+
 ## November 1: inline market chat released
 
-PR521 is live at runtime `956a6c85cb830c6ea5bf03d5b70a426cfab03420`, deployment `dpl_CGjAvkjRKUfcmRo2pNo24WUw5aaq`. Overview → Explore → What does the hiring market look like for a role? now opens a local response inside the conversation with Country and Role dropdowns and Show market insights. Independent review, 38 composed tests, exact CI and public desktop/mobile passed (eight groups each, HTTP 200, no errors, clean/drained). Drafts, saved plans, scope changes and keyboard focus were verified; no model or plan-attachment request occurs. It includes PR520 coverage of 50/197 non-pay and 59/197 pay. [Contract, release and limits](inline-market-chat-2026-11-01.md).
+PR521 was published at runtime `956a6c85cb830c6ea5bf03d5b70a426cfab03420`, deployment `dpl_CGjAvkjRKUfcmRo2pNo24WUw5aaq`. Overview → Explore → What does the hiring market look like for a role? now opens a local response inside the conversation with Country and Role dropdowns and Show market insights. Independent review, 38 composed tests, exact CI and public desktop/mobile passed (eight groups each, HTTP 200, no errors, clean/drained). Drafts, saved plans, scope changes and keyboard focus were verified; no model or plan-attachment request occurs. It includes PR520 coverage of 50/197 non-pay and 59/197 pay. [Contract, release and limits](inline-market-chat-2026-11-01.md).
 
 ## November 1: conditional IT systems evidence released
 
