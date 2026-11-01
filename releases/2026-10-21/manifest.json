@@ -5429,8 +5429,8 @@
     },
     {
       "path": "lib/data/uk-occupation-demand-2025.json",
-      "sha256": "3b1b2b3f9559a924ea5e15bd22b6ab88fc6a2d38adf93271120a835d9d44987c",
-      "bytes": 6788
+      "sha256": "2b1f8b686ac1d1aa4f9db1d3184f3855989935d6256dcbe360ca6cbff633fe20",
+      "bytes": 6938
     },
     {
       "path": "lib/position-uk-demand.ts",
@@ -5439,8 +5439,8 @@
     },
     {
       "path": "scripts/extract-uk-occupation-demand.py",
-      "sha256": "7f1da6a888e2e6e9395177f029083b094d2af982ab99f11b8bec36928ede437a",
-      "bytes": 2644
+      "sha256": "6c33a659f3e20d17eac1f468905e8e97bead044f30cb85084c73d6a14a89f83b",
+      "bytes": 2794
     },
     {
       "path": "tests/position-market-demand-ui.test.mjs",

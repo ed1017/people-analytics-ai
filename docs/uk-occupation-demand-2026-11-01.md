@@ -18,7 +18,7 @@ The published government outputs are released under Open Government Licence v3.0
 
 - Published Critical demand, Elevated demand and Not in high demand are categories from a composite assessment. They are not a shortage score, applicant count, hiring duration or staffing approval.
 - Preserve the named indicators in demand, uncertainty and imputation fields. The summary CSV does not supply five individual indicator categories; do not manufacture those or derive the classification from its informational index. All selected rows report no flagged uncertainty and no imputed indicators; this is a source flag, not a claim of certainty.
-- Source periods differ: visa grants Q4 2024–Q2 2025; online advert density Q4 2024–Q3 2025; hourly wage and hours change April 2024–April 2025; wage premium April 2025. Wage/hours inputs exclude Northern Ireland although the overall release is UK-level.
+- Source periods differ: visa grants Q4 2024–Q2 2025 and online adverts Q4 2024–Q3 2025 both use employment denominators July 2024–June 2025; hourly wage and hours change compare the year to April 2024 with the year to April 2025; wage premium uses the year to April 2025. Wage/hours inputs exclude Northern Ireland although the overall release is UK-level.
 - Official statistics in development; methodology changed from the prior release. No unqualified trend comparison. Missing/excluded records stay unavailable, not Not in high demand.
 - Reader cards and AI lookup use the same canonical values. Source attachment is explicit and creates a revision; no automatic cost, timing, allocation or approval updates. Prior chat snapshots, saved plans and source revisions remain unchanged.
 
