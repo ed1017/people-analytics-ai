@@ -1,0 +1,210 @@
+{
+  "id": "esco-budget-skills-v120-v1",
+  "requestedDatasetVersion": "v1.2.0",
+  "versionNote": "Explicit API selectedVersion request; returned self links omit version. Portal current v1.2.1 is not claimed.",
+  "retrievedDate": "2026-11-01",
+  "licence": {
+    "name": "Creative Commons Attribution 4.0 International, unless otherwise indicated",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "noticeUrl": "https://esco.ec.europa.eu/en/copyright-notice-esco-skills-competences",
+    "attribution": "European Commission, ESCO v1.2.0, retrieved 1 November 2026. Budget analyst occupation and skill relations selected and reformatted for a duty-confirmed French FP&A scenario. No endorsement implied. Underlying-source notices retained at linked copyright notice."
+  },
+  "records": [
+    {
+      "countryApplicability": "FR",
+      "roleCode": "FIN-FPNA",
+      "role": "Financial Planning and Analysis Analyst",
+      "vacancies": 1,
+      "reviewStatus": "independently-reviewed-conditional-budget-scope",
+      "dutyCondition": "Confirm substantive budget preparation and review, expenditure monitoring and financial-performance reporting. Exclude roles primarily performing investment or valuation analysis, accounting or audit.",
+      "originalFile": "budget-analyst-v1.2.0.json",
+      "sha256": "bb2ebba4f43b163be7ca89ffb45a916a4d4c0074392e3dea39047d2172d18513",
+      "bytes": 31060,
+      "occupationUri": "http://data.europa.eu/esco/occupation/4e4a291d-1d38-4c5a-812a-5827d0691b11",
+      "occupationCode": "2411.1.4",
+      "preferredLabels": {
+        "en": "budget analyst",
+        "de": "Haushaltsanalyst/Haushaltsanalystin",
+        "fr": "analyste budgétaire"
+      },
+      "description": {
+        "en": {
+          "literal": "Budget analysts monitor the spending activities of public and private institutions and companies. They prepare budget reports, review the budget model used in the company and ensure compliance with the budgeting policies and other legal regulations.",
+          "mimetype": "plain/text"
+        },
+        "de": {
+          "literal": "Haushaltsanalysten/Haushaltsanalystinnen überwachen die Ausgaben öffentlicher und privater Einrichtungen und Unternehmen. Sie erstellen Haushaltsberichte, überprüfen das im Unternehmen verwendete Haushaltsmodell und stellen sicher, dass die Haushaltsrichtlinien und andere Rechtsvorschriften eingehalten werden.",
+          "mimetype": "plain/text"
+        },
+        "fr": {
+          "literal": "Les analystes budgétaires contrôlent les dépenses des institutions et des entreprises publiques et privées. Ils/elles élaborent des rapports budgétaires, examinent le modèle budgétaire utilisé dans la société et veillent au respect des politiques de budgétisation et des autres réglementations juridiques.",
+          "mimetype": "plain/text"
+        }
+      },
+      "sourceStatus": "released",
+      "relations": [
+        {
+          "uri": "http://data.europa.eu/esco/skill/147170ba-0141-4337-89af-b4513d745afe",
+          "labelEn": "support development of annual budget",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 0
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/f75b740c-b36c-495e-bc67-efe347bbc6b5",
+          "labelEn": "company policies",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 1
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/6556cbf1-d5c0-4f53-89a9-8707066069a6",
+          "labelEn": "evaluate budgets",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 2
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/8a43795b-bb38-4f29-91df-a6c92ad4643c",
+          "labelEn": "analyse financial performance of a company",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 3
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/39e43f7c-a95e-4583-be76-bb134ccce1ae",
+          "labelEn": "financial department processes",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 4
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/71dde84c-0058-4c52-a556-523369333db8",
+          "labelEn": "use office systems",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 5
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/4f060129-8b75-4d58-a8dd-515bd8fef349",
+          "labelEn": "develop financial statistics reports",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 6
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/b08ec8ff-1a3e-4cc3-8016-9520b21666a6",
+          "labelEn": "exert expenditure control",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 7
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/e95058a6-e139-42e7-a470-72038a606649",
+          "labelEn": "assess financial viability",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 8
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/74688c5d-2af1-4f7a-9d1c-00e808eaa1e6",
+          "labelEn": "budgetary principles",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 9
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/958b8802-ec3e-4813-97f7-6c8f48610dbd",
+          "labelEn": "identify process improvements",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasEssentialSkill",
+          "sourceOrder": 10
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/56426cfa-6e92-4ed9-a632-f08849864588",
+          "labelEn": "review investment portfolios",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 0
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/d41262ae-eca1-4ede-89a8-46d2d99a7a31",
+          "labelEn": "consider economic criteria in decision making",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 1
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/3556c075-eee0-4549-b730-48ae70cb5af9",
+          "labelEn": "funding methods",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 2
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/f241fbf8-08a2-4c05-b9c1-3438d3e648dd",
+          "labelEn": "revise drafts made by managers",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 3
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/a9640376-8d72-4a70-a4a3-7a18e2e8f3c0",
+          "labelEn": "advise on public finance",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 4
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/cb059032-dd34-4761-a786-98cfb9d0efe3",
+          "labelEn": "explain accounting records",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 5
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/660060e4-c418-4049-836b-beade5f8a4a8",
+          "labelEn": "create annual marketing budget",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 6
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/1951e126-6c66-46cf-9345-d4941c85bc2a",
+          "labelEn": "inspect government expenditures",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 7
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/dccbdbb8-7266-4fb4-a4cf-29056f102f12",
+          "labelEn": "budget for financial needs",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 8
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/21c5790c-0930-4d74-b3b0-84caf5af12ea",
+          "labelEn": "manage budgets",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 9
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/387ee646-0aaa-4161-ab3b-cde87ec09fdf",
+          "labelEn": "public finance",
+          "skillType": "http://data.europa.eu/esco/skill-type/knowledge",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 10
+        },
+        {
+          "uri": "http://data.europa.eu/esco/skill/5c99d21a-9d02-4638-9b52-a6ba840dcb0a",
+          "labelEn": "synthesise financial information",
+          "skillType": "http://data.europa.eu/esco/skill-type/skill",
+          "sourceRelation": "hasOptionalSkill",
+          "sourceOrder": 11
+        }
+      ]
+    }
+  ]
+}
