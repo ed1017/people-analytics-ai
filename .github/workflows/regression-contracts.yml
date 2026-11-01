@@ -100,6 +100,9 @@ jobs:
       - name: Verify conditional product and budget guidance
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-esco-budget.test.mjs tests/position-us-product-career.test.mjs tests/position-product-budget-context.test.mjs tests/position-product-career-ui.test.mjs
+      - name: Verify Canadian occupational guidance
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-canada-duty-guidance.test.mjs tests/position-canada-duty-context.test.mjs tests/position-canada-duty-ui.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs
