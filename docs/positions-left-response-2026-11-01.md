@@ -9,3 +9,6 @@ Original screenshot was inspected by the parent and recovery worker. Local suppo
 Validation: focused component presentation tests cover standalone, split, pending target and inactive output; finance panel tests retain state/explicit adoption checks. Existing handoff, immutable capture, source scope and demo arithmetic tests pass. Type graph passes. Independent source review found no state/persistence defect; its custom test-loader issue was repaired. Browser and exact release records follow after verification.
 
 No paid AI calls or new model-answer quality claims. Coverage unchanged: 108/197 non-pay, 59/197 pay.
+
+## Incident integration
+Publication paused for the independently confirmed pricing-expiry incident. PR548 repaired that incident and restored public configured status without a model call. Merged main cfe12ed into this branch before repackaging. All pricing runtime files and reviewed fingerprints remain identical to the repaired main release; the previous96d73cb layout stage is superseded and must not be promoted. See nonexpiring-pricing-2026-11-01.md for audit history and spending restrictions.
