@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "211184e5c0f60bdab036335c74505fd366f4203b84fe9ce429e1b1b0478b44cd",
-      "bytes": 19712
+      "sha256": "64a4596296dfb12be3d8c43df4afee8d93afa4c9efe49c4c90c81c3265df0d40",
+      "bytes": 19837
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5299,7 +5299,7 @@
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "1ae773029909a8d5055a757ee96596bd19888d0c8167bfc786a6ee5d6e1f1a44",
+      "sha256": "123c1f7ad9d7f6f7820460b2a8a2b9f640d882be17e384f458cc404fcd8a0278",
       "bytes": 10072
     },
     {
@@ -5324,13 +5324,13 @@
     },
     {
       "path": "lib/position-nonpay-role-mappings.ts",
-      "sha256": "e2269d585ebddbd2bdc9915f1d5090658d0c6be17297bdb4b934d686d9d23820",
-      "bytes": 1710
+      "sha256": "30625ef98a69171440609890d1798fde9d2cc4a8650c02817f27e1c5867d8ddf",
+      "bytes": 1822
     },
     {
       "path": "tests/position-conditional-nonpay.test.mjs",
-      "sha256": "62087a3502702d3b0084d5a019ad771c6a4741468067dc2e403e4250451deb60",
-      "bytes": 19932
+      "sha256": "584958f44f6e5b0cc8a419b613f1c2f52e3968315ba200be148bcf00e6852cb6",
+      "bytes": 19969
     },
     {
       "path": "lib/data/network-market-nonpay-v1.json",
@@ -5344,7 +5344,7 @@
     },
     {
       "path": "tests/position-network-market-context.test.mjs",
-      "sha256": "2b41e524af4e448de22d8db4e0e8f14c54f9ab4b07c3b9eaae22f4d2309954e7",
+      "sha256": "df1f7cd068a536f0dd03249bfe00741d60039b7eb0d1bd868a2499bb6311c9bb",
       "bytes": 23215
     },
     {
@@ -5369,8 +5369,8 @@
     },
     {
       "path": "tests/position-modeled-duties.test.mjs",
-      "sha256": "9f9d64edfdf45b394988bb01c25d07349e0acc485959cc55fa1c0fbb45692db6",
-      "bytes": 9482
+      "sha256": "4f915f24208377fdbaa9d9a669a1f294f1127dd045dd440e8be4db4071598fe0",
+      "bytes": 9519
     },
     {
       "path": "components/home-market-context-explorer.tsx",
@@ -5381,6 +5381,16 @@
       "path": "tests/home-market-context-explorer.test.mjs",
       "sha256": "171d545669f0b5f16d34248c89b181f88cd0a8b5df1933f89c1414c5f471bad6",
       "bytes": 6717
+    },
+    {
+      "path": "lib/data/it-systems-nonpay-mapping-v1.json",
+      "sha256": "fc2ff18522109e69129f73ad14114262285ea7da8f62df74af4d09dde9a55e51",
+      "bytes": 859
+    },
+    {
+      "path": "tests/position-it-systems-market.test.mjs",
+      "sha256": "4bdc968f283306cfcbfd8f59c708cfa40618ff1cd586dd8166c22d8202076c76",
+      "bytes": 7770
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
