@@ -15,8 +15,10 @@ test('canonical lookup returns dated broader outlook and categorical software wi
 });
 test('scope missing, unknown country and unreviewed role never fall back',()=>{
  assert.equal(readMarketContext(args({country:null})).status,'needs-clarification');assert.equal(readMarketContext(args({role:null})).status,'needs-clarification');
- for(const patch of [{country:'Japan'},{country:'Canada'},{role:'AI wizard'}])assert.equal(readMarketContext(args(patch)).status,'unavailable');
+ for(const patch of [{country:'Canada'},{role:'AI wizard'}])assert.equal(readMarketContext(args(patch)).status,'unavailable');
 });
+test('Japan has its own skill levels without substituting US occupational outlook',()=>{assert.equal(readMarketContext(args({country:'Japan',kind:'occupational-skill-levels'})).status,'available');assert.equal(readMarketContext(args({country:'Japan',kind:'occupation-outlook'})).status,'unavailable');});
+
 test('exact O*NET disaggregation and SOC do not substitute siblings',()=>{
  const bi=readMarketContext(args({role:'Business Intelligence Analyst',kind:'in-demand-software'}));assert.equal(bi.references[0].occupationCode,'15-2051.01');
  assert.equal(readMarketContext(args({role:'Business Intelligence Analyst',occupationCode:'15-2051.00',kind:'in-demand-software'})).status,'unavailable');
