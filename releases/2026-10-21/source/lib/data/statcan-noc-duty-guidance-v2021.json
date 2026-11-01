@@ -1,0 +1,1169 @@
+{
+  "id": "statcan-noc2021-v1-canada-duty-guidance-selected-v1",
+  "kind": "occupational-duty-guidance",
+  "country": "CA",
+  "taxonomy": "NOC 2021 Version 1.0",
+  "releaseDate": "2021-09-28",
+  "capturedAt": "2026-11-01",
+  "observationDate": null,
+  "source": {
+    "url": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1/noc-2021-v1.0-elements.csv",
+    "catalogueUrl": "https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1",
+    "sha256": "50c3e31a90b0150cc5b8efd29ec020c2fd9ea5fc5b0a171ed65d3cd9a0abf32f",
+    "bytes": 5129133,
+    "encoding": "UTF-8",
+    "csvRecordConvention": "Header is logical record 1"
+  },
+  "licence": {
+    "name": "Statistics Canada Open Licence",
+    "url": "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+    "attribution": "Adapted from Statistics Canada, National Occupational Classification (NOC) 2021 Version 1.0, September 28, 2021. This does not constitute an endorsement by Statistics Canada of this product."
+  },
+  "occupations": {
+    "21231": {
+      "code": "21231",
+      "title": "Software engineers and designers",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=21231&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 6191,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 6192,
+          "elementType": "Main duties",
+          "text": "Collect and document users' requirements and develop logical and physical specifications ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6193,
+          "elementType": "Main duties",
+          "text": "Research, evaluate and synthesize technical information to design, develop and test computer-based systems including mobile applications ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6194,
+          "elementType": "Main duties",
+          "text": "Develop data, process and network models to optimize architecture and to evaluate the performance and reliability of designs ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6195,
+          "elementType": "Main duties",
+          "text": "Plan, design and coordinate the development, installation, integration and operation of computer-based systems including mobile applications ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6196,
+          "elementType": "Main duties",
+          "text": "Assess, test, troubleshoot, document, upgrade and develop maintenance procedures for operating systems, communications environments and applications software ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6197,
+          "elementType": "Main duties",
+          "text": "May lead and coordinate teams of information systems professionals in the development of software and integrated information systems, process control software and other embedded software control systems. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 6198,
+          "elementType": "Employment requirements",
+          "text": "A bachelor's degree, usually in computer science, computer systems engineering, software engineering or mathematics  or Completion of a college program in computer science is usually required. "
+        },
+        {
+          "csvRecord": 6199,
+          "elementType": "Employment requirements",
+          "text": "A master's or doctoral degree in a related discipline may be required. "
+        },
+        {
+          "csvRecord": 6200,
+          "elementType": "Employment requirements",
+          "text": "Licensing by a provincial or territorial association of professional engineers is required to approve engineering drawings and reports and to practise as a Professional Engineer (P.Eng.). "
+        },
+        {
+          "csvRecord": 6201,
+          "elementType": "Employment requirements",
+          "text": "Engineers are eligible for registration following graduation from an accredited educational program, three or four years of supervised work experience in engineering, and passing a professional practice examination. "
+        },
+        {
+          "csvRecord": 6202,
+          "elementType": "Employment requirements",
+          "text": "Experience as a computer programmer is usually required. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 6181,
+          "elementType": "Exclusion(s)",
+          "text": "Computer and information systems managers  (See 20012 Computer and information systems managers)"
+        },
+        {
+          "csvRecord": 6182,
+          "elementType": "Exclusion(s)",
+          "text": "Computer engineer (except software)  (See 21311 Computer engineers (except software engineers and designers))"
+        },
+        {
+          "csvRecord": 6183,
+          "elementType": "Exclusion(s)",
+          "text": "Computer systems developers and programmers  (See 21230 Computer systems developers and programmers)"
+        },
+        {
+          "csvRecord": 6184,
+          "elementType": "Exclusion(s)",
+          "text": "Database analysts and data administrators  (See 21223 Database analysts and data administrators)"
+        },
+        {
+          "csvRecord": 6185,
+          "elementType": "Exclusion(s)",
+          "text": "Electrical and electronics engineers  (See 21310 Electrical and electronics engineers)"
+        },
+        {
+          "csvRecord": 6186,
+          "elementType": "Exclusion(s)",
+          "text": "Information systems specialists  (See 21222 Information systems specialists)"
+        },
+        {
+          "csvRecord": 6187,
+          "elementType": "Exclusion(s)",
+          "text": "Information systems testing technicians  (See 22222 Information systems testing technicians)"
+        },
+        {
+          "csvRecord": 6188,
+          "elementType": "Exclusion(s)",
+          "text": "Software developers and programmers  (See 21232 Software developers and programmers)"
+        },
+        {
+          "csvRecord": 6189,
+          "elementType": "Exclusion(s)",
+          "text": "Web designers  (See 21233 Web designers)"
+        },
+        {
+          "csvRecord": 6190,
+          "elementType": "Exclusion(s)",
+          "text": "Web developers and programmers  (See 21234 Web developers and programmers)"
+        }
+      ],
+      "additionalInformation": [],
+      "mappingTitleEvidence": {
+        "csvRecord": 6142,
+        "elementType": "All examples",
+        "text": "cloud architect "
+      }
+    },
+    "12101": {
+      "code": "12101",
+      "title": "Human resources and recruitment officers",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=12101&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 2299,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 2300,
+          "elementType": "Main duties",
+          "text": "Identify current and prospective staffing requirements, prepare and post notices and advertisements, and collect and screen applications ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2301,
+          "elementType": "Main duties",
+          "text": "Advise job applicants on employment requirements and on terms and conditions of employment ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2302,
+          "elementType": "Main duties",
+          "text": "Review candidate inventories and contact potential applicants to arrange interviews and transfers, redeployment and placement of personnel ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2303,
+          "elementType": "Main duties",
+          "text": "Recruit graduates of colleges, universities and other educational institutions ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2304,
+          "elementType": "Main duties",
+          "text": "Coordinate and participate in selection and examination boards to evaluate candidates ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2305,
+          "elementType": "Main duties",
+          "text": "Notify applicants of results of selection process and prepare job offers ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2306,
+          "elementType": "Main duties",
+          "text": "Advise managers and employees on staffing policies and procedures ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2307,
+          "elementType": "Main duties",
+          "text": "Organize and administer staff consultation and grievance procedures ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2308,
+          "elementType": "Main duties",
+          "text": "Determine eligibility to entitlements, arrange staff training and provide information or services such as employee assistance, counselling and recognition programs ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2309,
+          "elementType": "Main duties",
+          "text": "May manage and follow up on the opening of Occupational Health and Safety (OHS) files ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 2310,
+          "elementType": "Main duties",
+          "text": "May supervise personnel clerks performing filing and record-keeping duties. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 2311,
+          "elementType": "Employment requirements",
+          "text": "A college diploma in a field related to personnel management such as business administration, industrial relations, commerce or completion of a professional development program in personnel administration is usually required. "
+        },
+        {
+          "csvRecord": 2312,
+          "elementType": "Employment requirements",
+          "text": "Certification as a Certified Human Resources Professional (CHRP) may be required. "
+        },
+        {
+          "csvRecord": 2313,
+          "elementType": "Employment requirements",
+          "text": "Some experience in a clerical or administrative position related to personnel administration may be required. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 2295,
+          "elementType": "Exclusion(s)",
+          "text": "Human resources managers  (See 10011 Human resources managers)"
+        },
+        {
+          "csvRecord": 2296,
+          "elementType": "Exclusion(s)",
+          "text": "Human resources professionals  (See 11200 Human resources professionals)"
+        },
+        {
+          "csvRecord": 2297,
+          "elementType": "Exclusion(s)",
+          "text": "Personnel clerks  (See 14102 Personnel clerks)"
+        },
+        {
+          "csvRecord": 2298,
+          "elementType": "Exclusion(s)",
+          "text": "Training officer - company  (See 41210 College and other vocational instructors)"
+        }
+      ],
+      "additionalInformation": [
+        {
+          "csvRecord": 2314,
+          "elementType": "Additional information",
+          "text": "Progression to specialist and management positions is possible with experience. "
+        }
+      ]
+    },
+    "11200": {
+      "code": "11200",
+      "title": "Human resources professionals",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=11200&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 1733,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 1734,
+          "elementType": "Main duties",
+          "text": "Plan, develop, implement and evaluate human resources and labour relations strategies including policies, programs and procedures to address an organization's human resource requirements ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1735,
+          "elementType": "Main duties",
+          "text": "Advise employers and employees on the interpretation of human resources policies, compensation and benefit programs and collective agreements ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1736,
+          "elementType": "Main duties",
+          "text": "Negotiate collective agreements on behalf of employers or workers, mediate labour disputes and grievances and provide advice on employee and labour relations ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1737,
+          "elementType": "Main duties",
+          "text": "Research and prepare occupational classifications, job descriptions, salary scales and competency appraisal measures and systems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1738,
+          "elementType": "Main duties",
+          "text": "Plan and administer staffing, total compensation, training and career development, employee assistance, employment equity and affirmative action programs ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1739,
+          "elementType": "Main duties",
+          "text": "Manage programs and maintain human resources information and related records systems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1740,
+          "elementType": "Main duties",
+          "text": "Hire and oversee training of staff ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1741,
+          "elementType": "Main duties",
+          "text": "Coordinate employee performance appraisal programs ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1742,
+          "elementType": "Main duties",
+          "text": "Research employee benefit and health and safety practices and recommend changes or modifications to existing policies. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 1743,
+          "elementType": "Employment requirements",
+          "text": "A university degree or college diploma in human resources management or a related field, such as business administration, industrial relations, commerce or psychology  or completion of a professional development program in human resources administration is required. "
+        },
+        {
+          "csvRecord": 1744,
+          "elementType": "Employment requirements",
+          "text": "Some employers may require human resources professionals to hold a Certified Human Resources Professional (CHRP) designation. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 1728,
+          "elementType": "Exclusion(s)",
+          "text": "Human resources and recruitment officers  (See 12101 Human resources and recruitment officers)"
+        },
+        {
+          "csvRecord": 1729,
+          "elementType": "Exclusion(s)",
+          "text": "Human resources managers  (See 10011 Human resources managers)"
+        },
+        {
+          "csvRecord": 1730,
+          "elementType": "Exclusion(s)",
+          "text": "Personnel clerks  (See 14102 Personnel clerks)"
+        },
+        {
+          "csvRecord": 1731,
+          "elementType": "Exclusion(s)",
+          "text": "Professional occupations in business management consulting  (See 11201 Professional occupations in business management consulting)"
+        },
+        {
+          "csvRecord": 1732,
+          "elementType": "Exclusion(s)",
+          "text": "Training officer - company  (See 41210 College and other vocational instructors)"
+        }
+      ],
+      "additionalInformation": [
+        {
+          "csvRecord": 1745,
+          "elementType": "Additional information",
+          "text": "Progression to management positions is possible with experience. "
+        }
+      ]
+    },
+    "11201": {
+      "code": "11201",
+      "title": "Professional occupations in business management consulting",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=11201&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 1817,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 1818,
+          "elementType": "Main duties",
+          "text": "Analyze and provide advice on the managerial methods and organization of a public or private sector establishment ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1819,
+          "elementType": "Main duties",
+          "text": "Conduct research to determine efficiency and effectiveness of managerial policies and programs ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1820,
+          "elementType": "Main duties",
+          "text": "Conduct assessments and propose improvements to methods, systems and procedures in areas such as operations, human resources, records management, security management and communications ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1821,
+          "elementType": "Main duties",
+          "text": "Conduct quality audits and develop quality management and quality assurance standards for ISO (International Organization for Standardization) registration ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1822,
+          "elementType": "Main duties",
+          "text": "Provide guidance and support to businesses on regulatory policies and procedures; ensure internal compliance with regulatory requirements; and prepare submissions and filings with regulatory bodies ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1823,
+          "elementType": "Main duties",
+          "text": "Plan the reorganization of the operations of an establishment ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1824,
+          "elementType": "Main duties",
+          "text": "May supervise contracted researchers or clerical staff. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 1825,
+          "elementType": "Employment requirements",
+          "text": "A bachelor's degree or college diploma in business administration, commerce or a related discipline is usually required. "
+        },
+        {
+          "csvRecord": 1826,
+          "elementType": "Employment requirements",
+          "text": "A graduate degree in business administration may be required. "
+        },
+        {
+          "csvRecord": 1827,
+          "elementType": "Employment requirements",
+          "text": "Some establishments may require management consultants to be certified by a provincial management consulting association. "
+        },
+        {
+          "csvRecord": 1828,
+          "elementType": "Employment requirements",
+          "text": "Certification as a quality auditor may be required for some occupations in this unit group. "
+        },
+        {
+          "csvRecord": 1829,
+          "elementType": "Employment requirements",
+          "text": "Occupations in health information management consulting may require certification by the Canadian Health Information Management Association (CHIMA). "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 1808,
+          "elementType": "Exclusion(s)",
+          "text": "Business development officers and market researchers and analysts  (See 41402 Business development officers and market researchers and analysts)"
+        },
+        {
+          "csvRecord": 1809,
+          "elementType": "Exclusion(s)",
+          "text": "Economists and economic policy researchers and analysts  (See 41401 Economists and economic policy researchers and analysts)"
+        },
+        {
+          "csvRecord": 1810,
+          "elementType": "Exclusion(s)",
+          "text": "Engineering inspectors and regulatory officers  (See 22231 Engineering inspectors and regulatory officers)"
+        },
+        {
+          "csvRecord": 1811,
+          "elementType": "Exclusion(s)",
+          "text": "Financial and investment analysts  (See 11101 Financial and investment analysts)"
+        },
+        {
+          "csvRecord": 1812,
+          "elementType": "Exclusion(s)",
+          "text": "Financial auditors and accountants  (See 11100 Financial auditors and accountants)"
+        },
+        {
+          "csvRecord": 1813,
+          "elementType": "Exclusion(s)",
+          "text": "Health information management occupations  (See 12111 Health information management occupations)"
+        },
+        {
+          "csvRecord": 1814,
+          "elementType": "Exclusion(s)",
+          "text": "Industrial and manufacturing engineers  (See 21321 Industrial and manufacturing engineers)"
+        },
+        {
+          "csvRecord": 1815,
+          "elementType": "Exclusion(s)",
+          "text": "Other financial officers  (See 11109 Other financial officers)"
+        },
+        {
+          "csvRecord": 1816,
+          "elementType": "Exclusion(s)",
+          "text": "Records management technicians  (See 12112 Records management technicians)"
+        }
+      ],
+      "additionalInformation": [
+        {
+          "csvRecord": 1830,
+          "elementType": "Additional information",
+          "text": "Progression to senior and managerial positions is possible with experience. "
+        }
+      ]
+    },
+    "11202": {
+      "code": "11202",
+      "title": "Professional occupations in advertising, marketing and public relations",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=11202&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 1954,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 1955,
+          "elementType": "Main duties",
+          "text": "Assess characteristics of products or services to be promoted to determine marketing and advertising needs of an establishment ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1956,
+          "elementType": "Main duties",
+          "text": "Advise clients on marketing, advertising or sales promotion opportunities and strategies ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1957,
+          "elementType": "Main duties",
+          "text": "Develop strategies and related content for direct and digital marketing and advertising campaigns and implement them ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1958,
+          "elementType": "Main duties",
+          "text": "Manage post campaign analysis to measure and report on marketing and advertising metrics ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1959,
+          "elementType": "Main duties",
+          "text": "Develop and maintain social media accounts, including managing customer reviews and testimonials ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1960,
+          "elementType": "Main duties",
+          "text": "Develop, implement and evaluate public relations strategies and programs designed to inform clients, employees and the general public of initiatives and policies of businesses, governments and other organizations ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1961,
+          "elementType": "Main duties",
+          "text": "Conduct public opinion and attitude surveys to identify the interests and concerns of key groups served by their organization ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1962,
+          "elementType": "Main duties",
+          "text": "Prepare or oversee preparation of reports, briefs, bibliographies, speeches, presentations, Web sites and press releases ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1963,
+          "elementType": "Main duties",
+          "text": "Develop and organize workshops, meetings, ceremonies and other events and programs for publicity, fundraising and information purposes ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1964,
+          "elementType": "Main duties",
+          "text": "Arrange interviews, news conferences and other media events ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1965,
+          "elementType": "Main duties",
+          "text": "Act as spokesperson for an organization and answer written and oral inquiries ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1966,
+          "elementType": "Main duties",
+          "text": "Coordinate special publicity events and promotions for internal and external audiences ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1967,
+          "elementType": "Main duties",
+          "text": "Assist in the preparation of brochures, reports, newsletters and other material ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1968,
+          "elementType": "Main duties",
+          "text": "Represent and act as an agent for talented individuals or individuals with specific occupational expertise ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1969,
+          "elementType": "Main duties",
+          "text": "Prepare or oversee preparation of sports, literary, performance or other contracts. ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 1970,
+          "elementType": "Main duties",
+          "text": "Literary agents specialize in representing specific types of authors and writers. Performance agents specialize in representing singers, musicians, actors or other performers. Sports agents specialize in representing specific athletes or sports teams. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 1971,
+          "elementType": "Employment requirements",
+          "text": "A university degree or college diploma in business marketing, public relations, communications, journalism, museology or a discipline related to a particular subject matter is usually required. "
+        },
+        {
+          "csvRecord": 1972,
+          "elementType": "Employment requirements",
+          "text": "Practitioners in public relations may require an APR (Accredited in Public Relations) designation. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 1950,
+          "elementType": "Exclusion(s)",
+          "text": "Authors and writers  (See 51111 Authors and writers (except technical))"
+        },
+        {
+          "csvRecord": 1951,
+          "elementType": "Exclusion(s)",
+          "text": "Business development officers and market researchers and analysts  (See 41402 Business development officers and market researchers and analysts)"
+        },
+        {
+          "csvRecord": 1952,
+          "elementType": "Exclusion(s)",
+          "text": "Conference and event planners  (See 12103 Conference and event planners)"
+        },
+        {
+          "csvRecord": 1953,
+          "elementType": "Exclusion(s)",
+          "text": "Public relations manager  (See 10022 Advertising, marketing and public relations managers)"
+        }
+      ],
+      "additionalInformation": [
+        {
+          "csvRecord": 1973,
+          "elementType": "Additional information",
+          "text": "Progression to managerial positions in public relations, communications and fundraising is possible with additional training and experience. "
+        }
+      ]
+    },
+    "21223": {
+      "code": "21223",
+      "title": "Database analysts and data administrators",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=21223&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 6077,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 6078,
+          "elementType": "Main duties",
+          "text": "Database analysts ",
+          "isHeading": true
+        },
+        {
+          "csvRecord": 6079,
+          "elementType": "Main duties",
+          "text": "Collect and document user requirements ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6080,
+          "elementType": "Main duties",
+          "text": "Design and develop database architecture for information systems projects ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6081,
+          "elementType": "Main duties",
+          "text": "Design, construct, modify, integrate, implement and test data models and database management systems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6082,
+          "elementType": "Main duties",
+          "text": "Conduct research and provide advice to other informatics professionals regarding the selection, application and implementation of database management tools ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6083,
+          "elementType": "Main duties",
+          "text": "Operate database management systems to analyze data and perform data mining analysis ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6084,
+          "elementType": "Main duties",
+          "text": "May lead, coordinate or supervise other workers in this group. ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6085,
+          "elementType": "Main duties",
+          "text": "Data administrators ",
+          "isHeading": true
+        },
+        {
+          "csvRecord": 6086,
+          "elementType": "Main duties",
+          "text": "Develop and implement data administration policy, standards and models ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6087,
+          "elementType": "Main duties",
+          "text": "Research and document data requirements, data collection and administration policy, data access rules and security ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6088,
+          "elementType": "Main duties",
+          "text": "Develop policies and procedures for network and/or Internet database access and usage and for the backup and recovery of data ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6089,
+          "elementType": "Main duties",
+          "text": "Conduct research and provide advice to other information systems professionals regarding the collection, availability, security and suitability of data ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6090,
+          "elementType": "Main duties",
+          "text": "Write scripts related to stored procedures and triggers ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6091,
+          "elementType": "Main duties",
+          "text": "May lead and coordinate teams of data administrators in the development and implementation of data policies, standards and models. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 6092,
+          "elementType": "Employment requirements",
+          "text": "A bachelor's degree or college program, usually in computer science, computer engineering, or in mathematics is usually required. "
+        },
+        {
+          "csvRecord": 6093,
+          "elementType": "Employment requirements",
+          "text": "Computer programming and related experience is usually required. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 6071,
+          "elementType": "Exclusion(s)",
+          "text": "Computer and information systems managers  (See 20012 Computer and information systems managers)"
+        },
+        {
+          "csvRecord": 6072,
+          "elementType": "Exclusion(s)",
+          "text": "Computer engineers (except software engineers and designers)  (See 21311 Computer engineers (except software engineers and designers))"
+        },
+        {
+          "csvRecord": 6073,
+          "elementType": "Exclusion(s)",
+          "text": "Computer systems developers and programmers  (See 21230 Computer systems developers and programmers)"
+        },
+        {
+          "csvRecord": 6074,
+          "elementType": "Exclusion(s)",
+          "text": "Information systems specialists  (See 21222 Information systems specialists)"
+        },
+        {
+          "csvRecord": 6075,
+          "elementType": "Exclusion(s)",
+          "text": "Software developers and programmers  (See 21232 Software developers and programmers)"
+        },
+        {
+          "csvRecord": 6076,
+          "elementType": "Exclusion(s)",
+          "text": "Software engineers and designers  (See 21231 Software engineers and designers)"
+        }
+      ],
+      "additionalInformation": []
+    },
+    "21222": {
+      "code": "21222",
+      "title": "Information systems specialists",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=21222&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 6028,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 6029,
+          "elementType": "Main duties",
+          "text": "Design, develop, test, implement and oversee IT systems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6030,
+          "elementType": "Main duties",
+          "text": "Collect and analyze data to identify areas for improvement within an organization's IT infrastructure ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6031,
+          "elementType": "Main duties",
+          "text": "Review existing IT systems and internal processes ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6032,
+          "elementType": "Main duties",
+          "text": "Develop, implement and apply policies and procedures throughout the software development life cycle to maximize the efficiency, effectiveness and overall quality of software products and information systems, and to ensure that all systems and processes meet organization standards and user requirements ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6033,
+          "elementType": "Main duties",
+          "text": "Develop quality assurance procedures and tests for the development and improvement of new and existing systems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6034,
+          "elementType": "Main duties",
+          "text": "Identify, analyze and document discrepancies and ensure that appropriate adjustments are made ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 6035,
+          "elementType": "Main duties",
+          "text": "Perform preventive maintenance tasks on computer systems. ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 6036,
+          "elementType": "Employment requirements",
+          "text": "A bachelor's degree in computer science, computer systems engineering, software engineering, business administration or a related discipline or completion of a college program in computer science is usually required. "
+        },
+        {
+          "csvRecord": 6037,
+          "elementType": "Employment requirements",
+          "text": "Experience as a computer programmer is usually required. "
+        },
+        {
+          "csvRecord": 6038,
+          "elementType": "Employment requirements",
+          "text": "Certification or training provided by software vendors may be required by some employers. "
+        },
+        {
+          "csvRecord": 6039,
+          "elementType": "Employment requirements",
+          "text": "A professional certification such as Certified Information Systems Auditor (CISA), Certified Information Security Manager (CISM), Certified Internal Auditor (CIA) or another related information technology (IT) designation. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 6017,
+          "elementType": "Exclusion(s)",
+          "text": "Computer and information systems managers  (See 20012 Computer and information systems managers)"
+        },
+        {
+          "csvRecord": 6018,
+          "elementType": "Exclusion(s)",
+          "text": "Computer engineers (except software engineers and designers)  (See 21311 Computer engineers (except software engineers and designers))"
+        },
+        {
+          "csvRecord": 6019,
+          "elementType": "Exclusion(s)",
+          "text": "Computer systems developers and programmers  (See 21230 Computer systems developers and programmers)"
+        },
+        {
+          "csvRecord": 6020,
+          "elementType": "Exclusion(s)",
+          "text": "Data scientists  (See 21211 Data scientists)"
+        },
+        {
+          "csvRecord": 6021,
+          "elementType": "Exclusion(s)",
+          "text": "Database analysts and data administrators  (See 21223 Database analysts and data administrators)"
+        },
+        {
+          "csvRecord": 6022,
+          "elementType": "Exclusion(s)",
+          "text": "Financial auditors and accountants  (See 11100 Financial auditors and accountants)"
+        },
+        {
+          "csvRecord": 6023,
+          "elementType": "Exclusion(s)",
+          "text": "Professional occupations in business management consulting  (See 11201 Professional occupations in business management consulting)"
+        },
+        {
+          "csvRecord": 6024,
+          "elementType": "Exclusion(s)",
+          "text": "Software developers and programmers  (See 21232 Software developers and programmers)"
+        },
+        {
+          "csvRecord": 6025,
+          "elementType": "Exclusion(s)",
+          "text": "Software engineers and designers  (See 21231 Software engineers and designers)"
+        },
+        {
+          "csvRecord": 6026,
+          "elementType": "Exclusion(s)",
+          "text": "Web designers  (See 21233 Web designers)"
+        },
+        {
+          "csvRecord": 6027,
+          "elementType": "Exclusion(s)",
+          "text": "Web developers and programmers  (See 21234 Web developers and programmers)"
+        }
+      ],
+      "additionalInformation": []
+    },
+    "21211": {
+      "code": "21211",
+      "title": "Data scientists",
+      "profileUrl": "https://noc.esdc.gc.ca/Structure/NOCProfile?GocTemplateCulture=en-CA&code=21211&version=2021.0",
+      "dutyPreamble": {
+        "csvRecord": 5872,
+        "elementType": "Main duties",
+        "text": "This group performs some or all of the following duties: "
+      },
+      "duties": [
+        {
+          "csvRecord": 5873,
+          "elementType": "Main duties",
+          "text": "Implement cutting-edge techniques and tools in machine learning, deep learning and artificial intelligence to make data analysis more efficient ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5874,
+          "elementType": "Main duties",
+          "text": "Perform large-scale experimentation to identify hidden relationships between variables in large datasets ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5875,
+          "elementType": "Main duties",
+          "text": "Create advanced machine learning algorithms such as regression, simulation, scenario analysis, modeling, clustering, decision trees and neural networks ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5876,
+          "elementType": "Main duties",
+          "text": "Prepare and extract data using programming language ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5877,
+          "elementType": "Main duties",
+          "text": "Implement new statistical, machine learning, or other mathematical methodologies to solve specific business problems ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5878,
+          "elementType": "Main duties",
+          "text": "Visualize data in a way that allows a business to quickly draw conclusions and make decisions ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5879,
+          "elementType": "Main duties",
+          "text": "Develop artificial intelligence models and algorithms and implement them to meet the needs of the organization ",
+          "isHeading": false
+        },
+        {
+          "csvRecord": 5880,
+          "elementType": "Main duties",
+          "text": "Coordinate research and analysis activities using unstructured and structured data and use programming to clean and organize data ",
+          "isHeading": false
+        }
+      ],
+      "entryGuidance": [
+        {
+          "csvRecord": 5881,
+          "elementType": "Employment requirements",
+          "text": "A bachelor's degree in statistics, mathematics, computer science, computer systems engineering or a related discipline or completion of a college program in computer science is usually required. "
+        },
+        {
+          "csvRecord": 5882,
+          "elementType": "Employment requirements",
+          "text": "A master's or doctoral degree in machine learning, data science, or a related quantitative field is usually required. "
+        },
+        {
+          "csvRecord": 5883,
+          "elementType": "Employment requirements",
+          "text": "Experience in programming is usually required. "
+        },
+        {
+          "csvRecord": 5884,
+          "elementType": "Employment requirements",
+          "text": "Experience in statistical modelling and machine learning is usually required. "
+        }
+      ],
+      "exclusions": [
+        {
+          "csvRecord": 5866,
+          "elementType": "Exclusion(s)",
+          "text": "Computer and information systems managers  (See 20012 Computer and information systems managers)"
+        },
+        {
+          "csvRecord": 5867,
+          "elementType": "Exclusion(s)",
+          "text": "Computer engineers (except software engineers and designers)  (See 21311 Computer engineers (except software engineers and designers))"
+        },
+        {
+          "csvRecord": 5868,
+          "elementType": "Exclusion(s)",
+          "text": "Database analysts and data administrators  (See 21223 Database analysts and data administrators)"
+        },
+        {
+          "csvRecord": 5869,
+          "elementType": "Exclusion(s)",
+          "text": "Information systems specialists  (See 21222 Information systems specialists)"
+        },
+        {
+          "csvRecord": 5870,
+          "elementType": "Exclusion(s)",
+          "text": "Mathematicians, statisticians and actuaries  (See 21210 Mathematicians, statisticians and actuaries)"
+        },
+        {
+          "csvRecord": 5871,
+          "elementType": "Exclusion(s)",
+          "text": "Software engineers and designers  (See 21231 Software engineers and designers)"
+        }
+      ],
+      "additionalInformation": []
+    }
+  },
+  "mappings": [
+    {
+      "role": "Cloud Architect",
+      "country": "CA",
+      "vacancyCount": 2,
+      "code": "21231",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes requirements analysis, architecture or system models, and integrated-system design or testing.",
+      "excludes": "Routine cloud administration or support without substantive design."
+    },
+    {
+      "role": "Talent Acquisition Specialist",
+      "country": "CA",
+      "vacancyCount": 2,
+      "code": "12101",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes staffing requirements, candidate screening, interviews or selection, and recruitment offers.",
+      "excludes": "Vendor sourcing, procurement or unrelated administration."
+    },
+    {
+      "role": "HR Business Partner",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "11200",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes developing or evaluating HR policies or programs and advising management or employees.",
+      "excludes": "Clerical HR administration alone."
+    },
+    {
+      "role": "Transformation Consultant",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "11201",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes assessing managerial methods or organizational effectiveness and proposing operational or process improvements.",
+      "excludes": "Implementation coordination alone."
+    },
+    {
+      "role": "Growth Marketing Specialist",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "11202",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes marketing strategy, digital campaign development or implementation, and campaign analysis.",
+      "excludes": "Sales-account administration alone."
+    },
+    {
+      "role": "Data Engineer",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "21223",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work substantively includes database architecture, data-model or DBMS design and integration, or data-administration policies and standards.",
+      "excludes": "Generic pipeline operations without database architecture, DBMS or data-administration duties."
+    },
+    {
+      "role": "Technology Consultant",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "21222",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes analysis and improvement of IT systems or internal processes, with systems design, testing or quality procedures.",
+      "excludes": "Generic commercial advice or helpdesk-only work."
+    },
+    {
+      "role": "Applied Data Scientist",
+      "country": "CA",
+      "vacancyCount": 1,
+      "code": "21211",
+      "mappingBasis": "conditional-actual-duties",
+      "requiresExplicitConfirmation": true,
+      "condition": "Actual work includes advanced statistical or machine-learning modeling, experimentation, data preparation and algorithm development.",
+      "excludes": "Reporting-only analytics."
+    }
+  ],
+  "heldRoles": [
+    "Strategy Analyst",
+    "Business Operations Specialist",
+    "Sales Account Executive",
+    "Sales Operations Specialist",
+    "AI Architect"
+  ],
+  "interpretation": {
+    "measure": "Qualitative occupational classification duties and source-described entry guidance",
+    "notMeasures": [
+      "Applicant supply",
+      "Hiring demand",
+      "Hiring difficulty",
+      "Time to fill",
+      "Skill proficiency",
+      "Wages"
+    ],
+    "entryGuidance": "Preserve usually/may qualifiers and occupational subgroup scope; not universal employer requirements.",
+    "professionalEngineering": "The 21231 licensing statement concerns regulated professional engineering practice and approval of engineering drawings/reports, not every cloud job."
+  }
+}
