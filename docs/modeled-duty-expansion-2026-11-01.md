@@ -1,6 +1,6 @@
 # Modeled role duties and conditional market references
 
-Status at preparation: candidate implementation, not a published release. The verified live baseline covers 96 of 197 modeled vacancies with non-pay external references. This candidate adds six independently reviewed conditional matches, taking candidate coverage to 102 of 197. Authoring a fictional duty template does not itself increase external-reference coverage.
+PR539 is publicly accepted at runtime `a392375404726fe2c46513b02c975732f5abdfff`. Ten direct-public acceptance groups passed at both desktop and mobile widths. Six independently reviewed conditional matches increase eligible non-pay coverage from 96 to **102 of 197**; 95 remain unmatched and pay coverage remains 59. Authoring a fictional duty template does not itself increase external-reference coverage.
 
 ## Authorized scope
 
@@ -61,6 +61,12 @@ Seven of the thirteen newly modeled vacancies remain without a new matched sourc
 
 The owner-supplied original six-digit and four-digit Australian OSL workbooks have been recovered. Their identities are respectively `9d35938318b7032f95a1f203962f83d00800622a98a8f2df17d8ace90fedcedd` (151,746 bytes) and `0eab13fc886e4b8e7852a56dfe6863b8e32101996e5e7c167495b9a030e4ec39` (81,658 bytes). `integration-evidence/au-osl-rights-duty-review-20261101.md` records the separate rights and conditional role-fit review. JSA's published CC BY 4.0 terms support a bounded attributed extraction subject to their exclusions; an unresolved blanket reuse-rights prohibition is not the current status. Exact workbook rows, taxonomy granularity and mappings still require their own review and release. This candidate adds no Australian coverage.
 
-## Release evidence pending
+## Verified release
 
-This document records the candidate contract and reviewed evidence, not a deployment completion. Exact commit, CI, staged/public acceptance and final live coverage belong in the release record after those gates pass. Existing roadmap and release records are not changed by this document.
+PR539 merge: `097bea9600c3909ed8445b7ba470f4c34c51dfc8`. Runtime: `a392375404726fe2c46513b02c975732f5abdfff`. Deployment: `dpl_82Pirma7qFuzApbwUcmk6b5HhLFu`. Exact CI41335955581 succeeded. Independent review and 478 local checks across 61 files passed; these overlapping checks are not added to CI totals. Archive SHA-256: `bbb96d99b536b68db1c80c1fbd66c9556fef1f6e14d871e1ef306415d02ca1cb`.
+
+Intermediate `1033aca` browser reports include failures and six completed continuation groups; they are not a full terminal staged pass. The final `a392375` stage passed three bounded smoke groups at desktop and mobile widths. Full ten-group direct-public runs subsequently passed at both widths: HTTP 200, 19 mocked explanations per run, zero recorded browser/bridge/mock/blocked errors, drained teardown and no stage replay. No paid model calls, credential changes or accounting changes were made. The exact source/runtime distinction and final acceptance belong in [release reconciliation](nonpay-release-reconciliation-2026-11-01.md).
+
+The retained intermediate receipts distinguish six reader assertions before a harness lookup failure from the continuation's six source-planning groups and modeled-only flow (19 mocked requests) before a held-state assertion failed. Test-only corrections addressed those assertions; failed receipts remain retained. The final exact-build three-group smoke includes Track, Review and backup. None of these partial or bounded runs is labeled a full ten-group acceptance.
+
+Final public evidence: `integration-evidence/position-modeled-duty-expansion-public-a392375-{1440,390}.json`, with actual screenshots inspected by the QA owner and matching native `-backup.json` artifacts (1,332,489 bytes each). The final public acceptance is distinct from the intermediate staged failures and the bounded final-stage smoke. No fresh paid-model-output acceptance is claimed.

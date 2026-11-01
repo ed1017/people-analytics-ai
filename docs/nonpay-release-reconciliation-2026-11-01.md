@@ -1,6 +1,6 @@
 # Non-pay release reconciliation - 1 November 2026
 
-**Publicly accepted: 96 of 197 modeled vacancies; 101 remain. Pay coverage is 59.** PR536 passed direct public desktop/mobile acceptance at exact runtime `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1`. Attaching an eligible reference requires explicit duty confirmation. Eligibility is not complete market evidence or an adopted assumption.
+**Publicly accepted: 102 of 197 modeled vacancies; 95 remain. Pay coverage is 59.** PR539 passed ten direct-public groups at both widths at runtime `a392375404726fe2c46513b02c975732f5abdfff`. Explicit duty confirmation remains required; eligible references do not establish complete market evidence or adopted assumptions.
 
 | PR | Coverage | Runtime | Deployment | Successful exact CI | Direct public checks |
 | --- | ---: | --- | --- | ---: | --- |
@@ -11,6 +11,7 @@
 | [533](https://github.com/ed1017/people-analytics-ai/pull/533) | 84/197 | `d63590c8624fd92b6eab51daa86c9ecce3d19406` | `dpl_EygB6pjkQXvFBNFGKoW4kpbMg9Rs` | 41286136750 | 8 per width |
 | [535](https://github.com/ed1017/people-analytics-ai/pull/535) | 86/197 | `cd50fbd5ac370b0465507d56085dd5b922967b05` | `dpl_9FrQeoEUvUVtzBU8Jx97RTxUgphh` | 41288740951 | 4 groups per width |
 | [536](https://github.com/ed1017/people-analytics-ai/pull/536) | 96/197 | `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1` | `dpl_ArAgSAsFCgmywFKtp1YFvcYc6mQQ` | 41289621631 | 7 groups per width |
+| [539](https://github.com/ed1017/people-analytics-ai/pull/539) | 102/197 | `a392375404726fe2c46513b02c975732f5abdfff` | `dpl_82Pirma7qFuzApbwUcmk6b5HhLFu` | 41335955581 | 10 groups per width |
 
 Each accepted release passed independent review, source/invariant checks, isolated production-equivalent runtime verification and direct public desktop/mobile acceptance. HTTP200, no recorded browser/transport errors, clean teardown and inspected screenshots are recorded. Private runtime inputs remained unchanged. Counts from overlapping suites are not added into a purported unique test total.
 
@@ -45,4 +46,17 @@ PR535 successful CI41288740951, 257 historical market checks, eight context chec
 
 PR536 successful CI41289621631 and seven staged groups per width are recorded, with 298 historical market checks and targeted module/context/UI checks. Initial staged execution correctly hit the existing 20-goal limit; corrected continuation reused one new goal and verified Track/backup without changing the limit. Direct public acceptance passed seven groups per width: HTTP200, no recorded errors, zero asset replay, drained teardown and inspected screenshots. Seven explanation requests per run were mocked; no paid providers were called. Archive SHA256: `f5bf19b8d7d63f656e1b2ca3d767c074d2fef5eb5e9447bca76c6035622965e5`. Private inputs remain unchanged. No paid provider calls or fresh model-output acceptance occurred.
 
-The earlier remaining-country list is a historical PR533 snapshot. Current PR536 remaining101: IN59, SG11, AU9, BR7, CA5, GB5, US2, DE2, JP1. See the current action matrix and separate international-guidance assessment; neither research nor permission requests count as coverage.
+The earlier remaining-country list is a historical PR533 snapshot. Historical PR536 remaining 101: IN59, SG11, AU9, BR7, CA5, GB5, US2, DE2, JP1. See the current action matrix and separate international-guidance assessment; neither research nor permission requests count as coverage.
+
+
+## PR539 final public acceptance
+
+PR539 merged as `097bea9600c3909ed8445b7ba470f4c34c51dfc8`. Exact runtime `a392375404726fe2c46513b02c975732f5abdfff` was promoted through deployment `dpl_82Pirma7qFuzApbwUcmk6b5HhLFu` after successful CI41335955581, independent review, 478 local checks across 61 files, and final isolated runtime checks. Archive SHA-256: `bbb96d99b536b68db1c80c1fbd66c9556fef1f6e14d871e1ef306415d02ca1cb`. Private runtime inputs and accounting/access controls remain unchanged.
+
+Verification is deliberately separated by build. The intermediate `1033aca1b37d1b19505a8c22bf2432b264c5d012` reports include failed initial runs and continuation reports with six completed groups before a later failure; these are not a full terminal staged pass. Final exact-build `a392375` smoke reports pass three groups at each width. Final ten-group direct-public runs subsequently passed at both widths. Evidence identifiers are `position-modeled-duty-expansion-stage-1033aca-continuation-{1440,390}.json` and `position-modeled-duty-expansion-stage-a392375-smoke-{1440,390}.json` in the executor evidence archive.
+
+The candidate adds eleven fictional templates for thirteen modeled vacancies and six external matches, preserving four older US templates and 131 earlier references. Publicly accepted external coverage is now 102/197; modeled templates total fifteen covering eighteen vacancies. Remaining current gaps: IN59, SG11, AU9, BR7, GB4, US2, CA1, DE1, JP1. The Australian originals are recovered for a separate review; this release does not include Australian evidence. See [the source and duty contract](modeled-duty-expansion-2026-11-01.md). No paid provider calls or fresh model-answer acceptance occurred.
+
+The retained intermediate receipts distinguish six reader assertions before a harness lookup failure from the continuation's six source-planning groups and modeled-only flow (19 mocked requests) before a held-state assertion failed. Test-only corrections addressed those assertions; failed receipts remain retained. The final exact-build three-group smoke includes Track, Review and backup. None of these partial or bounded runs is labeled a full ten-group acceptance.
+
+Final reports: `integration-evidence/position-modeled-duty-expansion-public-a392375-{1440,390}.json`. Each records ten passed groups, HTTP 200, 19 locally mocked explanations, zero page/bridge/blocked/mock errors, drained teardown and zero replay. Actual public screenshots were inspected by the browser QA owner. Native backups use the same prefix with `-backup.json` and are 1,332,489 bytes each. The final complete public journey covers the exact promoted build; it does not retroactively turn intermediate failed receipts into passes.

@@ -1,4 +1,14 @@
-# Publicly accepted 96: remaining 101 source handoff
+# Remaining source handoff - current PR539 status
+
+**Publicly accepted: 102/197 non-pay vacancies; 95 unresolved. Pay: 59/197.** PR539 runtime `a392375404726fe2c46513b02c975732f5abdfff` passed ten direct-public groups at desktop and mobile widths. Eleven new fictional duty templates clarify thirteen vacancies; six independently reviewed source matches add coverage (Canada four, UK one, Germany one). Modeled duties do not themselves establish external evidence or approval. See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md) and [the exact duty/source contract](modeled-duty-expansion-2026-11-01.md).
+
+Current remaining country totals: India 59, Singapore 11, Australia 9, Brazil 7, UK 4, US 2, Canada 1, Germany 1 and Japan 1. The defined-but-unmatched follow-up roles are Canada Sales Operations, UK Client Operations and three Corporate Development vacancies, Germany Customer Success, and Japan Talent Management. Their blocker is current source fit, not absence of a modeled duty definition. Original non-sales Customer Success and transaction-focused Corporate Development duties remain unchanged.
+
+Australian six-digit and four-digit original OSL workbooks are now recovered. Their earlier zero-byte transport failures are historical. Published JSA CC BY 4.0 terms support a bounded attributed extraction subject to exclusions; exact row/taxonomy/mapping review and a separate checked release remain necessary. No Australian coverage is included in PR539. Denied routes elsewhere remain denied; no new account, source purchase or permission grant is implied.
+
+## Historical PR536 assessment (superseded where noted above)
+
+The following records the earlier 96/197 assessment and its evidence boundaries. Its missing-duty, unrecovered-Australian-original and no-further-candidate conclusions are historical, not the current status. Preserve the source-specific restrictions and limitations that have not been superseded.
 
 Final follow-up: [feasible alternatives and grouped terminal inputs](nonpay-final-feasible-alternatives-2026-11-01.md). Coverage remains 96/197; no additional mapping was accepted.
 
