@@ -5299,7 +5299,7 @@
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "1ae773029909a8d5055a757ee96596bd19888d0c8167bfc786a6ee5d6e1f1a44",
+      "sha256": "123c1f7ad9d7f6f7820460b2a8a2b9f640d882be17e384f458cc404fcd8a0278",
       "bytes": 10072
     },
     {
@@ -5329,8 +5329,8 @@
     },
     {
       "path": "tests/position-conditional-nonpay.test.mjs",
-      "sha256": "62087a3502702d3b0084d5a019ad771c6a4741468067dc2e403e4250451deb60",
-      "bytes": 19932
+      "sha256": "584958f44f6e5b0cc8a419b613f1c2f52e3968315ba200be148bcf00e6852cb6",
+      "bytes": 19969
     },
     {
       "path": "lib/data/network-market-nonpay-v1.json",
