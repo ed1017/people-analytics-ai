@@ -40,4 +40,6 @@ Initial CI41276728249 found an obsolete test expecting every UK Frontend referen
 
 Final source archive SHA256 `885748f33ac1f92e3f01bed081f92fefd75195682222412bbc3d3d00cd1a2020`, 1,233 runtime inputs and 1,088 manifest entries; private inputs unchanged. Staged desktop 1440/mobile 390 each passed ten journey groups: actual pre-upgrade chat/backup preservation, three published categories, source periods, consent/cancel, stale attachment, immutable revisions, Inventory/Overview context, reload, unsupported/foreign/mixed scope, restore and Track copy. HTTP 200 throughout, eight mocked responses each, all error arrays empty and teardown drained. Focused category/details images were inspected.
 
+Staging used exact authenticated GET-response replay for protected assets; public checks used direct requests without replay.
+
 All model traffic was intercepted or blocked; canonical tool/context behavior was tested, not fresh model answer quality. No paid calls, new credentials/access, denied-route workarounds, Lab validation or chart-overlay promotion occurred.
