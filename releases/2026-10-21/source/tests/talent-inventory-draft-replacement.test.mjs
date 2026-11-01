@@ -35,6 +35,7 @@ function renderHarness(initialDraft=null,initialLedger=storedLedger(),initialPro
  const react={...React,useEffect:(fn,deps)=>{const i=cursor++,previous=hooks[i];if(!previous||deps.some((v,j)=>v!==previous[j]))effects.push(fn);hooks[i]=deps;},useState,useMemo:fn=>fn(),useId:()=>':inventory:',useRef:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]={current:initial};return hooks[i];}};
  vm.runInNewContext(source,{exports,require:name=>{
   if(name==='react')return react;
+  if(name==='@/components/planner-results')return {PlannerResults:({children})=>children};
   if(name==='@/components/interactive-planner')return {InteractivePlanner:'Planner'};
   if(name==='@/components/decision-store')return {decisionStore:store,useDecisionStorage:()=>snapshot};
   if(name==='./planning-session-context')return {usePlanningSession:()=>({goalKey:'test:'})};

@@ -16,7 +16,7 @@ import * as inputDisplay from '../lib/workforce-input-display.ts';
 import {componentModule} from './fixtures/component-module.mjs';
 import * as catalog from '../lib/catalog-display.ts';
 import * as choice from '../lib/staffing-choice-summary.ts';
-const planner=componentModule('interactive-planner.tsx',{'@/lib/catalog-display':catalog});
+const planner=componentModule('interactive-planner.tsx',{'@/lib/catalog-display':catalog,'./planner-results':{useSplitPlannerResults:()=>false,PlannerResults:({children})=>children}});
 const decision=componentModule('scenario-decision-summary.tsx',{'@/lib/staffing-choice-summary':choice,'@/lib/swp-demo':demo});
 const require=createRequire(import.meta.url);
 function component(path,modules={}){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(new URL('../components/'+path,import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:id=>modules[id]??require(id)});return exports;}

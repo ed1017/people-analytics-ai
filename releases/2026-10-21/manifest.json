@@ -4394,8 +4394,8 @@
     },
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
-      "bytes": 7529,
-      "sha256": "d557bb696887ceb4a6f67393b57b851d944408173ff7b091c14edfe747fde7e3"
+      "bytes": 7622,
+      "sha256": "e0cfcf3d7ab9d9af68c43e211ca8a1fb336a58032e580a1a1858384236b1de57"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
@@ -4929,8 +4929,8 @@
     },
     {
       "path": "tests/talent-inventory-draft-replacement.test.mjs",
-      "bytes": 12391,
-      "sha256": "f44d5ec788d61fbd1997b49372e20534ac3afb56c6d3fea0b2b5142f2615dd53"
+      "bytes": 12482,
+      "sha256": "9251ea85ac786f24f9ab344c0cb5ad7cf7b59ef2e5fa62cb639fa2e951a2706c"
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
@@ -5774,8 +5774,8 @@
     },
     {
       "path": "tests/planner-results-placement.test.mjs",
-      "sha256": "c4f91c3c193684eea05d0cbe9a8542ea2e178b93a298831177cc9165b41932bb",
-      "bytes": 2797
+      "sha256": "b8135120f2799ee0857e3d3f81fe1938923cdf1b046678ed3897ed922dafea8e",
+      "bytes": 2796
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
