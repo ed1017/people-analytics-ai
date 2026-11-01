@@ -1,4 +1,6 @@
 // @ts-expect-error Native tests share canonical source.
+import {australiaOscaShortageReferences} from './position-australia-osca-shortage.ts';
+// @ts-expect-error Native tests share canonical source.
 import {australiaShortageReferences,type PositionOccupationalShortageFacts} from './position-australia-shortage.ts';
 // @ts-expect-error Native tests share canonical source.
 import {canadaDutyGuidanceReferences,type PositionOccupationalDutyGuidanceFacts} from './position-canada-duty-guidance.ts';
@@ -93,7 +95,7 @@ function canonicalReferences():PositionMarketContextReference[]{
  cards.push(...escoBudgetReferences(),...usProductCareerReferences());
  cards.push(...canadaDutyGuidanceReferences());
  cards.push(...canadaDutyExpansionReferences(),...peopleAnalyticsEscoReferences(),...businessAnalystCareerReferences());
- cards.push(...australiaShortageReferences());
+ cards.push(...australiaShortageReferences(),...australiaOscaShortageReferences());
  return cards;
 }
 const references=canonicalReferences();

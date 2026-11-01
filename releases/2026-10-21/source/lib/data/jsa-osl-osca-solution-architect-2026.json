@@ -1,0 +1,26 @@
+{
+  "id": "jsa-osl-osca-2026-solution-architect-v1",
+  "sourceUrl": "https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_occupation_shortage_list_-_6_digit_anzsco_and_osca.xlsx",
+  "sha256": "9d35938318b7032f95a1f203962f83d00800622a98a8f2df17d8ace90fedcedd",
+  "bytes": 151746,
+  "libraryFileId": "libfile_29659f98935481919fe6cd2eea6afafb",
+  "libraryVersion": 0,
+  "extractSha256": "b18f996014afcd9478c47fb93fce121cd3f3bcaf12449ac94da3540a5abb7f80",
+  "provenance": "Parent Linux extraction worker verified original hash and bounded OSCA row. Local adapter author did not inspect workbook bytes. No CA modeled duties or consent transferred.",
+  "capturedAt": "2026-11-01",
+  "taxonomy": "OSCA 2024 v1.0",
+  "sheet": "2026 OSL (OSCA 2024)",
+  "excelRow": 456,
+  "raw": {
+    "A": "273233",
+    "E": 1,
+    "F": 2,
+    "D": "Clear",
+    "C": "NS",
+    "B": "Solution Architect"
+  },
+  "definitionUrl": "https://www.abs.gov.au/statistics/classifications/osca-occupation-standard-classification-australia/2024-version-1-0/browse-classification/2/27/273/2732/273233",
+  "methodologyUrl": "https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_osl_methodology.pdf",
+  "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "rightsPolicyUrl": "https://www.jobsandskills.gov.au/copyright-and-disclaimer"
+}
