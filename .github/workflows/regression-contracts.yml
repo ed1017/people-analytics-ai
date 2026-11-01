@@ -70,6 +70,9 @@ jobs:
       - name: Verify explicit position market assumptions
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-market-assumptions.test.mjs tests/position-market-ui.test.mjs tests/position-market-context.test.mjs tests/position-market-context-ui.test.mjs tests/position-outlook-coverage.test.mjs tests/market-context-lookup.test.mjs tests/position-uk-hiring-context.test.mjs tests/position-conditional-nonpay.test.mjs tests/position-network-market-context.test.mjs tests/position-modeled-duties.test.mjs tests/position-modeled-duties-ui.test.mjs
+      - name: Verify visible market exploration without provider calls
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/home-prompt-categories.test.mjs tests/home-market-context-explorer.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs
