@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "2eb4ae0f174f506b9f780573ad97b93c5eb3639eb4b985f6b2dda9225f275270",
-      "bytes": 17755
+      "sha256": "82ca8a5ed392d5fe1fad5aa9bddbfcefba613f83ab502fdc6f4d99bbfa12271d",
+      "bytes": 17809
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "e20c89e35610a45a85cd946eee84379d65d6b78889cbd3b059291747dda18a28",
-      "bytes": 23436
+      "sha256": "57123d8c36c32dafb71a83febfa3a1ce8c95bf55516d1e759c07b1b18b38ab42",
+      "bytes": 23617
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5304,8 +5304,8 @@
     },
     {
       "path": "lib/market-context-lookup.ts",
-      "sha256": "0f03c495f41a399a5b3a2d634f7958499b6c3a4ecb1ddb29fe6261ec0af42819",
-      "bytes": 9586
+      "sha256": "fa2902cf949602a85cbbebff8a968fae28f1c509372004f563e1ddef4dd68742",
+      "bytes": 9640
     },
     {
       "path": "tests/market-context-lookup.test.mjs",
@@ -5389,7 +5389,7 @@
     },
     {
       "path": "tests/position-it-systems-market.test.mjs",
-      "sha256": "69d0d176de3eb150901feeb9d41fa550fd1f444946df63f5c6839318df6072e5",
+      "sha256": "1ddd0639f2f25163b8e11d4287e6caddea7c4c7e1681933ad6c5ea1f3a088aec",
       "bytes": 8906
     },
     {
@@ -5449,7 +5449,7 @@
     },
     {
       "path": "tests/position-uk-demand.test.mjs",
-      "sha256": "3ab41dfb918f9e5275548f69e6770f7fe31e789f7bbc558e71bddd06231520a6",
+      "sha256": "8020968065152614ddce14722d763c2e8e8a32f485166fb1b607ae5837c1e52c",
       "bytes": 10382
     },
     {
@@ -5469,7 +5469,7 @@
     },
     {
       "path": "tests/position-france-recruitment.test.mjs",
-      "sha256": "2d5a58b009b8835f286919b99f96892a7d938b1a34515554ffc2c337a35de698",
+      "sha256": "0b170c2b3850ee8f95c9810d019f4079867bc66c2287989f60c81b9c0e12e64d",
       "bytes": 8975
     },
     {
@@ -5504,12 +5504,12 @@
     },
     {
       "path": "tests/position-corporate-development-market.test.mjs",
-      "sha256": "4699d11da54cfa6c8769070f559c36b764b6ab3d31367252048da6b3af258e7b",
+      "sha256": "de354d610a06a6182b86537c2e8c68ea559d84a8dc6e786cb6ebecf192ec6a97",
       "bytes": 6607
     },
     {
       "path": "tests/position-japan-skills.test.mjs",
-      "sha256": "8b5415c2b0d1067ea13cc1d8ddf746515d58df2f9d142cc22c26fd8d8e229516",
+      "sha256": "50cf9dcd2641849cb9c6525ba816672c28a2b263e24dde98923ca590ed577b2a",
       "bytes": 7951
     },
     {
@@ -5544,7 +5544,7 @@
     },
     {
       "path": "tests/position-esco-japan-extension.test.mjs",
-      "sha256": "97c4f9072724e440e756b7b806a3883a5b2dd7008a2da97a6e50386097400958",
+      "sha256": "c9d86618fae47288c1195c7e7297943deeacead6e6b56db453b6ce347b1a02dc",
       "bytes": 9025
     },
     {
@@ -5564,7 +5564,7 @@
     },
     {
       "path": "tests/position-career-profile-skills.test.mjs",
-      "sha256": "f197f8d23425d4259b9fb7bd170351ae1249ee88ac069108023e7c0649b6be93",
+      "sha256": "18edf2693fe5997bdca3284599d9c539b983d101afcc56ce20cfb0ad2c3c5103",
       "bytes": 7597
     },
     {
@@ -5589,7 +5589,7 @@
     },
     {
       "path": "tests/position-esco-followup.test.mjs",
-      "sha256": "760b336a21f54bce867fe24f88e3c2f01168bfc18c41a6c149294e18d84f2120",
+      "sha256": "4ca992ac4b83eb89a76e469c6c2f02f23ae523a3cebcc39bb64d898d2098af2d",
       "bytes": 9568
     },
     {
@@ -5724,23 +5724,43 @@
     },
     {
       "path": "lib/position-australia-shortage.ts",
-      "sha256": "6c25b2620bc8be35bd1123e0d92f6418ac03877e70a893c7d94d2bd0920adf32",
-      "bytes": 4490
+      "sha256": "885e2abff5519cfc5400d67be6d8ddb8dc76e21060117e9f1914a2dd73f8712c",
+      "bytes": 4506
     },
     {
       "path": "tests/position-australia-shortage-context.test.mjs",
-      "sha256": "50925ce2ee892442e9024a8873d669e7bad40a202287932c26a771502ed28fd2",
-      "bytes": 6583
+      "sha256": "21adb55ebeca3ccdc25c060001841356a31007ec7a8c91a2b79ea5799023c128",
+      "bytes": 6617
     },
     {
       "path": "tests/position-australia-shortage-ui.test.mjs",
-      "sha256": "a5e38942d0a2fa56ee19f9adec3de02d2f0de8a3979ea640d4e5274e877ec365",
-      "bytes": 9775
+      "sha256": "37804456a8831a9c62621616c80d5c8d3e359efa5a29084177a9bd40ab4ea745",
+      "bytes": 9786
     },
     {
       "path": "tests/position-australia-shortage.test.mjs",
       "sha256": "9bcb6f4affa782881d00c522faefaba1a60b7f2e5eaa5ec4318b8baa01c2fef8",
       "bytes": 3162
+    },
+    {
+      "path": "lib/data/jsa-osl-osca-solution-architect-2026.json",
+      "sha256": "7cb8bda5edfe6c33269f26138f4d3b1232e2432cd864f91e0f7447f48c2c5ed4",
+      "bytes": 1360
+    },
+    {
+      "path": "lib/position-australia-osca-shortage.ts",
+      "sha256": "4a7380f876f3afc3656751a3bc6c79fa30db9169dafaf3e8bf6c131d3c3094ff",
+      "bytes": 2906
+    },
+    {
+      "path": "tests/position-australia-osca-context.test.mjs",
+      "sha256": "b0cfa802b8a4ed426d326f0abc4fecb5ef7dd37f253843a96c41eb109fd10e4a",
+      "bytes": 6212
+    },
+    {
+      "path": "tests/position-australia-osca-shortage.test.mjs",
+      "sha256": "61c97d4d515e8af696864b817b7864f0fde21ec81351292e68adb80d7aa93620",
+      "bytes": 2036
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

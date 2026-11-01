@@ -1,6 +1,6 @@
 import source from './data/jsa-osl-selected-2026.json' with {type:'json'};
 import type {PositionMarketContextReference} from './position-market-context';
-export type PositionOccupationalShortageFacts={kind:'occupational-shortage';ratingCode:'NS'|'S'|'R'|'M';ratingLabel:string;confidence:'Clear'|'On-balance'|null;shortageDriver:string|null;taxonomy:'ANZSCO 2022';classificationLevel:'occupation'|'unit-group';assessmentYear:2026;sourceExcelRow:number;sourceSheet:string;raw:{A:string;B:string;C:string;D:string};methodologyUrl:string;rightsPolicyUrl:string};
+export type PositionOccupationalShortageFacts={kind:'occupational-shortage';ratingCode:'NS'|'S'|'R'|'M';ratingLabel:string;confidence:'Clear'|'On-balance'|null;shortageDriver:string|null;taxonomy:'ANZSCO 2022'|'OSCA 2024 v1.0';classificationLevel:'occupation'|'unit-group';assessmentYear:2026;sourceExcelRow:number;sourceSheet:string;raw:{A:string;B:string;C:string;D:string};methodologyUrl:string;rightsPolicyUrl:string};
 type Reference=Omit<PositionMarketContextReference,'kind'|'facts'>&{kind:'occupational-shortage';facts:PositionOccupationalShortageFacts};
 const labels={NS:'No shortage',S:'Shortage',R:'Regional shortage',M:'Metropolitan shortage'} as const;
 const mappings=[
