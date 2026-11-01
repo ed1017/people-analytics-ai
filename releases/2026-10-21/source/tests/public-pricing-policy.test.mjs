@@ -21,3 +21,10 @@ test('new verification is used on next request without changing the previous sna
  const second=pricingPolicyForRoute(next,'chat',now+6*3600000);
  assert.equal(first.validUntil,old.validUntil);assert.equal(second.validUntil,next.validUntil);
 });
+
+test('explicit non-expiring verification remains valid without weakening terms or revocation',()=>{
+ const r={...fixture(),validUntil:null};
+ for(const route of ['home-solution','chat','plan','intake','capability'])assert.equal(pricingPolicyForRoute(r,route,Date.parse('2040-01-01')).validUntil,null);
+ for(const patch of [{validUntil:undefined},{validUntil:''},{validUntil:'infinity'},{status:'unavailable'},{verifiedAt:'2041-01-01'},{terms:{}}])assert.throws(()=>pricingPolicyForRoute({...r,...patch},'chat',Date.parse('2040-01-01')));
+ const missing={...r};delete missing.validUntil;assert.throws(()=>pricingPolicyForRoute(missing,'chat',now));
+});

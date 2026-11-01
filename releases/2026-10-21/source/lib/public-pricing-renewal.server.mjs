@@ -51,8 +51,8 @@ export function createPricingRenewalHandler({production=false,deploymentHostname
     stage='renewal';
     const result=await renew({eventId,pricingDigest:proof.digest,observedAt:proof.verifiedAt,sources:proof.sources,matches:true},controller.signal);
     controller.signal.throwIfAborted();
-    const expectedUntil=new Date(Date.parse(proof.verifiedAt)+24*60*60*1000).toISOString();
-    if(!result||result.recorded!==true||typeof result.replayed!=='boolean'||result.version!==eventId||typeof result.verifiedAt!=='string'||Date.parse(result.verifiedAt)!==Date.parse(proof.verifiedAt)||typeof result.validUntil!=='string'||Date.parse(result.validUntil)!==Date.parse(expectedUntil))throw Error('receipt');
+    const expectedUntil=null; // Explicitly non-expiring; verification and revocation remain mandatory.
+    if(!result||result.recorded!==true||typeof result.replayed!=='boolean'||result.version!==eventId||typeof result.verifiedAt!=='string'||Date.parse(result.verifiedAt)!==Date.parse(proof.verifiedAt)||result.validUntil!==expectedUntil)throw Error('receipt');
     return reply(200,{ok:true,status:result.replayed?'already-recorded':'renewed',validUntil:expectedUntil});
    })();
    return await Promise.race([work,aborted]);

@@ -34,7 +34,7 @@ export function createPublicAiApplication({options,enabled=PUBLIC_AI_ENABLED,adm
   return Number.isFinite(at)&&['home-solution','chat','plan','intake','capability'].every(kind=>{
    const policy=policyForRoute(kind);
    // Receipt lasts30seconds; leave the per-round timeout and safety margin too.
-   return at>=Date.parse(policy.verifiedAt)&&at+30000+policy.timeoutMs+30000<Date.parse(policy.validUntil);
+   return at>=Date.parse(policy.verifiedAt)&&(policy.validUntil===null||at+30000+policy.timeoutMs+30000<Date.parse(policy.validUntil));
   });
  };
  return createPublicAiDispatcher({options,enabled:true,configurationCheck,now,handlers:Object.fromEntries(
