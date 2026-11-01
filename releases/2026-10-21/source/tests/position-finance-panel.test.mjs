@@ -1,3 +1,5 @@
+import {generateCompanyPositionInventoryV2} from '../lib/company-position-model-v2.ts';
+import {POSITION_MODELED_DUTIES_FIELD,listPositionModeledDuties} from '../lib/position-modeled-duties.ts';
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createRequire} from 'node:module';import {fileURLToPath} from 'node:url';import vm from 'node:vm';
 import {createPositionAllocation,calculatePositionAllocation} from '../lib/position-allocation.ts';
 import {DEMO_POSITION_INVENTORY,COMPANY_POSITION_INVENTORY} from '../lib/position-inventory.ts';
@@ -12,7 +14,7 @@ const nativeRequire=createRequire(import.meta.url),at='2026-10-30T03:00:00.000Z'
 function fixture(inventory=DEMO_POSITION_INVENTORY){const ids=inventory.positions.filter(p=>p.status==='vacant'&&p.vacancyStatus!=='frozen').slice(0,12).map(p=>p.id),allocation=createPositionAllocation(ids,inventory===DEMO_POSITION_INVENTORY,inventory),savedCapture={scenarioId:'one',scenarioNumber:1,revision:1,sequence:1,savedAt:at,draft:structuredClone(allocation),result:calculatePositionAllocation(allocation)},allocationLedger={version:1,datasetToken:token,goalId:'a',records:[savedCapture]};return {allocation,savedCapture,allocationLedger,datasetToken:token,goalId:'a'};}
 function render(props,extraFields={}){
  const state={ready:true,saved:true,data:{revision:1,goals:{activeId:'a',goals:[{id:'a',statement:'Goal A'}]},workspaces:{a:{fields:extraFields}}}};
- const module={exports:{}};const customRequire=name=>name==='./position-market-context'?{PositionMarketContext:()=>null}:name==='./position-scenario-explanation'?{PositionScenarioExplanation:()=>null}:name==='@/components/decision-store'?{useDecisionStorage:()=>state,decisionStore:{getSnapshot:()=>state,getDatasetToken:()=>token}}:name.startsWith('@/lib/')?nativeRequire(fileURLToPath(new URL('../lib/'+name.slice('@/lib/'.length)+'.ts',import.meta.url))):require(name);
+ const module={exports:{}};const customRequire=name=>name==='./position-modeled-duties'?{PositionModeledDuties:()=>null}:name==='./position-market-context'?{PositionMarketContext:()=>null}:name==='./position-scenario-explanation'?{PositionScenarioExplanation:()=>null}:name==='@/components/decision-store'?{useDecisionStorage:()=>state,decisionStore:{getSnapshot:()=>state,getDatasetToken:()=>token}}:name.startsWith('@/lib/')?nativeRequire(fileURLToPath(new URL('../lib/'+name.slice('@/lib/'.length)+'.ts',import.meta.url))):require(name);
  vm.runInNewContext(compiled,{module,exports:module.exports,require:customRequire,console,structuredClone},{filename:fileURLToPath(file)});
  return renderToStaticMarkup(React.createElement(module.exports.PositionFinancePanel,props));
 }
@@ -33,7 +35,7 @@ function eventHarness(initial){
  let cursor=0,hooks=[],props=initial;
  const state={ready:true,saved:true,data:{revision:1,goals:{activeId:'a',goals:[{id:'a',statement:'Goal A'},{id:'b',statement:'Goal B'}]},workspaces:{a:{fields:{}},b:{fields:{}}}}};
  const module={exports:{}};
- const customRequire=name=>name==='react'?{...React,useId:()=>':finance:',useMemo:fn=>fn(),useState:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]=typeof initial==='function'?initial():initial;return [hooks[i],next=>{hooks[i]=typeof next==='function'?next(hooks[i]):next;}];}}:name==='./position-market-context'?{PositionMarketContext:()=>null}:name==='./position-scenario-explanation'?{PositionScenarioExplanation:'Explanation'}:name==='@/components/decision-store'?{useDecisionStorage:()=>state,decisionStore:{getSnapshot:()=>state,getDatasetToken:()=>token}}:name.startsWith('@/lib/')?nativeRequire(fileURLToPath(new URL('../lib/'+name.slice('@/lib/'.length)+'.ts',import.meta.url))):require(name);
+ const customRequire=name=>name==='react'?{...React,useId:()=>':finance:',useMemo:fn=>fn(),useState:initial=>{const i=cursor++;if(!(i in hooks))hooks[i]=typeof initial==='function'?initial():initial;return [hooks[i],next=>{hooks[i]=typeof next==='function'?next(hooks[i]):next;}];}}:name==='./position-modeled-duties'?{PositionModeledDuties:'ModeledDuties'}:name==='./position-market-context'?{PositionMarketContext:()=>null}:name==='./position-scenario-explanation'?{PositionScenarioExplanation:'Explanation'}:name==='@/components/decision-store'?{useDecisionStorage:()=>state,decisionStore:{getSnapshot:()=>state,getDatasetToken:()=>token}}:name.startsWith('@/lib/')?nativeRequire(fileURLToPath(new URL('../lib/'+name.slice('@/lib/'.length)+'.ts',import.meta.url))):require(name);
  vm.runInNewContext(compiled,{module,exports:module.exports,require:customRequire,console,structuredClone});
  function render(next){if(next)props=next;cursor=0;const nodes=[];function walk(n){if(!n||typeof n!=='object')return;nodes.push(n);React.Children.forEach(n.props?.children,walk);}walk(module.exports.PositionFinancePanel(props));return nodes;}
  const packet=()=>render().find(n=>n.type==='Explanation').props.packet;
@@ -73,4 +75,15 @@ test('explicit handoff binds old funding revision and never substitutes latest o
  assert.match(render({...props,initialFinanceRevision:null},fields),/Funding not verified/);
  const missing=render({...props,initialFinanceRevision:99},fields);
  assert.match(missing,/selected funding revision is unavailable/);assert.match(missing,/<fieldset disabled=/);
+});
+
+test('modeled duties explanation uses explicit exact revision and clears independently',()=>{
+ const inventory=generateCompanyPositionInventoryV2(),ids=inventory.positions.filter(p=>p.status==='vacant'&&p.countryCode==='US'&&p.role==='IT Engineer').map(p=>p.id),allocation=createPositionAllocation(ids,false,inventory);
+ const props=fixture();props.allocation=allocation;props.savedCapture={...props.savedCapture,draft:structuredClone(allocation),result:calculatePositionAllocation(allocation)};props.allocationLedger={...props.allocationLedger,records:[props.savedCapture]};
+ const template=listPositionModeledDuties(allocation)[0],records=[1,2].map(dutyRevision=>({scenarioId:'one',allocationRevision:1,allocationSignature:positionAllocationSignature(allocation),dutyRevision,sequence:dutyRevision,adoptedAt:at,templateId:template.id,templateVersion:template.version}));
+ const h=eventHarness(props);h.state.data.workspaces.a.fields[POSITION_MODELED_DUTIES_FIELD]={version:1,datasetToken:token,goalId:'a',records};const original=structuredClone(h.state.data.workspaces.a.fields);
+ assert.equal(h.packet().modeledDuties,null,'no automatic latest');const select=v=>h.render().find(n=>n.type==='ModeledDuties').props.onSelectedRevision(v);
+ select(1);assert.deepEqual(h.packet().modeledDuties.record,records[0]);assert.equal(h.packet().marketContext,null);select(2);assert.deepEqual(h.packet().modeledDuties.record,records[1]);select(null);assert.equal(h.packet().modeledDuties,null);
+ select(1);const changed={...props,allocation:structuredClone(allocation)};changed.allocation.input.horizonMonths=9;h.render(changed);assert.equal(h.packet(),null,'unsaved allocation cannot send adopted duties');h.render(props);assert.deepEqual(h.packet().modeledDuties.record,records[0]);assert.deepEqual(h.state.data.workspaces.a.fields,original,'selection does not mutate saved versions');
+ const other={...props,goalId:'b',allocationLedger:{...props.allocationLedger,goalId:'b'}};h.state.data.goals.activeId='b';h.render(other);assert.equal(h.packet().modeledDuties,null,'other goal cannot inherit duty selection');
 });

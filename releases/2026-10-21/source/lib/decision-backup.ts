@@ -1,4 +1,6 @@
 // @ts-expect-error Native tests share canonical TypeScript.
+import {POSITION_MODELED_DUTIES_FIELD,readPositionModeledDutiesLedger} from './position-modeled-duties.ts';
+// @ts-expect-error Native tests share canonical TypeScript.
 import {POSITION_MARKET_CONTEXT_FIELD,readPositionMarketContextLedger} from './position-market-context.ts';
 // @ts-expect-error Native tests share canonical TypeScript source.
 import {listPositionResultTargets} from './position-result-targets.ts';
@@ -38,6 +40,7 @@ function validated(envelope:string,datasetToken:string):{data:DecisionData;count
   if(Object.hasOwn(f,planAlternativesField)){const value=readPlanAlternatives(f[planAlternativesField],{goalId:id,goal});requireValue(value,'Saved plans cannot be verified.');counts.plans+=value.plans.length;}
   if(Object.hasOwn(f,bundleWorkspaceField)){const value=readBundleWorkspace(f[bundleWorkspaceField],id);requireValue(value,'Saved bundles cannot be verified.');counts.bundles+=value.attachments.length;}
   if(Object.hasOwn(f,POSITION_MARKET_CONTEXT_FIELD))requireValue(readPositionMarketContextLedger(f[POSITION_MARKET_CONTEXT_FIELD],datasetToken,id,f[POSITION_ALLOCATION_LEDGER_FIELD]),'Saved position market context cannot be verified.');
+  if(Object.hasOwn(f,POSITION_MODELED_DUTIES_FIELD))requireValue(readPositionModeledDutiesLedger(f[POSITION_MODELED_DUTIES_FIELD],datasetToken,id,f[POSITION_ALLOCATION_LEDGER_FIELD]),'Saved modeled duties cannot be verified.');
   const positionTargets=listPositionResultTargets(f,datasetToken,id);
   if(Object.hasOwn(f,manualPlanResultsField)){const value=readManualResults(f[manualPlanResultsField],id);requireValue(value.targets.every(item=>item.target.datasetToken===datasetToken),'Saved result history belongs to a different dataset.');requireValue(value.targets.every(item=>item.target.metric!=='position-ready-fte'||positionTargets.some(target=>JSON.stringify(target)===JSON.stringify(item.target))),'Saved position results do not match an exact tracked scenario.');counts.results+=value.entries.length;}
   if(Object.hasOwn(f,goalProgressField)){const value=readGoalProgressLedger(f[goalProgressField],id);counts.progressEvents+=value.events.length;}
