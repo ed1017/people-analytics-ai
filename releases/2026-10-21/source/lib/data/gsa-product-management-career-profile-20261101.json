@@ -1,0 +1,32 @@
+{
+  "id": "gsa-product-management-career-profile-20261101-v1",
+  "source": {
+    "publisher": "U.S. General Services Administration, Technology Transformation Services, U.S. Digital Corps",
+    "title": "The Opportunity - Product Management track",
+    "url": "https://digitalcorps.gsa.gov/opportunity/",
+    "file": "gsa-digital-corps-opportunity.html",
+    "sha256": "aedce3f29625cc63fd315e57fb4ca1c670878d4a671f5f8508667364e4d552fa",
+    "bytes": 32239,
+    "retrievedAt": "2026-11-01",
+    "publicationDate": null,
+    "scope": "U.S. federal early-career digital-service fellowship track guidance",
+    "section": "Product Management / div#a3",
+    "sourceQualifier": "Work in this track may include:",
+    "orderedTasks": [
+      "Contributing to the end-to-end development of a digital product or service, from concept to delivery",
+      "Coordinating cross-functional stakeholders",
+      "Using agile and lean approaches to product management",
+      "Conducting qualitative and quantitative research to understand user needs and product performance",
+      "Collaborating on product vision, roadmapping, and metric development"
+    ]
+  },
+  "rights": {
+    "policyUrl": "https://www.gsa.gov/website-information/website-policies",
+    "policyFile": "gsa-website-policies.html",
+    "policySha256": "7c8fdc89490f88733733a8a8fa9f69ad6371821e1ed810e5733a96c4098ca63f",
+    "basis": "GSA policy states most federal employee-authored material is public domain in the US and may be copied/distributed without permission; photos/graphics and third-party material can be restricted. Selected track text has no third-party credit or separate rights notice in inspected original.",
+    "attribution": "U.S. General Services Administration, U.S. Digital Corps, Product Management track, accessed 1 November 2026. Selected task text reformatted for planning reference; no endorsement implied.",
+    "excludedMaterials": "Images, graphics, trademarks and external linked materials not included."
+  },
+  "mappingCondition": "Confirm the planned role concerns digital product or service discovery, user-needs research, prioritisation and requirements with delivery teams, and evaluation of product outcomes. Use this as a federal early-career task reference, not a claim of equivalent seniority or national occupational requirements."
+}

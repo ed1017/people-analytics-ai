@@ -1,6 +1,6 @@
 import source from './data/ncs-ai-engineer-career-profile-20261101.json' with {type:'json'};
 import type {PositionMarketContextReference} from './position-market-context';
-export type PositionCareerProfileSkillsFacts={kind:'career-profile-skills';skills:string[];tasks:string[];ordering:'source order, not ranking';capturedAt:string;sourceUpdatedAt:null;profileScope:'England careers guidance'};
+export type PositionCareerProfileSkillsFacts={kind:'career-profile-skills';skills:string[];tasks:string[];ordering:'source order, not ranking';capturedAt:string;sourceUpdatedAt:null;profileScope:'England careers guidance'|'U.S. federal early-career digital-service guidance';taskQualifier?:'Work may include'};
 
 /** Qualitative source lists are not ratings and have no implied numerical scale. */
 export function careerProfileReferences():PositionMarketContextReference[]{
