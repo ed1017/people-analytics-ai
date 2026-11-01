@@ -1,11 +1,12 @@
-// Suggested questions only. Every label is submitted verbatim through normal chat.
+// Ordinary questions submit verbatim; the market starter opens an explicit scoped lookup.
 // @ts-expect-error Native regression tests share the same source.
 import {capacityRiskPrompt} from './group-capacity-risk.ts';
+export const marketExplorationPrompt='What does the hiring market look like for a role?';
 export const homePromptCategories = [
   {id:'explore',label:'Explore',prompts:[
     capacityRiskPrompt,
     'Which business unit has the highest voluntary turnover, and what should we investigate?',
-    'Which business units have the most open positions and the longest average time to fill?',
+    marketExplorationPrompt,
   ]},
   {id:'capacity',label:'Capacity Planning',prompts:[
     'How can we close a staffing gap?',

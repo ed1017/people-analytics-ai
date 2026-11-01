@@ -4099,18 +4099,18 @@
     },
     {
       "path": "components/home-prompt-categories.tsx",
-      "sha256": "0c75a9ae8abfbb6019b358411051376ee0a36cce7c07a06cae61586375a97e37",
-      "bytes": 1693
+      "sha256": "ae9106822792167bf0779f24cdfbb98c98cb59b29cef1c161132aed2ff10a6a7",
+      "bytes": 2413
     },
     {
       "path": "lib/home-prompt-categories.ts",
-      "sha256": "3cb0a9b02c031f8e133c35e706325fed78ce641bb6bd9425c2bc27fb43047af6",
-      "bytes": 909
+      "sha256": "2d900d9b721ee677f43b79a9817cf64896ccc9ad355aacd44934333fc7887ae5",
+      "bytes": 940
     },
     {
       "path": "tests/home-prompt-categories.test.mjs",
-      "sha256": "384ca132ba2edee260980f6452e6ac31fe1c4eacceb562f036282ed6d7494817",
-      "bytes": 2471
+      "sha256": "83d22b425a3343a7dc08602e36ff367039eeb9503dbbad2ad9cf2b820fe0eaae",
+      "bytes": 2953
     },
     {
       "path": "components/chart-pointer-tooltip.tsx",
@@ -5064,8 +5064,8 @@
     },
     {
       "path": "tests/exploration-issue-starters.test.mjs",
-      "sha256": "1ec61adf0a4e1778411c74281df86ae1ad1fe948c1bcccd522d76beb6c43dec7",
-      "bytes": 2231
+      "sha256": "c440d82d0fed7883643e3f3fbed4712c16832b033ded5c77eb84f334d9fefb12",
+      "bytes": 2157
     },
     {
       "path": "components/home-workforce-kpi-targets.tsx",
@@ -5269,8 +5269,8 @@
     },
     {
       "path": "components/workforce-planning/position-market-context.tsx",
-      "sha256": "fc51c9979b099f9214d718bb97f0d9368dae4ae95e29afae9e0dc09ee98769ab",
-      "bytes": 12753
+      "sha256": "1e2c361409298e2eee1ecadecee8278a92f94b919f8356b69532e8d0ab8dbf5b",
+      "bytes": 12774
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
@@ -5371,6 +5371,16 @@
       "path": "tests/position-modeled-duties.test.mjs",
       "sha256": "9f9d64edfdf45b394988bb01c25d07349e0acc485959cc55fa1c0fbb45692db6",
       "bytes": 9482
+    },
+    {
+      "path": "components/home-market-context-explorer.tsx",
+      "sha256": "0939450d710e5f5dd7b169185c7ce1989c86e10f458718aff95e797e2f858a37",
+      "bytes": 5059
+    },
+    {
+      "path": "tests/home-market-context-explorer.test.mjs",
+      "sha256": "171d545669f0b5f16d34248c89b181f88cd0a8b5df1933f89c1414c5f471bad6",
+      "bytes": 6717
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
