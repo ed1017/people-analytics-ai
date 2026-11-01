@@ -1,0 +1,10 @@
+{
+  "version": "it-systems-nonpay-mapping-v1",
+  "roleId": "IT-ENG",
+  "role": "IT Engineer",
+  "countryCode": "US",
+  "onetCode": "15-1211.00",
+  "outlookCode": "15-1211",
+  "duties": "Use this reference only for a planned role performing substantive business requirements evaluation and system design, together with systems integration and change testing. Exclude routine operations, server administration, help-desk support and implementation without substantive systems analysis.",
+  "limit": "Conditional broader Computer Systems Analysts reference, not an IT Engineer-specific estimate. The fictional IT duty template does not by itself establish this match; separately confirm these systems-analysis duties. Shared national occupation figures are not additive across mapped roles. No available-applicant, local hiring-time or proficiency inference."
+}
