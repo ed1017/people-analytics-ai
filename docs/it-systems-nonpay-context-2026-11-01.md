@@ -1,6 +1,6 @@
 # Conditional IT systems market context
 
-Status: reviewed implementation; not yet released.
+Status: released November 1, 2026; included in PR521.
 
 The fictional IT Engineer duty template establishes integration/testing work, not automatic Computer Systems Analysts equivalence. This separate non-pay mapping requires substantive business requirements evaluation and system design together with integration/change testing. Routine operations, server administration, help-desk support and implementation without systems analysis are excluded. A reader must confirm the displayed mapping duties before reviewing and attaching evidence to an exact saved scenario revision. Modeling a duty template alone never supplies that confirmation.
 
@@ -21,6 +21,15 @@ Conditional coverage becomes 50/197 non-pay: software 47, outlook 46, UK difficu
 
 Existing explicit review/cancel/confirmation, stale-ticket rejection, selected-revision reconstruction, goal copy and backup validation apply. Modeled duties and external context are separate ledgers and independent selections. General market lookup can describe the canonical conditional catalogue without attaching it; exact scenario explanations reconstruct only the selected recorded revision. No cost, timing, Finance authorization or individual skill inference is introduced.
 
-Independent review and 20 focused/existing-context tests passed. Root affected aggregate: 74 tests passed; focused type graph: zero diagnostics. Two current-catalogue count expectations moved from 60 to 62; historical hashes remain unchanged. Hosted build, exact CI and staged/public desktop/mobile acceptance are pending. No paid provider calls or fresh model-answer acceptance.
+Independent review and 20 focused/existing-context tests passed. Root affected aggregate: 74 tests passed; focused type graph: zero diagnostics. Two current-catalogue count expectations moved from 60 to 62; historical hashes remain unchanged. Full hosted build and final exact CI passed; staged and public acceptance are recorded below. No paid provider calls or fresh model-answer acceptance.
 
 Corporate Development, Customer Success and Product Manager remain unmatched: their intentional M&A, adoption/support and product-discovery duties are not silently converted into management analysis, sales or general operations.
+
+## Release evidence
+
+- PR520 final head/runtime `e4ad8e388472e3ca3c65c41c6b66f9e0c9a1935a`, merge `52ec21cde92e24e8a9c908f633ddb2d0a29411a7`, CI `41259416775` success.
+- Final deployment `dpl_3Y2EZozVDSzqmsFMpiq8F33XCmb2`, host `people-analytics-7nxyirjlu-ed-56dc.vercel.app`; archive SHA256 `9a45b14ae002eb582607cc127106735ec672d7af03c092fd14f15bceea109be7`, 1,221 inputs and 1,076 manifest entries. No private input or dependency changes.
+- Initial CI `41258940180` at `7a9272e` failed two obsolete aggregate expectations. The reviewed follow-up changed only two test inputs; every non-test packaged input is identical. Full affected market suite then passed 139 tests; historical hashes and rejection assertions remain intact.
+- Initial staged desktop/mobile each passed ten workflow groups on those identical application inputs. Final-head stage then passed four bounded runtime checkpoints each, avoiding duplicate unaffected workflows. Both had zero functional/page/mock errors; protected cleanup timed out after 15 seconds (initial late errors 8/4, final 7/4), recorded separately.
+- Exact final deployment was promoted only after CI and runtime verification; public deployment identity confirmed. Direct public desktop/mobile each passed all ten groups with HTTP 200, zero page/bridge/mock errors and clean shutdown. Covered separate duty consent, no automatic match, cancellation, stale allocation, immutable revisions, canonical Inventory/Overview mocked payloads, mixed/foreign scope rejection, backup restore and Track goal-copy preserving originals.
+- Browser screenshots inspected. No real provider calls or fresh model-answer acceptance. Evidence: `integration-evidence/IT-SYSTEMS-MARKET-RELEASE.json`, `IT-SYSTEMS-TEST-ONLY-EQUIVALENCE.json`, and `position-market-it-systems-public-e4ad8e3-{1440,390}.json`.
