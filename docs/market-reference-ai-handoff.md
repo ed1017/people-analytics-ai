@@ -4,9 +4,17 @@ Updated November 1, 2026. This is the concise continuation record for coding age
 
 ## Current release and owned work
 
-### PR518 current - visible market exploration
+### PR521 current - inline market chat
 
-PR518 is live at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
+PR521 is live at runtime `956a6c85cb830c6ea5bf03d5b70a426cfab03420`, deployment `dpl_CGjAvkjRKUfcmRo2pNo24WUw5aaq`. Overview → Explore → What does the hiring market look like for a role? now opens a local response inside the conversation with Country and Role dropdowns and Show market insights. Independent review, 38 composed tests, exact CI and public desktop/mobile passed (eight groups each, HTTP 200, no errors, clean/drained). Drafts, saved plans, scope changes and keyboard focus were verified; no model or plan-attachment request occurs. It includes PR520 coverage of 50/197 non-pay and 59/197 pay. [Contract, release and limits](inline-market-chat-2026-11-01.md).
+
+### PR520 included - conditional IT systems evidence
+
+PR520 was published at runtime `e4ad8e388472e3ca3c65c41c6b66f9e0c9a1935a`, deployment `dpl_3Y2EZozVDSzqmsFMpiq8F33XCmb2`. One US IT Engineer vacancy can use existing Computer Systems Analysts references only after substantive analysis/design duty confirmation. All 60 prior references and pay eligibility remain unchanged. Conditional coverage is 50/197 non-pay (software 47, outlook 46, UK difficulty 3; overlapping), pay 59. Independent review, 139 affected market tests, exact CI and direct public desktop/mobile passed (ten groups each, HTTP 200, clean/drained). Modeled duties and external evidence remain separate; no paid calls. [Contract and evidence](it-systems-nonpay-context-2026-11-01.md).
+
+### PR518 included - visible market exploration
+
+PR518 was published at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
 
 ### PR516 included - modeled position duties
 
@@ -90,4 +98,4 @@ PR504 attached revision-bound outlook/software evidence, PR506 expanded BLS cove
 PR512 separates conditional non-pay mappings from pay eligibility. People Analytics pay remains held even though eligible statistical/modeling duties can use non-pay context. PR514 publishes restrictive opt-in 15-1241/13-1161 mappings using a separate bounded fixture, preserving full occupation counts separately from the 22 flagged rows. PR516 now supplies explicit fictional duty templates for the five remaining US vacancies under user authorization. These are separate from external references and do not automatically establish occupational equivalence; no further extraction request is pending. Do not mistake these eligibility counts for confirmed duties or adopted assumptions.
 
 
-Reader discoverability is released in PR518: a visible third Explore entry with explicit role/country selection and canonical local evidence. Risk remains first and turnover second. There is no unsupported market-tightness score, automatic scenario attachment or cross-scope AI submission. Further source coverage remains constrained by verified duties, compatible evidence and reuse rights.
+Reader discoverability was released in PR518 and refined into an in-chat two-dropdown response in PR521: a visible third Explore entry with explicit role/country selection and canonical local evidence. Risk remains first and turnover second. There is no unsupported market-tightness score, automatic scenario attachment or cross-scope AI submission. Further source coverage remains constrained by verified duties, compatible evidence and reuse rights.

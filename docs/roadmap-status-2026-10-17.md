@@ -1,8 +1,16 @@
 # Active roadmap - November 1
 
+## November 1: inline market chat released
+
+PR521 is live at runtime `956a6c85cb830c6ea5bf03d5b70a426cfab03420`, deployment `dpl_CGjAvkjRKUfcmRo2pNo24WUw5aaq`. Overview → Explore → What does the hiring market look like for a role? now opens a local response inside the conversation with Country and Role dropdowns and Show market insights. Independent review, 38 composed tests, exact CI and public desktop/mobile passed (eight groups each, HTTP 200, no errors, clean/drained). Drafts, saved plans, scope changes and keyboard focus were verified; no model or plan-attachment request occurs. It includes PR520 coverage of 50/197 non-pay and 59/197 pay. [Contract, release and limits](inline-market-chat-2026-11-01.md).
+
+## November 1: conditional IT systems evidence released
+
+PR520 was published at runtime `e4ad8e388472e3ca3c65c41c6b66f9e0c9a1935a`, deployment `dpl_3Y2EZozVDSzqmsFMpiq8F33XCmb2`. One US IT Engineer vacancy can use existing Computer Systems Analysts references only after substantive analysis/design duty confirmation. All 60 prior references and pay eligibility remain unchanged. Conditional coverage is 50/197 non-pay (software 47, outlook 46, UK difficulty 3; overlapping), pay 59. Independent review, 139 affected market tests, exact CI and direct public desktop/mobile passed (ten groups each, HTTP 200, clean/drained). Modeled duties and external evidence remain separate; no paid calls. [Contract and evidence](it-systems-nonpay-context-2026-11-01.md).
+
 ## November 1: visible market exploration released
 
-PR518 is live at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
+PR518 was published at runtime `ca9805c6368fc5901e898bbaef52ce5188a4aaf7`, deployment `dpl_Ey48ER46ikCLFDDZkqm8P2GbRuis`. The third Overview Explore card opens explicit US/UK country and role controls with canonical outlook, software and hiring-difficulty evidence. Risk remains first and turnover second. No model call, plan attachment or arbitrary red/green score occurs. Independent review, focused tests, exact CI and public desktop/mobile passed (seven workflow groups each, HTTP 200, no errors or blocked requests, clean/drained). Saved goals and an unsent draft remain unchanged. External coverage stays 49/197 non-pay and 59/197 pay. [Reader contract and release evidence](visible-market-exploration-2026-11-01.md).
 
 ## November 1: modeled position duties released
 
