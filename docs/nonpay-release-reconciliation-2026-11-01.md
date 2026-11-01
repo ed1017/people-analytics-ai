@@ -1,5 +1,16 @@
 # Non-pay release reconciliation - 1 November 2026
 
+## Current Australian release — PR541
+
+**Live and publicly accepted: 106/197 non-pay vacancies; 91 remain. Pay: 59/197.** PR541 merged as `43cdeb453b26e3cd2b0293e5bfea07da9a950516` and published exact runtime `9279edee6cf0171cf592f04cbdd9d32801d84ea3` through deployment `dpl_GDVznzWNzeWAkeM7GQeDP8TMTW63` after successful CI41339206030. Stage and direct-public acceptance each passed seven groups at both 1440 and 390 widths: HTTP 200, nine locally mocked explanations per run, zero recorded errors, drained teardown, and zero public asset replay. All 20 saved goals and earlier records were preserved. No paid model calls were made.
+
+The new reference set covers two Treasury vacancies (221212, NS/Clear), one Management Consultant (224713, NS/Clear) and one Privacy Counsel (published Solicitors group2713, Shortage/Suitability gap). Group driver and occupation confidence remain distinct. See [Australian source and release evidence](australia-shortage-2026-11-01.md), [remaining source checkpoint](remaining-source-checkpoint-2026-11-01.md) and [the full register](data/nonpay-vacancy-coverage-2026-11-01.json).
+
+The original OSCA273233 Solution Architect row has now been received and independently accepted for conditional duty fit: national NS/Clear, OSCA2024 v1.0, row456 in `2026 OSL (OSCA 2024)`, same verified six-digit workbook hash. It belongs to a separate next candidate108/197, not this live106 release. No additional coverage is counted here.
+
+## Prior accepted state and historical evidence
+
+
 **Publicly accepted: 102 of 197 modeled vacancies; 95 remain. Pay coverage is 59.** PR539 passed ten direct-public groups at both widths at runtime `a392375404726fe2c46513b02c975732f5abdfff`. Explicit duty confirmation remains required; eligible references do not establish complete market evidence or adopted assumptions.
 
 | PR | Coverage | Runtime | Deployment | Successful exact CI | Direct public checks |
