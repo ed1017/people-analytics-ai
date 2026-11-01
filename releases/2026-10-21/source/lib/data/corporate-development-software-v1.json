@@ -1,0 +1,147 @@
+{
+  "status": "candidate only; no app changes",
+  "source": {
+    "originalFile": "integration-evidence\\nonpay\\onet31-software-skills.csv",
+    "sha256": "6aabb96b464288db849580e6510530efff3f80e25dde2bb23f1fc36bb526b016",
+    "bytes": 3557545,
+    "databaseVersion": "31.0",
+    "licence": "Creative Commons Attribution4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "termsUrl": "https://www.onetcenter.org/license_db.html",
+    "attribution": "O*NET(R) Database31.0, U.S. Department of Labor/Employment and Training Administration; filtered occupation rows; no endorsement",
+    "url": "https://www.onetcenter.org/dl_files/database/db_31_0_csv/software_skills.csv"
+  },
+  "mapping": {
+    "role": "Corporate Development Analyst",
+    "country": "US",
+    "vacancies": 1,
+    "occupation": "Financial and Investment Analysts",
+    "code": "13-2051.00",
+    "officialDefinitionUrl": "https://www.onetonline.org/link/summary/13-2051.00",
+    "condition": "Quantitative financial analysis including business valuation and transaction analysis; explicit duties confirmation; broader occupation not specialized role assessment",
+    "template": "position-modeled-duties-v1:CORPDEV-ANA unchanged",
+    "templateFit": [
+      "Develop valuation and transaction analyses using explicit assumptions",
+      "Coordinate financial and commercial due diligence and summarize transaction risks"
+    ],
+    "limits": "No automatic template consent, pay change or occupational core skills substitution"
+  },
+  "occupationRowCount": 180,
+  "inDemandRowCount": 8,
+  "coreSkillRowCount": 0,
+  "inDemandRows": [
+    {
+      "csvRecord": 5347,
+      "physicalLineStart": 5347,
+      "physicalLineEnd": 5347,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Microsoft Excel",
+        "Element ID": "2.E.4.i",
+        "Element Name": "Spreadsheet software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5349,
+      "physicalLineStart": 5349,
+      "physicalLineEnd": 5349,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Microsoft Office software",
+        "Element ID": "2.E.1.k",
+        "Element Name": "Office suite software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5351,
+      "physicalLineStart": 5351,
+      "physicalLineEnd": 5351,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Microsoft Outlook",
+        "Element ID": "2.E.16.a",
+        "Element Name": "Electronic mail software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5352,
+      "physicalLineStart": 5352,
+      "physicalLineEnd": 5352,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Microsoft Power BI",
+        "Element ID": "2.E.6.m",
+        "Element Name": "Business intelligence and data analysis software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5353,
+      "physicalLineStart": 5353,
+      "physicalLineEnd": 5353,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Microsoft PowerPoint",
+        "Element ID": "2.E.4.f",
+        "Element Name": "Presentation software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5414,
+      "physicalLineStart": 5414,
+      "physicalLineEnd": 5414,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "SAP software",
+        "Element ID": "2.E.2.b",
+        "Element Name": "Enterprise resource planning ERP software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5424,
+      "physicalLineStart": 5424,
+      "physicalLineEnd": 5424,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Structured query language SQL",
+        "Element ID": "2.E.6.f",
+        "Element Name": "Data base user interface and query software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    },
+    {
+      "csvRecord": 5427,
+      "physicalLineStart": 5427,
+      "physicalLineEnd": 5427,
+      "raw": {
+        "O*NET-SOC Code": "13-2051.00",
+        "Title": "Financial and Investment Analysts",
+        "Workplace Example": "Tableau",
+        "Element ID": "2.E.6.m",
+        "Element Name": "Business intelligence and data analysis software",
+        "Hot Technology": "Y",
+        "In Demand": "Y"
+      }
+    }
+  ],
+  "id": "corporate-development-software-v1"
+}

@@ -1,5 +1,11 @@
 # Market-to-position AI handoff
 
+## Current verified milestone: France, November 1, 2026
+
+PR529 is live and publicly verified at runtime `679faf34c70f8b04afd3a63db57bb223a56e1267` (deployment `dpl_34hXBL8g9ahysU27DR9Y6Jes35Zz`). Non-pay coverage is **66/197**, pay **59/197**. Three conditional French IT occupation-family references report national recruitment intentions and anticipated difficulty. Exact CI and staged/direct public desktop/mobile ten-group checks passed. Reader chat cards and exact saved-revision AI context share source facts. No paid model calls.
+
+The next Japan skill-level and US valuation-software batch is under verification, candidate **72/197**. It is not yet live. Six German vacancies have reviewed European taxonomy candidates; these are not German measured demand. Source/access/reuse/duty gaps remain distinct from supported coverage. See `france-recruitment-market-2026-11-01.md` and `japan-corpdev-market-2026-11-01.md` for exact source contracts and validation.
+
 ## November 1: UK occupation demand released (PR527)
 
 Current runtime `13529d2a74c1af166b8713f2ac902aa91d916322`, deployment `dpl_EviE3unKvTZFURht5Wc3TBfoWDRd`. Twelve Skills England 2025 references across nine SOC2020 occupations add **11 newly covered vacancies**. Non-pay coverage is now **61/197**, including **14/20 UK**; pay remains **59/197**. The 92 older references, persisted market chat cards, saved plans and source revisions remain unchanged.

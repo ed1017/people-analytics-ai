@@ -1,0 +1,984 @@
+{
+  "id": "jobtag-japan-occupational-skills-v7-selected-v1",
+  "source": {
+    "file": "IPD_DL_numeric_7_00.csv",
+    "version": "7.00",
+    "url": "https://sgteprdstaplog01.blob.core.windows.net/web-app-contents/downloads/ver13/IPD_DL_numeric_7_00.csv",
+    "sha256": "0284e82309b70fa7f7597e849c175099ab9e1ef7717e8f81d547400ec34c4e23",
+    "workbookSha256": "a09aef2c1874200da1cda8910d5a6eebc484f183c29ed1d7458f8531575b2ffd",
+    "releaseDate": "2026-03-17",
+    "internalUpdateDate": "2026-02-10",
+    "retrievedAt": "2026-11-01",
+    "catalogueUrl": "https://shigoto.mhlw.go.jp/User/download",
+    "ratingGuideUrl": "https://shigoto.mhlw.go.jp/User/about_ability",
+    "licence": "jobtag Terms of Use Article 9 (processed occupational data)",
+    "licenceUrl": "https://shigoto.mhlw.go.jp/User/tos",
+    "attribution": "Source: Japan Institute for Labour Policy and Training (JILPT), jobtag occupational information database, IPD_DL_numeric_7_00.csv, version 7.00, retrieved 2026-11-01. Processed by selecting three occupation profiles and 39 skill means, translating labels into English and adding source coordinates; not an official translation.",
+    "translationNote": "English labels are authored translations of the original Japanese skill labels; original labels are retained.",
+    "coordinates": "One-based CSV record and column; header record 17, variable IDs record 18.",
+    "sourceRange": {
+      "min": 0,
+      "max": 7
+    },
+    "publicAnchorRange": {
+      "min": 1,
+      "max": 7
+    }
+  },
+  "records": [
+    {
+      "profileId": "314",
+      "titleJa": "システムエンジニア（Webサービス開発）",
+      "skills": [
+        {
+          "variableId": "IPD_04_03_01_001",
+          "labelJa": "読解力",
+          "labelEn": "Reading comprehension",
+          "raw": "4.500",
+          "csvRecord": 320,
+          "csvColumn": 22
+        },
+        {
+          "variableId": "IPD_04_03_01_002",
+          "labelJa": "傾聴力",
+          "labelEn": "Active listening",
+          "raw": "4.620",
+          "csvRecord": 320,
+          "csvColumn": 23
+        },
+        {
+          "variableId": "IPD_04_03_01_003",
+          "labelJa": "文章力",
+          "labelEn": "Writing",
+          "raw": "4.280",
+          "csvRecord": 320,
+          "csvColumn": 24
+        },
+        {
+          "variableId": "IPD_04_03_01_004",
+          "labelJa": "説明力",
+          "labelEn": "Speaking and explaining",
+          "raw": "4.120",
+          "csvRecord": 320,
+          "csvColumn": 25
+        },
+        {
+          "variableId": "IPD_04_03_01_005",
+          "labelJa": "外国語を読む",
+          "labelEn": "Reading a foreign language",
+          "raw": "2.400",
+          "csvRecord": 320,
+          "csvColumn": 26
+        },
+        {
+          "variableId": "IPD_04_03_01_006",
+          "labelJa": "外国語を聞く",
+          "labelEn": "Listening in a foreign language",
+          "raw": "1.720",
+          "csvRecord": 320,
+          "csvColumn": 27
+        },
+        {
+          "variableId": "IPD_04_03_01_007",
+          "labelJa": "外国語で書く",
+          "labelEn": "Writing in a foreign language",
+          "raw": "1.460",
+          "csvRecord": 320,
+          "csvColumn": 28
+        },
+        {
+          "variableId": "IPD_04_03_01_008",
+          "labelJa": "外国語で話す",
+          "labelEn": "Speaking a foreign language",
+          "raw": "1.320",
+          "csvRecord": 320,
+          "csvColumn": 29
+        },
+        {
+          "variableId": "IPD_04_03_01_009",
+          "labelJa": "数学的素養",
+          "labelEn": "Mathematical literacy",
+          "raw": "3.080",
+          "csvRecord": 320,
+          "csvColumn": 30
+        },
+        {
+          "variableId": "IPD_04_03_01_010",
+          "labelJa": "科学的素養",
+          "labelEn": "Scientific literacy",
+          "raw": "2.340",
+          "csvRecord": 320,
+          "csvColumn": 31
+        },
+        {
+          "variableId": "IPD_04_03_01_011",
+          "labelJa": "論理と推論（批判的思考）",
+          "labelEn": "Logic and reasoning (critical thinking)",
+          "raw": "3.860",
+          "csvRecord": 320,
+          "csvColumn": 32
+        },
+        {
+          "variableId": "IPD_04_03_01_012",
+          "labelJa": "新しい情報の応用力",
+          "labelEn": "Applying new information",
+          "raw": "3.880",
+          "csvRecord": 320,
+          "csvColumn": 33
+        },
+        {
+          "variableId": "IPD_04_03_01_013",
+          "labelJa": "学習方法の選択・実践",
+          "labelEn": "Selecting and applying learning methods",
+          "raw": "3.360",
+          "csvRecord": 320,
+          "csvColumn": 34
+        },
+        {
+          "variableId": "IPD_04_03_01_014",
+          "labelJa": "継続的観察と評価",
+          "labelEn": "Ongoing observation and evaluation",
+          "raw": "3.440",
+          "csvRecord": 320,
+          "csvColumn": 35
+        },
+        {
+          "variableId": "IPD_04_03_01_015",
+          "labelJa": "他者の反応の理解",
+          "labelEn": "Understanding others' reactions",
+          "raw": "3.720",
+          "csvRecord": 320,
+          "csvColumn": 36
+        },
+        {
+          "variableId": "IPD_04_03_01_016",
+          "labelJa": "他者との調整",
+          "labelEn": "Coordination with others",
+          "raw": "3.900",
+          "csvRecord": 320,
+          "csvColumn": 37
+        },
+        {
+          "variableId": "IPD_04_03_01_017",
+          "labelJa": "説得",
+          "labelEn": "Persuasion",
+          "raw": "3.500",
+          "csvRecord": 320,
+          "csvColumn": 38
+        },
+        {
+          "variableId": "IPD_04_03_01_018",
+          "labelJa": "交渉",
+          "labelEn": "Negotiation",
+          "raw": "3.620",
+          "csvRecord": 320,
+          "csvColumn": 39
+        },
+        {
+          "variableId": "IPD_04_03_01_019",
+          "labelJa": "指導",
+          "labelEn": "Instruction",
+          "raw": "3.740",
+          "csvRecord": 320,
+          "csvColumn": 40
+        },
+        {
+          "variableId": "IPD_04_03_01_020",
+          "labelJa": "対人援助サービス",
+          "labelEn": "Interpersonal support services",
+          "raw": "3.100",
+          "csvRecord": 320,
+          "csvColumn": 41
+        },
+        {
+          "variableId": "IPD_04_03_01_021",
+          "labelJa": "複雑な問題解決",
+          "labelEn": "Complex problem solving",
+          "raw": "3.780",
+          "csvRecord": 320,
+          "csvColumn": 42
+        },
+        {
+          "variableId": "IPD_04_03_01_022",
+          "labelJa": "要件分析（仕様作成）",
+          "labelEn": "Requirements analysis (specification writing)",
+          "raw": "4.240",
+          "csvRecord": 320,
+          "csvColumn": 43
+        },
+        {
+          "variableId": "IPD_04_03_01_023",
+          "labelJa": "カスタマイズと開発",
+          "labelEn": "Customization and development",
+          "raw": "3.840",
+          "csvRecord": 320,
+          "csvColumn": 44
+        },
+        {
+          "variableId": "IPD_04_03_01_024",
+          "labelJa": "道具、機器、設備の選択",
+          "labelEn": "Selecting tools, machinery and equipment",
+          "raw": "3.340",
+          "csvRecord": 320,
+          "csvColumn": 45
+        },
+        {
+          "variableId": "IPD_04_03_01_025",
+          "labelJa": "設置と設定",
+          "labelEn": "Installation and configuration",
+          "raw": "3.680",
+          "csvRecord": 320,
+          "csvColumn": 46
+        },
+        {
+          "variableId": "IPD_04_03_01_026",
+          "labelJa": "プログラミング",
+          "labelEn": "Programming",
+          "raw": "4.800",
+          "csvRecord": 320,
+          "csvColumn": 47
+        },
+        {
+          "variableId": "IPD_04_03_01_027",
+          "labelJa": "計器監視",
+          "labelEn": "Instrument monitoring",
+          "raw": "2.340",
+          "csvRecord": 320,
+          "csvColumn": 48
+        },
+        {
+          "variableId": "IPD_04_03_01_028",
+          "labelJa": "操作と制御",
+          "labelEn": "Operation and control",
+          "raw": "2.620",
+          "csvRecord": 320,
+          "csvColumn": 49
+        },
+        {
+          "variableId": "IPD_04_03_01_029",
+          "labelJa": "保守点検",
+          "labelEn": "Maintenance inspection",
+          "raw": "2.640",
+          "csvRecord": 320,
+          "csvColumn": 50
+        },
+        {
+          "variableId": "IPD_04_03_01_030",
+          "labelJa": "故障等の原因特定",
+          "labelEn": "Identifying causes of faults",
+          "raw": "3.420",
+          "csvRecord": 320,
+          "csvColumn": 51
+        },
+        {
+          "variableId": "IPD_04_03_01_031",
+          "labelJa": "修理",
+          "labelEn": "Repair",
+          "raw": "2.900",
+          "csvRecord": 320,
+          "csvColumn": 52
+        },
+        {
+          "variableId": "IPD_04_03_01_032",
+          "labelJa": "クオリティチェック",
+          "labelEn": "Quality checking",
+          "raw": "3.700",
+          "csvRecord": 320,
+          "csvColumn": 53
+        },
+        {
+          "variableId": "IPD_04_03_01_033",
+          "labelJa": "合理的な意思決定",
+          "labelEn": "Rational decision making",
+          "raw": "3.480",
+          "csvRecord": 320,
+          "csvColumn": 54
+        },
+        {
+          "variableId": "IPD_04_03_01_034",
+          "labelJa": "企業・組織の活動の分析",
+          "labelEn": "Analyzing business and organizational activity",
+          "raw": "2.920",
+          "csvRecord": 320,
+          "csvColumn": 55
+        },
+        {
+          "variableId": "IPD_04_03_01_035",
+          "labelJa": "企業・組織の活動の評価",
+          "labelEn": "Evaluating business and organizational activity",
+          "raw": "2.800",
+          "csvRecord": 320,
+          "csvColumn": 56
+        },
+        {
+          "variableId": "IPD_04_03_01_036",
+          "labelJa": "時間管理",
+          "labelEn": "Time management",
+          "raw": "3.580",
+          "csvRecord": 320,
+          "csvColumn": 57
+        },
+        {
+          "variableId": "IPD_04_03_01_037",
+          "labelJa": "資金管理",
+          "labelEn": "Financial resource management",
+          "raw": "2.620",
+          "csvRecord": 320,
+          "csvColumn": 58
+        },
+        {
+          "variableId": "IPD_04_03_01_038",
+          "labelJa": "資材管理",
+          "labelEn": "Material resource management",
+          "raw": "2.480",
+          "csvRecord": 320,
+          "csvColumn": 59
+        },
+        {
+          "variableId": "IPD_04_03_01_039",
+          "labelJa": "人材管理",
+          "labelEn": "Human resource management",
+          "raw": "2.840",
+          "csvRecord": 320,
+          "csvColumn": 60
+        }
+      ]
+    },
+    {
+      "profileId": "318",
+      "titleJa": "システムエンジニア（基盤システム）",
+      "skills": [
+        {
+          "variableId": "IPD_04_03_01_001",
+          "labelJa": "読解力",
+          "labelEn": "Reading comprehension",
+          "raw": "4.172",
+          "csvRecord": 324,
+          "csvColumn": 22
+        },
+        {
+          "variableId": "IPD_04_03_01_002",
+          "labelJa": "傾聴力",
+          "labelEn": "Active listening",
+          "raw": "4.172",
+          "csvRecord": 324,
+          "csvColumn": 23
+        },
+        {
+          "variableId": "IPD_04_03_01_003",
+          "labelJa": "文章力",
+          "labelEn": "Writing",
+          "raw": "4.017",
+          "csvRecord": 324,
+          "csvColumn": 24
+        },
+        {
+          "variableId": "IPD_04_03_01_004",
+          "labelJa": "説明力",
+          "labelEn": "Speaking and explaining",
+          "raw": "3.914",
+          "csvRecord": 324,
+          "csvColumn": 25
+        },
+        {
+          "variableId": "IPD_04_03_01_005",
+          "labelJa": "外国語を読む",
+          "labelEn": "Reading a foreign language",
+          "raw": "2.328",
+          "csvRecord": 324,
+          "csvColumn": 26
+        },
+        {
+          "variableId": "IPD_04_03_01_006",
+          "labelJa": "外国語を聞く",
+          "labelEn": "Listening in a foreign language",
+          "raw": "1.328",
+          "csvRecord": 324,
+          "csvColumn": 27
+        },
+        {
+          "variableId": "IPD_04_03_01_007",
+          "labelJa": "外国語で書く",
+          "labelEn": "Writing in a foreign language",
+          "raw": "1.379",
+          "csvRecord": 324,
+          "csvColumn": 28
+        },
+        {
+          "variableId": "IPD_04_03_01_008",
+          "labelJa": "外国語で話す",
+          "labelEn": "Speaking a foreign language",
+          "raw": "1.172",
+          "csvRecord": 324,
+          "csvColumn": 29
+        },
+        {
+          "variableId": "IPD_04_03_01_009",
+          "labelJa": "数学的素養",
+          "labelEn": "Mathematical literacy",
+          "raw": "2.724",
+          "csvRecord": 324,
+          "csvColumn": 30
+        },
+        {
+          "variableId": "IPD_04_03_01_010",
+          "labelJa": "科学的素養",
+          "labelEn": "Scientific literacy",
+          "raw": "1.810",
+          "csvRecord": 324,
+          "csvColumn": 31
+        },
+        {
+          "variableId": "IPD_04_03_01_011",
+          "labelJa": "論理と推論（批判的思考）",
+          "labelEn": "Logic and reasoning (critical thinking)",
+          "raw": "3.483",
+          "csvRecord": 324,
+          "csvColumn": 32
+        },
+        {
+          "variableId": "IPD_04_03_01_012",
+          "labelJa": "新しい情報の応用力",
+          "labelEn": "Applying new information",
+          "raw": "3.448",
+          "csvRecord": 324,
+          "csvColumn": 33
+        },
+        {
+          "variableId": "IPD_04_03_01_013",
+          "labelJa": "学習方法の選択・実践",
+          "labelEn": "Selecting and applying learning methods",
+          "raw": "3.224",
+          "csvRecord": 324,
+          "csvColumn": 34
+        },
+        {
+          "variableId": "IPD_04_03_01_014",
+          "labelJa": "継続的観察と評価",
+          "labelEn": "Ongoing observation and evaluation",
+          "raw": "3.379",
+          "csvRecord": 324,
+          "csvColumn": 35
+        },
+        {
+          "variableId": "IPD_04_03_01_015",
+          "labelJa": "他者の反応の理解",
+          "labelEn": "Understanding others' reactions",
+          "raw": "3.466",
+          "csvRecord": 324,
+          "csvColumn": 36
+        },
+        {
+          "variableId": "IPD_04_03_01_016",
+          "labelJa": "他者との調整",
+          "labelEn": "Coordination with others",
+          "raw": "4.034",
+          "csvRecord": 324,
+          "csvColumn": 37
+        },
+        {
+          "variableId": "IPD_04_03_01_017",
+          "labelJa": "説得",
+          "labelEn": "Persuasion",
+          "raw": "3.672",
+          "csvRecord": 324,
+          "csvColumn": 38
+        },
+        {
+          "variableId": "IPD_04_03_01_018",
+          "labelJa": "交渉",
+          "labelEn": "Negotiation",
+          "raw": "3.655",
+          "csvRecord": 324,
+          "csvColumn": 39
+        },
+        {
+          "variableId": "IPD_04_03_01_019",
+          "labelJa": "指導",
+          "labelEn": "Instruction",
+          "raw": "3.638",
+          "csvRecord": 324,
+          "csvColumn": 40
+        },
+        {
+          "variableId": "IPD_04_03_01_020",
+          "labelJa": "対人援助サービス",
+          "labelEn": "Interpersonal support services",
+          "raw": "3.052",
+          "csvRecord": 324,
+          "csvColumn": 41
+        },
+        {
+          "variableId": "IPD_04_03_01_021",
+          "labelJa": "複雑な問題解決",
+          "labelEn": "Complex problem solving",
+          "raw": "3.500",
+          "csvRecord": 324,
+          "csvColumn": 42
+        },
+        {
+          "variableId": "IPD_04_03_01_022",
+          "labelJa": "要件分析（仕様作成）",
+          "labelEn": "Requirements analysis (specification writing)",
+          "raw": "4.121",
+          "csvRecord": 324,
+          "csvColumn": 43
+        },
+        {
+          "variableId": "IPD_04_03_01_023",
+          "labelJa": "カスタマイズと開発",
+          "labelEn": "Customization and development",
+          "raw": "3.879",
+          "csvRecord": 324,
+          "csvColumn": 44
+        },
+        {
+          "variableId": "IPD_04_03_01_024",
+          "labelJa": "道具、機器、設備の選択",
+          "labelEn": "Selecting tools, machinery and equipment",
+          "raw": "3.379",
+          "csvRecord": 324,
+          "csvColumn": 45
+        },
+        {
+          "variableId": "IPD_04_03_01_025",
+          "labelJa": "設置と設定",
+          "labelEn": "Installation and configuration",
+          "raw": "3.879",
+          "csvRecord": 324,
+          "csvColumn": 46
+        },
+        {
+          "variableId": "IPD_04_03_01_026",
+          "labelJa": "プログラミング",
+          "labelEn": "Programming",
+          "raw": "4.190",
+          "csvRecord": 324,
+          "csvColumn": 47
+        },
+        {
+          "variableId": "IPD_04_03_01_027",
+          "labelJa": "計器監視",
+          "labelEn": "Instrument monitoring",
+          "raw": "2.828",
+          "csvRecord": 324,
+          "csvColumn": 48
+        },
+        {
+          "variableId": "IPD_04_03_01_028",
+          "labelJa": "操作と制御",
+          "labelEn": "Operation and control",
+          "raw": "3.310",
+          "csvRecord": 324,
+          "csvColumn": 49
+        },
+        {
+          "variableId": "IPD_04_03_01_029",
+          "labelJa": "保守点検",
+          "labelEn": "Maintenance inspection",
+          "raw": "2.638",
+          "csvRecord": 324,
+          "csvColumn": 50
+        },
+        {
+          "variableId": "IPD_04_03_01_030",
+          "labelJa": "故障等の原因特定",
+          "labelEn": "Identifying causes of faults",
+          "raw": "3.776",
+          "csvRecord": 324,
+          "csvColumn": 51
+        },
+        {
+          "variableId": "IPD_04_03_01_031",
+          "labelJa": "修理",
+          "labelEn": "Repair",
+          "raw": "2.569",
+          "csvRecord": 324,
+          "csvColumn": 52
+        },
+        {
+          "variableId": "IPD_04_03_01_032",
+          "labelJa": "クオリティチェック",
+          "labelEn": "Quality checking",
+          "raw": "3.586",
+          "csvRecord": 324,
+          "csvColumn": 53
+        },
+        {
+          "variableId": "IPD_04_03_01_033",
+          "labelJa": "合理的な意思決定",
+          "labelEn": "Rational decision making",
+          "raw": "3.466",
+          "csvRecord": 324,
+          "csvColumn": 54
+        },
+        {
+          "variableId": "IPD_04_03_01_034",
+          "labelJa": "企業・組織の活動の分析",
+          "labelEn": "Analyzing business and organizational activity",
+          "raw": "2.879",
+          "csvRecord": 324,
+          "csvColumn": 55
+        },
+        {
+          "variableId": "IPD_04_03_01_035",
+          "labelJa": "企業・組織の活動の評価",
+          "labelEn": "Evaluating business and organizational activity",
+          "raw": "2.655",
+          "csvRecord": 324,
+          "csvColumn": 56
+        },
+        {
+          "variableId": "IPD_04_03_01_036",
+          "labelJa": "時間管理",
+          "labelEn": "Time management",
+          "raw": "3.879",
+          "csvRecord": 324,
+          "csvColumn": 57
+        },
+        {
+          "variableId": "IPD_04_03_01_037",
+          "labelJa": "資金管理",
+          "labelEn": "Financial resource management",
+          "raw": "2.431",
+          "csvRecord": 324,
+          "csvColumn": 58
+        },
+        {
+          "variableId": "IPD_04_03_01_038",
+          "labelJa": "資材管理",
+          "labelEn": "Material resource management",
+          "raw": "2.603",
+          "csvRecord": 324,
+          "csvColumn": 59
+        },
+        {
+          "variableId": "IPD_04_03_01_039",
+          "labelJa": "人材管理",
+          "labelEn": "Human resource management",
+          "raw": "2.552",
+          "csvRecord": 324,
+          "csvColumn": 60
+        }
+      ]
+    },
+    {
+      "profileId": "325",
+      "titleJa": "AIエンジニア",
+      "skills": [
+        {
+          "variableId": "IPD_04_03_01_001",
+          "labelJa": "読解力",
+          "labelEn": "Reading comprehension",
+          "raw": "5.250",
+          "csvRecord": 331,
+          "csvColumn": 22
+        },
+        {
+          "variableId": "IPD_04_03_01_002",
+          "labelJa": "傾聴力",
+          "labelEn": "Active listening",
+          "raw": "4.607",
+          "csvRecord": 331,
+          "csvColumn": 23
+        },
+        {
+          "variableId": "IPD_04_03_01_003",
+          "labelJa": "文章力",
+          "labelEn": "Writing",
+          "raw": "4.571",
+          "csvRecord": 331,
+          "csvColumn": 24
+        },
+        {
+          "variableId": "IPD_04_03_01_004",
+          "labelJa": "説明力",
+          "labelEn": "Speaking and explaining",
+          "raw": "4.786",
+          "csvRecord": 331,
+          "csvColumn": 25
+        },
+        {
+          "variableId": "IPD_04_03_01_005",
+          "labelJa": "外国語を読む",
+          "labelEn": "Reading a foreign language",
+          "raw": "3.786",
+          "csvRecord": 331,
+          "csvColumn": 26
+        },
+        {
+          "variableId": "IPD_04_03_01_006",
+          "labelJa": "外国語を聞く",
+          "labelEn": "Listening in a foreign language",
+          "raw": "2.357",
+          "csvRecord": 331,
+          "csvColumn": 27
+        },
+        {
+          "variableId": "IPD_04_03_01_007",
+          "labelJa": "外国語で書く",
+          "labelEn": "Writing in a foreign language",
+          "raw": "2.464",
+          "csvRecord": 331,
+          "csvColumn": 28
+        },
+        {
+          "variableId": "IPD_04_03_01_008",
+          "labelJa": "外国語で話す",
+          "labelEn": "Speaking a foreign language",
+          "raw": "2.036",
+          "csvRecord": 331,
+          "csvColumn": 29
+        },
+        {
+          "variableId": "IPD_04_03_01_009",
+          "labelJa": "数学的素養",
+          "labelEn": "Mathematical literacy",
+          "raw": "4.893",
+          "csvRecord": 331,
+          "csvColumn": 30
+        },
+        {
+          "variableId": "IPD_04_03_01_010",
+          "labelJa": "科学的素養",
+          "labelEn": "Scientific literacy",
+          "raw": "3.571",
+          "csvRecord": 331,
+          "csvColumn": 31
+        },
+        {
+          "variableId": "IPD_04_03_01_011",
+          "labelJa": "論理と推論（批判的思考）",
+          "labelEn": "Logic and reasoning (critical thinking)",
+          "raw": "5.036",
+          "csvRecord": 331,
+          "csvColumn": 32
+        },
+        {
+          "variableId": "IPD_04_03_01_012",
+          "labelJa": "新しい情報の応用力",
+          "labelEn": "Applying new information",
+          "raw": "4.929",
+          "csvRecord": 331,
+          "csvColumn": 33
+        },
+        {
+          "variableId": "IPD_04_03_01_013",
+          "labelJa": "学習方法の選択・実践",
+          "labelEn": "Selecting and applying learning methods",
+          "raw": "4.893",
+          "csvRecord": 331,
+          "csvColumn": 34
+        },
+        {
+          "variableId": "IPD_04_03_01_014",
+          "labelJa": "継続的観察と評価",
+          "labelEn": "Ongoing observation and evaluation",
+          "raw": "4.857",
+          "csvRecord": 331,
+          "csvColumn": 35
+        },
+        {
+          "variableId": "IPD_04_03_01_015",
+          "labelJa": "他者の反応の理解",
+          "labelEn": "Understanding others' reactions",
+          "raw": "4.250",
+          "csvRecord": 331,
+          "csvColumn": 36
+        },
+        {
+          "variableId": "IPD_04_03_01_016",
+          "labelJa": "他者との調整",
+          "labelEn": "Coordination with others",
+          "raw": "4.036",
+          "csvRecord": 331,
+          "csvColumn": 37
+        },
+        {
+          "variableId": "IPD_04_03_01_017",
+          "labelJa": "説得",
+          "labelEn": "Persuasion",
+          "raw": "3.786",
+          "csvRecord": 331,
+          "csvColumn": 38
+        },
+        {
+          "variableId": "IPD_04_03_01_018",
+          "labelJa": "交渉",
+          "labelEn": "Negotiation",
+          "raw": "3.643",
+          "csvRecord": 331,
+          "csvColumn": 39
+        },
+        {
+          "variableId": "IPD_04_03_01_019",
+          "labelJa": "指導",
+          "labelEn": "Instruction",
+          "raw": "4.393",
+          "csvRecord": 331,
+          "csvColumn": 40
+        },
+        {
+          "variableId": "IPD_04_03_01_020",
+          "labelJa": "対人援助サービス",
+          "labelEn": "Interpersonal support services",
+          "raw": "3.643",
+          "csvRecord": 331,
+          "csvColumn": 41
+        },
+        {
+          "variableId": "IPD_04_03_01_021",
+          "labelJa": "複雑な問題解決",
+          "labelEn": "Complex problem solving",
+          "raw": "4.750",
+          "csvRecord": 331,
+          "csvColumn": 42
+        },
+        {
+          "variableId": "IPD_04_03_01_022",
+          "labelJa": "要件分析（仕様作成）",
+          "labelEn": "Requirements analysis (specification writing)",
+          "raw": "4.536",
+          "csvRecord": 331,
+          "csvColumn": 43
+        },
+        {
+          "variableId": "IPD_04_03_01_023",
+          "labelJa": "カスタマイズと開発",
+          "labelEn": "Customization and development",
+          "raw": "4.786",
+          "csvRecord": 331,
+          "csvColumn": 44
+        },
+        {
+          "variableId": "IPD_04_03_01_024",
+          "labelJa": "道具、機器、設備の選択",
+          "labelEn": "Selecting tools, machinery and equipment",
+          "raw": "4.536",
+          "csvRecord": 331,
+          "csvColumn": 45
+        },
+        {
+          "variableId": "IPD_04_03_01_025",
+          "labelJa": "設置と設定",
+          "labelEn": "Installation and configuration",
+          "raw": "4.500",
+          "csvRecord": 331,
+          "csvColumn": 46
+        },
+        {
+          "variableId": "IPD_04_03_01_026",
+          "labelJa": "プログラミング",
+          "labelEn": "Programming",
+          "raw": "5.286",
+          "csvRecord": 331,
+          "csvColumn": 47
+        },
+        {
+          "variableId": "IPD_04_03_01_027",
+          "labelJa": "計器監視",
+          "labelEn": "Instrument monitoring",
+          "raw": "3.143",
+          "csvRecord": 331,
+          "csvColumn": 48
+        },
+        {
+          "variableId": "IPD_04_03_01_028",
+          "labelJa": "操作と制御",
+          "labelEn": "Operation and control",
+          "raw": "3.786",
+          "csvRecord": 331,
+          "csvColumn": 49
+        },
+        {
+          "variableId": "IPD_04_03_01_029",
+          "labelJa": "保守点検",
+          "labelEn": "Maintenance inspection",
+          "raw": "2.536",
+          "csvRecord": 331,
+          "csvColumn": 50
+        },
+        {
+          "variableId": "IPD_04_03_01_030",
+          "labelJa": "故障等の原因特定",
+          "labelEn": "Identifying causes of faults",
+          "raw": "3.929",
+          "csvRecord": 331,
+          "csvColumn": 51
+        },
+        {
+          "variableId": "IPD_04_03_01_031",
+          "labelJa": "修理",
+          "labelEn": "Repair",
+          "raw": "3.107",
+          "csvRecord": 331,
+          "csvColumn": 52
+        },
+        {
+          "variableId": "IPD_04_03_01_032",
+          "labelJa": "クオリティチェック",
+          "labelEn": "Quality checking",
+          "raw": "4.357",
+          "csvRecord": 331,
+          "csvColumn": 53
+        },
+        {
+          "variableId": "IPD_04_03_01_033",
+          "labelJa": "合理的な意思決定",
+          "labelEn": "Rational decision making",
+          "raw": "4.000",
+          "csvRecord": 331,
+          "csvColumn": 54
+        },
+        {
+          "variableId": "IPD_04_03_01_034",
+          "labelJa": "企業・組織の活動の分析",
+          "labelEn": "Analyzing business and organizational activity",
+          "raw": "3.679",
+          "csvRecord": 331,
+          "csvColumn": 55
+        },
+        {
+          "variableId": "IPD_04_03_01_035",
+          "labelJa": "企業・組織の活動の評価",
+          "labelEn": "Evaluating business and organizational activity",
+          "raw": "3.357",
+          "csvRecord": 331,
+          "csvColumn": 56
+        },
+        {
+          "variableId": "IPD_04_03_01_036",
+          "labelJa": "時間管理",
+          "labelEn": "Time management",
+          "raw": "3.857",
+          "csvRecord": 331,
+          "csvColumn": 57
+        },
+        {
+          "variableId": "IPD_04_03_01_037",
+          "labelJa": "資金管理",
+          "labelEn": "Financial resource management",
+          "raw": "2.893",
+          "csvRecord": 331,
+          "csvColumn": 58
+        },
+        {
+          "variableId": "IPD_04_03_01_038",
+          "labelJa": "資材管理",
+          "labelEn": "Material resource management",
+          "raw": "2.714",
+          "csvRecord": 331,
+          "csvColumn": 59
+        },
+        {
+          "variableId": "IPD_04_03_01_039",
+          "labelJa": "人材管理",
+          "labelEn": "Human resource management",
+          "raw": "3.250",
+          "csvRecord": 331,
+          "csvColumn": 60
+        }
+      ]
+    }
+  ]
+}
