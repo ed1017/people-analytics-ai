@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "210174d572ff458d211d622f8d29b70606b3976b2e7143221a15ea6131843822",
-      "bytes": 15224
+      "sha256": "d1a21961278f9fd0575a77ca6aeb524947475800acbfacb8c75ac0a2b33453c7",
+      "bytes": 15474
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -5269,8 +5269,8 @@
     },
     {
       "path": "components/workforce-planning/position-market-context.tsx",
-      "sha256": "8353455311beef2ecd6c03cbe428dd333347efcd30776c423a9923468c4e7cd3",
-      "bytes": 17288
+      "sha256": "5be614e5f5a74eceda465adca1e3d853ee17809830e3efa750e7a0dd22d07250",
+      "bytes": 19655
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "98a447cc6bd6a433da36544bd90d6f6dab6983df011c32b5c5e352ed86fd202e",
-      "bytes": 20090
+      "sha256": "2c1b64f7ab8de2e21caa74fcbcc3f6ebd75ffdf06a8a583d1561c91db47000c7",
+      "bytes": 20332
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5294,18 +5294,18 @@
     },
     {
       "path": "tests/position-market-context.test.mjs",
-      "sha256": "e34ddb7fcab5334d3f9f79c9f4e3fee38f29eacce2ddeccd341000635cf6b47b",
-      "bytes": 9435
+      "sha256": "1f99f5dedeb8427e5f0487efeb653909a1520a5853c45423bd22d1292ffcf039",
+      "bytes": 9467
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
-      "sha256": "123c1f7ad9d7f6f7820460b2a8a2b9f640d882be17e384f458cc404fcd8a0278",
-      "bytes": 10072
+      "sha256": "c266512c00419a252fa18d4f12cd7d881779f703891c1a42e443f2d86f1b881b",
+      "bytes": 10281
     },
     {
       "path": "lib/market-context-lookup.ts",
-      "sha256": "dbe1453effe91597f11da9a40cf9ef03a26067a5b7bc7750b3f3e9a1ce6fa021",
-      "bytes": 5284
+      "sha256": "7d2d6e64b5557e715540a2338481e45ac1bcf4b47ef9a278310707f78a59e5c6",
+      "bytes": 5691
     },
     {
       "path": "tests/market-context-lookup.test.mjs",
@@ -5344,8 +5344,8 @@
     },
     {
       "path": "tests/position-network-market-context.test.mjs",
-      "sha256": "2f45777faaf1d6af462424ff88cad8cee597a09c75e5ab8ad0d62f5aa233c23e",
-      "bytes": 23295
+      "sha256": "75c5b77429a8e76c4cbda9d2c7106963c67d904ba7fb5704b7ba0fd4afcd6ccb",
+      "bytes": 23355
     },
     {
       "path": "components/workforce-planning/position-modeled-duties.tsx",
@@ -5369,8 +5369,8 @@
     },
     {
       "path": "tests/position-modeled-duties.test.mjs",
-      "sha256": "31503c3e98a3526b2ed51466672886d66f64572a70257657708a4228d13a7add",
-      "bytes": 9559
+      "sha256": "fb5cc78dcbf4b6300866beaf581df7a02339f18be55deff998be75fdb755e36b",
+      "bytes": 9589
     },
     {
       "path": "components/home-market-context-explorer.tsx",
@@ -5389,8 +5389,8 @@
     },
     {
       "path": "tests/position-it-systems-market.test.mjs",
-      "sha256": "2941ff3dd8ccd7136935052114ddfcf3d6cebb8e4d4d0e38a6e70b70a0960fcb",
-      "bytes": 7938
+      "sha256": "bf62f991cd5e35b62f132f89d95fc73c8069cbd6eb09f8676522babd2a7c4c69",
+      "bytes": 8028
     },
     {
       "path": "lib/market-chat-message.ts",
@@ -5419,13 +5419,38 @@
     },
     {
       "path": "tests/position-core-skills.test.mjs",
-      "sha256": "c618067231666a845af091deefdefc8066567cc78247b24e4bfa3a259669265e",
-      "bytes": 9971
+      "sha256": "69597e611be7c2d42850f6773ee646fe1d6487ea38d6b83d22d92b62fb482f02",
+      "bytes": 10031
     },
     {
       "path": "tests/position-market-skills-ui.test.mjs",
       "sha256": "488cf3939c3d9d71101c83906b1a00a44008dd8dd0f363e7daa1c6eac99f5c18",
       "bytes": 7967
+    },
+    {
+      "path": "lib/data/uk-occupation-demand-2025.json",
+      "sha256": "2b1f8b686ac1d1aa4f9db1d3184f3855989935d6256dcbe360ca6cbff633fe20",
+      "bytes": 6938
+    },
+    {
+      "path": "lib/position-uk-demand.ts",
+      "sha256": "1f2f2485e3a5e1db089f09196d503ee2e8f56e335e504d63d6054e7bafcce2d3",
+      "bytes": 3646
+    },
+    {
+      "path": "scripts/extract-uk-occupation-demand.py",
+      "sha256": "6c33a659f3e20d17eac1f468905e8e97bead044f30cb85084c73d6a14a89f83b",
+      "bytes": 2794
+    },
+    {
+      "path": "tests/position-market-demand-ui.test.mjs",
+      "sha256": "83032c64d4fe6e74ffef4d34138043feecaccd0a89a1ee3fdcf44df4c50c65b0",
+      "bytes": 5422
+    },
+    {
+      "path": "tests/position-uk-demand.test.mjs",
+      "sha256": "faa998d216cc4ae94fba26b857e1cbef409fd6755e3c7aa9f756f17c06a4af93",
+      "bytes": 9836
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
