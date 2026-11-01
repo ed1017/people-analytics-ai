@@ -53,6 +53,7 @@ export function welcomeScale(values: readonly number[]) {
 export type HomeChatWelcomeProps = Omit<HomeOverviewSummaryProps, 'onNavigate'> & {
   onReviewSyntheticCapacity?:()=>void;
   onQuestion: (question: string) => void;
+  onMarketExplore?:()=>void;
   onNavigate: (page: AppPage) => void;
   disabled?: boolean;
   recruitingKpi?: HomeRecruitingKpi|null;
@@ -148,12 +149,12 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
     </section>;
 }
 
-export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, onNavigate, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows,onReviewSyntheticCapacity}: HomeChatWelcomeProps) {
+export function HomeChatWelcome({overview, receipt, requested, scopeLabel, loading, error, onQuestion, onMarketExplore, onNavigate, disabled = false, composer, templates, plannerVisual, trend = [], recruitingKpi, recruitingPending, flows,onReviewSyntheticCapacity}: HomeChatWelcomeProps) {
   return <section aria-label="Plan your workforce" className={styles.welcome}>
     <HomeConversationSplit enabled visuals={plannerVisual??<HomeHeadcountSummary onNavigate={onNavigate} onReviewSyntheticCapacity={onReviewSyntheticCapacity} overview={overview} receipt={receipt} requested={requested} scopeLabel={scopeLabel} loading={loading} error={error} trend={trend} recruitingKpi={recruitingKpi} recruitingPending={recruitingPending} flows={flows}/> }>
     <HomeCompanyIntro datasetToken={receipt?.version === 3 && isVerifiedDashboardScope(receipt) ? receipt.datasetToken : undefined} asOf={overview?.snapshot_date}/>
     <h3>What decision are you facing?</h3>
-    <HomePromptCategories onQuestion={onQuestion} disabled={disabled} templates={templates}/>
+    <HomePromptCategories onMarketExplore={onMarketExplore} onQuestion={onQuestion} disabled={disabled} templates={templates}/>
     {composer && <div className={styles.composer}>{composer}</div>}
     </HomeConversationSplit>
   </section>;
