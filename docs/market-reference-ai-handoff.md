@@ -1,12 +1,20 @@
 # Market-to-position AI handoff
 
+## November 1: occupational core skills released (PR525)
+
+Runtime `3ee4ed62480d3c016f24bc1d028426a5ed565c91`, deployment `dpl_FNrv3cwEpo8L1UqvJDNJ9hSyxSV6`. Adds 35 O*NET 31.0 essential/transferable skills for 19 exact reviewed US occupations (30 role references), enriching 47 existing US vacancies. Coverage remains **50/197 non-pay and 59/197 pay**; no new country or role eligibility.
+
+Compact top-six importance charts and expandable skill/source details are shared by persisted market chat messages and explicit saved-position attachments. Read-only `read_market_context` and exact saved-revision explanation payloads use the canonical ratings. Importance 1–5, level 0–7 with per-skill anchors, actual rating dates, analyst sample, uncertainty and suppression remain distinct from employee proficiency, applicant supply, postings demand or training duration. Existing 62 references and older chat snapshots are unchanged.
+
+Independent source/code review, 52 affected checks, focused TypeScript, exact CI41267025994 including 3,095 historical tests, and isolated/public desktop/mobile 11-group journeys passed. Model calls were intercepted fixtures; no fresh model answer acceptance or paid calls. Source hashes, reproduction, limitations and release evidence: [occupational core skills record](occupational-core-skills-2026-11-01.md). Remaining international source/duty gates, user-owned Lab and unapproved overlay remain unchanged.
+
 Updated November 1, 2026. This is the concise continuation record for coding agents and explanation-context work. Read the linked source records instead of treating this document as a new numerical dataset or model acceptance result.
 
 ## Current release and owned work
 
-### PR523 current - market conversation messages
+### PR523 included - market conversation messages
 
-PR523 is live at runtime `f3befbf46df84fc0b1a985000a990a939ffdb6b3`, deployment `dpl_ALoUwWjZZMQfq2oDstoQpLALxnC6`. Market selectors/results are individual persisted conversation messages, preserving earlier selections across later cards, replies and reloads. Close/Reset controls are removed, with plain data/source labels across main navigation, risk and planning controls. Explicit general-chat follow-ups carry the chosen card scope; changed scope blocks submission and preserves the draft. Source values, saved plans and coverage remain unchanged (50/197 non-pay, 59/197 pay). Independent review, 33 focused tests, 32 risk/editorial regressions, exact CI (including 3,095 historical tests), production build and direct public desktop/mobile acceptance passed (ten groups each, HTTP 200, no errors, clean/drained). Four mocked replies per width test transport/state; no paid or fresh model-answer acceptance. [Contract and release evidence](market-conversation-messages-2026-11-01.md).
+PR523 was published at runtime `f3befbf46df84fc0b1a985000a990a939ffdb6b3`, deployment `dpl_ALoUwWjZZMQfq2oDstoQpLALxnC6`. Market selectors/results are individual persisted conversation messages, preserving earlier selections across later cards, replies and reloads. Close/Reset controls are removed, with plain data/source labels across main navigation, risk and planning controls. Explicit general-chat follow-ups carry the chosen card scope; changed scope blocks submission and preserves the draft. Source values, saved plans and coverage remain unchanged (50/197 non-pay, 59/197 pay). Independent review, 33 focused tests, 32 risk/editorial regressions, exact CI (including 3,095 historical tests), production build and direct public desktop/mobile acceptance passed (ten groups each, HTTP 200, no errors, clean/drained). Four mocked replies per width test transport/state; no paid or fresh model-answer acceptance. [Contract and release evidence](market-conversation-messages-2026-11-01.md).
 
 ### PR521 included - initial inline market card
 

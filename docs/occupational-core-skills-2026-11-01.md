@@ -37,4 +37,15 @@ PR523 catalogue: 62 references, canonical JSON SHA256 `3a678c0a4dba4910c71c6f9d8
 
 ## Validation and release
 
-Independent extraction verified all 1,330 rating records, 105 anchors and both scales. The 17 focused backend/UI tests and focused TypeScript graph passed. All 62 prior references retain their canonical hash; all 30 new role references fit existing lookup and scenario payload bounds. Historical regression compatibility and browser acceptance are in progress. This record does not yet claim a released feature or tested model answer. No paid provider calls, new credentials, access changes, denied source retries, Lab validation or chart-overlay publication are included.
+PR525 runtime `3ee4ed62480d3c016f24bc1d028426a5ed565c91`, merge `6f4d9e0df734b349c409b8f5ba0c3238003262e3`. Deployment `dpl_FNrv3cwEpo8L1UqvJDNJ9hSyxSV6` at `people-analytics-5aa5zktbu-ed-56dc.vercel.app` was built with no domain assignment, tested, then promoted unchanged. The public domain resolves to that READY deployment. Direct public desktop/mobile acceptance passed all 11 journey groups on each width, HTTP200 throughout, eight mocked responses each, no replay, no page/request/mock/bridge errors and drained teardown.
+
+- Independent extraction matched all 1,330 raw ratings and coordinates, 105 anchors and both scales. The bounded fixture is reproducible with `scripts/extract-onet-core-skills.py <original-directory> <fixture-path> --check`.
+- 52 affected regression tests passed; focused TypeScript reported zero diagnostics. Independent source/code/test-adjustment review passed. All 62 prior canonical references remain byte-identical. All 30 added references fit lookup and scenario payload limits.
+- Exact-head CI41267025994 passed every required step, including 3,095 historical tests, generated artifacts and TypeScript. Hosted prebuild, compilation, TypeScript and runtime input audit passed.
+- Package SHA256 `48cb7b902ded0f17ed85d68f57cb3dc9c97e646af349748d27c3956ea29128d2`, 1,228 runtime inputs, 1,083 manifest entries; private inputs unchanged.
+- Staging desktop1440/mobile390 each passed 11 journey groups with HTTP200, eight intercepted fixture responses, no page/request/mock/bridge errors and drained teardown. Checks covered old native backup and chat snapshots, US skills versus UK exclusion, consent/cancel/stale allocation, immutable revisions, Inventory/Overview selected context, reload, mixed/foreign scope, backup restore and Track copying. Focused charts/details/source images were inspected.
+- Initial staged attempts stopped at an over-scoped nested test locator for the visible Rating sources control. The harness selector was corrected; the same unchanged app deployment then passed. Failed reports remain preserved separately.
+
+Coverage is unchanged: 50/197 non-pay, 59/197 pay. This adds depth for 47 already eligible US vacancies, 30 role references and 19 exact occupations. The 147 uncovered vacancies retain the source/duty boundaries above.
+
+All model transport was mocked or blocked. Tool dispatch and exact selected-revision context were verified; fresh model answer quality was not tested. No paid calls, new credentials/access, denied-source retries, Lab validation or chart-overlay publication occurred.
