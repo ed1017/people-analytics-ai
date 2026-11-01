@@ -1,5 +1,9 @@
 # Market-to-position AI handoff
 
+## Current priority: hiring-manager demonstration
+
+Market expansion is paused for the user-approved complete demo audit. PR545 now runs as `3486e56a64c3923d57668f70ffc1f68ead059d85` through `dpl_7ffS3TE8vhGhKykLqB8RzLwcV9Qa`; exact CI and staged/direct-public desktop/mobile journey checks passed. Coverage remains 108/197 non-pay and 59/197 pay. See [the repeatable demonstration and release record](hiring-manager-demo-2026-11-01.md). Company-wide capacity, cash allowance, donor release and skill readiness must remain distinct. Paid provider-answer acceptance remains untested; paid AI is still paused. The PR543 section below is the latest market-data milestone, not the current runtime.
+
 ## Current publicly accepted release — PR543
 
 **Live and publicly accepted: 108/197 non-pay vacancies; 89 remain. Pay: 59/197.** PR543 merge `5b49da7c3e8255f6359a786244d338840bc8566f`, runtime `c9ecdd75364569b8e212e5197b262e481137d216`, deployment `dpl_5RB2P1jGFAD2aWHkVV2mgm3GazRn`, successful CI41340932569. Staged and direct-public acceptance passed four groups at both 1440 and 390 widths, three mocked explanations per run, HTTP 200 only, empty error arrays and drained teardown. Public runs had zero stage replay. No paid calls.
