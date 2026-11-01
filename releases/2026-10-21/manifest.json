@@ -4839,8 +4839,8 @@
     },
     {
       "path": "lib/decision-backup.ts",
-      "bytes": 6906,
-      "sha256": "beae1c8ae595e27f3b862045b415797e79ba22dcfe95e01727976a3211a645cb"
+      "bytes": 7303,
+      "sha256": "34c107ab277983cbb01058fb86343310f2cd7f443b060c02e97f581ad1ebba3a"
     },
     {
       "path": "tests/decision-backup-store.test.mjs",
@@ -4934,8 +4934,8 @@
     },
     {
       "path": "components/workforce-planning/position-finance-panel.tsx",
-      "sha256": "886187027ef0b007fadd138e9c8f04311ae2e870b348b09d2504dd7d4e7a26ef",
-      "bytes": 14269
+      "sha256": "cc5f7b4a62578d64e3a1c233b0cf1931946488b2b42b6eb1bcd0a0bf083c54ee",
+      "bytes": 15322
     },
     {
       "path": "components/workforce-planning/position-scenario-explanation.tsx",
@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "9ab4d3b4b83dd0d803eff51a9230eaf436bc07fa52063cdf8976643d6d7f1d1c",
-      "bytes": 13879
+      "sha256": "ae5972b35d240371750dd40ed03d1400627cc8aa6d2c26d116863e1fbd04e27d",
+      "bytes": 14963
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -4974,8 +4974,8 @@
     },
     {
       "path": "tests/position-finance-panel.test.mjs",
-      "bytes": 10283,
-      "sha256": "ce8a10fcb5eedf6af67f4abc819ba544dbddd998ad4fd8077cd2707c70a4352a"
+      "bytes": 12730,
+      "sha256": "2e9fd156edd7541f0fee67e2ff3fd96cb443474108fa75c562184045c09089c4"
     },
     {
       "path": "tests/position-finance-store.test.mjs",
@@ -5214,8 +5214,8 @@
     },
     {
       "path": "lib/position-tracking-goal.ts",
-      "bytes": 6007,
-      "sha256": "1bf1898a8a45ef6c06e63a1af48243a9317f6ba84ad32d921254ee611c2da3c4"
+      "bytes": 6584,
+      "sha256": "aa587923df78ddd37c7ba8162bd07a8bc22d4796317df7f7017812036a50b8ce"
     },
     {
       "path": "tests/position-tracking-goal-ui.test.mjs",
@@ -5346,6 +5346,31 @@
       "path": "tests/position-network-market-context.test.mjs",
       "sha256": "2b41e524af4e448de22d8db4e0e8f14c54f9ab4b07c3b9eaae22f4d2309954e7",
       "bytes": 23215
+    },
+    {
+      "path": "components/workforce-planning/position-modeled-duties.tsx",
+      "sha256": "43c6b22c99487cf810e2bcdabfb083b5a5fe9f7b31cd7e700da54106906687b5",
+      "bytes": 7261
+    },
+    {
+      "path": "lib/data/position-modeled-duties-v1.json",
+      "sha256": "a906e158875259e3a4b5f682ae3f29682dd298aa92b645ec2f33dfe7732dffc1",
+      "bytes": 3281
+    },
+    {
+      "path": "lib/position-modeled-duties.ts",
+      "sha256": "6f176dbeb7ceeefa8514f301176012c42cff2cfde621baa62a65897d9d14c1c3",
+      "bytes": 10121
+    },
+    {
+      "path": "tests/position-modeled-duties-ui.test.mjs",
+      "sha256": "42c2555a0eaad8ede65c77d276ff449c4ca45c20ac7b36f581d19b6e50bec273",
+      "bytes": 7507
+    },
+    {
+      "path": "tests/position-modeled-duties.test.mjs",
+      "sha256": "9f9d64edfdf45b394988bb01c25d07349e0acc485959cc55fa1c0fbb45692db6",
+      "bytes": 9482
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

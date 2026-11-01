@@ -1,0 +1,79 @@
+{
+  "id": "position-modeled-duties-v1",
+  "basis": "fictional-planning-assumption",
+  "description": "Reviewable modeled role duties for the fictional company. Not employee observations, verified job descriptions or external occupational evidence.",
+  "templates": [
+    {
+      "id": "modeled-duty:IT-ENG",
+      "version": "position-modeled-duties-v1:IT-ENG",
+      "roleId": "IT-ENG",
+      "role": "IT Engineer",
+      "countryCode": "US",
+      "basis": "fictional-planning-assumption",
+      "title": "Enterprise systems integration",
+      "duties": [
+        "Integrate and configure enterprise systems to meet documented business requirements.",
+        "Test changes, troubleshoot incidents and improve service reliability.",
+        "Maintain system interfaces and operational documentation."
+      ],
+      "exclusions": [
+        "Not a network-architecture or cybersecurity-specialist role by default.",
+        "No automatic occupational match or claim of verified vacancy duties."
+      ]
+    },
+    {
+      "id": "modeled-duty:CORPDEV-ANA",
+      "version": "position-modeled-duties-v1:CORPDEV-ANA",
+      "roleId": "CORPDEV-ANA",
+      "role": "Corporate Development Analyst",
+      "countryCode": "US",
+      "basis": "fictional-planning-assumption",
+      "title": "Corporate development and transactions",
+      "duties": [
+        "Screen acquisition opportunities against the company strategy.",
+        "Develop valuation and transaction analyses using explicit assumptions.",
+        "Coordinate financial and commercial due diligence and summarize transaction risks."
+      ],
+      "exclusions": [
+        "Not generic management consulting or routine operations analysis.",
+        "No investment recommendation, transaction approval or occupational match is implied."
+      ]
+    },
+    {
+      "id": "modeled-duty:CSM-GEN",
+      "version": "position-modeled-duties-v1:CSM-GEN",
+      "roleId": "CSM-GEN",
+      "role": "Customer Success Specialist",
+      "countryCode": "US",
+      "basis": "fictional-planning-assumption",
+      "title": "Customer adoption and support",
+      "duties": [
+        "Guide customer onboarding and product adoption.",
+        "Coordinate support issues and explain available product capabilities.",
+        "Monitor customer feedback and communicate adoption obstacles to product teams."
+      ],
+      "exclusions": [
+        "No sales quota, prospecting, closing or revenue ownership is assumed.",
+        "Not automatically mapped to service sales representatives."
+      ]
+    },
+    {
+      "id": "modeled-duty:PROD-PM",
+      "version": "position-modeled-duties-v1:PROD-PM",
+      "roleId": "PROD-PM",
+      "role": "Product Manager",
+      "countryCode": "US",
+      "basis": "fictional-planning-assumption",
+      "title": "Product discovery and priorities",
+      "duties": [
+        "Investigate customer problems and evaluate potential product outcomes.",
+        "Prioritize product opportunities and define requirements with delivery teams.",
+        "Review adoption and outcome evidence to adjust product priorities."
+      ],
+      "exclusions": [
+        "Not general operations management or project scheduling alone.",
+        "No general-manager occupational match is implied."
+      ]
+    }
+  ]
+}
