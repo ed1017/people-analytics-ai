@@ -1,3 +1,177 @@
+# Publicly accepted 96: remaining 101 source handoff
+
+Evidence-only reconciliation, 1 November 2026. **PR536 is publicly accepted at 96/197, leaving 101.** Seven direct public groups passed at each width; PR535 is the prior accepted86 milestone. All 101 unmatched IDs were checked against `nonpay-candidate96-register-20261101.json`; source commit `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1`. The integration-evidence companion JSON retains every exact ID, source URL, blocker class and next action.
+
+| Country | Remaining | Blocker classes |
+| --- | ---: | --- |
+| IN | 59 | unresolved-reuse-and-link-rights, insufficient-role-granularity |
+| SG | 11 | unresolved-commercial-reuse-and-link-rights, access-403, anti-robot-challenge, insufficient-role-granularity |
+| AU | 9 | technical-timeout-no-bytes, original-rows-and-notes-unverified, duty-match-pending |
+| BR | 7 | access-403, registration-boundary, unresolved-adaptation-rights, insufficient-content |
+| CA | 5 | insufficient-primary-duties |
+| GB | 5 | draft-not-approved, insufficient-primary-duties, occupation-equivalence-unestablished |
+| US | 2 | primary-duty-incompatibility |
+| DE | 2 | primary-duty-incompatibility |
+| JP | 1 | primary-duty-incompatibility, separate-instrument-rights-unverified |
+
+Coverage means conditional occupational-reference eligibility, not complete hiring evidence or confirmed actual duties. Classification guidance, curriculum, skills taxonomy and demand statistics are not interchangeable. No global-source exhaustion claim.
+
+## IN: 59 remaining
+
+DGE reproduction/link permission and NQR link/attachment-specific rights remain unresolved. Fresh NCS career link provides education/training schemes, not exact occupational duties; public-dissemination prose is not an affirmative commercial adaptation grant. Portal totals cannot be allocated to modeled vacancies.
+
+**Smallest next input/action:** Obtain explicit applicable reproduction/link permission for exact DGE/NQR files, or an occupation-level original with affirmative reuse rights. Verify attachment ownership, validity and duty fit. No paid PLFS registration. Qualification levels/hours are not employee proficiency/readiness or demand.
+
+Audits: `integration-evidence/india-singapore-brazil-rights-followup-20261101.json`, `integration-evidence/india-nonpay-source-feasibility-20261101.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://dge.gov.in/nco-2015`
+- `https://dge.gov.in/website-policy`
+- `https://www.nqr.gov.in/copyright-policy`
+- `https://www.nqr.gov.in/hyperlinking-policy`
+- `https://ncs.gov.in/`
+- `https://ncs.gov.in/terms&condition`
+- `https://ncs.gov.in/careerSchemes`
+
+## SG: 11 remaining
+
+Detailed MOM original already obtained; commercial reuse and internal hyperlink permission unresolved. SkillsFuture direct read403; IMDA anti-robot challenge stopped. Independent data.gov.sg broad group vacancy rates are openly licensed but cannot establish exact-role coverage.
+
+**Smallest next input/action:** Request permission for the existing detailed MOM original including intended reuse/linking, or supply permitted original SkillsFuture/IMDA role files with dataset-specific rights. Then verify exact duties. Do not retry denied/challenged routes or treat missing occupations as zero.
+
+Audits: `integration-evidence/india-singapore-brazil-rights-followup-20261101.json`, `integration-evidence/sg-mom-followup-20261101/audit.json`, `integration-evidence/ca-de-sg-nonpay-audit-20261101/audit.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://www.mom.gov.sg/terms-of-use`
+- `https://stats.mom.gov.sg/iMAS_Tables1/Job%20Vacancies/2025/mrsd_2025_jv_by_ssoc_ind_occ_edu.xlsx`
+- `https://jobsandskills.skillsfuture.gov.sg/skills-frameworks`
+- `https://www.imda.gov.sg/how-we-can-help/techskills-accelerator-tesa/skills-framework-for-infocomm-technology-sfw-for-ict`
+- `https://data.gov.sg/datasets/d_1e10046c33418c507bb2483c26dca489/view`
+
+## AU: 9 remaining
+
+Independent exact workbook check: unsupported XLSX web reader then approved direct curl exit28/HTTP000 after40seconds, zero bytes. Interactive page loading problem exposed no target ratings. Not a source denial; no original/hash/notes/ratings verified.
+
+**Smallest next input/action:** Supply unchanged official151746-byte workbook with notes/licence, or wait for materially recovered permitted transport. Stop unchanged retries, mirrors/proxies and new API registration. Inspect exact national rows and duty mappings; not all9 automatically fit.
+
+Audits: `integration-evidence/jsa-osl-independent-20261101/audit.json`, `integration-evidence/jsa-osl-2026/retrieval-status.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://www.jobsandskills.gov.au/sites/default/files/2026-10/2026_occupation_shortage_list_-_6_digit_anzsco_and_osca.xlsx`
+- `https://www.jobsandskills.gov.au/data/occupation-shortage`
+- `https://www.jobsandskills.gov.au/data/occupation-shortage/occupation-shortage-list`
+
+## BR: 7 remaining
+
+QBQ403 stopped; registered downloads not accessed. CBO BY-ND footer does not establish processed/translated reuse. Independent SEADE catalogue accessible but lists codes/names only and explicitly no licence supplied; not skills/demand evidence.
+
+**Smallest next input/action:** Supply permitted original occupational descriptions/skills and explicit adaptation/translation rights. No account creation, denial retry or code-list substitution. Review exact role duties after source/rights verified.
+
+Audits: `integration-evidence/india-singapore-brazil-rights-followup-20261101.json`, `integration-evidence/jp-br-nonpay-20261101/README.md`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://qbq.trabalho.gov.br/Pesquisa`
+- `https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/servicos/downloads`
+- `https://dadosabertos.des.sp.gov.br/dataset/codigos-cbo`
+
+## CA: 5 remaining
+
+Independent Statistics Canada NOC original is available and openly reusable with attribution. Eight conditional mappings cover10 Canadian vacancies in candidate96. The remaining five are duty-fit holds, not blanket Canadian source/access failures; denied COPS/OaSIS are distinct unused sources.
+
+**Smallest next input/action:** Obtain primary-duty descriptions for each held role below; independently select exact NOC scope without all-other fallback or foreign substitution. Existing original CSV suffices for first review; no re-download or new permissions needed for accepted NOC use.
+
+- Strategy Analyst: Distinguish organizational-method consulting from investment or market strategy.
+- Business Operations Specialist: Distinguish professional organizational analysis from operational administration.
+- Sales Account Executive: Specify product/technical scope and actual sales duties.
+- Sales Operations Specialist: Distinguish sales execution, administration and professional analysis.
+- AI Architect: Distinguish systems architecture from advanced model research/design; title alone is insufficient.
+
+Audits: `integration-evidence/canada-noc-independent-20261101/README.md`, `integration-evidence/canada-noc-independent-20261101/noc-reviewed-records.json`, `integration-evidence/canada-noc-independent-20261101/independent-review.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1`
+- `https://www.statcan.gc.ca/en/subjects/standard/noc/2021/indexV1/noc-2021-v1.0-elements.csv`
+- `https://www.statcan.gc.ca/en/terms-conditions/open-licence`
+
+## GB: 5 remaining
+
+ST1465 remains in development, not approved despite past target dates; draft PDFs only indexed, not captured. Approved ST0472v1.0 remains current until future latest-start2027-04-12, but investment banking is not internal M&A. ST0070v1.0 administration and ST0071v1.3 customer service are approved alternatives with OGL notices; primary fit unverified.
+
+**Smallest next input/action:** For Corporate Development3 obtain approved internal-acquisition/valuation/diligence source or separately authorize a task-level reference contract without occupation equivalence. For Operations2 establish administration versus process-analysis and direct customer support versus internal account/transaction operations; only then capture exact approved standard/version/rights. No apprenticeship-to-app-level inference.
+
+Audits: `integration-evidence/uk-standards-followup-20261101/README.md`, `integration-evidence/uk-us-jp-role-alternatives-20261101/audit.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://skillsengland.education.gov.uk/apprenticeship-standards/st1465`
+- `https://skillsengland.education.gov.uk/media/pnopxxwb/st1465-financial-investment-professional-level-6-standard.pdf`
+- `https://skillsengland.education.gov.uk/media/i0pb5tmi/st1465-l6-financial-investment-professional-aap.pdf`
+- `https://occupational-maps.skillsengland.education.gov.uk/maps/occupation/OCC1465A`
+- `https://skillsengland.education.gov.uk/apprenticeships/st0472-v1-0`
+- `https://skillsengland.education.gov.uk/apprenticeship-standards/st0070-v1-0`
+- `https://skillsengland.education.gov.uk/apprenticeships/st0071-v1-3`
+
+## US: 2 remaining
+
+Customer Success2 template describes onboarding/adoption, support coordination and feedback. Computer User Support requires hands-on technical diagnosis; CSR requires primarily routine/scripted enquiries. Sales alternative conflicts with explicit no-sales/revenue assumptions.
+
+**Smallest next input/action:** Confirm actual primary work without rewriting template to force fit. A technical-support, training-design or customer-service profile is valid only if those substantive duties are evidenced; otherwise continue independent profile research.
+
+Audits: `integration-evidence/uk-us-jp-role-alternatives-20261101/audit.json`, `integration-evidence/fr-uk-us-alternate-nonpay-20261101.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://www.onetonline.org/link/custom/15-1232.00`
+- `https://www.onetonline.org/link/summary/43-4051.00`
+
+## DE: 2 remaining
+
+Customer Success: client-relations manager essential set includes sales revenues/staff management. People Analytics: HR officer centers recruitment/payroll rather than analytics. Available licensed ESCO originals do not cure duty mismatch.
+
+**Smallest next input/action:** Provide substantive primary-duty evidence or find a genuinely matching profile; do not cherry-pick overlapping tasks and inherit whole occupation. Keep European taxonomy separate from German measured demand. No denied German routes.
+
+Audits: `integration-evidence/de-fr-final-roles-20261101/audit.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://ec.europa.eu/esco/api/resource/occupation?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Foccupation%2F725090a7-9943-4dae-8079-a6999d21ddba&language=en&selectedVersion=v1.2.0`
+- `https://ec.europa.eu/esco/api/resource/occupation?uri=http%3A%2F%2Fdata.europa.eu%2Fesco%2Foccupation%2Fd3e32e5e-7f24-48e3-b939-e4f800eb62fb&language=en&selectedVersion=v1.2.0`
+
+## JP: 1 remaining
+
+Talent Management1: jobtag432 broad recruitment/pay/benefits administration cannot establish whole-profile equivalence from overlapping appraisal/development tasks. Ability-check02-22 is a separate instrument; downloadable-database Article9 rights do not automatically extend to it.
+
+**Smallest next input/action:** Establish actual talent-development/succession/performance duties and exact source scope. Verify separate competency-instrument reuse before any import; no assessment taken or blanket prohibition inferred.
+
+Audits: `integration-evidence/uk-us-jp-role-alternatives-20261101/audit.json`.
+
+Exact audited URLs (research identifiers; no new request made):
+
+- `https://shigoto.mhlw.go.jp/User/Occupation/Detail/432`
+- `https://shigoto.mhlw.go.jp/User/AbilityCheck/02-22`
+- `https://shigoto.mhlw.go.jp/User/tos`
+
+## Continuation boundaries
+
+Use `nonpay-remaining101-followup-20261101.json` for precise vacancy-level routing. Canada is no longer an all-source access blocker: ten matches use an independent licensed NOC original; five specific duty decisions remain. Do not reactivate denied COPS/OaSIS routes. Australia has a technical zero-byte timeout, not a source denial. Singapore and Brazil combine distinct access and rights gaps. UK approved standards must be distinguished from drafts and future retirement dates. Rights-holder contact, paid services, new accounts and access changes are not authorized by this handoff. No source calls or repo/live-header edits were made in this reconciliation.
+
+## Final bounded India alternatives audit
+
+The later audit `integration-evidence/india-final-alternatives-20261101.md` checked the distinct official NSDC NOS/model-curriculum page `https://nsdcindia.org/national-occupational-standards-and-model-curriculum`: HTTP403, stopped without an alternate route. `https://www.data.gov.in/` returned a fetch timeout, not a denial. Bounded search found no exact rights-verified role-duty dataset. An indexed NSDC qualification catalogue is a lead, not verified original/version/reuse evidence. India remains59 unmatched; no coverage gain or assertion that every alternative is exhausted. The smallest next input is a permitted original with exact version and affirmative reuse rights, followed by duty-fit review.
+
+## International guidance does not close local gaps
+
+See [ISCO assessment](nonpay-international-guidance-assessment-2026-11-01.md): no mappings or local coverage gains; bulk duty-text reuse remains unverified.
+
+---
+
+## Historical PR533 audit (84/197; superseded by the current matrix above)
+
 # Remaining nonpay sources: actionable handoff
 
 Prepared 1 November 2026 from existing audit files; no new network research in this pass.

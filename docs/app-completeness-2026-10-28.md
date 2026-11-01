@@ -2,11 +2,11 @@
 
 ## Current release state - 1 November 2026
 
-**Live: 84/197 non-pay vacancies; pay: 59/197.** PR533 is publicly verified at runtime `d63590c8624fd92b6eab51daa86c9ecce3d19406`, deployment `dpl_EygB6pjkQXvFBNFGKoW4kpbMg9Rs`. PR529 (66), PR530 (72), PR531 (80) and PR532 (81) are released predecessors. No release candidate remains pending in this batch.
+**Live and publicly accepted: 96/197 non-pay vacancies; 101 remain. Pay: 59/197.** PR536 passed seven direct public acceptance groups at both desktop and mobile widths at runtime `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1`, deployment `dpl_ArAgSAsFCgmywFKtp1YFvcYc6mQQ`, successful CI41289621631. PR535 (86) and PR529–533 (66,72,80,81,84) remain verified historical milestones.
 
-See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md), [all 197 vacancy records](data/nonpay-vacancy-coverage-2026-11-01.json) and [remaining source actions](nonpay-remaining-source-blockers-2026-11-01.md). The remaining 113 have specific source-access, reuse-rights or duty-fit blockers; reviewing a gap does not count as coverage. This does not claim that every possible global source is exhausted.
+See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md), [all 197 vacancy records](data/nonpay-vacancy-coverage-2026-11-01.json) and [remaining source actions](nonpay-remaining-source-blockers-2026-11-01.md). The register retains exact IDs, source versions, modeled provenance and prior delta history. Eight Canadian NOC duty references add ten eligible vacancies while preserving all123 prior references; five Canadian vacancies still need specific primary-duty evidence.
 
-Reader cards, canonical lookup and saved-revision explanation payloads share source facts and limitations. Explicit duty confirmation is still required. There was **no fresh paid-model-output acceptance**; tests used canonical payload inspection and mocked responses. Skills taxonomy and career guidance are not measured local hiring demand, available applicants or employee proficiency.
+Coverage means an eligible conditional occupational reference, not complete market evidence, verified duties or adopted assumptions. Explicit reader duty confirmation remains required. There was **no fresh paid-model-output acceptance**; tests inspect canonical payloads and mocked responses. [International ISCO guidance assessment](nonpay-international-guidance-assessment-2026-11-01.md) adds no local coverage. No claim of global-source exhaustion is made.
 
 The dated sections below are historical snapshots. Their earlier coverage and next-step wording does not override this header.
 

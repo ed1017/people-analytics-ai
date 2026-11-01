@@ -17,3 +17,7 @@ This is U.S. federal early-career digital-service fellowship guidance, not a nat
 The versioned reference uses exact source identity and five task texts. Explicit scenario attachment preserves allocation revision and duty consent; selected-context reconstruction and backup use the existing canonical validation. Tests cover scope, qualifier, immutable task hash, missing-date honesty, consent, cancelled/stale review, backup and selected revision. No fresh live-model acceptance or paid request was performed.
 
 Original source/rights captures and research decision: `integration-evidence/uk-us-jp-role-alternatives-20261101/` in the integration workspace.
+
+## Public release appendix - PR535
+
+Released and publicly accepted at runtime `cd50fbd5ac370b0465507d56085dd5b922967b05`, deployment `dpl_9FrQeoEUvUVtzBU8Jx97RTxUgphh`; CI41288740951 succeeded. Four direct public groups per desktop/mobile width passed, with no recorded errors and inspected screenshots. Together the two new references increase eligible non-pay coverage84 to86; pay59 is unchanged. Prior121 references remain unchanged. The preparation statements above describe historical source work, not current release status. See [reconciliation](nonpay-release-reconciliation-2026-11-01.md). No paid calls or fresh model-output acceptance.
