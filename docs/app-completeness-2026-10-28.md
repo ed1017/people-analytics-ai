@@ -1,5 +1,15 @@
 # App completeness - October 28, 2026
 
+## November 1: UK occupation demand released (PR527)
+
+Current runtime `13529d2a74c1af166b8713f2ac902aa91d916322`, deployment `dpl_EviE3unKvTZFURht5Wc3TBfoWDRd`. Twelve Skills England 2025 references across nine SOC2020 occupations add **11 newly covered vacancies**. Non-pay coverage is now **61/197**, including **14/20 UK**; pay remains **59/197**. The 92 older references, persisted market chat cards, saved plans and source revisions remain unchanged.
+
+Readers see published Critical/Elevated/Not-in-high demand classifications and named indicators, with exact periods, uncertainty, imputation and sources in Details. These are national occupational demand assessments, not worker shortages, available applicants, hiring duration or approval. Existing duty acknowledgments and explicit source attachment still apply. General read-only AI lookup and exact saved-revision context share the canonical data; no paid model answer was tested.
+
+Independent source/code review passed; full affected market workflow 133/133, exact CI 41276975592 including 3,095 historical tests, production build, staged/public desktop/mobile ten-group acceptance all passed. The final record includes the corrected source periods and obsolete-test correction. [Source contract and release evidence](uk-occupation-demand-2026-11-01.md).
+
+Remaining non-pay gaps: 136 vacancies (India 59, Canada 15, Singapore 11, Germany 10, Australia 9, Japan 8, Brazil 7, France 7, UK 6, US 4). Australia OSL workbook retrieval remains zero-byte timeout; France BMO original recovered but national published figures and duty crosswalks remain unverified. No denied-source retry, new access, Lab work or overlay default is included. These are source boundaries, not permission to fabricate coverage.
+
 ## November 1: occupational core skills released (PR525)
 
 Runtime `3ee4ed62480d3c016f24bc1d028426a5ed565c91`, deployment `dpl_FNrv3cwEpo8L1UqvJDNJ9hSyxSV6`. Adds 35 O*NET 31.0 essential/transferable skills for 19 exact reviewed US occupations (30 role references), enriching 47 existing US vacancies. Coverage remains **50/197 non-pay and 59/197 pay**; no new country or role eligibility.
