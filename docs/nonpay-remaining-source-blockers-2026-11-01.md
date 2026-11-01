@@ -1,5 +1,16 @@
 # Remaining source handoff - current PR539 status
 
+## Current Australian release — PR541
+
+**Live and publicly accepted: 106/197 non-pay vacancies; 91 remain. Pay: 59/197.** PR541 merged as `43cdeb453b26e3cd2b0293e5bfea07da9a950516` and published exact runtime `9279edee6cf0171cf592f04cbdd9d32801d84ea3` through deployment `dpl_GDVznzWNzeWAkeM7GQeDP8TMTW63` after successful CI41339206030. Stage and direct-public acceptance each passed seven groups at both 1440 and 390 widths: HTTP 200, nine locally mocked explanations per run, zero recorded errors, drained teardown, and zero public asset replay. All 20 saved goals and earlier records were preserved. No paid model calls were made.
+
+The new reference set covers two Treasury vacancies (221212, NS/Clear), one Management Consultant (224713, NS/Clear) and one Privacy Counsel (published Solicitors group2713, Shortage/Suitability gap). Group driver and occupation confidence remain distinct. See [Australian source and release evidence](australia-shortage-2026-11-01.md), [remaining source checkpoint](remaining-source-checkpoint-2026-11-01.md) and [the full register](data/nonpay-vacancy-coverage-2026-11-01.json).
+
+The original OSCA273233 Solution Architect row has now been received and independently accepted for conditional duty fit: national NS/Clear, OSCA2024 v1.0, row456 in `2026 OSL (OSCA 2024)`, same verified six-digit workbook hash. It belongs to a separate next candidate108/197, not this live106 release. No additional coverage is counted here.
+
+## Prior accepted state and historical evidence
+
+
 **Publicly accepted: 102/197 non-pay vacancies; 95 unresolved. Pay: 59/197.** PR539 runtime `a392375404726fe2c46513b02c975732f5abdfff` passed ten direct-public groups at desktop and mobile widths. Eleven new fictional duty templates clarify thirteen vacancies; six independently reviewed source matches add coverage (Canada four, UK one, Germany one). Modeled duties do not themselves establish external evidence or approval. See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md) and [the exact duty/source contract](modeled-duty-expansion-2026-11-01.md).
 
 Current remaining country totals: India 59, Singapore 11, Australia 9, Brazil 7, UK 4, US 2, Canada 1, Germany 1 and Japan 1. The defined-but-unmatched follow-up roles are Canada Sales Operations, UK Client Operations and three Corporate Development vacancies, Germany Customer Success, and Japan Talent Management. Their blocker is current source fit, not absence of a modeled duty definition. Original non-sales Customer Success and transaction-focused Corporate Development duties remain unchanged.

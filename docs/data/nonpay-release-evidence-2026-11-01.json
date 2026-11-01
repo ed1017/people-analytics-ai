@@ -419,5 +419,49 @@
       "position-modeled-duty-expansion-public-a392375-1440-backup.json",
       "position-modeled-duty-expansion-public-a392375-390-backup.json"
     ]
+  },
+  {
+    "status": "live; direct public acceptance passed",
+    "pr": 541,
+    "merge": "43cdeb453b26e3cd2b0293e5bfea07da9a950516",
+    "runtime": "9279edee6cf0171cf592f04cbdd9d32801d84ea3",
+    "deployment": "dpl_GDVznzWNzeWAkeM7GQeDP8TMTW63",
+    "ci": 41339206030,
+    "coverage": {
+      "live": 106,
+      "candidate": 106,
+      "total": 197,
+      "pay": 59
+    },
+    "priorReferencesUnchanged": 137,
+    "newReferences": 3,
+    "newVacancies": 4,
+    "publicPromotion": true,
+    "paidCalls": 0,
+    "archiveSha256": "ffc600d89bcb7079c29874a3991b38a689b3fd5ad290078167dcac5e41b5d369",
+    "runtimeInputs": 1291,
+    "manifestEntries": 1146,
+    "privateInputsUnchanged": true,
+    "acceptance": {
+      "stageGroupsPerWidth": 7,
+      "publicGroupsPerWidth": 7,
+      "widths": [
+        1440,
+        390
+      ],
+      "mockedExplanationsPerRun": 9,
+      "http": 200,
+      "errors": [],
+      "blocked": [],
+      "mockErrors": [],
+      "bridgeErrors": [],
+      "teardown": "drained",
+      "publicAssetReplay": 0,
+      "screenshotsInspected": true,
+      "reports": "integration-evidence/position-market-australia-shortage-{stage,public}-9279ede-{1440,390}.json",
+      "nativeBackupBytesPerWidth": 1366410,
+      "preservedGoals": 20
+    },
+    "followOn": "OSCA273233 received and independently conditionally reviewed; candidate108 separate and unpublished."
   }
 ]
