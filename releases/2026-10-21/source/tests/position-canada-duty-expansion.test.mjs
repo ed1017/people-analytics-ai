@@ -23,6 +23,7 @@ test('reused facts preserve canonical source profiles while roles and conditions
  }
  const ai=refs().find(r=>r.roles[0]==='AI Architect');assert.match(ai.mappingDuties,/Not AI research, network-only architecture/);assert.doesNotMatch(ai.mappingDuties,/Cloud Architect/);
  assert.match(refs().find(r=>r.roles[0]==='Strategy Analyst').mappingDuties,/not investment analysis or transaction execution/);
+ const strategy=refs().find(r=>r.roles[0]==='Strategy Analyst');assert.doesNotMatch(strategy.mappingDuties,/Preserve some-or-all duty qualifier/);assert.match(strategy.mappingLimit,/some or all duties/);
 });
 test('new64101 exact raw records retain qualifiers, source coordinates and rights',()=>{
  assert.equal(createHash('sha256').update(readFileSync(new URL('../lib/data/statcan-noc-duty-expansion-v2021.json',import.meta.url))).digest('hex'),'4165f8022a51a085bae407dfdd55d171dc06624a9ced925e186a1c1c096e3760');

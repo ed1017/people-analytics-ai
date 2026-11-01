@@ -5679,8 +5679,8 @@
     },
     {
       "path": "lib/position-canada-duty-expansion.ts",
-      "sha256": "52a23925e21546daa9aab8974de1f38addf785d0aabf36b2d857b7df25bc1a16",
-      "bytes": 3989
+      "sha256": "64a3835565a3081b2103b7fdb12fbb355493b52b8088016fd6832aa3ca2a2f8a",
+      "bytes": 4090
     },
     {
       "path": "lib/position-people-analytics-esco.ts",
@@ -5694,8 +5694,8 @@
     },
     {
       "path": "tests/position-canada-duty-expansion.test.mjs",
-      "sha256": "1062f0c5d2347a7e109fe8fe5e49e3972fe9d6533b53e56411a26548f909ca2f",
-      "bytes": 4324
+      "sha256": "f7d8aa167f976a734d55a5c568905ef97d00ff977f1baa131e474d47ed8b73da",
+      "bytes": 4528
     },
     {
       "path": "tests/position-duty-source-expansion-contract.test.mjs",

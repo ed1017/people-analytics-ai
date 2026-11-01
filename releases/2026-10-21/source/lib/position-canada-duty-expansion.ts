@@ -23,7 +23,7 @@ export function canadaDutyExpansionReferences():PositionMarketContextReference[]
     const shared={
       id:`statcan-noc-duties:${mapping.code}:${target.role}`,
       version:`${source.id}:${HASH}:conditional-duties-v1`,
-      roles:[target.role],mappingDuties:`Confirm actual planned duties: ${mapping.condition}`,
+      roles:[target.role],mappingDuties:`Confirm actual planned duties: ${mapping.roleId==='STRAT-ANA'?mapping.condition.replace(/ Preserve some-or-all duty qualifier\.$/,''):mapping.condition}`,
       mappingLimit:'Broader Canadian occupational classification, not verified duties of this vacancy. The source describes some or all duties. Entry guidance retains may/usually qualifiers and subgroup conditions. Modeled duties and external-source consent are separate; no automatic attachment. No demand, available applicants, pay or proficiency inference.'+
         (mapping.code==='21231'?' The P.Eng. guidance concerns regulated professional engineering practice and approval of engineering drawings/reports, not all AI architecture work.':''),
     };
