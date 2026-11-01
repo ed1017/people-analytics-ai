@@ -243,8 +243,8 @@ export function AiPanel({
 
         <div id={detailsId} popover="auto" role="dialog" aria-label="Conversation details" className="fixed inset-0 m-auto max-h-[80dvh] w-[min(42rem,92vw)] overflow-y-auto rounded-xl border bg-background p-5 text-foreground shadow-xl">
           <div className="mb-3 flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Conversation details</h2><button type="button" popoverTarget={detailsId} popoverTargetAction="hide" className="min-h-11 rounded border px-3 focus-visible:ring-2 focus-visible:ring-ring">Close conversation details</button></div>
-          <section aria-label="Current evidence scope"><h3 className="font-semibold">Evidence scope</h3><p className="mt-1 text-sm">{scopeNote}</p>{readOnlyReason&&<p className="mt-2 text-sm">{readOnlyReason}</p>}</section>
-          <section aria-label="Conversation history" className="mt-5"><h3 className="font-semibold">Conversation history</h3><p className="my-2 text-xs text-muted-foreground">Reference only, including conversations cleared with Reset. Current findings use current evidence and saved goal context.</p>{conversationHistory.length?<ConversationMessages messages={conversationHistory}/>:<p className="text-sm">No conversation yet.</p>}</section>
+          <section aria-label="Current data scope"><h3 className="font-semibold">Data scope</h3><p className="mt-1 text-sm">{scopeNote}</p>{readOnlyReason&&<p className="mt-2 text-sm">{readOnlyReason}</p>}</section>
+          <section aria-label="Conversation history" className="mt-5"><h3 className="font-semibold">Conversation history</h3><p className="my-2 text-xs text-muted-foreground">Reference only, including conversations cleared with Reset. Current findings use current data and your saved goal.</p>{conversationHistory.length?<ConversationMessages messages={conversationHistory}/>:<p className="text-sm">No conversation yet.</p>}</section>
         </div>
 
         {aiCollapsed ? (
@@ -265,10 +265,10 @@ export function AiPanel({
             )}
 
             <div className="shrink-0">{goalTakeaway}</div>
-            {!dashboardReady&&!hasGoal&&<p role="status" className="mb-2 text-sm text-muted-foreground">{readOnlyReason?"AI analysis is not available on this page.":"Page evidence is loading or unavailable."}</p>}
+            {!dashboardReady&&!hasGoal&&<p role="status" className="mb-2 text-sm text-muted-foreground">{readOnlyReason?"AI analysis is not available on this page.":"Page data is loading or unavailable."}</p>}
             <div key={goalViewKey} aria-label="AI conversation" className="mb-3 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain pr-2">
               <GoalConversationMessages messages={chatMessages} viewKey={goalViewKey} hasGoal={hasGoal} hideHistory/>
-              {!chatMessages.length&&!hasGoal&&!readOnlyReason&&!dashboardReady&&<p className="text-base text-muted-foreground">You can keep drafting while page evidence loads.</p>}
+              {!chatMessages.length&&!hasGoal&&!readOnlyReason&&!dashboardReady&&<p className="text-base text-muted-foreground">You can keep drafting while page data loads.</p>}
             </div>
 
             {suggestedPrompts.length>0&&<details key={`${goalViewKey}:${chatMessages.length}:${chatLoading}`} open={!chatMessages.length&&!chatLoading} className="mb-2 shrink-0"><summary className="min-h-11 cursor-pointer py-2 font-semibold">Suggested prompts</summary><PromptExamples hideHeading prompts={suggestedPrompts} draft={chatInput} busy={chatLoading||!dashboardReady||previewPage||Boolean(readOnlyReason)} onSend={onSendSuggested}/></details>}

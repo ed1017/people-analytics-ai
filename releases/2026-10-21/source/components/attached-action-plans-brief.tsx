@@ -21,7 +21,7 @@ export function AttachedActionPlansBrief({raw,alternatives,goalId,goal,onReview}
    {draft.binding.goal!==goal&&<p className="font-medium">Goal wording has changed since this attachment.</p>}
    {edited&&!superseded.has(item.id)&&<p>A different working draft is saved on Home. This attachment has not been replaced by that draft.</p>}
    <SavedPlanHighlights draft={draft} result={result}/>
-   <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Plan details</summary><div className="space-y-2 pb-2"><HomePlanSummary draft={draft} result={result} savedBudgetText={result.budget?planBudgetText(result):undefined}/>{measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline provenance: {measure.baseline.basis}</p>}</div></details>
+   <details><summary className="min-h-11 cursor-pointer py-2 font-medium focus-visible:ring-2 focus-visible:ring-ring">Plan details</summary><div className="space-y-2 pb-2"><HomePlanSummary draft={draft} result={result} savedBudgetText={result.budget?planBudgetText(result):undefined}/>{measure?.baseline.basis&&<p className="break-words text-xs">Saved baseline source: {measure.baseline.basis}</p>}</div></details>
    <PlanDirections draft={draft} snapshot/>
    <details><summary className="min-h-11 cursor-pointer py-2 font-medium">Saved assumptions, activities and unknowns</summary><div className="space-y-3 pt-2">
     <p>Population — {bundleAssumptionText(draft.inputs.scope.population)}. Start — {bundleAssumptionText(draft.inputs.scope.startMonth)}. Duration — {bundleAssumptionText(draft.inputs.scope.months)} months.</p>

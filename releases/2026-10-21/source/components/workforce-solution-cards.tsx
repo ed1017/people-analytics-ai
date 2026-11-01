@@ -135,7 +135,7 @@ function Cards({optionActions,onExplore,solution,resultId,blocked,onDraftChange,
      {snapshot&&<WorkforceCalculationBreakdown plan={plan} review={snapshot.review} editsDisabled={editBlocked} scopeDisabled={editBlocked||!!draft||working} onEdit={editField} onReviewScope={onReviewScope}/>}
      <p className="break-all">Goal {solution.goalId}; solution {solution.id}; calculation {resultId}; version {sourceResult?.version}; alternative review {card.reviewId??'None'}, slot {card.slot===null?'None':card.slot+1}. {sourceResult?.payload.localWhatIf?'Locally recalculated on retained evidence; not a source refresh.':''}</p>
      <ul className="list-disc pl-5">{[...(snapshot?.review.limitations??[]),...plan.warnings].map((text,i)=><li key={i}>{text}</li>)}</ul>
-     <details><summary className="min-h-11 cursor-pointer py-2">Exact assumptions and lineage</summary><pre className="max-h-80 overflow-auto whitespace-pre-wrap break-all text-xs">{JSON.stringify({input:plan.input,evidenceIds:sourceResult?.evidenceIds,origin:sourceResult?.payload.localWhatIf??null,searchOrigin:snapshot?.alternative?.schemaVersion===2?snapshot.alternative.selectionOrigin:null},null,2)}</pre></details>
+     <details><summary className="min-h-11 cursor-pointer py-2">Assumptions and sources</summary><pre className="max-h-80 overflow-auto whitespace-pre-wrap break-all text-xs">{JSON.stringify({input:plan.input,evidenceIds:sourceResult?.evidenceIds,origin:sourceResult?.payload.localWhatIf??null,searchOrigin:snapshot?.alternative?.schemaVersion===2?snapshot.alternative.selectionOrigin:null},null,2)}</pre></details>
     </details>
 
    </article>;

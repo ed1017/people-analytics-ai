@@ -131,12 +131,12 @@ export function AppSidebar({
             <Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span className="whitespace-normal text-left">{item.label}</span>}
           </Button>;
         })}
-        <section aria-label="Explore evidence" className="border-t pt-3">
-          {!navCollapsed&&<h2 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Explore evidence</h2>}
+        <section aria-label="Explore data" className="border-t pt-3">
+          {!navCollapsed&&<h2 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Explore data</h2>}
           {planningEvidence.map(item=>{const Icon=pageIcons[item.page];return <Button key={item.page} type="button" data-nav-destination={item.page} title={item.label} aria-label={item.label} aria-current={activePage===item.page?'page':undefined} variant={activePage===item.page?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`min-h-10 w-full gap-3 px-3 text-sm text-muted-foreground ${navCollapsed?'justify-center':'justify-start'}`}><Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span>{item.label}</span>}</Button>})}
         </section>
         <section aria-label="Explore tools" className="border-t pt-2">
-          <button type="button" aria-label="More evidence and tools" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
+          <button type="button" aria-label="More data and tools" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
             <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>More</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
           </button>
           <div id="explore-navigation" hidden={!exploreOpen}>

@@ -75,7 +75,7 @@ jobs:
         run: node --test tests/position-it-systems-market.test.mjs
       - name: Verify visible market exploration without provider calls
         working-directory: releases/2026-10-21/source
-        run: node --test tests/home-prompt-categories.test.mjs tests/home-market-context-explorer.test.mjs
+        run: node --test tests/home-prompt-categories.test.mjs tests/home-market-context-explorer.test.mjs tests/market-chat-message.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

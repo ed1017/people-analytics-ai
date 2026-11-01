@@ -97,7 +97,7 @@ function ApplicationReview(props: Props) {
     const choice = choices[row.destination] ?? 'preserve', unavailable = row.status === 'read-only' || row.proposed === null;
     return <div key={row.destination} className="grid gap-2 border-b py-2 sm:grid-cols-[1fr_9rem]">
       <div className="min-w-0 break-words text-xs"><strong>{labelFor(row.destination)}</strong><p>{display(row.current)} → {display(row.proposed)}</p><p className="text-muted-foreground">{row.unit} · {row.status}{row.conflict ? ' · existing value differs' : ''}</p>
-        {row.reason && <p>{row.reason}</p>}{row.provenance.length > 0 && <details><summary className="cursor-pointer py-1">Provenance</summary>{row.provenance.map((item, index) => <p key={index}>{item.kind}: {item.basis ?? 'Exact attached goal'}</p>)}</details>}
+        {row.reason && <p>{row.reason}</p>}{row.provenance.length > 0 && <details><summary className="cursor-pointer py-1">Sources</summary>{row.provenance.map((item, index) => <p key={index}>{item.kind}: {item.basis ?? 'Exact attached goal'}</p>)}</details>}
       </div>
       <label className="text-xs">Choice<select aria-label={`${labelFor(row.destination)} application choice`} className={control} disabled={busy || props.disabled || unavailable && choice === 'preserve'} value={choice} onChange={event => setChoices(previous => ({...previous, [row.destination]: event.target.value as ApplicationChoices[string]}))}>
         <option value="preserve">Preserve</option><option value="fill-empty" disabled={unavailable}>Fill empty</option><option value="replace" disabled={unavailable}>Replace</option>

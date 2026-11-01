@@ -35,6 +35,7 @@ export type DashboardResponse = {
 export type ChatMessage = {
   role: "user" | "assistant";
   content: string;
+  marketInsights?: import("./market-chat-message").MarketChatState;
 };
 
 export type Persona = "HR" | "Leader" | "Finance";
