@@ -1,0 +1,61 @@
+{
+  "id": "ncs-career-profile:business-analyst:GB",
+  "sourceCode": "business-analyst",
+  "sourceTitle": "Business analyst",
+  "alternateTitles": [
+    "Process analyst",
+    "business systems analyst"
+  ],
+  "status": "eligible qualitative candidate; independently reviewed; additive conditional catalogue reference",
+  "sourceUrl": "https://nationalcareers.service.gov.uk/job-profiles/business-analyst",
+  "capturedAt": "2026-11-01",
+  "sourceUpdatedAt": null,
+  "originalFile": "original.html",
+  "sha256": "6f21a2b50b0f4eadd679d99017fef232874d823d6cadfe3d88837a3e4dc9420d",
+  "bytes": 48910,
+  "kind": "career-profile-skills",
+  "profileScope": "England careers guidance",
+  "skills": [
+    "business management skills",
+    "analytical thinking skills",
+    "knowledge of teaching and the ability to design courses",
+    "to be flexible and open to change",
+    "the ability to use your initiative",
+    "customer service skills",
+    "the ability to work well with others",
+    "excellent verbal communication skills",
+    "to have a thorough understanding of computer systems and applications"
+  ],
+  "tasks": [
+    "speak to managers to learn what their business needs are",
+    "write down what the business does and how",
+    "analyse your findings to suggest changes and improvements",
+    "explain the possible effects of changes, such as the costs, benefits and risks",
+    "organise testing and quality checks",
+    "support staff to make changes"
+  ],
+  "ordering": "source order, not ranking",
+  "licence": "Open Government Licence v3.0 except where otherwise stated",
+  "licenceUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+  "rightsEvidence": "Exact captured HTML footer explicitly supplies OGLv3/Crown copyright; selected skills/tasks have no adjacent third-party attribution. Existing rights review retained; no retry of previously denied National Archives endpoint.",
+  "attribution": "Contains National Careers Service information, Crown copyright, licensed under the Open Government Licence v3.0.",
+  "roleId": "OPS-BUS",
+  "role": "Business Operations Specialist",
+  "countryCode": "GB",
+  "modeledDutyId": "modeled-duty:OPS-BUS:GB",
+  "vacancyIds": [
+    "MODEL2-BU-DATAAI--OPS-BUS--L6--0003"
+  ],
+  "mappingCondition": "Confirm primary work investigates and documents business workflows, identifies problems, recommends practical process changes and supports their implementation. Not routine coordination or reporting alone.",
+  "fit": "The approved fictional duties establish process analysis and improvement as primary work. This matches the career profile as broader qualitative guidance, not an assertion that every illustrative task or skill is mandatory. No teaching-course ownership, software engineering, manager powers or external consultancy added.",
+  "exclusions": [
+    "No salary/hours/current opportunities copied",
+    "No occupational demand, ratings, proficiency, hiring difficulty or training-duration inference",
+    "No mapping from app grade to qualification level",
+    "No third-party photos, personal stories or course listings copied"
+  ],
+  "retrieval": [
+    "sandbox curl connection failure HTTP000 zero bytes",
+    "approved direct exact public URL HTTP200 48910 bytes"
+  ]
+}

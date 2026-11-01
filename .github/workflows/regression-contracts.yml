@@ -103,6 +103,9 @@ jobs:
       - name: Verify Canadian occupational guidance
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-canada-duty-guidance.test.mjs tests/position-canada-duty-context.test.mjs tests/position-canada-duty-ui.test.mjs
+      - name: Verify modeled duties and conditional international references
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/position-modeled-duties-expansion.test.mjs tests/position-canada-duty-expansion.test.mjs tests/position-people-analytics-esco.test.mjs tests/position-uk-business-analyst-career.test.mjs tests/position-duty-source-expansion-contract.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs

@@ -1,6 +1,12 @@
 // @ts-expect-error Native tests share canonical source.
 import {canadaDutyGuidanceReferences,type PositionOccupationalDutyGuidanceFacts} from './position-canada-duty-guidance.ts';
 // @ts-expect-error Native tests share canonical source.
+import {canadaDutyExpansionReferences} from './position-canada-duty-expansion.ts';
+// @ts-expect-error Native tests share canonical source.
+import {peopleAnalyticsEscoReferences} from './position-people-analytics-esco.ts';
+// @ts-expect-error Native tests share canonical source.
+import {businessAnalystCareerReferences} from './position-uk-business-analyst-career.ts';
+// @ts-expect-error Native tests share canonical source.
 import {escoFollowupReferences} from './position-esco-followup.ts';
 // @ts-expect-error Native tests share canonical source.
 import {escoBudgetReferences} from './position-esco-budget.ts';
@@ -84,6 +90,7 @@ function canonicalReferences():PositionMarketContextReference[]{
  cards.push(...escoFollowupReferences());
  cards.push(...escoBudgetReferences(),...usProductCareerReferences());
  cards.push(...canadaDutyGuidanceReferences());
+ cards.push(...canadaDutyExpansionReferences(),...peopleAnalyticsEscoReferences(),...businessAnalystCareerReferences());
  return cards;
 }
 const references=canonicalReferences();
