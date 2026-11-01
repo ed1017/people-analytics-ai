@@ -4944,8 +4944,8 @@
     },
     {
       "path": "lib/position-chat-context.ts",
-      "sha256": "ae5972b35d240371750dd40ed03d1400627cc8aa6d2c26d116863e1fbd04e27d",
-      "bytes": 14963
+      "sha256": "210174d572ff458d211d622f8d29b70606b3976b2e7143221a15ea6131843822",
+      "bytes": 15224
     },
     {
       "path": "lib/position-finance-assessment.ts",
@@ -5269,8 +5269,8 @@
     },
     {
       "path": "components/workforce-planning/position-market-context.tsx",
-      "sha256": "1e2c361409298e2eee1ecadecee8278a92f94b919f8356b69532e8d0ab8dbf5b",
-      "bytes": 12774
+      "sha256": "8353455311beef2ecd6c03cbe428dd333347efcd30776c423a9923468c4e7cd3",
+      "bytes": 17288
     },
     {
       "path": "lib/data/bls-position-outlook-2025-2035.json",
@@ -5284,8 +5284,8 @@
     },
     {
       "path": "lib/position-market-context.ts",
-      "sha256": "64a4596296dfb12be3d8c43df4afee8d93afa4c9efe49c4c90c81c3265df0d40",
-      "bytes": 19837
+      "sha256": "98a447cc6bd6a433da36544bd90d6f6dab6983df011c32b5c5e352ed86fd202e",
+      "bytes": 20090
     },
     {
       "path": "tests/position-market-context-ui.test.mjs",
@@ -5294,8 +5294,8 @@
     },
     {
       "path": "tests/position-market-context.test.mjs",
-      "sha256": "ea3fec19e776b3bd937d6112ef01f57856cac2f4b18d614e044e0411a30c0114",
-      "bytes": 9296
+      "sha256": "e34ddb7fcab5334d3f9f79c9f4e3fee38f29eacce2ddeccd341000635cf6b47b",
+      "bytes": 9435
     },
     {
       "path": "tests/position-outlook-coverage.test.mjs",
@@ -5304,13 +5304,13 @@
     },
     {
       "path": "lib/market-context-lookup.ts",
-      "sha256": "2ecfd70ef2d2649690bcaf88f9f44b311f32b9beabb260a2663b35002ef6370a",
-      "bytes": 4979
+      "sha256": "dbe1453effe91597f11da9a40cf9ef03a26067a5b7bc7750b3f3e9a1ce6fa021",
+      "bytes": 5284
     },
     {
       "path": "tests/market-context-lookup.test.mjs",
-      "sha256": "58fb877b8a071c6906c85f395fff409cdb8aca4ec03ed1a2d13e995dad447015",
-      "bytes": 8385
+      "sha256": "26edb1611819b49a9b293633b761ce3641bf565585f3a2aef9ea8fc23e9cde0a",
+      "bytes": 8461
     },
     {
       "path": "lib/data/dfe-ess2024-uk-position-hiring.json",
@@ -5329,8 +5329,8 @@
     },
     {
       "path": "tests/position-conditional-nonpay.test.mjs",
-      "sha256": "584958f44f6e5b0cc8a419b613f1c2f52e3968315ba200be148bcf00e6852cb6",
-      "bytes": 19969
+      "sha256": "982def970f8079fe3722de262da4e4e7d458fa3a0c509021003b8fcbf37913a3",
+      "bytes": 20077
     },
     {
       "path": "lib/data/network-market-nonpay-v1.json",
@@ -5344,8 +5344,8 @@
     },
     {
       "path": "tests/position-network-market-context.test.mjs",
-      "sha256": "df1f7cd068a536f0dd03249bfe00741d60039b7eb0d1bd868a2499bb6311c9bb",
-      "bytes": 23215
+      "sha256": "2f45777faaf1d6af462424ff88cad8cee597a09c75e5ab8ad0d62f5aa233c23e",
+      "bytes": 23295
     },
     {
       "path": "components/workforce-planning/position-modeled-duties.tsx",
@@ -5369,8 +5369,8 @@
     },
     {
       "path": "tests/position-modeled-duties.test.mjs",
-      "sha256": "4f915f24208377fdbaa9d9a669a1f294f1127dd045dd440e8be4db4071598fe0",
-      "bytes": 9519
+      "sha256": "31503c3e98a3526b2ed51466672886d66f64572a70257657708a4228d13a7add",
+      "bytes": 9559
     },
     {
       "path": "components/home-market-context-explorer.tsx",
@@ -5389,8 +5389,8 @@
     },
     {
       "path": "tests/position-it-systems-market.test.mjs",
-      "sha256": "4bdc968f283306cfcbfd8f59c708cfa40618ff1cd586dd8166c22d8202076c76",
-      "bytes": 7770
+      "sha256": "2941ff3dd8ccd7136935052114ddfcf3d6cebb8e4d4d0e38a6e70b70a0960fcb",
+      "bytes": 7938
     },
     {
       "path": "lib/market-chat-message.ts",
@@ -5401,6 +5401,31 @@
       "path": "tests/market-chat-message.test.mjs",
       "sha256": "36c28056eab8112ec89a64957c421be1558726e6be80ebb876a86031f12877ce",
       "bytes": 6793
+    },
+    {
+      "path": "lib/data/onet-core-skills-31-reviewed-us.json",
+      "sha256": "ea7f883ade511cc76175e1e263df3bd6556dff062a51fef6303b50c6ea2d1ec5",
+      "bytes": 648258
+    },
+    {
+      "path": "lib/position-core-skills.ts",
+      "sha256": "6b822051abcbefede30d924ea90003f67b12d14a7cdcfb0fc9367894506a2ffa",
+      "bytes": 4580
+    },
+    {
+      "path": "scripts/extract-onet-core-skills.py",
+      "sha256": "f06cd681b0e575f0c44a4eb84e53727a4b9e100907bf5c327dffb5741ec96252",
+      "bytes": 2882
+    },
+    {
+      "path": "tests/position-core-skills.test.mjs",
+      "sha256": "c618067231666a845af091deefdefc8066567cc78247b24e4bfa3a259669265e",
+      "bytes": 9971
+    },
+    {
+      "path": "tests/position-market-skills-ui.test.mjs",
+      "sha256": "488cf3939c3d9d71101c83906b1a00a44008dd8dd0f363e7daa1c6eac99f5c18",
+      "bytes": 7967
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

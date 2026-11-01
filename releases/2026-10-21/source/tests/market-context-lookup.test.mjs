@@ -9,7 +9,7 @@ import {PUBLIC_9037 as P} from '../lib/public-9037-contract.mjs';
 import {public9037Metadata} from '../lib/public-9037-projection.mjs';
 const args=(patch={})=>({country:'US',role:'Machine Learning Engineer',occupationCode:null,kind:'all',...patch});
 test('canonical lookup returns dated broader outlook and categorical software without adoption',()=>{
- const r=readMarketContext(args());assert.equal(r.status,'available');assert.equal(r.references.length,2);
+ const r=readMarketContext(args());assert.equal(r.status,'available');assert.equal(r.references.length,3);assert.equal(r.references.filter(x=>x.kind==='occupation-skills').length,1);
  const o=r.references.find(x=>x.kind==='occupation-outlook');assert.equal(o.facts.annualOpenings,24800);assert.equal(o.occupationCode,'15-2051');assert.match(o.mappingLimit,/broader|shared/i);assert.equal(o.period,'2025-2035');assert.match(o.sourceSha256,/^[a-f0-9]{64}$/);assert.match(r.mappingStatus,/not confirmed/);
  assert.match(r.action,/no assumptions changed/);assert.ok(JSON.stringify(r).length<48000);
 });
