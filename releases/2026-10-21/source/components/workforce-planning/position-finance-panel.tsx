@@ -1,4 +1,5 @@
 'use client';
+import {PlannerResults} from '@/components/planner-results';
 import {useId,useMemo,useState} from 'react';
 import {decisionStore,useDecisionStorage} from '@/components/decision-store';
 import {POSITION_MARKET_FIELD,readPositionMarketLedger,positionMarketChatReference} from '@/lib/position-market-assumptions';
@@ -78,8 +79,10 @@ export function PositionFinancePanel({allocation,datasetToken,goalId,savedCaptur
     <p className="mt-2 text-xs text-muted-foreground">Proposed vacant positions. Staffing is a separate decision.</p>
    </details>
   </fieldset>
+  {matches&&<PlannerResults><section aria-label="Position funding results" className="min-w-0 space-y-3"><h3 className="font-semibold">Funding comparison</h3>
   {matches&&result&&<dl className="grid grid-cols-2 gap-3 sm:grid-cols-4"><div><dt className="text-xs text-muted-foreground">Cash required</dt><dd className="text-lg font-semibold">{money(result.requiredCashUsd)}</dd></div><div><dt className="text-xs text-muted-foreground">Allowance remaining</dt><dd className="text-lg font-semibold">{money(result.fundingRemainingUsd)}</dd></div><div><dt className="text-xs text-muted-foreground">Added positions</dt><dd className="text-lg font-semibold">{result.proposedAddition.positions}</dd></div><div><dt className="text-xs text-muted-foreground">Added position FTE</dt><dd className="text-lg font-semibold">{result.proposedAddition.positionFte??'Unknown'}</dd></div></dl>}
   {matches&&validation&&<p role="alert" className="text-sm">{validation}</p>}
+  </section></PlannerResults>}
   <div className="flex flex-wrap gap-2"><button type="button" className={`${button} bg-primary text-primary-foreground`} disabled={disabled||Boolean(validation)||result?.status==='invalid-scenario'} onClick={save}>Save funding comparison</button>{edits[key]&&<><button type="button" className={button} onClick={()=>{setEdits(current=>{const next={...current};delete next[key];return next;});setNotice('Funding edits reset.');setError('');}}>Reset funding edits</button><span className="self-center text-xs">Unsaved funding changes</span></>}</div>
   {records.length>0&&<div className="flex flex-wrap items-end gap-2"><label className="min-w-0 flex-1 text-sm">Saved funding comparison<select className={control} value={selected[key]??String(record?.revision??'')} onChange={e=>setSelected(current=>({...current,[key]:e.target.value}))}>{records.map(row=><option key={row.revision} value={row.revision}>Revision {row.revision} · {labels[row.result.status]}</option>)}</select></label><button type="button" className={button} disabled={disabled} onClick={()=>{const row=records.find(r=>String(r.revision)===(selected[key]??String(record?.revision??'')));if(row)reopen(row);}}>Reopen funding</button></div>}
   {error&&<p role="alert" className="text-sm">{error}</p>}{notice&&<p role="status" className="text-sm">{notice}</p>}

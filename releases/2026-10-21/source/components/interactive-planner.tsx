@@ -1,3 +1,5 @@
+'use client';
+import {PlannerResults,useSplitPlannerResults} from './planner-results';
 import {catalogProseDisplay} from '@/lib/catalog-display';
 import type {ReactNode} from 'react';
 import styles from './interactive-planner.module.css';
@@ -7,6 +9,18 @@ const display=(value:ReactNode)=>typeof value==='string'?catalogProseDisplay(val
 
 /** Presentation only. Each adapter supplies outputs and controls from its existing calculator. */
 export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,assumptions,children,supplement,focusVisual=false,compact=false}:{scope:ReactNode;outcome:ReactNode;metrics:{label:string;value:ReactNode}[];levers:ReactNode;visual:ReactNode;actions?:ReactNode;assumptions?:ReactNode;children?:ReactNode;supplement?:ReactNode;focusVisual?:boolean;compact?:boolean}){
+ const split=useSplitPlannerResults();
+ if(split)return <section className={`${decision.surface} ${styles.planner} ${compact?styles.compact:''}`} aria-label="Interactive scenario planner">
+  <header className={decision.hero}><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
+  <section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section>
+  {actions&&<div className={styles.actions}>{actions}</div>}
+  <PlannerResults><section className={`${decision.surface} ${styles.planner}`} aria-label="Position scenario results">
+   <header><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
+   <dl className={styles.metrics}>{metrics.map(metric=><div key={metric.label}><dt>{metric.label}</dt><dd>{display(metric.value)}</dd></div>)}</dl>
+   <div className={styles.visual}>{visual}</div>{supplement}
+   {assumptions&&<details className={styles.assumptions}><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Details</summary><div>{display(assumptions)}</div></details>}
+  </section></PlannerResults>{children}
+ </section>;
  return <section className={`${decision.surface} ${styles.planner} ${compact?styles.compact:''}`} aria-label="Interactive scenario planner">
   <header className={decision.hero}><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
   <dl className={styles.metrics}>{metrics.map(metric=><div key={metric.label}><dt>{metric.label}</dt><dd>{display(metric.value)}</dd></div>)}</dl>

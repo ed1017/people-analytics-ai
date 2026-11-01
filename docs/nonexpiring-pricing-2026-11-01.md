@@ -25,3 +25,14 @@ Independent review, exact-head CI, staged build, production migration, authentic
 - https://developers.openai.com/api/docs/models/gpt-5.6-luna.md
 - https://developers.openai.com/api/docs/guides/prompt-caching.md
 - https://supabase.com/docs/guides/database/functions
+
+## Published repair
+PR548 merged as cfe12ede54165d72c809f917b9ae6698b7241c66. Runtime1d6d1415275aaf41d3deb16b407e3ed9fd6d4788 passed CI41357570631 and independent68 JS/16 PGlite checks. Archive SHA25626912d149cd6ee48a0feffa8abee76ca7a28ce28c9db4b94641f8268c5f860c1.
+
+First stage GFy6FUNhjPht8WyAApLteN4e2fsb failed its organization identity guard and was never promoted. Corrected production stage6wzwpGYN8UZpKkA1ddqYZNyQ33iW supplied the existing organization ID as deployment-local runtime/build configuration, passed build/type checks and desktop/mobile rendering, and was promoted without rebuilding. No persistent environment or guard relaxation was made.
+
+The guarded migration applied successfully. Post-checks preserve cap100000000 microUSD, gross reserved599310034,119 provider receipts and177 reservations; actual charges plus outstanding holds remain29765929 microUSD. Gross reservations are cumulative accounting, not current spend. Existing security advisor findings are unchanged; no new finding for the four pricing functions.
+
+The existing authenticated Vercel cron was manually triggered once at2026-11-01T22:42:26.180Z. It fetched official documents and appended verification4bc6d7ae47ae451e58d753e1ea0bd3c64d39046169fa2653f4b4b5b7b0df74e3 at22:42:26.997Z, validUntil:null. Public endpoint returned configured for all five AI routes; desktop1440/mobile390 confirmed the actual GET and zero provider requests. Short-lived capability receipts still expire after30seconds and are refreshed normally; this is separate from pricing validity.
+
+No new paid model answer was tested. The assistant testing-spend pause remains in force. The production cap was not changed by this request. The old layout stage must not be promoted; PR547 now incorporates the released repair and requires a new combined stage.

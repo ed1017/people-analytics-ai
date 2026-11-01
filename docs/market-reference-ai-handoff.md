@@ -1,3 +1,5 @@
+[Position planner left-response placement](positions-left-response-2026-11-01.md) records the current UI work; source coverage is unchanged.
+
 # Market-to-position AI handoff
 
 ## Current priority: hiring-manager demonstration
