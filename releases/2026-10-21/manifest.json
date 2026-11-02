@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "c97dd9cc39a3aea93d23dfe38b653bdf96dd6b3f5f30eb025b7fb24ac07c7af2",
-      "bytes": 113629
+      "sha256": "6e8e766c2fee6e3d905205261ec3672f93d100309a76d3655d785f4a900208a1",
+      "bytes": 114011
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -879,8 +879,8 @@
     },
     {
       "path": "components/problem-conversation.tsx",
-      "sha256": "531f3db74238e4980608fa8475bdab298c3f0eb48c1eae2f6d68e21d2c7198bb",
-      "bytes": 29731
+      "sha256": "88c9dc5c2b891fddbe33670479bceeb30a032e1b4ffd88b2a1fe6bb6c24c5af2",
+      "bytes": 29761
     },
     {
       "path": "components/project-case-study.tsx",
@@ -2774,8 +2774,8 @@
     },
     {
       "path": "lib/local-decisions.ts",
-      "sha256": "414419ab86b2c02895a83d9bb246867761dafe92a3eb75a6f21d9f76be082a9b",
-      "bytes": 21887
+      "sha256": "26373443d6188413fd6b01f3a0d4ad1e484ffdad666f8b52ca22b5d4e70d132e",
+      "bytes": 22593
     },
     {
       "path": "lib/local-goals.ts",
@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "79f3189310cbb077b4cf234a0a73955240cc88a5db94f638b047497615da7b61",
-      "bytes": 14802
+      "sha256": "eece3b03e58f7c85109b2207a37c9d252aa02d6effb71eaba2492da8ef550cc2",
+      "bytes": 14975
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4124,13 +4124,13 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "bytes": 2815,
-      "sha256": "6384898d3d953b1defb0e701c5625036dc526f89f7fc900c5d155feafb76c8ab"
+      "bytes": 2845,
+      "sha256": "4d3ebd3419e656d6eac6699d7041975a1970da501619691750fba6c366cf5530"
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "4830a7f4ae628b09fd01a16857060f9f31115752c36705a81115c8976d10e272",
-      "bytes": 3315
+      "sha256": "b66f92a343788b7a0e2050560b1402f94909cdd3923b034756a7edf9b59c94ad",
+      "bytes": 3392
     },
     {
       "path": "components/scenario-planner-workspace.tsx",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "e71d1459914302b6b2d49498b7a2a0c5774051798f99d7bc8687177c92f8396e",
-      "bytes": 8329
+      "sha256": "326064451cb434716eb25a418497486d58dad936ba9473fdacbf8c7d5721b344",
+      "bytes": 8368
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -5769,8 +5769,8 @@
     },
     {
       "path": "components/planner-results.tsx",
-      "sha256": "fc53b20de49799598acf44d31a40b4c49aa1766c08903e64591863affcf520d9",
-      "bytes": 890
+      "sha256": "43468b737d48658530219a4dd5a1fe2b81e86a510dbc544b3d113fe444b36ab9",
+      "bytes": 1239
     },
     {
       "path": "tests/planner-results-placement.test.mjs",
@@ -5794,8 +5794,8 @@
     },
     {
       "path": "lib/scenario-chat-continuity.ts",
-      "sha256": "91647614579628d7de1852fd58c87ecd5f857147bc7cee6899f7cf86a48c7f6e",
-      "bytes": 2757
+      "sha256": "62a91f2bd225dd139258360407e317ee58597ff3ca76c180d3b9b4830c6d04e9",
+      "bytes": 3010
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

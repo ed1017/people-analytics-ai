@@ -24,3 +24,5 @@
 .layout{gap:.75rem}.levers,.visual{padding:12px}.levers{gap:10px}
 .compact{padding:.65rem;gap:.6rem}.compact .layout{gap:.65rem}
 @container(max-width:499px){.planner header{padding:12px}.metrics>div{padding:.55rem}.levers,.visual{padding:10px}}
+
+.resultsScope{color:#4d6378}
