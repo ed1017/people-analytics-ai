@@ -23,6 +23,7 @@ import {homeRecruitingKpi,type HomeRecruitingKpi} from '@/lib/home-kpi-source';
 import {HomeHeadcountSummary,type HomeSnapshotProps} from '@/components/home-chat-welcome';
 import {SyntheticCapacityRiskScenario} from '@/components/synthetic-capacity-risk-scenario';
 import {GroupCapacityRisk} from '@/components/group-capacity-risk';
+import {isGroupStaffingFollowup} from '@/lib/group-staffing-followup';
 import {capacityRiskIntent} from '@/lib/group-capacity-risk';
 import {useHomeProjection} from '@/components/use-home-projection';
 import {datasetSession} from '@/lib/dataset-client.mjs';
@@ -262,6 +263,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const [syntheticRiskContext,setSyntheticRiskContext]=useState<string|null>(null);
   const syntheticScope=JSON.stringify([datasetSession.snapshot(),workforceQuery,workforceScope,persona]);
   const syntheticRiskOpen=syntheticRiskContext===syntheticScope;
+  const riskCommand=useRef<((text:string)=>string|null)|null>(null);
   const [riskRequest,setRiskRequest]=useState<{months:number;question:string;context:string}|null>(null);
   function resetHomeConversation(){
     setSyntheticRiskContext(null);
@@ -379,6 +381,10 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
     if(marketFollowup?.workspace===marketWorkspace&&!marketQuestionCurrent()){setMarketFollowup(null);setChatError('The selected market or planning context changed. Choose the market again. Your draft is kept.');return;}
+    if(!actionPlan&&!selectedMarketMessage&&riskRequest?.context===contextKey&&active&&!chatLoading&&!sending.current){
+      const reply=riskCommand.current?.(message)??(isGroupStaffingFollowup(message)?'The trend controls are still loading. Ask again when they appear; your current question and assumptions are kept.':null);
+      if(reply!==null){setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:reply}]);setChatError(null);if(!keepComposer||input.trim()===message)setInput('');return;}
+    }
     const riskMonths=actionPlan||selectedMarketMessage?null:capacityRiskIntent(message);
     if(riskMonths!==null&&(!ready||!conversation.storageReady)){setChatError('Workforce data is still loading. Your question is kept; submit when loading finishes.');return;}
     if(riskMonths!==null&&active&&!chatLoading&&!sending.current){setRiskRequest({months:riskMonths,question:message,context:contextKey});setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:'Compare conditional workforce change using each business unit’s recent recorded trend. Demand is not supplied, so this is workforce exposure rather than a measured capacity gap.'}]);setChatError(null);if(!keepComposer||input.trim()===message)setInput('');return;}
@@ -822,7 +828,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
     {liveChatAvailable&&clarification?.context===contextKey&&<section aria-label="Clarify your goal" className="space-y-2 rounded border border-primary/40 p-3 text-sm"><p className="font-semibold">{clarification.question}</p><p>{userGoalCurrent?'Pin your goal above or answer to refine the plan.':'Reply below. Your goal and constraints are kept.'}</p><button type="button" className="min-h-11 rounded border px-3 py-2 focus-visible:ring-2 focus-visible:ring-ring" onClick={focusQuestion}>Answer in chat</button></section>}
     {preparationUnavailable?.context===contextKey&&<section role="status" aria-label="Problem and options not prepared" className="space-y-1 rounded border p-3 text-sm"><p className="font-semibold">Problem and options not prepared</p><p>{showCandidatePin&&candidate?.userGoal&&!candidate.proposal?'No validated investigation options were prepared. You can still pin your own stated goal above to request Action Plan drafts.':'This answer has no validated problem and options to pin.'} Your work and drafts are kept.</p><details><summary className="cursor-pointer py-1">Preparation details</summary><p>Stage: {preparationUnavailable.stage}. Reason: {preparationUnavailable.diagnostic.reason}. Field: {preparationUnavailable.diagnostic.field}. Candidate count (4 means 4 or more): {preparationUnavailable.diagnostic.optionCount}. Missing fields: {preparationUnavailable.diagnostic.missingFieldCount}.</p></details></section>}
     {candidateNotice&&<p role="status">{candidateNotice}</p>}
-    {trendOpen&&riskRequest&&<PlannerResultsProvider target={trendResultsTarget} active={trendOpen}><GroupCapacityRisk key={contextKey+':'+riskRequest.months} months={riskRequest.months} question={riskRequest.question} scopeQuery={workforceQuery} onClose={()=>{setRiskRequest(null);focusQuestion();}}/></PlannerResultsProvider>}
+    {trendOpen&&riskRequest&&<PlannerResultsProvider target={trendResultsTarget} active={trendOpen}><GroupCapacityRisk key={contextKey+':'+riskRequest.months} months={riskRequest.months} question={riskRequest.question} commandRef={riskCommand} scopeQuery={workforceQuery} onClose={()=>{setRiskRequest(null);focusQuestion();}}/></PlannerResultsProvider>}
     </div>
 
     {liveChatAvailable&&swpDemoVisible&&<button type="button" aria-expanded={demoChatOpen} className="min-h-11 self-start rounded border px-3 py-2 text-sm" onClick={()=>{setDemoChatOpen(!demoChatOpen);if(!demoChatOpen)requestAnimationFrame(()=>composer.current?.focus());}}>{demoChatOpen?'Close chat':'Ask about this'}</button>}
