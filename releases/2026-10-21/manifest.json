@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "6e8e766c2fee6e3d905205261ec3672f93d100309a76d3655d785f4a900208a1",
-      "bytes": 114011
+      "sha256": "4794e34a753584375e0c2ac9d7857db717653ac137c165f18ea07c229f445191",
+      "bytes": 114712
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4074,8 +4074,8 @@
     },
     {
       "path": "components/group-capacity-risk.tsx",
-      "sha256": "eece3b03e58f7c85109b2207a37c9d252aa02d6effb71eaba2492da8ef550cc2",
-      "bytes": 14975
+      "sha256": "b8cf069a702bb76a74d899dba2fea2c38291340bf7a523cd4fe05bd390df38bf",
+      "bytes": 18094
     },
     {
       "path": "lib/group-capacity-risk-source.ts",
@@ -4164,8 +4164,8 @@
     },
     {
       "path": "components/group-workforce-trend.tsx",
-      "sha256": "326064451cb434716eb25a418497486d58dad936ba9473fdacbf8c7d5721b344",
-      "bytes": 8368
+      "sha256": "8ab97d5a47c3ad076f4c7c6568e90b6e0e34dd6339d27e1cc06eae22b458d5f3",
+      "bytes": 9259
     },
     {
       "path": "components/headcount-projection-entry.tsx",
@@ -5379,8 +5379,8 @@
     },
     {
       "path": "tests/home-market-context-explorer.test.mjs",
-      "sha256": "8dc039556aff51a6d67835132d32a35e2c9190781d5fbccf1bd2422185489893",
-      "bytes": 9349
+      "sha256": "6664cc2432b6f19dda1b0d6c1b0f6913a19d4ba670315df5239df7401c0eb445",
+      "bytes": 9414
     },
     {
       "path": "lib/data/it-systems-nonpay-mapping-v1.json",
@@ -5796,6 +5796,11 @@
       "path": "lib/scenario-chat-continuity.ts",
       "sha256": "62a91f2bd225dd139258360407e317ee58597ff3ca76c180d3b9b4830c6d04e9",
       "bytes": 3010
+    },
+    {
+      "path": "lib/group-staffing-followup.ts",
+      "bytes": 4420,
+      "sha256": "e41925fbc08147653b4bb53b38707c5400d2754e6ad6d43ff2beee9a4e37c05b"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

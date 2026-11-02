@@ -1,5 +1,6 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState,type RefObject} from 'react';
+import type {TrendControl} from '@/lib/group-staffing-followup';
 import {datasetSession} from '@/lib/dataset-client.mjs';
 import {StandaloneScenarioBackup} from './standalone-scenario-backup';
 import {readTrendScenario} from '@/lib/standalone-scenario-backup';
@@ -10,10 +11,12 @@ import {InteractivePlanner} from './interactive-planner';
 import {PlanningAssumptionSlider} from './planning-assumption-slider';
 const n=(v:number)=>v.toLocaleString('en-US',{maximumFractionDigits:1});
 const button='min-h-11 rounded border px-3 py-2 text-sm';
-export function GroupWorkforceTrend({groups,months,selected,onSelect,onPlan,onClose,storageKey,scopeLabel="All business units",backLabel="Back to conversation"}:{groups:RiskGroup[];months:number;selected:string;onSelect:(code:string)=>void;onPlan?:()=>void;onClose:()=>void;storageKey:string;scopeLabel?:string;backLabel?:string}){
+export function GroupWorkforceTrend({groups,months,selected,onSelect,onPlan,onClose,storageKey,scopeLabel="All business units",backLabel="Back to conversation",controlRef}:{groups:RiskGroup[];months:number;selected:string;onSelect:(code:string)=>void;onPlan?:()=>void;onClose:()=>void;storageKey:string;scopeLabel?:string;backLabel?:string;controlRef?:RefObject<TrendControl|null>}){
  const [lookback,setLookback]=useState('3'),[horizon,setHorizon]=useState(String(months)),[edits,setEdits]=useState<Record<string,{headcount:string;fte:string}>>({}),[notice,setNotice]=useState('');
  const rows=groups.map(g=>{try{const e=edits[g.code];if(e&&(e.headcount.trim()===''||e.fte.trim()===''))throw Error('Enter net changes or reset to the observed trend.');return {g,result:groupWorkforceTrend(g,Number(lookback),Number(horizon),e?{headcount:Number(e.headcount),fte:Number(e.fte)}:undefined),error:''};}catch(e){return {g,result:null,error:(e as Error).message};}}),row=rows.find(r=>r.g.code===selected)??rows[0],ranked=[...rows].sort((a,b)=>(a.result?.deltaFte??Infinity)-(b.result?.deltaFte??Infinity)||a.g.code.localeCompare(b.g.code));
  const result=row?.result,points=result?.points??[],min=Math.floor(Math.min(...points.map(p=>p.fte),row?.g.fte??0)*.98),max=Math.max(min+1,Math.ceil(Math.max(...points.map(p=>p.fte),row?.g.fte??1)*1.02));
+ const currentDataset=datasetSession.snapshot();
+ useEffect(()=>{if(!controlRef)return;const controller:TrendControl={read(code,override){if(datasetSession.snapshot()!==currentDataset)return null;const g=groups.find(g=>g.code===code);if(!g)return null;try{const e=edits[code];if(e&&(e.headcount.trim()===''||e.fte.trim()===''))return null;return {groupCode:code,edited:Boolean(e),result:groupWorkforceTrend(g,Number(lookback),override??Number(horizon),e?{headcount:Number(e.headcount),fte:Number(e.fte)}:undefined)};}catch{return null;}},setHorizon:months=>setHorizon(String(months))};controlRef.current=controller;return()=>{if(controlRef.current===controller)controlRef.current=null;};},[controlRef,groups,edits,lookback,horizon,currentDataset]);
  const barMax=Math.max(1,...ranked.map(r=>Math.abs(r.result?.deltaFte??0)));
  const source=JSON.stringify(groups.map(g=>[g.code,g.asOf,g.history]));
  const backupContext={kind:'trend' as const,datasetToken:datasetSession.snapshot(),groups,months,storageKey:storageKey+':trend'};
