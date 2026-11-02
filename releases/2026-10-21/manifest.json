@@ -3389,8 +3389,8 @@
     },
     {
       "path": "lib/staffing-choice-summary.ts",
-      "sha256": "3494b2fb8876ab914d530fafe1c336a3c84bd44eda44b86dacc11de6c4120f23",
-      "bytes": 2840
+      "sha256": "370723688e8341eecff35263b6e47798567b1a03dcb225ead110930a80a98c22",
+      "bytes": 2836
     },
     {
       "path": "lib/staffing-monthly-capacity.ts",
@@ -4469,13 +4469,13 @@
     },
     {
       "path": "components/staffing-priority-summary.tsx",
-      "bytes": 2164,
-      "sha256": "06ce274b5b74f4e46e579e7d42c574fcfd05ed089d8aac7b6fbd1000a2bbb7c0"
+      "bytes": 2160,
+      "sha256": "67e8785953c0947ed2fe7a67ffdb291fc1f9eab654463486b48accfa51ff4fe5"
     },
     {
       "path": "tests/staffing-priority-presentation.test.mjs",
-      "bytes": 6058,
-      "sha256": "81de38cb614e32537b1eb41982956e0af8057b6c7cd711a1cc839e49354c56ae"
+      "bytes": 6042,
+      "sha256": "db688d7e69527f2d858fc98658ab41663bd669921f79d83ad55fb8d8fb96412b"
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",

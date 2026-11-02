@@ -21,7 +21,7 @@ export function staffingChoiceSummary(options:Choice[]){
 /** An adjusted mix is a conditional scenario, not a newly optimized recommendation. */
 export function adjustedStaffingSummary(option: Choice | undefined) {
  if (!option) return 'No calculated adjusted mix is available.';
- const action = `Develop ${option.mix.build}, redeploy ${option.mix.move}, and hire ${option.mix.buy}`;
+ const action = `Develop ${option.mix.build}, move ${option.mix.move}, and hire ${option.mix.buy}`;
  if (option.status === 'invalid') return `${action} is not a valid calculated option; review its inputs.`;
  if (option.shortfallHours === null) return `${action}, conditionally; workload coverage remains unknown.`;
  return `${action}, conditionally. ${option.shortfallHours > 0 ? `${number(option.shortfallHours)} workload hours remain uncovered.` : 'No workload shortfall is calculated under the entered assumptions.'}${option.status !== 'met' ? ' Some entered limits are unmet or unverified.' : ''}`;
