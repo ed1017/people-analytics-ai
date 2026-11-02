@@ -4124,13 +4124,13 @@
     },
     {
       "path": "components/interactive-planner.module.css",
-      "bytes": 2815,
-      "sha256": "6384898d3d953b1defb0e701c5625036dc526f89f7fc900c5d155feafb76c8ab"
+      "bytes": 2845,
+      "sha256": "4d3ebd3419e656d6eac6699d7041975a1970da501619691750fba6c366cf5530"
     },
     {
       "path": "components/interactive-planner.tsx",
-      "sha256": "e5cb4e8cf4b264f7468821867ee1d07acc78728d5da8fe2e8cdbbf3e2014f037",
-      "bytes": 3364
+      "sha256": "b66f92a343788b7a0e2050560b1402f94909cdd3923b034756a7edf9b59c94ad",
+      "bytes": 3392
     },
     {
       "path": "components/scenario-planner-workspace.tsx",

@@ -15,7 +15,7 @@ export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,
   <section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section>
   {actions&&<div className={styles.actions}>{actions}</div>}
   <PlannerResults><section className={`${decision.surface} ${styles.planner}`} aria-label={resultsLabel}>
-   <header><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
+   <header><p className={`${styles.scope} ${styles.resultsScope}`}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
    <dl className={styles.metrics}>{metrics.map(metric=><div key={metric.label}><dt>{metric.label}</dt><dd>{display(metric.value)}</dd></div>)}</dl>
    <div className={styles.visual}>{visual}</div>{supplement}
    {assumptions&&<details className={styles.assumptions}><summary className="min-h-11 cursor-pointer py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Details</summary><div>{display(assumptions)}</div></details>}
