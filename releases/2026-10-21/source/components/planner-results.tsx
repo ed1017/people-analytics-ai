@@ -8,6 +8,11 @@ const ResultsContext=createContext<{target:HTMLElement|null;active:boolean}|null
 export function PlannerResultsProvider({target,active,children}:{target:HTMLElement|null;active:boolean;children:ReactNode}){
  return <ResultsContext.Provider value={{target,active}}>{children}</ResultsContext.Provider>;
 }
+/** Keep hidden planner state mounted without exposing its portaled results. */
+export function PlannerResultsVisibility({active,children}:{active:boolean;children:ReactNode}){
+ const split=useContext(ResultsContext);
+ return <ResultsContext.Provider value={split?{...split,active:split.active&&active}:null}>{children}</ResultsContext.Provider>;
+}
 export function useSplitPlannerResults(){return useContext(ResultsContext)!==null;}
 export function PlannerResults({children}:{children:ReactNode}){
  const split=useContext(ResultsContext);

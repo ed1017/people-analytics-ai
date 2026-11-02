@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 import {createSwpDemo,swpDemoField} from '../releases/2026-10-21/source/lib/swp-demo.ts';
 import {bundleInputKey} from '../releases/2026-10-21/source/lib/home-bundle-reconciliation.ts';
 import {DecisionStore} from '../releases/2026-10-21/source/lib/local-decisions.ts';
-import {scenarioChatField,scenarioChatReceipt,readScenarioChatReceipt} from '../releases/2026-10-21/source/lib/scenario-chat-continuity.ts';
+import {scenarioChatField,scenarioChatReceipt,readScenarioChatReceipt,clearScenarioChat} from '../releases/2026-10-21/source/lib/scenario-chat-continuity.ts';
 const app=fileURLToPath(new URL('../releases/2026-10-21/source/',import.meta.url));
 const require=createRequire(path.join(app,'package.json')),ts=require('typescript'),React=require('react');
 const at='2026-10-16T12:00:00Z';
@@ -89,4 +89,30 @@ test('actual problem hook clears only current receipt before reset/new problem a
   else{assert.equal(conversation.activeGoalId,'');assert.equal(conversation.resetEpoch,1);assert.equal(store.getSnapshot().data.workspaces[draft.binding.goalId].fields[scenarioChatField],null);assert.deepEqual(store.getSnapshot().data.workspaces[draft.binding.goalId].fields.unrelated,{kept:true});}
   deny=false;const reopened=new DecisionStore();reopened.initialize(port);assert.deepEqual(reopened.getSnapshot().data.workspaces[draft.binding.goalId].fields[scenarioChatField],fail?before.workspaces[draft.binding.goalId].fields[scenarioChatField]:null);
  }
+});
+
+test('reset/new problem atomically retires owner and old General receipts, with quota and cross-tab protection',async()=>{
+ for(const command of ['resetConversation','startNewProblem'])for(const failure of ['none','quota','cas']){
+  const base=storage();let deny=false,writes=0;const port={...base,setItem(k,v){if(deny)throw Error('Quota denied');writes++;base.setItem(k,v);}};
+  const store=new DecisionStore();store.initialize(port);const general=await createSwpDemo('guided-old-general',at),goal=await createSwpDemo('guided-active-a',at);
+  store.commitExplorationFields(store.getSnapshot().data.revision,at,()=>({[scenarioChatField]:scenarioChatReceipt(general,context(store),null),generalSentinel:{keep:true}}));
+  store.commitGoalSelection(goal.binding.goalId,goal.binding.goal,store.getSnapshot().data.revision,at,()=>({[scenarioChatField]:scenarioChatReceipt(goal,{...context(store),ownerGoalId:goal.binding.goalId},null),goalSentinel:{keep:true}}),true,true);
+  const hook=harness(store,port);let c=hook.render();const before=structuredClone(store.getSnapshot().data);deny=failure==='quota';
+  if(failure==='cas'){const other=new DecisionStore();other.initialize(base);other.setField(goal.binding.goalId,'externalEdit','preserve');}
+  const beforeWrites=writes;c[command]();c=hook.render();
+  if(failure!=='none'){assert.equal(writes,beforeWrites);assert.deepEqual(store.getSnapshot().data,before);assert.equal(c.activeGoalId,goal.binding.goalId);assert.equal(c.resetEpoch,0);assert.ok(c.error);}
+  else{assert.equal(c.activeGoalId,'');assert.equal(c.resetEpoch,1);assert.equal(store.getSnapshot().data.exploration.fields[scenarioChatField],null);assert.equal(store.getSnapshot().data.workspaces[goal.binding.goalId].fields[scenarioChatField],null);}
+  deny=false;const reopened=new DecisionStore();reopened.initialize(base);const data=reopened.getSnapshot().data;
+  assert.deepEqual(data.exploration.fields.generalSentinel,{keep:true});assert.deepEqual(data.workspaces[goal.binding.goalId].fields.goalSentinel,{keep:true});
+  if(failure==='none'){const child=harness(reopened);await child.settle();assert.equal(child.props.modelContextRef.current,null);}
+  else{assert.deepEqual(data.exploration.fields[scenarioChatField],before.exploration.fields[scenarioChatField]);assert.deepEqual(data.workspaces[goal.binding.goalId].fields[scenarioChatField],before.workspaces[goal.binding.goalId].fields[scenarioChatField]);if(failure==='cas')assert.equal(data.workspaces[goal.binding.goalId].fields.externalEdit,'preserve');}
+ }
+});
+
+test('two-owner clearing is one write and preserves unrelated workspace bytes even when active receipt is absent',async()=>{
+ const base=storage();let writes=0;const port={...base,setItem(k,v){writes++;base.setItem(k,v);}};const store=new DecisionStore();store.initialize(port);
+ const draft=await createSwpDemo('guided-general-only',at);store.commitExplorationFields(store.getSnapshot().data.revision,at,()=>({[scenarioChatField]:scenarioChatReceipt(draft,context(store),null),untouched:0}));
+ const data=structuredClone(store.getSnapshot().data);data.goals={...data.goals,activeId:'goal-a',goals:[{id:'goal-a',statement:'Active goal'},{id:'goal-b',statement:'Other goal'}]};data.workspaces={'goal-a':{savedAt:at,fields:{plan:'keep A'}},'goal-b':{savedAt:at,fields:{plan:'keep B',[scenarioChatField]:{untouched:true}}}};
+ const original=store.getSnapshot().data;store.restoreBackup(data,store.getDatasetToken(),original.revision,JSON.stringify(original));const before=structuredClone(store.getSnapshot().data),count=writes;
+ clearScenarioChat(store,'goal-a',undefined,true);assert.equal(writes,count+1);const after=store.getSnapshot().data;assert.equal(after.revision,before.revision+1);assert.deepEqual(after.goals,before.goals);assert.deepEqual(after.workspaces['goal-b'],before.workspaces['goal-b']);assert.equal(after.workspaces['goal-a'].fields.plan,'keep A');assert.equal(after.exploration.fields.untouched,0);assert.equal(after.exploration.fields[scenarioChatField],null);
 });

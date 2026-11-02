@@ -20,11 +20,16 @@ export function staffingAssumptions(draft:BundleDraft):string{
 }
 
 import type {DecisionStore} from './local-decisions';
-/** Clear only the active owner's receipt, before changing conversation ownership. */
-export function clearScenarioChat(store:DecisionStore,owner:string,expected?:unknown){
+/** Reset may clear both owner and General destination atomically; ordinary close stays owner-only. */
+export function clearScenarioChat(store:DecisionStore,owner:string,expected?:unknown,includeGeneral=false){
  const state=store.getSnapshot(),fields=owner?state.data.workspaces[owner]?.fields:state.data.exploration?.fields;
  const receipt=fields?.[scenarioChatField];
- if(!receipt||expected!==undefined&&JSON.stringify(receipt)!==JSON.stringify(expected))return;
+ if(expected!==undefined&&JSON.stringify(receipt)!==JSON.stringify(expected))return;
+ if(includeGeneral){
+  if(receipt||state.data.exploration?.fields[scenarioChatField])store.commitConversationFieldClear(owner,scenarioChatField,state.data.revision,new Date().toISOString());
+  return;
+ }
+ if(!receipt)return;
  const patch=()=>({[scenarioChatField]:null});
  if(owner)store.commitGoalFields(owner,state.data.goals.goals.find(g=>g.id===owner)?.statement??'',state.data.revision,new Date().toISOString(),patch);
  else store.commitExplorationFields(state.data.revision,new Date().toISOString(),patch);

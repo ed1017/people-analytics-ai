@@ -8,13 +8,13 @@ import decision from './decision-style.module.css';
 const display=(value:ReactNode)=>typeof value==='string'?catalogProseDisplay(value):value;
 
 /** Presentation only. Each adapter supplies outputs and controls from its existing calculator. */
-export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,assumptions,children,supplement,focusVisual=false,compact=false}:{scope:ReactNode;outcome:ReactNode;metrics:{label:string;value:ReactNode}[];levers:ReactNode;visual:ReactNode;actions?:ReactNode;assumptions?:ReactNode;children?:ReactNode;supplement?:ReactNode;focusVisual?:boolean;compact?:boolean}){
+export function InteractivePlanner({scope,outcome,metrics,levers,visual,actions,assumptions,children,supplement,focusVisual=false,compact=false,resultsLabel='Position scenario results'}:{scope:ReactNode;outcome:ReactNode;metrics:{label:string;value:ReactNode}[];levers:ReactNode;visual:ReactNode;actions?:ReactNode;assumptions?:ReactNode;children?:ReactNode;supplement?:ReactNode;focusVisual?:boolean;compact?:boolean;resultsLabel?:string}){
  const split=useSplitPlannerResults();
  if(split)return <section className={`${decision.surface} ${styles.planner} ${compact?styles.compact:''}`} aria-label="Interactive scenario planner">
   <header className={decision.hero}><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
   <section className={styles.levers} aria-label="Scenario levers"><h4>Scenario levers</h4>{levers}</section>
   {actions&&<div className={styles.actions}>{actions}</div>}
-  <PlannerResults><section className={`${decision.surface} ${styles.planner}`} aria-label="Position scenario results">
+  <PlannerResults><section className={`${decision.surface} ${styles.planner}`} aria-label={resultsLabel}>
    <header><p className={styles.scope}>{display(scope)}</p><h3 className={styles.outcome}>{display(outcome)}</h3></header>
    <dl className={styles.metrics}>{metrics.map(metric=><div key={metric.label}><dt>{metric.label}</dt><dd>{display(metric.value)}</dd></div>)}</dl>
    <div className={styles.visual}>{visual}</div>{supplement}

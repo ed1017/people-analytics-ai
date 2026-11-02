@@ -185,7 +185,13 @@ export class DecisionStore {
   if(isolatedExample&&!/^guided-[a-zA-Z0-9-]+$/.test(id))throw Error('Invalid isolated example identity.');
   return this.commitWorkspace(id,goal,revision,at,build,true,isolatedExample,preserveExploration);
  }
- private commitWorkspace(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,selection:boolean,isolatedExample=false,preserveExploration=false):number{
+ /** Clear an active owner's field and its General destination in one checked envelope. */
+ commitConversationFieldClear(owner:string,field:string,revision:number,at:string):number{
+  if(!field||field.length>150||forbidden.has(field))throw Error('Invalid conversation field.');
+  const goal=this.state.data.goals.goals.find(item=>item.id===owner)?.statement??'';
+  return this.commitWorkspace(owner,goal,revision,at,()=>({[field]:null}),false,false,false,field);
+ }
+ private commitWorkspace(id:string,goal:string,revision:number,at:string,build:(fields:Record<string,Json>)=>Record<string,Json>,selection:boolean,isolatedExample=false,preserveExploration=false,clearGeneralField?:string):number{
   try{
    if(!this.state.ready||!this.state.saved||this.blocked||!this.port)throw Error('Saved planning state is unavailable; reload or resolve storage before applying.');
    const creating=selection&&!this.state.data.goals.activeId;
@@ -203,6 +209,9 @@ export class DecisionStore {
    const guideOrigin=readHomeGuideOrigin(before?.fields[homeGuideOriginField],id);
    if(guideOrigin||isolatedExample)slot.fields[homeGuideOriginField]=guideOrigin??{version:1,origin:'conversation-guide-v1',goalId:id,createdAt:at};
    const next:DecisionData={...original,revision:revision+1,...(id?{workspaces:{...original.workspaces,[id]:slot}}:{exploration:slot})};
+   if(id&&clearGeneralField&&original.exploration?.fields[clearGeneralField]!=null){
+    next.exploration={...original.exploration,savedAt:at,fields:{...original.exploration.fields,[clearGeneralField]:null}};
+   }
    if(creating){next.goals={...original.goals,activeId:id,goals:[...original.goals.goals,{id,statement:goal}]};if(!isolatedExample&&!preserveExploration)delete next.exploration;}
    const raw=encodeDecisions(next);parseDecisions(raw);
    // Recheck after candidate validation. localStorage has no native cross-tab CAS.
