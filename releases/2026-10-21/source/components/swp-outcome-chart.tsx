@@ -15,8 +15,8 @@ export function StaffingCoverageChart({target,scope,start,months,options,scopeAl
  const max=Math.max(1,target,...options.flatMap(o=>(o.coverage??[]).filter((v):v is number=>v!==null&&Number.isFinite(v)))),x=(n:number,width:number)=>54+n*(width-90)/Math.max(1,months-1),y=(n:number)=>185-n*140/max;
  return <figure aria-labelledby={id} className="min-w-0 space-y-2 rounded border p-3">
   <figcaption id={id} className="font-semibold">Ready roles over time</figcaption>
-  <p className="text-sm">{!scopeAlreadyShown&&<>{scope} · {start}–{swpMonth(start,months-1)}. </>}Target: {target} additional roles</p>
-  <ul aria-label="Scenario legend" className="flex flex-wrap gap-x-4 gap-y-1 text-sm"><li>Dashed: target</li>{options.length===1?<><li>Teal: ready</li><li>Amber: shortfall</li></>:options.map((o,i)=><li key={o.id}><span aria-hidden style={{color:color(i)}}>━ </span>{o.label}: Build {o.mix.build}, Move {o.mix.move}, Buy {o.mix.buy}</li>)}</ul>
+  <p className="text-sm">{!scopeAlreadyShown&&<>{scope} · {start}–{swpMonth(start,months-1)}. </>}Target: {target} additional roles</p><p className="text-xs">{options.length} options shown. Options with identical monthly coverage share a line.</p>
+  <ul aria-label="Scenario legend" className="flex flex-wrap gap-x-4 gap-y-1 text-sm"><li>Dashed: target</li>{options.length===1?<><li>Teal: ready</li><li>Amber: shortfall</li></>:options.map((o,i)=><li key={o.id}><span aria-hidden style={{color:color(i)}}>━ </span>{o.label}: Develop {o.mix.build}, move {o.mix.move}, hire {o.mix.buy}</li>)}</ul>
   <CompactChart label="Monthly conditional role coverage by plan and target" title="Monthly calculated role coverage. Exact values are in Assumptions & limits." minWidth={300}>{width=><>
     <path d={`M54 30V185H${width-36}`} stroke="currentColor" opacity=".3" fill="none"/>
     {[0,max].map(value=><text key={value} x="44" y={y(value)+4} textAnchor="end" fontSize="14" fill="currentColor">{value}</text>)}

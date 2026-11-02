@@ -1,3 +1,4 @@
+import * as continuity from '../lib/scenario-chat-continuity.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -23,7 +24,7 @@ function component(path,modules={}){const exports={};vm.runInNewContext(ts.trans
 const cost=component('staffing-option-cost.tsx',{'@/lib/guided-plan-summary':summary});
 const table=component('staffing-options-table.tsx');
 const priority=component('staffing-priority-summary.tsx',{'@/lib/staffing-choice-summary':choice,'@/lib/swp-demo':demo});
-const {SimpleSwpDemo}=component('simple-swp-demo.tsx',{'./staffing-priority-summary':priority,'./interactive-planner':planner,'./scenario-decision-summary':decision,'./staffing-options-table':table,'@/lib/workforce-input-display':inputDisplay,'@/lib/scenario-planning-parity':parity,'./staffing-option-cost':cost,'@/lib/staffing-option-title':title,'@/lib/guided-workload':workload,'@/lib/swp-demo':demo,'./swp-demo-inputs':{SwpDemoInputs:()=>null},'./guided-workload-summary':{GuidedWorkloadSummary:()=>null},'./swp-outcome-chart':{SwpOutcomeChart:()=>null}});
+const {SimpleSwpDemo}=component('simple-swp-demo.tsx',{'@/lib/scenario-chat-continuity':continuity,'./staffing-priority-summary':priority,'./interactive-planner':planner,'./scenario-decision-summary':decision,'./staffing-options-table':table,'@/lib/workforce-input-display':inputDisplay,'@/lib/scenario-planning-parity':parity,'./staffing-option-cost':cost,'@/lib/staffing-option-title':title,'@/lib/guided-workload':workload,'@/lib/swp-demo':demo,'./swp-demo-inputs':{SwpDemoInputs:()=>null},'./guided-workload-summary':{GuidedWorkloadSummary:()=>null},'./swp-outcome-chart':{SwpOutcomeChart:()=>null}});
 const draft=await demo.createSwpDemo('guided-popup-test','2026-10-20T12:00:00Z'),comparison=await demo.compareSwpDemo(draft);
 const noop=()=>{};
 const render=(selection=null,value=comparison,scenario=draft)=>renderToStaticMarkup(React.createElement(SimpleSwpDemo,{draft:scenario,comparison:value,selection,reviewing:false,edit:null,disabled:false,editingDisabled:false,pending:false,onSelect:noop,onEdit:noop,onAccept:noop,onCancel:noop,onCalculate:noop,onPrepare:noop,onPrimaryChange:noop,alreadySaved:false}));

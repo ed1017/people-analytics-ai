@@ -5,7 +5,7 @@ type Comparison=Awaited<ReturnType<typeof compareSwpDemo>>;
 const number=(value:number)=>value.toLocaleString('en-US',{maximumFractionDigits:2});
 const date=(value:string|null)=>value&&Number.isFinite(Date.parse(value))?new Date(value+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}):'Unknown';
 const action=(mix:{build:number;move:number;buy:number})=>[
- mix.build?`Develop ${mix.build}`:'',mix.move?`Redeploy ${mix.move}`:'',mix.buy?`Hire ${mix.buy}`:''
+ mix.build?`Develop ${mix.build}`:'',mix.move?`Move ${mix.move}`:'',mix.buy?`Hire ${mix.buy}`:''
 ].filter(Boolean).join(' · ')||'Keep the current staffing mix';
 /** Heading-safe presentation of the same eligible options displayed in the table. */
 export function StaffingPrioritySummary({comparison}:{comparison:Comparison}){

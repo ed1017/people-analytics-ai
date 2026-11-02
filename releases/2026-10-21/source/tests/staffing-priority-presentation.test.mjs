@@ -20,13 +20,13 @@ const compared=await demo.compareSwpDemo(draft);
 test('325k result shows distinct eligible cost and uncovered-work leaders with their exact quantities',()=>{
  const before=JSON.stringify(compared),html=render(compared);
  assert.match(html,/Least uncovered work/);assert.match(html,/Lowest incremental cash/);
- assert.match(html,/Redeploy 2 · Hire 3/);assert.match(html,/\$319,000 USD · 320 uncovered hours/);
- assert.match(html,/Develop 3 · Redeploy 2/);assert.match(html,/\$26,800 USD · 1,280 uncovered hours/);
+ assert.match(html,/Move 2 · Hire 3/);assert.match(html,/\$319,000 USD · 320 uncovered hours/);
+ assert.match(html,/Develop 3 · Move 2/);assert.match(html,/\$26,800 USD · 1,280 uncovered hours/);
  assert.doesNotMatch(html,/\$495,000|\$418,000|optimal|guarantee/i);assert.equal(JSON.stringify(compared),before);
 });
 test('200k result presents one shared leader without pretending the earlier affordable mix still qualifies',async()=>{
  const adjusted=acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 200000')),html=render(await demo.compareSwpDemo(adjusted));
- assert.match(html,/Lowest cash and least uncovered work/);assert.equal((html.match(/Develop 3 · Redeploy 2/g)||[]).length,1);assert.doesNotMatch(html,/319,000|Redeploy 2 · Hire 3/);
+ assert.match(html,/Lowest cash and least uncovered work/);assert.equal((html.match(/Develop 3 · Move 2/g)||[]).length,1);assert.doesNotMatch(html,/319,000|Move 2 · Hire 3/);
 });
 test('no eligible option remains an actionable empty state',async()=>{
  const adjusted=acceptBundleChatEdit(draft,previewBundleChatEdit(draft,'Set budget to 0'));assert.match(render(await demo.compareSwpDemo(adjusted)),/No eligible option\. Review inputs and limits\./);

@@ -564,8 +564,8 @@
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "6469f1567916411ba97b573a7a2ddb5c9f3a73b157d111d77715bf7502fca29c",
-      "bytes": 20667
+      "sha256": "e4055f8ccfba4c0eb11ac24dbb34d880e5d38d97447cdd2795a57e2306e1af03",
+      "bytes": 21130
     },
     {
       "path": "components/home-data-status.tsx",
@@ -879,8 +879,8 @@
     },
     {
       "path": "components/problem-conversation.tsx",
-      "sha256": "277c6ea5f3f10f6342b65d757f6b3fbbf2a55bc4fa87d05d31ec214291802641",
-      "bytes": 29377
+      "sha256": "531f3db74238e4980608fa8475bdab298c3f0eb48c1eae2f6d68e21d2c7198bb",
+      "bytes": 29731
     },
     {
       "path": "components/project-case-study.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "563cc4e57e8ceb2ea96027889d35de4be9610795c0d514ceed18921445af37e4",
-      "bytes": 10335
+      "sha256": "ad596164f14a73262a15f6b768939584bd69014da716b2c8ef7194e1e9cf66c0",
+      "bytes": 10514
     },
     {
       "path": "components/site-footer.tsx",
@@ -944,8 +944,8 @@
     },
     {
       "path": "components/staffing-options-table.tsx",
-      "sha256": "47dbee1aa21db99233b635615610044d10b26eabd1f0dd368d9372c449277cc3",
-      "bytes": 1620
+      "sha256": "a7c0bf18ffe48d9f62f747f70539dc6aa8d0853e005c5d5bcfefd64eca6fdf91",
+      "bytes": 1642
     },
     {
       "path": "components/swp-demand-editor.tsx",
@@ -959,13 +959,13 @@
     },
     {
       "path": "components/swp-demo-inputs.tsx",
-      "sha256": "322044f4b7a3eb5f77984fbbc5a445f7166563a5b2ddc1d685be5d69fbcc049d",
-      "bytes": 7570
+      "sha256": "6218acfcda6d2a854ac7fb16dff2a3bfb7d5533ba74be3dad691fc9bd7726dd5",
+      "bytes": 7543
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "aebece53e4eb1dc4db9250053708df8bc1e6eb95d335f7a12b4b4696aaa60ef3",
-      "bytes": 38048
+      "sha256": "fd03ecbe8a82f1d90707c4d09ff50fdc1d2837e02a74d19c7ce8261defcc18b4",
+      "bytes": 42426
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -974,8 +974,8 @@
     },
     {
       "path": "components/swp-outcome-chart.tsx",
-      "sha256": "20fec30c4ef6800628b9aaab518d4ee3cfa62acb5e4c78c8506044e7117cf48b",
-      "bytes": 4998
+      "sha256": "9524d74dc3ae3c22d1b1bb70f84ae4030f6522495f59b9b9fa07ecd19626b3ca",
+      "bytes": 5113
     },
     {
       "path": "components/synthetic-career-demo.tsx",
@@ -2129,8 +2129,8 @@
     },
     {
       "path": "lib/home-bundle-chat-edit.ts",
-      "sha256": "38957137a2d4bac2aca118d755bb2cdac41549045e916492e0339ba049e22116",
-      "bytes": 32843
+      "sha256": "ae3ea652f2a2652bcf2447daef69aaed230cc063ecebb56cf31d18eead92230d",
+      "bytes": 32885
     },
     {
       "path": "lib/home-bundle-display.ts",
@@ -3389,8 +3389,8 @@
     },
     {
       "path": "lib/staffing-choice-summary.ts",
-      "sha256": "3494b2fb8876ab914d530fafe1c336a3c84bd44eda44b86dacc11de6c4120f23",
-      "bytes": 2840
+      "sha256": "370723688e8341eecff35263b6e47798567b1a03dcb225ead110930a80a98c22",
+      "bytes": 2836
     },
     {
       "path": "lib/staffing-monthly-capacity.ts",
@@ -3624,8 +3624,8 @@
     },
     {
       "path": "lib/workforce-input-display.ts",
-      "sha256": "a3f3cc2c6449e10656f9f5f30990a51ea456759642f250229738a74453f5f857",
-      "bytes": 1627
+      "sha256": "b5c4754bb1626e0c0646e5ea1df835cb94d1838e9f4636a6f01cbf5edbb868ea",
+      "bytes": 1624
     },
     {
       "path": "lib/workforce-input-readiness.ts",
@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "b3e8d3ed0b199ad0819e09a6c23af8065e5aadc2a44f985280236500e627bd81",
-      "bytes": 5904
+      "sha256": "9a18dcdaeff8c9601b52ca30b5f4f64e4264184b5a41df6870e2327d527c6436",
+      "bytes": 5896
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
@@ -4394,8 +4394,8 @@
     },
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
-      "bytes": 7622,
-      "sha256": "e0cfcf3d7ab9d9af68c43e211ca8a1fb336a58032e580a1a1858384236b1de57"
+      "bytes": 7732,
+      "sha256": "15cba306cb672b29e86181283041ef96d3d734ef1586735edd975462f53dac0f"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
@@ -4469,13 +4469,13 @@
     },
     {
       "path": "components/staffing-priority-summary.tsx",
-      "bytes": 2164,
-      "sha256": "06ce274b5b74f4e46e579e7d42c574fcfd05ed089d8aac7b6fbd1000a2bbb7c0"
+      "bytes": 2160,
+      "sha256": "67e8785953c0947ed2fe7a67ffdb291fc1f9eab654463486b48accfa51ff4fe5"
     },
     {
       "path": "tests/staffing-priority-presentation.test.mjs",
-      "bytes": 6058,
-      "sha256": "81de38cb614e32537b1eb41982956e0af8057b6c7cd711a1cc839e49354c56ae"
+      "bytes": 6042,
+      "sha256": "db688d7e69527f2d858fc98658ab41663bd669921f79d83ad55fb8d8fb96412b"
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
@@ -5791,6 +5791,11 @@
       "path": "tests/dashboard-turnover-history.test.mjs",
       "sha256": "24416b9a0fdeb1b40b0e898f3eb6835164a0ace48f53c177c709fc844523d056",
       "bytes": 5835
+    },
+    {
+      "path": "lib/scenario-chat-continuity.ts",
+      "sha256": "91647614579628d7de1852fd58c87ecd5f857147bc7cee6899f7cf86a48c7f6e",
+      "bytes": 2757
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
