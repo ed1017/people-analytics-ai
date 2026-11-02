@@ -36,8 +36,8 @@ test('all page integrations gate stale results while loading/error',()=>{
 });
 test('adjusted staffing sentence tracks actual mix and shortfall without claiming optimization',()=>{
  const option={mix:{build:2,move:1,buy:3},cash:200000,shortfallHours:30,status:'met'};
- assert.match(adjustedStaffingSummary(option),/^Develop 2, redeploy 1, and hire 3.*30 workload hours remain/);
- assert.match(adjustedStaffingSummary({...option,mix:{build:0,move:0,buy:6},shortfallHours:0}),/^Develop 0, redeploy 0, and hire 6.*No workload shortfall/);
+ assert.match(adjustedStaffingSummary(option),/^Develop 2, move 1, and hire 3.*30 workload hours remain/);
+ assert.match(adjustedStaffingSummary({...option,mix:{build:0,move:0,buy:6},shortfallHours:0}),/^Develop 0, move 0, and hire 6.*No workload shortfall/);
  assert.match(adjustedStaffingSummary({...option,shortfallHours:null}),/coverage remains unknown/);
  assert.match(adjustedStaffingSummary({...option,status:'unmet'}),/limits are unmet or unverified/);
 });

@@ -3904,8 +3904,8 @@
     },
     {
       "path": "tests/key-findings.test.mjs",
-      "sha256": "b3e8d3ed0b199ad0819e09a6c23af8065e5aadc2a44f985280236500e627bd81",
-      "bytes": 5904
+      "sha256": "9a18dcdaeff8c9601b52ca30b5f4f64e4264184b5a41df6870e2327d527c6436",
+      "bytes": 5896
     },
     {
       "path": "tests/model-citation-catalog.test.mjs",
