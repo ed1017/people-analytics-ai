@@ -1,4 +1,5 @@
 "use client";
+import {clearScenarioChat} from '@/lib/scenario-chat-continuity';
 import {usePendingRequest} from "./use-pending-request";
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import {guidedReturnKey,readGuidedReturn,type GuidedReturn} from '@/lib/home-guided-return';
@@ -188,6 +189,7 @@ export function useProblemConversation(scope = "home") {
     activate({...current,activeId:id});
   };
   const startNewProblem = (draft = "") => {
+    if(!storageReady)return;try{clearScenarioChat(decisionStore,goalsRef.current.activeId);}catch(e){setError((e as Error).message);return;}setResetEpoch(value=>value+1);
     explorationContext.current=emptyGoalRequirements();setIssueEditor(null);
     const current = goalsRef.current;
     if (current.activeId) activate({...current,activeId:""});
@@ -296,6 +298,7 @@ export function useProblemConversation(scope = "home") {
   };
   const resetConversation=()=>{
     if(!storageReady)return;
+    try{clearScenarioChat(decisionStore,goalsRef.current.activeId);}catch(e){setError((e as Error).message);return;}
     if(tabDraft.current&&!guidedIsolation.current){tabDraft.current.clear();setTabDraftNotice(tabDraft.current.notice);}
     const current=goalsRef.current;
     explorationContext.current=emptyGoalRequirements();

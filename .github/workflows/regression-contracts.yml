@@ -42,6 +42,8 @@ jobs:
           cache: npm
 
       - run: npm ci --ignore-scripts
+      - name: Verify scenario follow-up continuity and decision assumptions
+        run: node --test tests/release-scenario-followup.test.mjs tests/release-scenario-presentation.test.mjs tests/release-scenario-save.test.mjs tests/release-scenario-planning-parity.test.mjs
       - name: Verify versioned source and public replay contracts
         run: |
           node releases/2026-10-21/verify.mjs

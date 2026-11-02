@@ -1,3 +1,4 @@
+import * as continuity from '../releases/2026-10-21/source/lib/scenario-chat-continuity.ts';
 import * as catalogDisplay from '../releases/2026-10-21/source/lib/catalog-display.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -22,7 +23,7 @@ const cost=component('staffing-option-cost.tsx',{'@/lib/guided-plan-summary':sum
 const table=component('staffing-options-table.tsx');
 const decision=component('scenario-decision-summary.tsx',{'@/lib/staffing-choice-summary':choice,'@/lib/swp-demo':demo});
 const priority=component('staffing-priority-summary.tsx',{'@/lib/staffing-choice-summary':choice,'@/lib/swp-demo':demo});
-const {SimpleSwpDemo}=component('simple-swp-demo.tsx',{'./staffing-priority-summary':priority,'./interactive-planner':planner,'./scenario-decision-summary':decision,'./staffing-options-table':table,'@/lib/workforce-input-display':inputDisplay,'@/lib/scenario-planning-parity':parity,'./staffing-option-cost':cost,'@/lib/staffing-option-title':title,'@/lib/guided-workload':workload,'@/lib/swp-demo':demo,'./swp-demo-inputs':{SwpDemoInputs:()=>null},'./guided-workload-summary':{GuidedWorkloadSummary:()=>null},'./swp-outcome-chart':{SwpOutcomeChart:()=>null}});
+const {SimpleSwpDemo}=component('simple-swp-demo.tsx',{'@/lib/scenario-chat-continuity':continuity,'./staffing-priority-summary':priority,'./interactive-planner':planner,'./scenario-decision-summary':decision,'./staffing-options-table':table,'@/lib/workforce-input-display':inputDisplay,'@/lib/scenario-planning-parity':parity,'./staffing-option-cost':cost,'@/lib/staffing-option-title':title,'@/lib/guided-workload':workload,'@/lib/swp-demo':demo,'./swp-demo-inputs':{SwpDemoInputs:()=>null},'./guided-workload-summary':{GuidedWorkloadSummary:()=>null},'./swp-outcome-chart':{SwpOutcomeChart:()=>null}});
 const draft=await demo.createSwpDemo('guided-popup-test','2026-10-20T12:00:00Z'),comparison=await demo.compareSwpDemo(draft);
 const noop=()=>{};
 const render=(selection=null,value=comparison,scenario=draft)=>renderToStaticMarkup(React.createElement(SimpleSwpDemo,{draft:scenario,comparison:value,selection,reviewing:false,edit:null,disabled:false,editingDisabled:false,pending:false,onSelect:noop,onEdit:noop,onAccept:noop,onCancel:noop,onCalculate:noop,onPrepare:noop,onPrimaryChange:noop,alreadySaved:false}));
@@ -41,6 +42,7 @@ test('shared table retains six bounded options and exact dates with no default s
  assert.match(html,/<progress aria-label="Planning progress" max="3" value="2"/);assert.match(html,/Calculated staffing priorities/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);
  for(const value of ['26,800','319,000','2027-01-01','2026-12-01','1,280','320','$325,000'])assert.ok(html.includes(value),value);
  assert.equal((html.match(/data-staffing-option=/g)||[]).length,6);
+ assert.match(html,/combinations evaluated/);assert.match(html,/6 displayed/);assert.match(html,/Backfills assumed: 0/);assert.match(html,/Donor-team capacity loss is not modeled/);assert.match(html,/Attrition is not modeled/);assert.match(html,/no gradual productivity ramp/);
  assert.match(html,/Incremental cash/);assert.doesNotMatch(html,/checked=""/);
  assert.equal((html.match(/aria-label="Selected staffing option details"/g)||[]).length,1);
  assert.doesNotMatch(html,/aria-label="Incremental cash components"/);
