@@ -60,7 +60,7 @@ Production deployment `dpl_4JiYtBmiQwn5yW9BNoRM1eCqFwJ9`, host `people-analytics
 
 ### Private database mirror: approval history and completed verification
 
-The existing Supabase project `noykvmztefmmhyuwuppv` now has a separate private schema `workforce_october_2026`. It is NOT the public app data source. Existing public, saved-work, Future of Work and AI-budget tables were not updated. All84 new tables including the import receipt table have RLS enabled; schema/table privileges are revoked from PUBLIC, anon and authenticated. The schema was created atomically. The reviewed import preparation script only creates local files; it never connects to a database.
+The existing Supabase project `noykvmztefmmhyuwuppv` now has a separate private schema `workforce_october_2026`. It is NOT the public app data source. Existing public, saved-work, Future of Work and AI-budget tables were not updated. The initial schema had 84 tables including the import receipt table, all with RLS enabled; schema/table privileges are revoked from PUBLIC, anon and authenticated. The schema was created atomically. The reviewed import preparation script only creates local files; it never connects to a database.
 
 The import initially paused at 6 of 665 bounded chunks (11,877 rows), after automatic approval review rejected generated career-preference and compensation payloads as sensitive egress. A single retry supplying verified synthetic provenance was also rejected. No further write was attempted until the user supplied the specific approval recorded below. At that earlier checkpoint no constraints or completion seal had been installed; it was not a completed database copy.
 
