@@ -68,6 +68,9 @@ export function validateAggregateRows(aggregates,components,{provider}={}){
   }
  }
  const stock=components.workforce.payload[0],a=aggregates;
+ const cutoff=provider?.cutoff??'2026-09-30',year=Number(cutoff.slice(0,4)),month=Number(cutoff.slice(5,7));
+ const historyMonths=(year-2024)*12+month;
+ must(stock.snapshot_date===cutoff&&Number.isInteger(historyMonths)&&historyMonths>=33&&historyMonths<=34,'reviewed history cutoff');
  must(isDeepStrictEqual(a.dashboard[0].payload.overview,stock),'dashboard/sealed workforce');
  must(isDeepStrictEqual(a.dashboard[0].payload.trend,a.dashboard_headcount_trend),'dashboard trend');
  const options=a.dashboard[0].payload.filter_options;
@@ -81,26 +84,26 @@ export function validateAggregateRows(aggregates,components,{provider}={}){
  }
  must(close(sum(a.finance_current_summary,'labor_cost_usd'),stock.labor_cost_usd)&&sum(a.finance_current_summary,'vacant_positions')===stock.open_positions,'finance/sealed cost and vacancies');
  must(a.position_integrity[0].active_employees===stock.headcount&&a.talent_integrity[0].active_headcount===stock.headcount&&a.preferences_summary[0].active_employees===stock.headcount,'domain/sealed population');
- must(a.dashboard_headcount_trend.length===33&&a.projection_monthly.length===32,'history length');
+ must(a.dashboard_headcount_trend.length===historyMonths&&a.projection_monthly.length===historyMonths-1,'history length');
  for(const [i,row]of a.dashboard_headcount_trend.entries())must(row.snapshot_date===new Date(Date.UTC(2024,i+1,0)).toISOString().slice(0,10),'history calendar');
  let previous=a.dashboard_headcount_trend[0];must(previous.snapshot_date==='2024-01-31'&&previous.headcount===8400,'history opening');
- for(let i=0;i<32;i++){
+ for(let i=0;i<historyMonths-1;i++){
   const f=a.projection_monthly[i],next=a.dashboard_headcount_trend[i+1];must(f.snapshot_date===next.snapshot_date&&f.headcount===next.headcount&&previous.headcount+f.external_starts-f.exits===next.headcount,'monthly headcount identity');previous=next;
  }
  must(previous.snapshot_date===stock.snapshot_date&&previous.headcount===stock.headcount&&sum(a.projection_monthly,'external_starts')===contract.externalStarts&&sum(a.projection_monthly,'exits')===contract.exits,'history endpoint');
- const ytd=a.dashboard_headcount_trend.slice(24),average=sum(ytd,'headcount')/9,exits=a.attrition_current_summary[0],rounded=(n,places=1)=>Math.round(n*10**places)/10**places;
+ const ytd=a.dashboard_headcount_trend.slice(24),average=sum(ytd,'headcount')/month,exits=a.attrition_current_summary[0],rounded=(n,places=1)=>Math.round(n*10**places)/10**places;
  must(exits.voluntary_turnover_ytd_pct===stock.voluntary_turnover_ytd_pct&&exits.voluntary_turnover_ytd_pct===rounded(100*exits.voluntary_exits/average)&&exits.total_turnover_ytd_pct===rounded(100*exits.total_exits/average),'declared company turnover');
- must(exits.annualized_voluntary_turnover_pct===rounded(100*exits.voluntary_exits/average*12/9),'annualized company turnover');
+ must(exits.annualized_voluntary_turnover_pct===rounded(100*exits.voluntary_exits/average*12/month),'annualized company turnover');
  must(exits.regrettable_share_of_voluntary_pct===rounded(100*exits.regrettable_exits/exits.voluntary_exits),'regrettable share of voluntary exits');
  // Only Jan–Sep 2026 exits belong to the current and group summaries. Monthly
  // rates use their own month-end stock, never the YTD average or all history.
- must(a.attrition_monthly_trend.length===33,'attrition monthly calendar');
+ must(a.attrition_monthly_trend.length===historyMonths,'attrition monthly calendar');
  for(const [i,row]of a.attrition_monthly_trend.entries()){
   const stock=a.dashboard_headcount_trend[i];
   must(row.month===stock.snapshot_date.slice(0,8)+'01','attrition monthly calendar');
   must(row.monthly_turnover_pct===rounded(100*row.total_exits/stock.headcount,2)&&row.monthly_voluntary_turnover_pct===rounded(100*row.voluntary_exits/stock.headcount,2),'attrition monthly turnover');
  }
- const currentMonths=a.attrition_monthly_trend.filter(row=>row.month>='2026-01-01'&&row.month<='2026-09-01');
+ const currentMonths=a.attrition_monthly_trend.filter(row=>row.month>='2026-01-01'&&row.month<=cutoff.slice(0,8)+'01');
  for(const metric of ['total_exits','voluntary_exits','involuntary_exits','regrettable_exits'])must(sum(currentMonths,metric)===exits[metric],'attrition YTD '+metric+' reconciliation');
  for(const name of ['attrition_business_unit_summary','attrition_level_summary','attrition_tenure_summary']){
   for(const metric of ['voluntary_exits','regrettable_exits'])must(sum(a[name],metric)===exits[metric],name+' YTD '+metric+' reconciliation');

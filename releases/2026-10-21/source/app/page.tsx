@@ -2041,7 +2041,7 @@ export default function Home() {
           <WorkforcePage
             performance={<WorkforcePerformanceField
               ratingsOnly
-              value={overviewData?.snapshot_date === "2026-09-30" ? workforcePerformance : null}
+              value={workforcePerformance}
               population={overviewData?.headcount ?? null}
               scopeReceipt={overviewScope}
               filters={{ country: selectedCountry, org: selectedOrg, level: selectedLevel }}
@@ -2127,7 +2127,7 @@ export default function Home() {
         ) : activePage ===
           "career-growth-mobility" ? (
           <CareerGrowthMobilityPage
-            performance={overviewData?.snapshot_date === "2026-09-30" ? workforcePerformance : null}
+            performance={workforcePerformance}
             workforceHeadcount={overviewData?.headcount ?? null}
             performanceScopeReceipt={overviewScope}
             performanceFilters={{ country: selectedCountry, org: selectedOrg, level: selectedLevel }}

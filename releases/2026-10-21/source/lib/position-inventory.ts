@@ -1,5 +1,7 @@
 // @ts-expect-error Native tests share the versioned generator.
 import {generateCompanyPositionInventoryV2} from './company-position-model-v2.ts';
+// @ts-expect-error Native tests share the versioned generator.
+import {generateCompanyPositionInventoryV3} from './company-position-model-v3.ts';
 import companyConstraints from './data/position-inventory-constraints-v1.json' with {type:'json'};
 // @ts-expect-error Native tests share TypeScript source.
 import {catalogDisplayLabel} from './catalog-display.ts';
@@ -72,7 +74,8 @@ export function generateCompanyPositionInventory():PositionInventory {
 }
 export const COMPANY_POSITION_INVENTORY=generateCompanyPositionInventory();
 export const COMPANY_POSITION_INVENTORY_V2=generateCompanyPositionInventoryV2();
-export const POSITION_INVENTORIES=[COMPANY_POSITION_INVENTORY_V2,COMPANY_POSITION_INVENTORY,DEMO_POSITION_INVENTORY] as const;
+export const COMPANY_POSITION_INVENTORY_V3=generateCompanyPositionInventoryV3();
+export const POSITION_INVENTORIES=[COMPANY_POSITION_INVENTORY_V3,COMPANY_POSITION_INVENTORY_V2,COMPANY_POSITION_INVENTORY,DEMO_POSITION_INVENTORY] as const;
 export function resolvePositionInventory(version:string):PositionInventory {
  const inventory=POSITION_INVENTORIES.find(i=>i.version===version);
  if(!inventory)throw Error('Unsupported inventory version. The saved baseline was not replaced.');

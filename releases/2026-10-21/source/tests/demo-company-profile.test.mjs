@@ -16,7 +16,7 @@ test('company profile matches the complete released country and unit populations
  assert.deepEqual(businessUnits.map(row=>row.org_code).sort(),[...profile.businessUnits].sort());
  assert.ok(countries.every(row=>row.as_of===profile.asOf&&row.headcount>0));
  assert.equal(data.trend[0].snapshot_date,profile.historyStart);
- assert.equal(data.trend.length,33);
+ assert.equal(data.trend.length,34);
  assert.equal(profile.refreshPolicy,'published-version');
 });
 test('missing, prior, future or wrong-date dataset cannot acquire this profile',()=>{
@@ -36,7 +36,7 @@ test('Company describes its actual business units and distinguishes history from
  assert.doesNotMatch(source,/mt-3|leading-relaxed/);
  assert.match(source,/fictional global business/);
  assert.match(source,/Data updates arrive as new releases/);
- assert.equal((source.match(/September 30, 2026/g)||[]).length,1);
+ assert.match(source,/profile.asOf/);
  assert.doesNotMatch(source,/text-xs/);
  assert.match(source,/refreshing the page keeps the same snapshot/);
  assert.doesNotMatch(source,/mid-sized|updated daily|refreshed monthly/i);

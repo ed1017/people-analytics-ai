@@ -1,0 +1,31 @@
+{
+  "version": "synthetic-workforce-october-2026-v1",
+  "cutoff": "2026-10-31",
+  "parentCutoff": "2026-09-30",
+  "parentFixtureSha256": "47dbd4e63ca953fa8761e4d3c4e7de55aeb0f19c595224f8707d03e209015460",
+  "basis": "Explicit fictional October operating story; not observed events, empirical calibration or a forecast",
+  "businessUnits": {
+    "BU-CLIENTOPS": {"starts":20,"exits":10,"voluntary":8,"fillPriorVacancies":15,"backfills":10,"promotions":3},
+    "BU-CONS": {"starts":10,"exits":18,"voluntary":13,"fillPriorVacancies":10,"backfills":9,"promotions":2},
+    "BU-CORP": {"starts":10,"exits":8,"voluntary":5,"fillPriorVacancies":10,"backfills":4,"promotions":1},
+    "BU-DATAAI": {"starts":42,"exits":7,"voluntary":4,"fillPriorVacancies":20,"backfills":7,"promotions":3},
+    "BU-DIGITAL": {"starts":12,"exits":24,"voluntary":12,"fillPriorVacancies":12,"backfills":8,"promotions":1},
+    "BU-MGSVC": {"starts":45,"exits":20,"voluntary":14,"fillPriorVacancies":20,"backfills":20,"promotions":2},
+    "BU-SALES": {"starts":10,"exits":15,"voluntary":11,"fillPriorVacancies":10,"backfills":8,"promotions":1},
+    "BU-TECH": {"starts":22,"exits":14,"voluntary":10,"fillPriorVacancies":18,"backfills":14,"promotions":2}
+  },
+  "transfers": [
+    {"from":"BU-DIGITAL","to":"BU-DATAAI","count":6},
+    {"from":"BU-TECH","to":"BU-MGSVC","count":4},
+    {"from":"BU-SALES","to":"BU-CLIENTOPS","count":3},
+    {"from":"BU-CORP","to":"BU-CONS","count":2}
+  ],
+  "story": {
+    "hiring": "Managed Services recovery and Data/AI expansion; fill explicit existing vacancies first, with separately identified new funded slots. Late-month starts follow October application/offer/acceptance events; no backdated September funnel events.",
+    "exits": "Digital contraction clusters October 8-10, Consulting October 14-17; other exits distributed across October. Fixed unit totals; deterministic weighted country/level selection varies composition without independent dashboard noise.",
+    "mobility": "15 same-grade cross-unit transfers and 15 promotions on October 20-24. No proficiency improvement inferred from mobility.",
+    "vacancies": "115 prior vacancies filled, 56 expansion slots filled, 80 replacement vacancies opened, 36 exited slots retired: 197 - 115 + 80 = 162 month-end vacancies. Internal moves close and replace their assigned slot, budget-neutral under the retained lifecycle convention.",
+    "headcount": "9037 + 171 external starts - 116 exits = 9092; internal moves cancel company-wide. Corporate headcount flat after two transfers; other units have distinct expansion/contraction paths.",
+    "unchangedEvidence": "No new survey wave, performance rating, external market observation or incumbent skill assessment. New hires have no skill assessment until explicitly modeled separately. September evidence keeps its original date."
+  }
+}

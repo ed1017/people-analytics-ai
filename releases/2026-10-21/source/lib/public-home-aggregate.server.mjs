@@ -12,6 +12,8 @@ import {readDashboardScopeReceipt} from './dashboard-scope.ts';
 import {queryWorkforceHistory} from './home-history-query.mjs';
 import {withBusinessUnitTurnover} from './home-bu-turnover.mjs';
 
+const ytdPeriod='January-'+new Date(P.cutoff+'T00:00:00Z').toLocaleDateString('en-US',{month:'long',timeZone:'UTC'})+' '+P.cutoff.slice(0,4);
+
 /** Same pinned dashboard source, with an explicit supported intersection per question. */
 export async function readPublicWorkforceHistory({binding,hostname,identity,args,signal,requestId}){
  const must=v=>{if(!v)throw Error('Historical workforce evidence could not be verified.');};
@@ -53,7 +55,7 @@ export function formatHomeAggregate(result){
  if(result.registryId==='catalog.policy_bands')context.push('Constructed policy bands; annual base at 1 FTE.');
  if(result.limitations.some(x=>x.startsWith('Successful-hire journeys')))context.push('Successful-hire records only; funnel conversion unavailable.');
  if(result.coverage==='bounded-source-list')context.push('Ranking covers the available source list.');
- const period=result.registryId.startsWith('finance.')?'':result.registryId==='attrition.business_units'?'January-September 2026':result.period;
+ const period=result.registryId.startsWith('finance.')?'':result.registryId==='attrition.business_units'?ytdPeriod:result.period;
  const excluded=result.excludedGroups?`${result.excludedGroups} groups excluded: ${result.registryId==='pay.job_compa'?'Withheld values': 'unavailable values'}.`:'';
  return [...(result.completeTie?[`All ${result.completeTie.count} groups are tied at ${result.completeTie.value} ${result.unit}.`]:labels),title,'Company-wide',period,...context,excluded,...(result.truncated?[`Showing ${result.returnedGroups} of ${result.eligibleGroups} groups, including cutoff ties.`]:[])].filter(Boolean).join('\n\n');
 }
@@ -102,14 +104,14 @@ export async function readPublicHomeAggregate({binding,hostname,identity,filters
  current();
  if(args.asOf!=='current'&&args.asOf!==result.asOf){
   const requested=/^\d{4}-\d{2}-\d{2}$/.test(args.asOf)?args.asOf:'historical period';
-  return {answer:definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric)&&result.asOf===P.cutoff?`Business-unit turnover for the requested ${requested} is unavailable. The available comparison covers January–September 2026 (YTD). Ask to use that period to compare business units.`:`The requested ${requested} comparison is unavailable. Available data is dated ${result.asOf}. Ask for the comparison as of that date.`};
+  return {answer:definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric)&&result.asOf===P.cutoff?`Business-unit turnover for the requested ${requested} is unavailable. The available comparison covers ${ytdPeriod} (YTD). Ask to use that period to compare business units.`:`The requested ${requested} comparison is unavailable. Available data is dated ${result.asOf}. Ask for the comparison as of that date.`};
  }
  const turnover=definition.id==='attrition.business_units'&&['total_turnover_ytd_pct','voluntary_turnover_ytd_pct'].includes(args.metric);
  const all=turnover?queryAggregate({registryId:args.registryId,metric:args.metric,order:args.order,limit:20},data):null;
  // The turnover chart contract requires the whole eight-BU partition. A nullable
  // registry metric can otherwise produce a partial ranking with a falsely complete chart.
  if(turnover&&(!all.complete||all.totalGroups!==8||all.eligibleGroups!==8||all.rows.length!==8))return {answer:'This turnover comparison is unavailable because values for all eight business units are required. Refresh the data or choose another measure.'};
- const chart=all&&requestId?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,result:all})).digest('hex'),kind:'recorded',synthetic:true,axis:'business-unit',metric:args.metric==='total_turnover_ytd_pct'?'bu_total_turnover_pct':'bu_voluntary_turnover_pct',title:args.metric==='total_turnover_ytd_pct'?'Business-unit total turnover':'Business-unit voluntary turnover',unit:'%',sourceId:'A1',scope:'All business units; all countries and levels. January–September 2026.',asOf:result.asOf,limitation:result.definition+'; complete eight-business-unit partition, not a forecast.',sampled:false,omitted:0,points:all.rows.map(r=>({date:JSON.parse(r.id)[0],value:r.value}))}:undefined;
+ const chart=all&&requestId?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,result:all})).digest('hex'),kind:'recorded',synthetic:true,axis:'business-unit',metric:args.metric==='total_turnover_ytd_pct'?'bu_total_turnover_pct':'bu_voluntary_turnover_pct',title:args.metric==='total_turnover_ytd_pct'?'Business-unit total turnover':'Business-unit voluntary turnover',unit:'%',sourceId:'A1',scope:`All business units; all countries and levels. ${ytdPeriod}.`,asOf:result.asOf,limitation:result.definition+'; complete eight-business-unit partition, not a forecast.',sampled:false,omitted:0,points:all.rows.map(r=>({date:JSON.parse(r.id)[0],value:r.value}))}:undefined;
  const comparison=aggregateVisual(result);
  const visual=chart??(comparison&&requestId?{version:1,requestId,datasetToken:P.token,packetSha256:createHash('sha256').update(JSON.stringify({digest:identity.digest,result})).digest('hex'),kind:'recorded',synthetic:true,axis:'aggregate',metric:'aggregate_comparison',title:result.definition,unit:result.unit,sourceId:'G1',scope:result.scope,asOf:result.asOf,limitation:result.limitations.join(' '),sampled:false,omitted:result.excludedGroups,aggregate:comparison,points:result.rows.map(r=>({date:r.id,value:r.value}))}:undefined);
  return {answer:formatHomeAggregate(result),...(visual?{chart:visual,charts:[visual]}:{})};

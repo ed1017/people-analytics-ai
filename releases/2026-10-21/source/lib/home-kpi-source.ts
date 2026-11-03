@@ -16,7 +16,7 @@ export function homeRecruitingKpi(result:unknown, settled:boolean, datasetToken:
   const source=object(result),data=object(source.data),meta=object(data.data_meta);
   if(source.status!=='loaded'||source.suppressed===true||data.suppressed===true||data.as_of!==snapshotDate)return null;
   if(legacy&&data.data_meta!==undefined&&(meta.datasetId!=='legacy-v1'||meta.datasetToken!==datasetToken||meta.dataClass==='constructed-synthetic'))return null;
-  if(candidate&&(snapshotDate!=='2026-09-30'||meta.datasetId!==(publicRelease?PUBLIC_9037.datasetId:candidateId)||meta.datasetToken!==datasetToken||meta.cutoff!==snapshotDate||meta.dataClass!=='constructed-synthetic'||meta.contract!==(publicRelease?PUBLIC_9037.contract:'local-app-parity-v1')||meta.hireDateConvention!==candidateConvention))return null;
+  if(candidate&&(snapshotDate!==(publicRelease?PUBLIC_9037.cutoff:'2026-09-30')||meta.datasetId!==(publicRelease?PUBLIC_9037.datasetId:candidateId)||meta.datasetToken!==datasetToken||meta.cutoff!==snapshotDate||meta.dataClass!=='constructed-synthetic'||meta.contract!==(publicRelease?PUBLIC_9037.contract:'local-app-parity-v1')||meta.hireDateConvention!==candidateConvention))return null;
   if(!Array.isArray(data.monthly))return null;
   const month=snapshotDate.slice(0,7)+'-01';
   const rows=data.monthly.map(object).filter(row=>row.month===month);

@@ -65,8 +65,8 @@ export function ScenarioPlanSummary({
   planningTotalExits,
 }: ScenarioPlanSummaryProps) {
   const draftProvenance=activePlanningScenario?.provenance?.status==='constructed_draft_assumption'?activePlanningScenario.provenance:null;
-  const carriedSeptemberOpening=Boolean(draftProvenance &&
-    draftProvenance.history_cutoff==='2026-09-30' &&
+  const carriedOpening=Boolean(draftProvenance &&
+    ['2026-09-30','2026-10-31'].includes(draftProvenance.history_cutoff??'') &&
     draftProvenance.planning_start==='2027-01-01' &&
     draftProvenance.planning_end==='2027-12-01');
   return (
@@ -88,7 +88,7 @@ export function ScenarioPlanSummary({
               >
                 <div className="rounded-lg border p-4">
                   <p className="text-sm text-muted-foreground">
-                    {carriedSeptemberOpening ? "January plan opening" : "Starting Headcount"}
+                    {carriedOpening ? "January plan opening" : "Starting Headcount"}
                   </p>
                   <p className="mt-2 text-3xl font-semibold">
                     {activePlanningStart
@@ -96,7 +96,7 @@ export function ScenarioPlanSummary({
                       : "—"}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {carriedSeptemberOpening ? "Based on September 2026 headcount; January actuals are not supplied." : "Beginning of planning horizon"}
+                    {carriedOpening ? `Based on ${draftProvenance?.history_cutoff} headcount; January actuals are not supplied.` : "Beginning of planning horizon"}
                   </p>
                 </div>
 
@@ -174,7 +174,7 @@ export function ScenarioPlanSummary({
                   </div>
 
                   <p className="mb-3 text-xs text-muted-foreground">
-                    {carriedSeptemberOpening ? <>October–December 2026 is unmodeled. January–December 2027 values are conditional planning assumptions. Source refresh time is unavailable.</> : draftProvenance ? <>{draftProvenance.reconciliation} History ends {draftProvenance.history_cutoff}. Source refresh time is unavailable.</> : <>Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals. Their completeness and reconciliation with the aligned Baseline headcount curve remain unverified; what-if engine flows are separate.</>}
+                    {carriedOpening ? <>October–December 2026 is unmodeled. January–December 2027 values are conditional planning assumptions. Source refresh time is unavailable.</> : draftProvenance ? <>{draftProvenance.reconciliation} History ends {draftProvenance.history_cutoff}. Source refresh time is unavailable.</> : <>Source-reported monthly flows across the returned month window. Missing, duplicate or invalid months and unknown flow values leave totals unavailable. Full horizon boundaries and source refresh date are not supplied. These flows are not observed actuals. Their completeness and reconciliation with the aligned Baseline headcount curve remain unverified; what-if engine flows are separate.</>}
                   </p>
                   <div className="evidence-chart">
                     <ResponsiveContainer

@@ -43,7 +43,7 @@ test('historical followups keep the unsupported period until explicit current-da
  reply=await h.run(request('And voluntary turnover by business unit?','historical-next',reply.state));
  assert.equal(h.reads(),0);assert.equal(reply.charts.length,0);assert.match(reply.answer,/available YTD comparison/);
  reply=await h.run(request('Yes please','accepted-current',reply.state));
- assert.equal(h.reads(),1);assert.match(reply.answer,/January-September 2026/);assert.equal(readChatEvidenceSeries(reply.charts,'accepted-current',P.token).length,1);
+ assert.equal(h.reads(),1);assert.match(reply.answer,/January-October 2026/);assert.equal(readChatEvidenceSeries(reply.charts,'accepted-current',P.token).length,1);
 });
 test('missing values never become a partial ranking or zero and preserve the caller state',async()=>{
  for(const mutate of [d=>d.business_units[0].voluntary_turnover_ytd_pct=null,d=>{d.business_units.pop();d.summary.total_exits=28;},d=>delete d.business_units[0].voluntary_turnover_ytd_pct]){

@@ -16,7 +16,7 @@ export function homeTurnoverFocus(goal:string,pack:unknown,query:string){
  const facts:Record<string,unknown>|null=matchingPeriod&&source?.facts?source.facts as Record<string,unknown>:null;
  const metric=voluntary?'Voluntary turnover':'Overall turnover';
  const sourceId=source?.id;
- const completeCalendar=sourceId==='W1'&&normalized.datasetContext?.dashboardAggregate?.metricContract==='voluntary-ytd-nine-month-average-stock-v2';
+ const completeCalendar=sourceId==='W1'&&['voluntary-ytd-nine-month-average-stock-v2','voluntary-ytd-calendar-month-average-stock-v3'].includes(normalized.datasetContext?.dashboardAggregate?.metricContract??'');
  const period=validDate?'YTD through '+new Date(date+'T00:00:00Z').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}):null;
  const overallRate=sourceId==='A1'&&rate(facts?.total_turnover_ytd_pct)?facts.total_turnover_ytd_pct:null;
  const voluntaryRate=rate(facts?.voluntary_turnover_ytd_pct,completeCalendar)?facts.voluntary_turnover_ytd_pct:null;

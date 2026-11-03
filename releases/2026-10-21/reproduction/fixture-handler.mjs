@@ -1,5 +1,5 @@
 import {verifyPublicBundle} from './verify-receipts.mjs';
-import {PUBLIC_9037} from '../source/lib/public-9037-contract.mjs';
+import {PUBLIC_9037} from './captured-public-contract.mjs';
 const TOKEN=PUBLIC_9037.token;
 const loopback=host=>['localhost','127.0.0.1','[::1]'].includes(host);
 export function createFixtureHandler(capture){

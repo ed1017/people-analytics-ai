@@ -2,8 +2,8 @@ import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {isDeepStrictEqual} from 'node:util';
 import {LOCAL_COMPANY_GET_ROUTES} from '../source/lib/dataset-company-routes.mjs';
-import {PUBLIC_9037} from '../source/lib/public-9037-contract.mjs';
-import {projectPublic9037,public9037Metadata} from '../source/lib/public-9037-projection.mjs';
+import {PUBLIC_9037} from './captured-public-contract.mjs';
+import {projectPublic9037,public9037Metadata} from './captured-public-projection.mjs';
 
 export const OBSERVED_PUBLIC_DIGEST='53f5270a08bf3a9c04de43cf22b6b4a48cd092f9fca0b39e113602bbb686bbd9';
 export const CAPTURED_FIELDS_SHA256='0ad759700470548279f733b5849e7c6ade66c5ab45ea53e7849db93596fa3d5f';

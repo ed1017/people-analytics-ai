@@ -38,7 +38,7 @@ export function createLocalDatasetIntegration({router, candidateDatasetId, candi
   const conversations = api ? createConversationAdapters({api,inputs:conversationInputs,metadata:identity,modelPorts,features:conversationFeatures,timeoutMs:conversationTimeoutMs,now}) : null;
   function identity() {
     const bound = router.current();
-    return {datasetToken: bound.token, datasetId: bound.datasetId, bundleDigest: bound.digest};
+    return {datasetToken: bound.token, datasetId: bound.datasetId, bundleDigest: bound.digest, cutoff:bound.provider?.cutoff??'2026-09-30'};
   }
   function candidate() {
     if (router.current().datasetId !== candidateDatasetId) throw Error('Sealed demo binding required');
@@ -48,7 +48,7 @@ export function createLocalDatasetIntegration({router, candidateDatasetId, candi
     candidate();
     const request = {method: 'GET', url: 'http://local.invalid/', hasBody: false};
     const parts = Object.fromEntries(await Promise.all(DATASET_COMPONENTS.map(async name => [name, await releases.read(name, request)])));
-    validateDemoBundle(parts, offline9037 ? {skillPopulationByCode: reviewed9037PresenterContract(candidateProvider).skillPopulationByCode} : undefined);
+    validateDemoBundle(parts, offline9037 ? {skillPopulationByCode: reviewed9037PresenterContract(candidateProvider).skillPopulationByCode,retainedCohorts:{ratings:{population:9037,date:'2026-09-30'},survey:{population:9037,date:'2026-09-30'}}} : undefined);
     return deepFreeze({...identity(), dataClass: 'constructed-synthetic', publicationApproved: false, components: parts});
   }
   return Object.freeze({

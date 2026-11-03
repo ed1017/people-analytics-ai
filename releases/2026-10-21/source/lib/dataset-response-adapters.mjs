@@ -41,8 +41,8 @@ const method=[
  'Allocations are explicit user assumptions. Conditional coverage counts each role unit once, capped at its own demand; it is not confirmed staffing or a forecast.',
  'Assessed readiness, available movers, release capacity, learning effectiveness, time to readiness and future hiring capacity are unknown. Unknowns stay null through every rollup; profile-fit and historical recruiting never supply future capacity.',
  'Internal placements change group membership, not company headcount. Structural position changes and response allocations do not create employment starts, exits or employee records.',
- 'Buy fill counts exclude internal movements; skill-level timing is opening to accepted offer. Evidence is company-wide constructed history through September 30, 2026. No future outcomes, employee decisions, requisitions, learning assignments or database changes are executed.',
- 'No execution schedule or deadline assessment is supplied here. October–December 2026 remains unmodeled; history cutoff alignment is not independent forecast validation.',
+ 'Buy fill counts exclude internal movements; skill-level timing is opening to accepted offer. Evidence is company-wide constructed history through the stated reporting cutoff. No future outcomes, employee decisions, requisitions, learning assignments or database changes are executed.',
+ 'No execution schedule or deadline assessment is supplied here. Months after the reporting cutoff remain unmodeled; history cutoff alignment is not independent forecast validation.',
 ];
 const warning='Staffing feasibility is unknown: the constructed profile comparisons, course catalog and recruiting history do not establish assessed readiness or available future capacity.';
 function feasibility(){return {status:'not_assessed',overall_feasible:null,assessed_ready_people:null,available_movers:null,release_capacity:null,build_capacity:null,buy_capacity:null,confirmed_coverage:null,time_to_readiness:null,scheduled_coverage:null,deadline_feasible:null};}
@@ -59,7 +59,7 @@ export function evaluateCandidateAllocationConstraints(target,caps){
 
 export function createResponseAdapters({planning,talent,analytics,metadata,contract=()=>LEGACY_PRESENTER_CONTRACT}){
  const context=()=>metadata({sourceLabel:'Constructed demo response assumptions; staffing feasibility is not assessed',independentForecastValidation:false,coverageSemantics:'conditional-if-executed',readinessSemantics:'not-assessed',schedulingStatus:'not-composed'});
- function common(){return {as_of:DEMO_CUTOFF,capacity_feasibility:feasibility(),data_meta:context()};}
+ function common(){return {as_of:metadata().cutoff??DEMO_CUTOFF,capacity_feasibility:feasibility(),data_meta:context()};}
  async function recruiting(c){
   const rows=await analytics.read('response_recruiting');must(Array.isArray(rows)&&rows.length===contract().skillCatalogSize&&new Set(rows.map(r=>r.skill_code)).size===contract().skillCatalogSize,'Missing external skill recruiting');
   for(const r of rows){const s=c.signals.get(r.skill_code);must(exact(r,PLANNING_COLUMNS.response_recruiting)&&s&&['external_filled_requisitions','internal_fills_excluded'].every(k=>Number.isSafeInteger(r[k])&&r[k]>=0)&&r.external_filled_requisitions<=contract().externalStarts&&r.internal_fills_excluded<=contract().internalFills&&r.external_filled_requisitions+r.internal_fills_excluded===s.historical_filled_requisitions&&(r.external_filled_requisitions===0?r.median_open_to_accepted_days===null:finite(r.median_open_to_accepted_days)&&r.median_open_to_accepted_days>=0),'Skill external/internal fill partition');}

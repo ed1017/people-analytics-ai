@@ -30,7 +30,7 @@ function fixtureBinding(){
   else{
    assert.equal(url.pathname,'/api/dashboard');const org=url.searchParams.get('org'),i=codes.indexOf(org);assert.ok(org==='all'||i>=0);
    const headcount=org==='all'?8000:1000,v=org==='all'?voluntaryTotal:voluntary[i],scope={country:'all',org,level:'all'};
-   data={data_meta:public9037Metadata(digest),workforce_filter_scope:{status:'verified_public_aggregate',requested:scope,effective:scope,cutoff:P.cutoff},turnover_evidence:{contract:'voluntary-ytd-nine-month-average-stock-v2',calendar_months:9,status:'available',voluntary_exits:v,sum_month_end_headcount:headcount*9,average_month_end_headcount:headcount,rate_pct:Math.round(1000*v/headcount)/10},trend:Array.from({length:9},(_,j)=>({snapshot_date:new Date(Date.UTC(2026,j+1,0)).toISOString().slice(0,10),headcount}))};
+   data={data_meta:public9037Metadata(digest),workforce_filter_scope:{status:'verified_public_aggregate',requested:scope,effective:scope,cutoff:P.cutoff},turnover_evidence:{contract:'voluntary-ytd-calendar-month-average-stock-v3',calendar_months:10,status:'available',voluntary_exits:v,sum_month_end_headcount:headcount*10,average_month_end_headcount:headcount,rate_pct:Math.round(1000*v/headcount)/10},trend:Array.from({length:10},(_,j)=>({snapshot_date:new Date(Date.UTC(2026,j+1,0)).toISOString().slice(0,10),headcount}))};
   }
   return Response.json(data,{headers:{'x-workforce-dataset':P.token}});
  }};
@@ -51,7 +51,7 @@ test('proves the legacy monthly path rejects a supported BU question; new route 
 test('standalone BU question after last-year exchange uses explicitly dated current source, with complete chart and unchanged state',async()=>{
  const start=reads,reply=await converseSolutions(request('Show voluntary turnover by business unit'),runtime,new AbortController().signal);
  assert.equal(reads,start+1);assert.equal(reply.usage.modelRounds,0);assert.equal(reply.charts.length,1);assert.equal(reply.charts[0].points.length,8);
- assert.equal(readChatEvidenceSeries(reply.charts,'bu-followup',P.token).length,1);assert.match(reply.answer,/Voluntary YTD turnover/);assert.match(reply.answer,/January-September 2026/);assert.doesNotMatch(reply.answer,/2025|unsupported|cross-domain join/);
+ assert.equal(readChatEvidenceSeries(reply.charts,'bu-followup',P.token).length,1);assert.match(reply.answer,/Voluntary YTD turnover/);assert.match(reply.answer,/January-October 2026/);assert.doesNotMatch(reply.answer,/2025|unsupported|cross-domain join/);
  const source=await(await binding.handle(new Request('https://'+hostname+'/api/attrition'))).json();
  const expected=source.business_units.map(r=>({code:r.org_code,value:r.voluntary_turnover_ytd_pct})).sort((a,b)=>b.value-a.value);
  assert.deepEqual(reply.charts[0].points.map(p=>({code:p.date,value:p.value})),expected);assert.equal(expected[0].code,'BU-MGSVC');assert.equal(expected[0].value,13.6);assert.deepEqual(reply.state.turns.slice(0,2),prior);assert.deepEqual(reply.state.working,[]);
@@ -79,11 +79,11 @@ test('accepting the explicit current-YTD offer preserves measure and reads curre
  const first=await converseSolutions(request('Show voluntary turnover by business unit last year'),runtime,new AbortController().signal);
  const follow={...request('Yes please'),requestId:'bu-followup-next',message:{id:'accept-ytd',text:'Yes please'},state:first.state};
  const followRuntime={...runtime,readDatasetQuestions:(args,signal)=>readDatasetQuestions(args,{signal,comparison:query=>readPublicHomeAggregate({binding,hostname,identity,filters,args:query,signal,requestId:follow.requestId})})};
- const second=await converseSolutions(follow,followRuntime,new AbortController().signal);assert.equal(readChatEvidenceSeries(second.charts,follow.requestId,P.token).length,1);assert.equal(second.usage.modelRounds,0);assert.equal(second.charts[0].metric,'bu_voluntary_turnover_pct');assert.match(second.answer,/January-September 2026/);assert.equal(businessUnitTurnoverIntent('yes',prior),null);
+ const second=await converseSolutions(follow,followRuntime,new AbortController().signal);assert.equal(readChatEvidenceSeries(second.charts,follow.requestId,P.token).length,1);assert.equal(second.usage.modelRounds,0);assert.equal(second.charts[0].metric,'bu_voluntary_turnover_pct');assert.match(second.answer,/January-October 2026/);assert.equal(businessUnitTurnoverIntent('yes',prior),null);
 });
 
 test('matching explicit YTD windows use available evidence; full-year 2026 stays unavailable',async()=>{
- for(const period of ['2026 YTD','YTD 2026','January-September 2026','Jan through Sep 2026','as of 2026-09-30','as of September 30, 2026']){
+ for(const period of ['2026 YTD','YTD 2026','January-October 2026','Jan through Oct 2026','as of 2026-10-31','as of October 31, 2026']){
   const reply=await businessUnitTurnoverReply('Show voluntary turnover by business unit '+period,prior,read,new AbortController().signal);assert.equal(reply.charts.length,1,period);assert.equal(reply.charts[0].points.length,8);
  }
  const reply=await businessUnitTurnoverReply('Show voluntary turnover by business unit for 2026',prior,()=>assert.fail('full year cannot use YTD'),new AbortController().signal);assert.match(reply.answer,/breakdown for 2026 is unavailable/);

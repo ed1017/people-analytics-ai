@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {execFileSync} from 'node:child_process';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {createFixtureHandler} from './fixture-handler.mjs';
@@ -11,7 +12,13 @@ const bytes=fs.readFileSync(path.join(here,'fixtures.json'));
 const pin=fs.readFileSync(path.join(here,'fixtures.sha256'),'utf8').trim();
 if(crypto.createHash('sha256').update(bytes).digest('hex')!==pin)throw Error('Fixture pin mismatch');
 createFixtureHandler(JSON.parse(bytes));
-fs.cpSync(path.join(release,'source'),output,{recursive:true});
+const historicalCommit='f0dd15c5bb162cbff49a8c4f0f7d3379971c7cc2';
+const repo=path.resolve(here,'../../..');
+const archive=execFileSync('git',['archive',historicalCommit,'releases/2026-10-21/source'],{cwd:repo,maxBuffer:64*1024*1024});
+fs.mkdirSync(output);
+execFileSync('tar',['-xf','-','--strip-components=3','-C',output],{input:archive});
+const historicalManifest=JSON.parse(execFileSync('git',['show',historicalCommit+':releases/2026-10-21/manifest.json'],{cwd:repo}));
+for(const f of historicalManifest.files){const bytes=fs.readFileSync(path.join(output,f.path));if(bytes.length!==f.bytes||crypto.createHash('sha256').update(bytes).digest('hex')!==f.sha256)throw Error('Historical source mismatch');}
 const write=(name,text)=>fs.writeFileSync(path.join(output,name),text);
 for(const item of JSON.parse(fs.readFileSync(path.join(here,'public-support.json'),'utf8'))){
  if(!/^experiments\/swp-headcount\/[a-z.-]+$/.test(item.path))throw Error('Invalid support path');
@@ -19,13 +26,14 @@ for(const item of JSON.parse(fs.readFileSync(path.join(here,'public-support.json
  if(crypto.createHash('sha256').update(text).digest('hex')!==item.sha256)throw Error('Public support mismatch');
  fs.mkdirSync(path.dirname(path.join(output,item.path)),{recursive:true});write(item.path,text);
 }
+for(const name of ['captured-public-contract.mjs','captured-public-projection.mjs'])write('lib/'+name,fs.readFileSync(path.join(here,name)));
 write('lib/fixtures.json',bytes);
 write('lib/captured-public-fields.json',fs.readFileSync(path.join(here,'captured-public-fields.json')));
 write('lib/fixture-handler.mjs',fs.readFileSync(path.join(here,'fixture-handler.mjs'),'utf8').replaceAll('../source/lib/','./'));
 write('lib/verify-receipts.mjs',fs.readFileSync(path.join(here,'verify-receipts.mjs'),'utf8').replaceAll('../source/lib/','./'));
 write('lib/fixture-runtime.mjs',`import fs from 'node:fs';\nimport crypto from 'node:crypto';\nimport {createFixtureHandler} from './fixture-handler.mjs';\nconst bytes=fs.readFileSync(process.cwd()+'/lib/fixtures.json');\nif(crypto.createHash('sha256').update(bytes).digest('hex')!=='${pin}')throw Error('Fixture pin mismatch');\nexport const fixtureHandle=createFixtureHandler(JSON.parse(bytes));\n`);
 write('proxy.ts',`import {NextResponse,type NextRequest} from 'next/server';\nimport {fixtureHandle} from './lib/fixture-runtime.mjs';\nexport function proxy(request:NextRequest){return fixtureHandle(request,process.env)??NextResponse.next();}\nexport const config={matcher:'/:path*'};\n`);
-write('lib/dataset-runtime.ts',`import {fixtureHandle} from './fixture-runtime.mjs';\nconst token='workforce-demo-9037-public-aggregates-v2:3';\nconst deny=():never=>{throw Error('External services are unavailable in public fixture reproduction');};\nexport const isLocal9037Development=true;\nexport function registerLegacyDatasetClient(_client:unknown){}\nexport function registerLegacyDatasetClientFactory(_factory:()=>unknown){}\nexport function datasetAI<T>(_call:()=>T):T{return deny();}\nexport async function withDatasetRequest(request:Request|undefined,_handler:()=>Promise<Response>):Promise<Response>{return request?(fixtureHandle(request,process.env)??Response.json({error:'Unavailable fixture route'},{status:503})):Response.json({error:'Missing request'},{status:400});}\nexport const datasetRouter={bootstrapToken:async()=>token,current:()=>({datasetId:'workforce-demo-9037-public-aggregates-v2',token,generation:3,digest:'historical-public-fixture'}),client:deny,assertAIContext:deny,request:withDatasetRequest};\n`);
+write('lib/dataset-runtime.ts',`import {fixtureHandle} from './fixture-runtime.mjs';\nconst token='workforce-demo-9037-public-aggregates-v4:5';\nconst deny=():never=>{throw Error('External services are unavailable in public fixture reproduction');};\nexport const isLocal9037Development=true;\nexport function registerLegacyDatasetClient(_client:unknown){}\nexport function registerLegacyDatasetClientFactory(_factory:()=>unknown){}\nexport function datasetAI<T>(_call:()=>T):T{return deny();}\nexport async function withDatasetRequest(request:Request|undefined,_handler:()=>Promise<Response>):Promise<Response>{return request?(fixtureHandle(request,process.env)??Response.json({error:'Unavailable fixture route'},{status:503})):Response.json({error:'Missing request'},{status:400});}\nexport const datasetRouter={bootstrapToken:async()=>token,current:()=>({datasetId:'workforce-demo-9037-public-aggregates-v4',token,generation:5,digest:'historical-public-fixture'}),client:deny,assertAIContext:deny,request:withDatasetRequest};\n`);
 const layout=fs.readFileSync(path.join(output,'app/layout.tsx'),'utf8');
 if(!layout.includes('<body>'))throw Error('Unrecognized layout');
 write('app/layout.tsx',layout.replace('<body>','<body><aside role="note" style={{padding:12,borderBottom:"1px solid currentColor"}}>Local historical synthetic fixture replay. Company-wide recorded data only; AI, external services and unrecorded calculations are unavailable.</aside>'));
@@ -35,5 +43,5 @@ const pkg=JSON.parse(fs.readFileSync(path.join(output,'package.json')));
 pkg.scripts={dev:'node run-next.mjs dev',build:'node run-next.mjs build',start:'node run-next.mjs start',typecheck:'tsc --noEmit'};
 write('package.json',JSON.stringify(pkg,null,2)+'\n');
 write('run-next.mjs',fs.readFileSync(path.join(here,'run-next.mjs')));
-write('REPRODUCTION.json',JSON.stringify({sourceManifest:'releases/2026-10-21/manifest.json',fixtureSha256:pin,publicSupport:JSON.parse(fs.readFileSync(path.join(here,'public-support.json'),'utf8')),overrides:['proxy.ts','lib/dataset-runtime.ts','app/layout.tsx','next.config.ts','package.json','vercel.json'],added:['lib/captured-public-fields.json','lib/fixtures.json','lib/fixture-handler.mjs','lib/fixture-runtime.mjs','lib/verify-receipts.mjs','run-next.mjs'],scope:'Historical company-wide public GET replay; no live AI, DB, private inputs or unrecorded calculator parity'},null,2)+'\n');
+write('REPRODUCTION.json',JSON.stringify({sourceCommit:historicalCommit,sourceManifest:'releases/2026-10-21/manifest.json',fixtureSha256:pin,publicSupport:JSON.parse(fs.readFileSync(path.join(here,'public-support.json'),'utf8')),overrides:['proxy.ts','lib/dataset-runtime.ts','app/layout.tsx','next.config.ts','package.json','vercel.json'],added:['lib/captured-public-fields.json','lib/fixtures.json','lib/fixture-handler.mjs','lib/fixture-runtime.mjs','lib/verify-receipts.mjs','run-next.mjs'],scope:'Historical company-wide public GET replay; no live AI, DB, private inputs or unrecorded calculator parity'},null,2)+'\n');
 console.log('Prepared isolated fixture application: '+output);
