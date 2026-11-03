@@ -1,3 +1,5 @@
+> Historical source is pinned to PR556 commit `f0dd15c5bb162cbff49a8c4f0f7d3379971c7cc2`. Use a full Git checkout and tar. The September capture and its contract are retained unchanged; this recipe does not relabel it as October.
+
 > Candidate status: the current fixture is a local replay of the reviewed public-route projection, not a hosted or production capture. No model output is included.
 
 # Local reproduction with public synthetic fixtures
