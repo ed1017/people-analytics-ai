@@ -5,6 +5,7 @@ export const STAFFING_TARGET_BASIS='business-unit-baseline-v1';
 // Explicit reviewed draft horizon, never an inferred bridge across the missing quarter.
 export const STAFFING_TARGET_9037_BASIS='constructed-9037-carried-stock-2027-v1';
 export const STAFFING_TARGET_9037_HORIZON=Object.freeze({start:'2027-01-01',end:'2027-12-01',openingStockDate:'2026-09-30',unmodeledMonths:Object.freeze(['2026-10','2026-11','2026-12'])});
+export const STAFFING_TARGET_OCTOBER_HORIZON=Object.freeze({start:'2027-01-01',end:'2027-12-01',openingStockDate:'2026-10-31',unmodeledMonths:Object.freeze(['2026-11','2026-12'])});
 
 export type StaffingCatalog={as_of:string;defaults:ScenarioModelAssumptions;business_units:BusinessUnitScenarioOption[];staffing_target_basis:string;staffing_target_horizon?:typeof STAFFING_TARGET_9037_HORIZON};
 const bounds={annual_growth_pct:[-10,20],salary_inflation_pct:[-5,15],annual_attrition_pct:[0,30],fill_rate_pct:[0,100],productivity_hiring_reduction_pct:[0,50]} as const;
@@ -18,8 +19,8 @@ const fail=()=>{throw Error('Comparable business-unit supply is unavailable. Ref
 function candidateHorizon(data:unknown){
  const d=data as StaffingCatalog&{data_meta?:{datasetId?:string;publicationApproved?:boolean}};
  if(d.staffing_target_basis!==STAFFING_TARGET_9037_BASIS)return false;
- const h=d.staffing_target_horizon;
- if(d.as_of!=='2026-09-30'||!((d.data_meta?.datasetId==='workforce-demo-9037-2026-09-30-v3-1-offline-candidate'&&d.data_meta.publicationApproved===false)||(d.data_meta?.datasetId===PUBLIC_9037.datasetId&&d.data_meta.publicationApproved===true))||!h||h.start!==STAFFING_TARGET_9037_HORIZON.start||h.end!==STAFFING_TARGET_9037_HORIZON.end||h.openingStockDate!==d.as_of||JSON.stringify(h.unmodeledMonths)!==JSON.stringify(STAFFING_TARGET_9037_HORIZON.unmodeledMonths))fail();
+ const h=d.staffing_target_horizon,expected=d.as_of==='2026-10-31'?STAFFING_TARGET_OCTOBER_HORIZON:STAFFING_TARGET_9037_HORIZON;
+ if(!['2026-09-30','2026-10-31'].includes(d.as_of)||!((d.data_meta?.datasetId==='workforce-demo-9037-2026-09-30-v3-1-offline-candidate'&&d.data_meta.publicationApproved===false)||(d.data_meta?.datasetId===PUBLIC_9037.datasetId&&d.data_meta.publicationApproved===true&&d.as_of===PUBLIC_9037.cutoff))||!h||h.start!==expected.start||h.end!==expected.end||h.openingStockDate!==d.as_of||JSON.stringify(h.unmodeledMonths)!==JSON.stringify(expected.unmodeledMonths))fail();
  return true;
 }
 const rawNumber=(value:unknown)=>{if((typeof value!=='number'&&typeof value!=='string')||String(value).trim()===''||!Number.isFinite(Number(value)))fail();return Number(value);};

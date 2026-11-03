@@ -136,7 +136,7 @@ function reviewedSource(version:string=POSITION_MARKET_SOURCE_VERSION):PositionM
  return POSITION_MARKET_REFERENCE;
 }
 function eligibleScope(inventoryVersion:string,inventoryKey:string,selectedIds:readonly string[],sourceVersion?:string){
- assert(inventoryVersion==='company-position-model-v2','Choose supported vacancies in the company register.');
+ assert(['company-position-model-v2','company-position-model-v3'].includes(inventoryVersion),'Choose supported vacancies in the company register.');
  const inventory=resolvePositionInventory(inventoryVersion);
  assert(inventoryKey===positionInventoryKey(inventory),'The position inventory changed.');
  assert(Array.isArray(selectedIds)&&selectedIds.length>0&&selectedIds.length<=500&&new Set(selectedIds).size===selectedIds.length,'Select position vacancies first.');

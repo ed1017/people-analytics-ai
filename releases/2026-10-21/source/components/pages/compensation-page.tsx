@@ -91,7 +91,7 @@ export function CompensationEvidence({ data }: { data: CompensationResponse }) {
     </div>
     <AssumptionsDisclosure>
       <div className="mt-3 space-y-2 text-muted-foreground">
-        <p>Source: <code>finance_current_summary</code>, the same demo aggregate view used by Workforce Cost. Its snapshot predicate is fixed to September 30, 2026; the view does not report when its data was refreshed.</p>
+        <p>Source: <code>finance_current_summary</code>, the same demo aggregate view used by Workforce Cost. Reporting date: {data?.snapshot_date ?? 'unavailable'}. This is the workforce snapshot date, not a refresh timestamp.</p>
         <p>Cohort: snapshot rows grouped by business unit. Active-employment eligibility and employee-level known/missing cost counts are not supplied. Source sums can omit missing employee costs, so these are reported aggregates, not verified complete payroll totals.</p>
         <p>Values are already denominated in USD by the source. Original currencies, exchange-rate dates and cost-period definitions are unavailable; no conversion or annualization is performed here.</p>
         <p>Missing aggregate values remain unavailable. Cost per FTE is total reported cost divided by total reported FTE, not an average of business-unit ratios. Share uses the sum of all supplied business-unit costs and is unavailable if that total is missing or zero.</p>

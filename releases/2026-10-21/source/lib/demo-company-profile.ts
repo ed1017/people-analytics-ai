@@ -1,14 +1,14 @@
-/** Static company profile reconciled to the released v4:5 aggregate catalogue.
+/** Static company profile reconciled to the released v5:6 aggregate catalogue.
  * A future dataset must supply its own profile; dashboard filters never redefine it.
  * Ed Inc. is the explicitly fictional presentation name approved for this demo.
  */
 const profile = Object.freeze({
   name: 'Ed Inc.',
-  datasetToken: 'workforce-demo-9037-public-aggregates-v4:5',
-  asOf: '2026-09-30',
+  datasetToken: 'workforce-demo-9037-public-aggregates-v5:6',
+  asOf: '2026-10-31',
   historyStart: '2024-01-31',
   refreshPolicy: 'published-version' as const,
-  people: 9037,
+  people: 9092,
   countries: Object.freeze(['AU', 'BR', 'CA', 'DE', 'FR', 'GB', 'IN', 'JP', 'SG', 'US']),
   businessUnits: Object.freeze(['BU-CLIENTOPS', 'BU-CONS', 'BU-CORP', 'BU-DATAAI', 'BU-DIGITAL', 'BU-MGSVC', 'BU-SALES', 'BU-TECH']),
 });

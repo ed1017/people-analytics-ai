@@ -174,7 +174,7 @@ export function OverviewPage({
               Selected-scope Headcount Trend
             </h3>
             <p className="text-sm text-muted-foreground">
-              Monthly active workforce from January 2024 through September 2026
+              Monthly active workforce from January 2024 through the latest reported month
             </p>
           </div>
 

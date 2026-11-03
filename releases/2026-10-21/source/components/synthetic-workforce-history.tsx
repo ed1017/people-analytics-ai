@@ -2,6 +2,7 @@
 
 import {useId, useMemo, useState, type ReactNode} from 'react';
 import {readDashboardScopeReceipt} from '@/lib/dashboard-scope';
+import {PUBLIC_9037} from '@/lib/public-9037-contract.mjs';
 import type {PerformanceFilters} from '@/lib/workforce-performance';
 import {
   HISTORY_VERSION, HISTORY_SEED, HISTORY_ITEMS, HISTORY_DATASET_TOKEN, HISTORY_BUNDLE_DIGEST,
@@ -25,7 +26,7 @@ const number = (value:number|null) => value === null ? 'Withheld' : value.toLoca
 export function historyScopeKey(filters:PerformanceFilters, scopeReceipt:unknown, loading=false):string|null {
   if(loading)return null;
   const receipt=readDashboardScopeReceipt(scopeReceipt);
-  if(receipt?.version!==3 || receipt.status!=='verified_public_aggregate' || receipt.datasetToken!==HISTORY_DATASET_TOKEN || !receipt.effective)return null;
+  if(receipt?.version!==3 || receipt.status!=='verified_public_aggregate' || receipt.datasetToken!==PUBLIC_9037.token || !receipt.effective)return null;
   if(dimensions.some(({key,source})=>receipt.requested[source]!==filters[source] || receipt.effective?.[source]!==filters[source] || filters[source]!=='all' && !HISTORY_OPTIONS[key].some(option=>option.value===filters[source])))return null;
   return JSON.stringify([receipt.datasetToken,receipt.contract,receipt.cutoff,filters.org,filters.country,filters.level]);
 }

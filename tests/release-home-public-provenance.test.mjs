@@ -20,7 +20,7 @@ test('public identity is explicit and caller labels are never retained',()=>{
 });
 for(const [field,value]of Object.entries({datasetId:DEMO_DATASET_ID,datasetToken:P.token+':3',contract:'local-app-parity-v1',publicationReceiptId:'other',cutoff:'2026-09-29',dataClass:'observed',publicationApproved:false,bundleDigest:'bad'}))test('public context rejects changed '+field,()=>assert.equal(readPublicDisplayContext({...meta(),[field]:value}),null));
 test('legacy identity remains separately constrained',()=>{
- const m={...meta(),datasetId:DEMO_DATASET_ID,datasetToken:DEMO_DATASET_ID+':1',contract:'local-app-parity-v1',publicationApproved:false};
+ const m={...meta(),cutoff:'2026-09-30',datasetId:DEMO_DATASET_ID,datasetToken:DEMO_DATASET_ID+':1',contract:'local-app-parity-v1',publicationApproved:false};
  assert.ok(readConstructedDisplayContext(m));assert.equal(readPublicDisplayContext(m),null);
  assert.equal(readConstructedDisplayContext({...m,publicationApproved:true}),null);
 });

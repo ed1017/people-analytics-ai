@@ -1,6 +1,6 @@
-import {STAFFING_TARGET_BASIS,STAFFING_TARGET_9037_BASIS,STAFFING_TARGET_9037_HORIZON,assertStaffingBaselineSource} from './staffing-target.ts';
+import {STAFFING_TARGET_BASIS,STAFFING_TARGET_9037_BASIS,STAFFING_TARGET_9037_HORIZON,STAFFING_TARGET_OCTOBER_HORIZON,assertStaffingBaselineSource} from './staffing-target.ts';
 import {LEGACY_PRESENTER_CONTRACT} from './dataset-presenter-contract.mjs';
-import {DEMO_BUS,DEMO_CUTOFF,exact,plain} from './dataset-demo-contracts.mjs';
+import {DEMO_BUS,exact,plain} from './dataset-demo-contracts.mjs';
 import {PLANNING_COLUMNS} from './dataset-planning-queries.mjs';
 import {runScenarioModel,buildScenarioSegmentBreakdown} from './scenario-engine.ts';
 import {positionActionDefaults,positionActionScenario} from './position-action-engine.ts';
@@ -62,17 +62,17 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
   for(const r of rows)for(const k of fields){const v=r[k];if(/(_code|_name|_category)$|^as_of$|^planning_month$/.test(k))must(typeof v==='string'&&v.length>0&&v.length<300,'Invalid planning dimension');else must(finite(v)&&v>=0||v===null&&['annual_cost_per_position','avg_course_duration_hours','median_time_to_fill_days','avg_active_bill_rate'].includes(k),'Missing planning metric: '+k);}
   return rows;
  }
- function provenance(extra={}){return metadata({sourceLabel:'Constructed demo what-if calculation; user assumptions, not observed outcomes or a validated forecast',historyCutoff:DEMO_CUTOFF,planningStart:'2027-01-01',planningEnd:'2027-12-01',unmodeledGap:['2026-10','2026-11','2026-12'],independentForecastValidation:false,...extra});}
+ function provenance(extra={}){return metadata({sourceLabel:'Constructed demo what-if calculation; user assumptions, not observed outcomes or a validated forecast',historyCutoff:metadata().cutoff,planningStart:'2027-01-01',planningEnd:'2027-12-01',unmodeledGap:['2026-10','2026-11','2026-12'].filter(month=>month>metadata().cutoff.slice(0,7)),independentForecastValidation:false,...extra});}
  async function positionInputs(){const p=await domains.positions(),c=p.current;return {asOf:p.as_of,authorizedPositions:c.current_positions+c.frozen_positions,filledPositions:c.filled_positions,openVacancies:c.vacant_positions,frozenPositions:c.frozen_positions,closedPositions:c.closed_positions};}
  async function planInputs(){
   const [defaultRows,history,orgs,families,businessUnits,release,workforce]=await Promise.all([read('scenario_defaults'),analytics.read('scenario_history'),read('scenario_org'),read('scenario_family'),analytics.read('workforce_business_unit_summary'),component('planning'),component('workforce')]);
-  must(defaultRows.length===1&&defaultRows[0].as_of===DEMO_CUTOFF,'Scenario defaults cutoff');
+  must(defaultRows.length===1&&defaultRows[0].as_of===metadata().cutoff,'Scenario defaults cutoff');
   const defaults=Object.fromEntries(Object.keys(SCENARIO_BOUNDS).map(k=>[k,defaultRows[0]['baseline_'+k]]));
   for(const [k,b] of Object.entries(SCENARIO_BOUNDS))must(validNumber(defaults[k],b.min,b.max),'Invalid scenario default');
-  const h=history[0];must(history.length===1&&exact(h,['months','first_date','last_date','average_headcount','exits'])&&h.months===9&&h.first_date==='2026-01-31'&&h.last_date===DEMO_CUTOFF&&count(h.exits)&&finite(h.average_headcount)&&h.average_headcount>0&&defaults.annual_attrition_pct===round(100*h.exits/h.average_headcount*12/9,2),'Constructed history/default reconciliation');
+  const h=history[0];must(history.length===1&&exact(h,['months','first_date','last_date','average_headcount','exits'])&&h.months===Number(metadata().cutoff.slice(5,7))&&h.first_date==='2026-01-31'&&h.last_date===metadata().cutoff&&count(h.exits)&&finite(h.average_headcount)&&h.average_headcount>0&&defaults.annual_attrition_pct===round(100*h.exits/h.average_headcount*12/h.months,2),'Constructed history/default reconciliation');
   must(defaults.annual_growth_pct===0&&defaults.salary_inflation_pct===0&&defaults.fill_rate_pct===100&&defaults.productivity_hiring_reduction_pct===0,'Stored flat assumptions');
   const baseline=release.data;
-  must(baseline.length===12&&businessUnits.length===8&&unique(businessUnits,r=>r.org_code)&&businessUnits.every(b=>DEMO_BUS.includes(b.org_code)&&b.as_of===DEMO_CUTOFF&&count(b.headcount)&&finite(b.fte))&&sum(businessUnits,'headcount')===contract().population,'Business-unit stock');
+  must(baseline.length===12&&businessUnits.length===8&&unique(businessUnits,r=>r.org_code)&&businessUnits.every(b=>DEMO_BUS.includes(b.org_code)&&b.as_of===metadata().cutoff&&count(b.headcount)&&finite(b.fte))&&sum(businessUnits,'headcount')===contract().population,'Business-unit stock');
   must(orgs.length===96&&unique(orgs,r=>r.planning_month+':'+r.org_code)&&families.length===324&&unique(families,r=>r.planning_month+':'+r.family_code),'Scenario segment completeness');
   let opening=contract().population;const prior=new Map(businessUnits.map(b=>[b.org_code,b.headcount]));
   for(const [i,b] of baseline.entries()){
@@ -86,12 +86,12 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
  }
  function calculate(inputs,assumptions,bu=null){
   const baseline=bu?inputs.orgs.filter(r=>r.org_code===bu.org_code):inputs.baseline,opening=bu?bu.headcount:contract().population,ledger=[];
-  const result=runScenarioModel({asOf:DEMO_CUTOFF,startingHeadcount:opening,baselinePoints:baseline,defaults:inputs.defaults,assumptions,onPoint:r=>{must(close(r.opening_headcount+r.hires-r.exits,r.closing_headcount),'Scenario monthly stock/flow');ledger.push(r);}});
+  const result=runScenarioModel({asOf:metadata().cutoff,startingHeadcount:opening,baselinePoints:baseline,defaults:inputs.defaults,assumptions,onPoint:r=>{must(close(r.opening_headcount+r.hires-r.exits,r.closing_headcount),'Scenario monthly stock/flow');ledger.push(r);}});
   must(ledger.length===12&&close(opening+sum(ledger,'hires')-sum(ledger,'exits'),ledger.at(-1).closing_headcount),'Scenario total stock/flow');
   result.methodology=result.methodology.filter(s=>!s.startsWith('Modeled hires and exits are engine-implied gross flows')).concat([
-   'Constructed September 2026 stock is carried to January 2027; October–December 2026 is unmodeled, not an observed or forecast bridge.',
+   `Constructed stock at ${metadata().cutoff} is carried to January 2027; intervening months are unmodeled, not an observed or forecast bridge.`,
    'Stored flat draft hires/exits are zero and reconcile. What-if hires/exits are separate engine-implied gross flows; they are not stored plan flows or observed future outcomes.',
-   `The ${inputs.defaults.annual_attrition_pct}% company annualized January–September exit rate is a shared scenario assumption${bu?' applied to this business unit; it is not an observed business-unit attrition rate':''}. Fill rate and productivity are authored assumptions, not estimated capacity.`,
+   `The ${inputs.defaults.annual_attrition_pct}% company annualized YTD exit rate is a shared scenario assumption${bu?' applied to this business unit; it is not an observed business-unit attrition rate':''}. Fill rate and productivity are authored assumptions, not estimated capacity.`,
    'Growth and inflation adjustments span the twelve explicit planning points; there is no independent forecast validation.',
   ]);
   result.accounting={scope:bu?{type:'business_unit',org_code:bu.org_code}:{type:'company'},basis:'Unrounded conditional arithmetic; display values are rounded separately.',monthly:ledger,starting_headcount:opening,total_hires:sum(ledger,'hires'),total_exits:sum(ledger,'exits'),ending_headcount:ledger.at(-1).closing_headcount};
@@ -101,7 +101,7 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
    result.segment_breakdown=buildScenarioSegmentBreakdown(result,org,family);
    reconcileSegments(result.segment_breakdown,result.summary);
   }
-  result.data_meta=provenance({scenarioFlowConvention:'Engine-implied conditional gross flows; stored draft has zero gross flows',attritionDefaultProvenance:'Company annualized constructed YTD exits / average month-end stock, multiplied by 12/9'});
+  result.data_meta=provenance({scenarioFlowConvention:'Engine-implied conditional gross flows; stored draft has zero gross flows',attritionDefaultProvenance:`Company annualized constructed YTD exits / average month-end stock, multiplied by 12/${inputs.history.months}`});
   return result;
  }
  async function structuralInputs(){
@@ -111,7 +111,7 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
   for(const r of rows)must(['level_rank','current_positions','filled_positions','vacant_positions','planned_headcount','open_requisition_vacancies','on_hold_requisition_vacancies','uncovered_vacancies'].every(k=>count(r[k]))&&r.current_positions===r.filled_positions+r.vacant_positions&&r.vacant_positions===r.open_requisition_vacancies+r.on_hold_requisition_vacancies+r.uncovered_vacancies&&(r.annual_cost_per_position===null?r.planned_headcount===0&&r.planned_labor_cost_usd===0:r.planned_headcount>0&&close(r.annual_cost_per_position,costPerHead(r.planned_labor_cost_usd,r.planned_headcount),0.001)),'Structural vacancy/cost coverage');
   for(const r of requirements)must(Object.hasOwn(contract().roleSkillRequirements[r.job_profile_code]??{},r.skill_code)&&supply.some(s=>s.skill_code===r.skill_code)&&signals.some(s=>s.skill_code===r.skill_code)&&rows.some(p=>p.job_profile_code===r.job_profile_code),'Missing structural role evidence');
   must(supply.every(r=>count(r.employees_with_skill)&&r.employees_with_skill<=contract().population),'Skill presence population');
-  return {asOf:DEMO_CUTOFF,rows:rows.map(r=>({...pick(r,['org_code','org_name','level_code','level_name','level_rank','job_profile_code','job_profile_name']),filled:r.filled_positions,vacant:r.vacant_positions,frozen:0,open_req:r.open_requisition_vacancies,on_hold_req:r.on_hold_requisition_vacancies,uncovered:r.uncovered_vacancies,frozen_open_req:0,frozen_on_hold_req:0,frozen_uncovered:0,planned_weight:r.planned_headcount,cost_per_position:r.annual_cost_per_position})),skillRequirements:requirements,skillSupply:new Map(supply.map(r=>[r.skill_code,r.employees_with_skill])),responseStrategySignals:new Map(signals.map(r=>[r.skill_code,r]))};
+  return {asOf:metadata().cutoff,rows:rows.map(r=>({...pick(r,['org_code','org_name','level_code','level_name','level_rank','job_profile_code','job_profile_name']),filled:r.filled_positions,vacant:r.vacant_positions,frozen:0,open_req:r.open_requisition_vacancies,on_hold_req:r.on_hold_requisition_vacancies,uncovered:r.uncovered_vacancies,frozen_open_req:0,frozen_on_hold_req:0,frozen_uncovered:0,planned_weight:r.planned_headcount,cost_per_position:r.annual_cost_per_position})),skillRequirements:requirements,skillSupply:new Map(supply.map(r=>[r.skill_code,r.employees_with_skill])),responseStrategySignals:new Map(signals.map(r=>[r.skill_code,r]))};
  }
  function structuralRun(inventory,actions){
   for(const a of actions)requestMust(inventory.rows.some(r=>match(r,a)),'Structural scope has no matching constructed inventory.');
@@ -126,7 +126,7 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
   result.accounting={company:{before:stock(inventory.rows),after:stock([...finalRows.values()])},basis:'Unrounded position capacity by ordered action scope; fills are conditional staffing, not observed external hires.',actions:ledger};
   result.methodology.unshift('Constructed demo what-if arithmetic only. No observed future employment or independently validated forecast is supplied.');
   result.methodology.push('Missing cost bases stay unavailable when affected; a zero-amount action has zero cost effect. A scope with zero draft allocation weight cannot receive weighted added positions.','Company, business-unit and role inventory partitions retain unrounded values for reconciliation; the UI rounds labels independently. Skill indicators and action display summaries are rounded estimates.',
-   'Skill supply counts profile presence, not assessed proficiency or ready employees. Move counts express recorded preferences and may overlap; they are not assessed readiness or available movers.','Recruiting and learning signals are company-wide constructed history through September 2026; action scopes do not turn them into filtered supply.');
+   'Skill supply counts profile presence, not assessed proficiency or ready employees. Move counts express recorded preferences and may overlap; they are not assessed readiness or available movers.','Recruiting and learning signals retain their own dates; action scopes do not turn company-wide signals into filtered supply.');
   result.response_strategy.provenance='Constructed company-wide catalog/history/preferences; not assessed readiness, guaranteed staffing, causal learning gains or filtered supply.';
   result.data_meta=provenance({sourceLabel:'Constructed demo structural actions; scoped inventory arithmetic and explicit cost gaps',missingCostCombinations:inventory.rows.filter(r=>r.cost_per_position===null).length,unavailable:['assessed readiness','contingent evidence','automation potential','execution/scheduling orchestration']});
   return result;
@@ -156,8 +156,8 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
     const inventory=await structuralInputs();data=body?structuralRun(inventory,body.actions):{...structuralPositionCatalog(inventory),data_meta:provenance({sourceLabel:'Constructed demo structural catalog; missing cost bases are unavailable',missingCostCombinations:inventory.rows.filter(r=>r.cost_per_position===null).length})};
    }else{
     const inputs=await planInputs(),buRoute=path==='/api/business-unit-scenario';
-    if(staffing&&contract().population!==9037)assertStaffingBaselineSource(inputs.baseline,DEMO_CUTOFF);
-    if(!body)data=buRoute?{as_of:DEMO_CUTOFF,defaults:inputs.defaults,business_units:inputs.businessUnits.map(r=>pick(r,['org_code','org_name','headcount','fte'])),data_meta:provenance()}:{as_of:DEMO_CUTOFF,defaults:inputs.defaults,bounds:SCENARIO_BOUNDS,data_meta:provenance()};
+    if(staffing&&![9037,9092].includes(contract().population))assertStaffingBaselineSource(inputs.baseline,metadata().cutoff);
+    if(!body)data=buRoute?{as_of:metadata().cutoff,defaults:inputs.defaults,business_units:inputs.businessUnits.map(r=>pick(r,['org_code','org_name','headcount','fte'])),data_meta:provenance()}:{as_of:metadata().cutoff,defaults:inputs.defaults,bounds:SCENARIO_BOUNDS,data_meta:provenance()};
     else{
      const requested=buRoute?body:body.assumptions,assumptions={...inputs.defaults,...pick(requested,Object.keys(SCENARIO_BOUNDS).filter(k=>Object.hasOwn(requested,k)))};
      if(Object.hasOwn(requested,'additional_attrition_pct_points')){assumptions.annual_attrition_pct+=requested.additional_attrition_pct_points;requestMust(validNumber(assumptions.annual_attrition_pct,0,30),'Combined attrition assumption is outside supported bounds.');}
@@ -166,8 +166,8 @@ export function createPlanningAdapters({analytics,component,domains,metadata,con
     }
    }
    if(staffing){
-    data.staffing_target_basis=contract().population===9037?STAFFING_TARGET_9037_BASIS:STAFFING_TARGET_BASIS;
-    if(contract().population===9037)data.staffing_target_horizon=STAFFING_TARGET_9037_HORIZON;
+    data.staffing_target_basis=[9037,9092].includes(contract().population)?STAFFING_TARGET_9037_BASIS:STAFFING_TARGET_BASIS;
+    if([9037,9092].includes(contract().population))data.staffing_target_horizon=metadata().cutoff==='2026-10-31'?STAFFING_TARGET_OCTOBER_HORIZON:STAFFING_TARGET_9037_HORIZON;
    }
    return Response.json(data,{headers:{'Cache-Control':'no-store'}});
   }catch(error){return Response.json({error:error instanceof RequestError?error.message:'Local planning inputs or accounting are unavailable.'},{status:error instanceof RequestError?error.status:503,headers:{'Cache-Control':'no-store'}});}

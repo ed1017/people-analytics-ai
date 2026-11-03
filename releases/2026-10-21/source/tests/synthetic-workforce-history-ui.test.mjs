@@ -11,12 +11,12 @@ const source=fs.readFileSync(new URL('../components/synthetic-workforce-history.
 const compiled=ts.transpileModule(source,{fileName:'synthetic-workforce-history.tsx',compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022},reportDiagnostics:true});
 assert.equal(compiled.diagnostics.length,0);
 const filters={country:'all',org:'all',level:'all'};
-const receipt=(selected=filters)=>({version:3,status:'verified_public_aggregate',requested:{...selected},effective:{...selected},label:'Selected workforce',basis:'Verified public synthetic aggregate',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'});
+const receipt=(selected=filters)=>({version:3,status:'verified_public_aggregate',requested:{...selected},effective:{...selected},label:'Selected workforce',basis:'Verified public synthetic aggregate',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-calendar-month-average-stock-v3',stockStatus:'positive'});
 function harness(overrides={}){
  let states=[],cursor=0,lastKey;
  const react={...React,useId:()=>':history-qa:',useMemo:fn=>fn(),useState:initial=>{const i=cursor++;if(!(i in states))states[i]=typeof initial==='function'?initial():initial;return[states[i],value=>states[i]=typeof value==='function'?value(states[i]):value];}};
  const module={exports:{}};
- vm.runInNewContext(compiled.outputText,{module,exports:module.exports,require:name=>name==='react'?react:name==='@/lib/synthetic-workforce-history'?{...history,...overrides}:name==='@/lib/dashboard-scope'?scopeModel:require(name)});
+ vm.runInNewContext(compiled.outputText,{module,exports:module.exports,require:name=>name==='react'?react:name==='@/lib/synthetic-workforce-history'?{...history,...overrides}:name==='@/lib/dashboard-scope'?scopeModel:name==='@/lib/public-9037-contract.mjs'?{PUBLIC_9037:P}:require(name)});
  let props={filters,scopeReceipt:receipt(),loading:false};
  return {api:module.exports,render(next={}){props={...props,...next};const outer=module.exports.SyntheticWorkforceHistory(props);if(typeof outer.type!=='function'){states=[];lastKey=undefined;return outer;}if(outer.key!==lastKey){states=[];lastKey=outer.key;}cursor=0;return outer.type(outer.props);},states:()=>states};
 }

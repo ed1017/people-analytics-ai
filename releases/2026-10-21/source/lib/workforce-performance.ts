@@ -33,11 +33,13 @@ export function resolvePublicWorkforcePerformance(value:unknown,filters:Performa
  if(receipt?.status!=='verified_public_aggregate'||receipt.stockStatus!=='positive'||!supportsPerformanceFilters(filters)||Object.entries(filters).some(([key,item])=>receipt.requested[key as keyof PerformanceFilters]!==item||receipt.effective?.[key as keyof PerformanceFilters]!==item)||!count(population)||population<=0)return null;
  if(!record(value)||!keys(value,['version','source','snapshotDate','reviewPeriod','periodKind','filters','status','availabilityKind','simulatedAvailableAt','originalAvailableAt','provenance','notRatedStatus','counts'])||value.version!=='ratings-9037-2026-09-30-offline-v1'||value.source!=='employee_snapshots JOIN performance_reviews'||value.snapshotDate!=='2026-09-30'||value.reviewPeriod!=='2026 YTD'||value.periodKind!=='ytd'||value.status!=='available'||value.availabilityKind!=='simulated_convention'||value.simulatedAvailableAt!=='2026-09-30T23:59:59.999Z'||value.originalAvailableAt!==null||value.provenance!=='Constructed synthetic workforce; deterministic all-active demo ratings; not observed performance.'||value.notRatedStatus!=='not_collected'||!record(value.filters)||!keys(value.filters,['country','org','level'])||Object.entries(filters).some(([key,item])=>(value.filters as Record<string,unknown>)[key]!==item))return null;
  const c=value.counts;
- if(!record(c)||!keys(c,['population','rated','ratings','notRated','unavailable'])||c.population!==population||c.rated!==population||c.notRated!==null||c.unavailable!==0||!Array.isArray(c.ratings)||c.ratings.length!==5||!c.ratings.every(count))return null;
+ // Retained September ratings keep their assessment cohort, not October stock.
+ const assessmentPopulation=receipt.cutoff==='2026-10-31'&&record(c)&&count(c.population)?c.population:population;
+ if(!record(c)||!keys(c,['population','rated','ratings','notRated','unavailable'])||c.population!==assessmentPopulation||c.rated!==assessmentPopulation||c.notRated!==null||c.unavailable!==0||!Array.isArray(c.ratings)||c.ratings.length!==5||!c.ratings.every(count))return null;
  const ratings:number[]=c.ratings;
- if(ratings.some(n=>n<10||population-n<10)||ratings.reduce((a,b)=>a+b,0)!==population)return null;
- if(filters.org==='all'&&(population!==9037||ratings.some((n,i)=>n!==[396,1071,4634,2409,527][i])))return null;
- return {version:value.version,snapshotDate:value.snapshotDate,reviewPeriod:value.reviewPeriod,filters:{...filters},counts:{population,rated:population,ratings:[...ratings],notRated:null,notRatedStatus:'not_collected' as const,unavailable:0}};
+ if(ratings.some(n=>n<10||assessmentPopulation-n<10)||ratings.reduce((a,b)=>a+b,0)!==assessmentPopulation)return null;
+ if(filters.org==='all'&&(assessmentPopulation!==9037||ratings.some((n,i)=>n!==[396,1071,4634,2409,527][i])))return null;
+ return {version:value.version,snapshotDate:value.snapshotDate,reviewPeriod:value.reviewPeriod,filters:{...filters},counts:{population:assessmentPopulation,rated:assessmentPopulation,ratings:[...ratings],notRated:null,notRatedStatus:'not_collected' as const,unavailable:0}};
 }
 /** Reject duplicate/unknown parameters before any aggregate release lookup. */
 export function parsePerformanceFilters(params: URLSearchParams): PerformanceFilters | null {

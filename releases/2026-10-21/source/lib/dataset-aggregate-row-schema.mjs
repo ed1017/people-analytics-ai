@@ -1309,7 +1309,7 @@ export const AGGREGATE_ROW_SCHEMAS = {
         "UX-DES"
       ]
     },
-    "median_time_to_fill_days": "integer",
+    "median_time_to_fill_days": "number",
     "open_advanced_candidates": "integer",
     "open_applicants": "integer",
     "open_interviews": "integer",
@@ -1385,7 +1385,7 @@ export const AGGREGATE_ROW_SCHEMAS = {
   },
   "role_recruiting_timing": {
     "accepted_offer_to_start": {
-      "median_days": "integer",
+      "median_days": "number",
       "p25_days": "integer",
       "p75_days": "integer",
       "valid_sample_count": "integer"
@@ -1451,13 +1451,13 @@ export const AGGREGATE_ROW_SCHEMAS = {
     "missing_or_invalid_acceptance": "integer",
     "missing_or_invalid_start": "integer",
     "opening_to_accepted_offer": {
-      "median_days": "integer",
+      "median_days": "number",
       "p25_days": "integer",
       "p75_days": "integer",
       "valid_sample_count": "integer"
     },
     "opening_to_start": {
-      "median_days": "integer",
+      "median_days": "number",
       "p25_days": "integer",
       "p75_days": "integer",
       "valid_sample_count": "integer"
@@ -2066,7 +2066,7 @@ export const AGGREGATE_ROW_SCHEMAS = {
   "talent_acquisition_business_unit_summary": {
     "application_to_hire_pct": "integer",
     "applications": "integer",
-    "avg_time_to_fill_days": "integer",
+    "avg_time_to_fill_days": "number",
     "hires": "integer",
     "open_positions": "integer",
     "open_requisitions": "integer",
@@ -2101,14 +2101,14 @@ export const AGGREGATE_ROW_SCHEMAS = {
     "applications": "integer",
     "as_of": "date",
     "avg_open_req_age_days": "number",
-    "avg_time_to_fill_days": "integer",
+    "avg_time_to_fill_days": "number",
     "external_hires": "integer",
     "hires": "integer",
     "internal_hires": "integer",
     "interview_to_offer_pct": "integer",
     "interviewed_applications": "integer",
-    "median_open_req_age_days": "integer",
-    "median_time_to_fill_days": "integer",
+    "median_open_req_age_days": "number",
+    "median_time_to_fill_days": "number",
     "offer_acceptance_pct": "integer",
     "offer_to_hire_pct": "integer",
     "offered_applications": "integer",
@@ -2124,7 +2124,7 @@ export const AGGREGATE_ROW_SCHEMAS = {
     "offers": "integer"
   },
   "talent_acquisition_recruiter_summary": {
-    "avg_time_to_fill_days": "integer",
+    "avg_time_to_fill_days": "number",
     "filled_requisitions": "integer",
     "open_positions": "integer",
     "open_requisitions": "integer",

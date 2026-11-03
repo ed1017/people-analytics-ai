@@ -15,13 +15,14 @@ const preview9037 = {
  * release ID alone. Legacy contents and their validator remain unchanged. */
 export function validateCompensationContext(data: unknown, token: string): ReleaseRow[] {
   if(token===PUBLIC_9037.token){
-    const publicData=data as {release_id?:string;rows?:ReleaseRow[];data_meta?:Record<string,unknown>};
+    const publicData=data as {release_id?:string;snapshot_date?:string;rows?:ReleaseRow[];data_meta?:Record<string,unknown>};
     const m=publicData?.data_meta;
     if(publicData.release_id!==PUBLIC_9037.compensationRelease||!Array.isArray(publicData.rows)||publicData.rows.some(r=>r.release_id!==PUBLIC_9037.compensationRelease)||m?.datasetId!==PUBLIC_9037.datasetId||m.datasetToken!==token||m.publicationApproved!==true||m.contract!==PUBLIC_9037.contract||m.publicationReceiptId!==PUBLIC_9037.approval||typeof m.bundleDigest!=='string'||!/^[a-f0-9]{64}$/.test(m.bundleDigest))throw Error('Unreviewed public compensation release');
     // Reuse numerical/withholding validation on an internal copy only. Public
     // identity is checked above; private receipts are never sent to the client.
-    const checked=validateCompensationContext({...publicData,release_id:preview9037.releaseId,rows:publicData.rows.map(r=>({...r,release_id:preview9037.releaseId})),data_meta:{...m,datasetId:preview9037.datasetId,datasetToken:preview9037.datasetId+':1',bundleDigest:preview9037.bundleDigest,publicationApproved:false,contract:'local-app-parity-v1'}},preview9037.datasetId+':1');
-    return checked.map(r=>({...r,release_id:PUBLIC_9037.compensationRelease}));
+    if(publicData.snapshot_date!==PUBLIC_9037.cutoff||m.cutoff!==PUBLIC_9037.cutoff||publicData.rows.some(r=>r.snapshot_date!==PUBLIC_9037.cutoff))throw Error('Wrong public compensation date');
+    const checked=validateCompensationContext({...publicData,snapshot_date:'2026-09-30',release_id:preview9037.releaseId,rows:publicData.rows.map(r=>({...r,snapshot_date:'2026-09-30',release_id:preview9037.releaseId})),data_meta:{...m,cutoff:'2026-09-30',datasetId:preview9037.datasetId,datasetToken:preview9037.datasetId+':1',bundleDigest:preview9037.bundleDigest,publicationApproved:false,contract:'local-app-parity-v1'}},preview9037.datasetId+':1');
+    return checked.map(r=>({...r,snapshot_date:PUBLIC_9037.cutoff,release_id:PUBLIC_9037.compensationRelease}));
   }
   const value=data as {release_id?:string;snapshot_date?:string;scope?:{country:unknown;org:unknown;level:unknown};rows?:unknown;data_meta?:{datasetToken?:string;datasetId?:string;bundleDigest?:string;cutoff?:string;contract?:string;dataClass?:string;publicationApproved?:boolean}};
   if(!value?.scope || value.scope.country!==null || value.scope.org!==null || value.scope.level!==null || value.snapshot_date!=='2026-09-30')throw Error('Wrong release scope');

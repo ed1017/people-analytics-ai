@@ -24,12 +24,13 @@ export function quarterlyTurnoverIntent(question,turns=[]){
  return {groupBy:dimensions[0][1],metric:/\bvoluntary\b/.test(text)?'voluntary':'total',year:years.length?Number(years[0]):null,quarters:qs};
 }
 export function calculateQuarterlyTurnover(history,selection,asOf){
- if(!Array.isArray(history)||history.length!==33||asOf!=='2026-09-30')throw Error('Incomplete quarterly history');
- for(let i=0;i<33;i++){
+ const expectedMonths=asOf==='2026-10-31'?34:33;
+ if(!Array.isArray(history)||history.length!==expectedMonths||!['2026-09-30','2026-10-31'].includes(asOf))throw Error('Incomplete quarterly history');
+ for(let i=0;i<expectedMonths;i++){
   const row=history[i],month=new Date(Date.UTC(2024,i,1)).toISOString().slice(0,10);
   if(!row||row.month!==month||!count(row.headcount)||i===0&&(row.total_exits!==null||row.voluntary_exits!==null)||i>0&&(!count(row.total_exits)||!count(row.voluntary_exits)||row.voluntary_exits>row.total_exits))throw Error('Invalid quarterly history');
  }
- const keys=selection.year?Array.from({length:4},(_,i)=>`${selection.year}-Q${i+1}`):Array.from({length:10},(_,i)=>`${2024+Math.floor((i+1)/4)}-Q${(i+1)%4+1}`);
+ const keys=selection.year?Array.from({length:4},(_,i)=>`${selection.year}-Q${i+1}`):Array.from({length:Math.ceil(expectedMonths/3)-1},(_,i)=>`${2024+Math.floor((i+1)/4)}-Q${(i+1)%4+1}`);
  return keys.filter(key=>!selection.quarters.length||selection.quarters.includes(Number(key.at(-1)))).map(quarter=>{
   const year=Number(quarter.slice(0,4)),q=Number(quarter.at(-1)),first=(q-1)*3;
   const periodStart=new Date(Date.UTC(year,first,1)).toISOString().slice(0,10),periodEnd=new Date(Date.UTC(year,first+3,0)).toISOString().slice(0,10);
@@ -44,7 +45,7 @@ export function calculateQuarterlyTurnover(history,selection,asOf){
 }
 /** Shared response/display validator. Counts and denominator independently reproduce each visible rate. */
 export function readQuarterlyTurnover(value){
- if(!value||!fields.includes(value.groupBy)||!['total','voluntary'].includes(value.metric)||value.asOf!=='2026-09-30'||value.definition!==QUARTERLY_DEFINITION||!Array.isArray(value.rows)||!value.rows.length||value.rows.length>132)return null;
+ if(!value||!fields.includes(value.groupBy)||!['total','voluntary'].includes(value.metric)||!['2026-09-30','2026-10-31'].includes(value.asOf)||value.definition!==QUARTERLY_DEFINITION||!Array.isArray(value.rows)||!value.rows.length||value.rows.length>132)return null;
  const seen=new Set();
  for(const r of value.rows){
   if(!r||!/^20\d{2}-Q[1-4]$/.test(r.quarter)||typeof r.groupCode!=='string'||r.groupCode.length>50||typeof r.groupLabel!=='string'||!r.groupLabel||r.groupLabel.length>150||seen.has(r.groupCode+'|'+r.quarter))return null;

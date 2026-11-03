@@ -15,7 +15,7 @@ export function roleRecruitingComparison(catalog, responses, cutoff) {
   must(t.scope?.job_profile_code===p.code&&t.scope.business_unit===null&&t.scope.country===null&&t.period_basis==='requisition closed_date','Unsupported role scope');
   const validDate=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
   must(validDate(t.period_start)&&validDate(t.period_end)&&t.period_start<=t.period_end&&t.period_end<=cutoff,'Invalid role period');
-  must(t.period_start==='2025-10-01'&&t.period_end==='2026-09-30','Unsupported released role period');
+  must(['2026-09-30','2026-10-31'].includes(cutoff)&&t.period_start===new Date(Date.UTC(Number(cutoff.slice(0,4))-1,Number(cutoff.slice(5,7)),1)).toISOString().slice(0,10)&&t.period_end===cutoff,'Unsupported released role period');
   start??=t.period_start;end??=t.period_end;must(start===t.period_start&&end===t.period_end,'Mixed role periods');
   must(m&&Number.isSafeInteger(m.valid_sample_count)&&m.valid_sample_count>=0&&m.minimum_benchmark_sample===5,'Invalid role sample');
   const available=m.status==='historical benchmark available';

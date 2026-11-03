@@ -1,4 +1,4 @@
-import {DEMO_CUTOFF,exact} from './dataset-demo-contracts.mjs';
+import {exact} from './dataset-demo-contracts.mjs';
 import {LEGACY_PRESENTER_CONTRACT} from './dataset-presenter-contract.mjs';
 import {validateSuccessionPublicSummary} from './succession-public-contract.mjs';
 
@@ -43,7 +43,7 @@ export function createDomainPresenters({analytics,component,metadata,contract=()
   const job_profile_pathways=jobs.map(j=>({...j,pathway_coverage_pct:j.required_skill_count?round(100*j.required_skills_with_active_pathway/j.required_skill_count):0}))
    .sort((a,b)=>b.pathway_coverage_pct-a.pathway_coverage_pct||b.required_skill_count-a.required_skill_count||a.job_profile_name.localeCompare(b.job_profile_name));
   const available=skill_pathways.filter(s=>s.pathway_available).length;
-  return {as_of:DEMO_CUTOFF,summary:{current_workforce:contract().population,current_gap_skills:skill_pathways.length,gap_skills_with_active_pathway:available,
+  return {as_of:metadata().cutoff,summary:{current_workforce:contract().population,current_gap_skills:skill_pathways.length,gap_skills_with_active_pathway:available,
    gap_pathway_coverage_pct:skill_pathways.length?round(100*available/skill_pathways.length):0,active_courses_on_gap_skills:sum(skill_pathways,'active_course_count'),
    active_job_profiles:jobs.length,job_profiles_with_any_pathway:jobs.filter(j=>j.required_skills_with_active_pathway>0).length,
    fully_covered_job_profiles:jobs.filter(j=>j.required_skill_count>0&&j.required_skills_with_active_pathway===j.required_skill_count).length},
@@ -74,7 +74,7 @@ export function createDomainPresenters({analytics,component,metadata,contract=()
   const orgKeys=['org_code','org_name'],levelKeys=['level_code','level_name','level_rank'],inventoryMetrics=['current_positions','filled_positions','vacant_positions'];
   const byOrg=grouped(rows,orgKeys,inventoryMetrics),byLevel=grouped(rows,levelKeys,inventoryMetrics);
   const plannedGroups=(keys,currentGroups)=>grouped(plans,keys,planMetrics).map(r=>{const c=currentGroups.find(c=>c[keys[0]]===r[keys[0]]);must(c,'Missing current position group');return {...r,planned_fte:round(r.planned_fte),planned_labor_cost_usd:round(r.planned_labor_cost_usd,2),current_positions:c.current_positions,net_position_change:r.planned_positions-c.current_positions,...(keys===orgKeys?{vacancy_rate_pct:c.current_positions?round(100*c.vacant_positions/c.current_positions):0}:{})};});
-  return {as_of:DEMO_CUTOFF,planning_month:'2027-12-01',current:{...current,vacancy_rate_pct:current.current_positions?round(100*current.vacant_positions/current.current_positions):0,
+  return {as_of:metadata().cutoff,planning_month:'2027-12-01',current:{...current,vacancy_rate_pct:current.current_positions?round(100*current.vacant_positions/current.current_positions):0,
    by_business_unit:byOrg.sort((a,b)=>b.current_positions-a.current_positions),by_level:byLevel.sort((a,b)=>a.level_rank-b.level_rank)},
    scenarios:[{scenario_name:'Baseline',scenario_type:'draft_assumption',planning_month:'2027-12-01',totals:{...planned,planned_fte:round(planned.planned_fte),planned_labor_cost_usd:round(planned.planned_labor_cost_usd,2),current_positions:current.current_positions,net_position_change:planned.planned_positions-current.current_positions},
     by_business_unit:plannedGroups(orgKeys,byOrg).sort((a,b)=>b.net_position_change-a.net_position_change),by_level:plannedGroups(levelKeys,byLevel).sort((a,b)=>a.level_rank-b.level_rank)}],

@@ -22,7 +22,7 @@ export type CompensationResponse = {
   evidence_type: "synthetic_aggregate";
   // Fixed predicate in the existing view, inspected on 2026-10-05.
   // This is a source contract, not the time of the request or a refresh date.
-  snapshot_date: "2026-09-30";
+  snapshot_date: "2026-09-30" | "2026-10-31";
   source_refreshed_at: null;
   currency: "USD";
   cost_period: null;

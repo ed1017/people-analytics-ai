@@ -9,7 +9,6 @@ export const LOCAL_EXECUTION_ROUTES=Object.freeze(['/api/time-phased-workforce-e
 const req=(v,m)=>{if(!v)throw new PlanningRequestError(m);};
 const must=(v,m)=>{if(!v)throw Error(m);};
 const baseKeys=['actions','allocations','role_plans'];
-const first=executionMonth(DEMO_CUTOFF.slice(0,7))+1,last=first+35;
 const pickBase=b=>Object.fromEntries(baseKeys.filter(k=>Object.hasOwn(b,k)).map(k=>[k,b[k]]));
 function executionBody(path,b){
  const scheduler=path==='/api/constraint-aware-workforce-scheduler',extra=scheduler?['constraints','scheduling_assumptions']:path==='/api/workforce-response-constraints'?['schedule','constraints']:['schedule'];
@@ -20,6 +19,7 @@ function executionBody(path,b){
  return b;
 }
 export function createExecutionAdapters({planning,response,metadata,now=()=>new Date().toISOString()}){
+ const cutoff=()=>metadata().cutoff??DEMO_CUTOFF;
  const context=()=>metadata({sourceLabel:'Constructed demo conditional execution; staffing feasibility remains unassessed',independentForecastValidation:false});
  async function invoke(api,path,body){
   const r=await api.handle(new Request('http://local.invalid'+path,{method:body===undefined?'GET':'POST',...(body===undefined?{}:{headers:{'content-type':'application/json'},body:JSON.stringify(body)})})),data=await r.json();
@@ -29,15 +29,16 @@ export function createExecutionAdapters({planning,response,metadata,now=()=>new 
  async function catalog(){return invoke(planning,'/api/position-structure');}
  async function solution(raw){
   let input;try{input=validateWorkforcePlanInput(raw);}catch(e){throw new PlanningRequestError(e.message);}
-  const start=executionMonth(input.planningMonth);req(start>=first&&start+Number(input.months)-1<=last,'The candidate incremental horizon must lie within October 2026–September 2029.');
+  const first=executionMonth(cutoff().slice(0,7))+1,last=first+35;
+  const start=executionMonth(input.planningMonth);req(start>=first&&start+Number(input.months)-1<=last,'Choose a horizon within the 36 months following the workforce reporting cutoff.');
   const c=await catalog(),combinations=c.combinations.filter(r=>r.org_code===input.businessUnit&&r.job_profile_code===input.jobProfile);req(combinations.length>0,'Choose an available candidate BU-role combination.');
   const actions=[{action_type:'add_positions',business_unit:input.businessUnit,job_profile:input.jobProfile,level:null,amount:Number(input.roles),fill_pct:null}],structural=(await planning.responseContext(actions)).scenario;
   const selectedRole=structural.job_profile_impact.find(r=>r.job_profile_code===input.jobProfile),selectedDestination=structural.business_unit_job_profile_impact.find(r=>r.org_code===input.businessUnit&&r.job_profile_code===input.jobProfile);
-  must(structural.as_of===DEMO_CUTOFF&&selectedRole&&selectedDestination&&Math.abs(selectedDestination.authorized_position_delta-Number(input.roles))<1e-7,'Requested structural demand was not fully allocated');
+  must(structural.as_of===cutoff()&&selectedRole&&selectedDestination&&Math.abs(selectedDestination.authorized_position_delta-Number(input.roles))<1e-7,'Requested structural demand was not fully allocated');
   const role=await invoke(response,'/api/role-workforce-response-plan',{actions,job_profile:input.jobProfile,allocation:{build:Number(input.build),move:Number(input.move),buy:Number(input.buy),borrow:0,automate:0}}),timing=role.external_recruiting_feasibility.timing_evidence;
   let proposed,hireOnly;try{proposed=calculateWorkforceIncrement(input,timing);hireOnly=calculateWorkforceIncrement({...input,build:'0',move:'0',buy:input.roles,backfills:'0',internalAnnualCostChange:'0',trainingCash:'0',trainingHours:'0'},timing);}catch(e){throw new PlanningRequestError(e.message);}
   const costKnown=combinations.every(r=>typeof r.annual_cost_per_position_usd==='number'&&Number.isFinite(r.annual_cost_per_position_usd)&&r.annual_cost_per_position_usd>0);
-  return {version:1,calculatedAt:now(),input,source:{asOf:DEMO_CUTOFF,provenance:'constructed synthetic company aggregates; timing and costs are explicit planning assumptions',businessUnit:c.business_units.find(r=>r.org_code===input.businessUnit),jobProfile:c.job_profiles.find(r=>r.job_profile_code===input.jobProfile),data_meta:context()},structural:{actions:structural.actions,current:structural.current,modeled:structural.modeled,selectedRole,selectedDestination,authorizedAnnualBudgetDelta:costKnown?structural.modeled.authorized_budget_delta_usd:null,costBasisCoverage:costKnown?'Selected catalog combinations have stored constructed cost bases':'At least one selected cost basis is missing; the structural annual budget reference is unknown',costBasisPeriod:'Constructed Baseline December 2027 annual cost per planned position; not a salary quote'},response:role,timing,proposed,hireOnly,capacity_feasibility:{...role.capacity_feasibility},confirmed_completion_date:null,data_meta:context(),limitations:[
+  return {version:1,calculatedAt:now(),input,source:{asOf:cutoff(),provenance:'constructed synthetic company aggregates; timing and costs are explicit planning assumptions',businessUnit:c.business_units.find(r=>r.org_code===input.businessUnit),jobProfile:c.job_profiles.find(r=>r.job_profile_code===input.jobProfile),data_meta:context()},structural:{actions:structural.actions,current:structural.current,modeled:structural.modeled,selectedRole,selectedDestination,authorizedAnnualBudgetDelta:costKnown?structural.modeled.authorized_budget_delta_usd:null,costBasisCoverage:costKnown?'Selected catalog combinations have stored constructed cost bases':'At least one selected cost basis is missing; the structural annual budget reference is unknown',costBasisPeriod:'Constructed Baseline December 2027 annual cost per planned position; not a salary quote'},response:role,timing,proposed,hireOnly,capacity_feasibility:{...role.capacity_feasibility},confirmed_completion_date:null,data_meta:context(),limitations:[
    'Structural additions are authorized vacancies. Numeric conditional coverage and constraint checks do not establish assessed readiness, available movers, release approval or future hiring capacity.',
    'Blank optional timing and costs remain unknown. Entered dates and common batches are assumptions; an explicitly selected historical median is an authored-demo timing comparison, not a predicted or confirmed completion date.',
    'The proposed mix and hire-only comparison use the same stated cost/timing assumptions. They do not establish recruiting concurrency or independent forecast validation.',

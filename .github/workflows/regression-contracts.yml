@@ -42,6 +42,9 @@ jobs:
           cache: npm
 
       - run: npm ci --ignore-scripts
+      - name: Verify October periods and preserved historical inventories without provider calls
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/october-workforce-periods.test.mjs tests/public-workforce-performance.test.mjs tests/home-bu-turnover-chat.test.mjs tests/demo-company-profile.test.mjs tests/group-capacity-risk.test.mjs tests/synthetic-workforce-history-ui.test.mjs tests/synthetic-workforce-history.test.mjs
       - name: Verify scenario follow-up continuity and decision assumptions
         run: node --test tests/release-scenario-followup.test.mjs tests/release-scenario-presentation.test.mjs tests/release-scenario-save.test.mjs tests/release-scenario-planning-parity.test.mjs
       - name: Verify versioned source and public replay contracts
