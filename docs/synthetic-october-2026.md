@@ -8,7 +8,7 @@ All historical snapshots and joined workforce facts through September must remai
 
 The new snapshot requires a distinct dataset identity and coherent regenerated component, joint-cell, query and public receipts. YTD turnover uses ten monthly closing stocks. October is only one month of Q4 and must not be presented as a complete quarter. Prior survey, rating, skill and external-source dates remain explicit; lack of an October observation is not zero or newly refreshed evidence.
 
-Status: local candidate and runtime integration; not yet published. Supabase is unchanged. Production remains PR556 until review, CI and staged verification complete.
+Status: PR558 is live and publicly verified. The separate private Supabase mirror is incomplete and approval-blocked at 6/665 batches; it is not connected to the app. See the release record below.
 
 ## Reconciled October result
 
@@ -41,7 +41,7 @@ Role recruiting uses the complete November 1, 2025–October 31, 2026 closed-req
 
 The isolated PostgreSQL replay executes 62 application queries: 49 changed with the October data, 13 identical. Twenty public GET projections, fifty role recruiting responses and fifty internal-talent responses pass, including client compensation validation, retained September ratings and all eight capacity-risk groups. These checks use local pinned artifacts, no Supabase mutation, network request or paid AI call. Typechecking passes after restoring the already-packaged experiment dependencies. New regressions cover partial Q4, October stock history, old/new position inventories, saved September references and explicit period clarification. Historical explorer tests preserve original outputs.
 
-Independent review found and prompted fixes for date-dependent adapters, current scope receipt rejection, retained assessment denominators, Company profile identity and planning/AI period copy. Remaining release gates: full relevant regression suite, final independent review, exact-commit CI, staged desktop/mobile checks, merge/promotion and direct public verification. No fresh provider-answer quality is claimed; paid AI testing remains paused.
+Independent review found and prompted fixes for date-dependent adapters, current scope receipt rejection, retained assessment denominators, Company profile identity and planning/AI period copy. These originally pending release gates are now complete: full regression suite, final independent review, exact-commit CI, staged desktop/mobile checks, merge/promotion and direct public verification. No fresh provider-answer quality is claimed; paid AI testing remains paused.
 
 ## Release preparation and rollback
 
