@@ -1,14 +1,14 @@
-# Active roadmap - November 1
+# Active roadmap - November 4
 
-## Current release state - 1 November 2026
+## Current release state - 4 November 2026
 
-**Live and publicly accepted: 96/197 non-pay vacancies; 101 remain. Pay: 59/197.** PR536 passed seven direct public acceptance groups at both desktop and mobile widths at runtime `c0ba3d6ec604b22d0f2dbe86101955dd724ba5b1`, deployment `dpl_ArAgSAsFCgmywFKtp1YFvcYc6mQQ`, successful CI41289621631. PR535 (86) and PR529–533 (66,72,80,81,84) remain verified historical milestones.
+October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. Runtime `319f551c0b68acb2c283da0ead88db4061f63c52`; PR558 and completion records PR559–560 are complete. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
 
-See [release reconciliation](nonpay-release-reconciliation-2026-11-01.md), [all 197 vacancy records](data/nonpay-vacancy-coverage-2026-11-01.json) and [remaining source actions](nonpay-remaining-source-blockers-2026-11-01.md). The register retains exact IDs, source versions, modeled provenance and prior delta history. Eight Canadian NOC duty references add ten eligible vacancies while preserving all123 prior references; five Canadian vacancies still need specific primary-duty evidence.
+The latest completed external-market milestone was 108/197 non-pay and 59/197 pay against the retained September inventory. Those denominators are **not October coverage counts**. Source expansion remains paused; retained source dates and explicit duty confirmation remain binding.
 
-Coverage means an eligible conditional occupational reference, not complete market evidence, verified duties or adopted assumptions. Explicit reader duty confirmation remains required. There was **no fresh paid-model-output acceptance**; tests inspect canonical payloads and mocked responses. [International ISCO guidance assessment](nonpay-international-guidance-assessment-2026-11-01.md) adds no local coverage. No claim of global-source exhaustion is made.
+The next agreed roadmap work is October end-to-end acceptance and deterministic answer regression coverage. [Current acceptance record](october-roadmap-acceptance-2026-11-04.md) records the desktop/mobile position lifecycle and September-survey/October-turnover boundaries. No new planner engine or data model is needed for this batch. Paid provider-answer acceptance remains blocked by the exhausted cumulative API authorization; no paid calls were made.
 
-The dated sections below are historical snapshots. Their earlier coverage and next-step wording does not override this header.
+Prior layout, context-continuity, pricing and turnover fixes remain in place. User-owned Future of Work/Lab validation, overlay publication and broader feature requests remain outside this batch. The dated sections below are historical snapshots, not current queues or coverage totals.
 
 ## Historical verified milestone: France, November 1, 2026
 

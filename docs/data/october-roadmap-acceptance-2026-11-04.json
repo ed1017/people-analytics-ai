@@ -1,0 +1,74 @@
+{
+  "1440": {
+    "checks": [
+      "Fresh intro has demo entry and closes normally",
+      "Actual navigation from risk overview reaches Talent Inventory",
+      "Two October modeled software vacancies saved with explicit four-month budget and assumptions",
+      "Hire, train and redeploy alternatives saved without changing original",
+      "Explicit revision retains original alternative",
+      "Explicit tracking goal cancel changes nothing; confirm preserves original exploration",
+      "Exact copied revision target and manual measured result save through actual UI",
+      "Review result persists on reload and Track/Review Back Forward retains state",
+      "Native backup cancel/restore preserves UI-created work"
+    ],
+    "errors": [],
+    "blocked": [],
+    "documentResponses": [
+      {
+        "url": "https://www.ed-ai.app/?page=home",
+        "status": 200
+      },
+      {
+        "url": "https://www.ed-ai.app/?page=assess-evaluate",
+        "status": 200
+      },
+      {
+        "url": "https://www.ed-ai.app/?page=plan-track",
+        "status": 200
+      }
+    ],
+    "selectedRows": [
+      "\tMODEL3-BU-CORP--SWE-FRONT--L7--0002\tFrontend Software Engineer\tCorporate Services\tGermany\tVacant \u00b7 recruiting\t1",
+      "\tMODEL3-BU-DATAAI--SWE-FRONT--L4--0008\tFrontend Software Engineer\tData & AI\tCanada\tVacant \u00b7 recruiting\t1"
+    ],
+    "teardown": "drained",
+    "bridgeErrors": [],
+    "reportSha256": "ed7c9f0aaf32339ee0c1726bd4ee8fb36d18804572b2e78586c90538b64881d5"
+  },
+  "390": {
+    "checks": [
+      "Fresh intro has demo entry and closes normally",
+      "Actual navigation from risk overview reaches Talent Inventory",
+      "Two October modeled software vacancies saved with explicit four-month budget and assumptions",
+      "Hire, train and redeploy alternatives saved without changing original",
+      "Explicit revision retains original alternative",
+      "Explicit tracking goal cancel changes nothing; confirm preserves original exploration",
+      "Exact copied revision target and manual measured result save through actual UI",
+      "Review result persists on reload and Track/Review Back Forward retains state",
+      "Native backup cancel/restore preserves UI-created work"
+    ],
+    "errors": [],
+    "blocked": [],
+    "documentResponses": [
+      {
+        "url": "https://www.ed-ai.app/?page=home",
+        "status": 200
+      },
+      {
+        "url": "https://www.ed-ai.app/?page=assess-evaluate",
+        "status": 200
+      },
+      {
+        "url": "https://www.ed-ai.app/?page=plan-track",
+        "status": 200
+      }
+    ],
+    "selectedRows": [
+      "\tMODEL3-BU-CORP--SWE-FRONT--L7--0002\tFrontend Software Engineer\tCorporate Services\tGermany\tVacant \u00b7 recruiting\t1",
+      "\tMODEL3-BU-DATAAI--SWE-FRONT--L4--0008\tFrontend Software Engineer\tData & AI\tCanada\tVacant \u00b7 recruiting\t1"
+    ],
+    "teardown": "drained",
+    "bridgeErrors": [],
+    "reportSha256": "e69efa37d118d0b3f1e1a880abd624ee1410eecef541d3e20107dab7b24f8441"
+  }
+}

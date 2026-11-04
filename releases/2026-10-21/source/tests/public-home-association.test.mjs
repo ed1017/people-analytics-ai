@@ -2,10 +2,11 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {isHomeAssociationQuestion,describeHomeAssociation,readPublicHomeAssociation} from '../lib/public-home-association.server.mjs';
 import {public9037Metadata} from '../lib/public-9037-projection.mjs';import {PUBLIC_9037 as P} from '../lib/public-9037-contract.mjs';
 const digest='a'.repeat(64),hostname='people-analytics-test-ed-56dc.vercel.app',identity={datasetId:P.datasetId,token:P.token,generation:P.generation,digest};
-function fixture(){const survey={as_of:P.cutoff,data_meta:public9037Metadata(digest),summary:{engagement_respondents:80},engagement_trend:[{close_date:P.cutoff,respondents:80}],business_units:Array.from({length:8},(_,i)=>({org_code:'BU-'+i,org_name:'Demo BU-'+i,respondents:10,avg_score:3,favorable_pct:20+i}))};const attrition={as_of:P.cutoff,data_meta:public9037Metadata(digest),summary:{total_exits:80},business_units:Array.from({length:8},(_,i)=>({org_code:'BU-'+i,org_name:'Demo BU-'+i,exits:10,voluntary_turnover_ytd_pct:16-i}))};return {survey,attrition};}
+// Authored CI fixture: retained September assessment, current workforce turnover.
+function fixture(){const survey={as_of:'2026-09-30',data_meta:public9037Metadata(digest),summary:{engagement_respondents:80},engagement_trend:[{close_date:'2026-09-30',respondents:80}],business_units:Array.from({length:8},(_,i)=>({org_code:'BU-'+i,org_name:'Demo BU-'+i,respondents:10,avg_score:3,favorable_pct:20+i}))};const attrition={as_of:P.cutoff,data_meta:public9037Metadata(digest),summary:{total_exits:80},business_units:Array.from({length:8},(_,i)=>({org_code:'BU-'+i,org_name:'Demo BU-'+i,exits:10,voluntary_turnover_ytd_pct:16-i}))};return {survey,attrition};}
 async function run(data=fixture(),overrides={}){let reads=0;const result=await readPublicHomeAssociation({binding:{router:{current:()=>identity,bootstrapToken:()=>P.token},handle:async req=>{reads++;return Response.json(new URL(req.url).pathname==='/api/attrition'?data.attrition:data.survey,{headers:{'x-workforce-dataset':P.token}});}},hostname,identity,filters:{country:'all',org:'all',level:'all'},text:'is sentiment correlated with turnover',signal:new AbortController().signal,...overrides});return {...result,reads};}
 test('cross-metric intent accepts paraphrases, not simple turnover or unrelated correlations',()=>{for(const q of ['is sentiment correlated with turnover','Is engagement related to attrition?','show association between favorability and voluntary turnover'])assert.equal(isHomeAssociationQuestion(q),true);for(const q of ['What was turnover last year?','Is pay correlated with tenure?'])assert.equal(isHomeAssociationQuestion(q),false);});
-test('complete paired groups use stable codes independent of order; exact negative association and definitions',async()=>{const d=fixture();d.attrition.business_units.reverse();const r=await run(d);assert.match(r.answer,/r = -1.000/);assert.match(r.answer,/eight business units/);assert.match(r.answer,/not text sentiment/);assert.match(r.answer,/2026-01-01 through 2026-09-30/);assert.match(r.answer,/not establish statistical significance, causality/);assert.doesNotMatch(r.answer,/Demo BU|bundleDigest/);assert.equal(r.reads,2);});
+test('complete paired groups use stable codes independent of order; exact negative association and definitions',async()=>{const d=fixture();d.attrition.business_units.reverse();const r=await run(d);assert.match(r.answer,/r = -1.000/);assert.match(r.answer,/eight business units/);assert.match(r.answer,/not text sentiment/);assert.ok(r.answer.includes('2026-01-01 through '+P.cutoff));assert.match(r.answer,/engagement survey closed 2026-09-30/);assert.match(r.answer,/not establish statistical significance, causality/);assert.doesNotMatch(r.answer,/Demo BU|bundleDigest/);assert.equal(r.reads,2);});
 test('zero variance is undefined, never zero correlation',()=>{const d=fixture();d.survey.business_units.forEach(r=>r.favorable_pct=40);assert.match(describeHomeAssociation(d.survey,d.attrition).answer,/undefined/);});
 test('incomplete, duplicate, null, suppressed, mismatched dates and unmatched codes never yield coefficient',async()=>{for(const mutate of [d=>d.survey.business_units.pop(),d=>d.attrition.business_units.pop(),d=>d.attrition.business_units[0].org_code='wrong',d=>d.attrition.business_units[0].org_code='BU-1',d=>d.survey.business_units[0].suppressed=true,d=>d.attrition.business_units[0].voluntary_turnover_ytd_pct=null,d=>d.survey.engagement_trend[0].close_date='2026-06-30',d=>d.attrition.as_of='2026-08-31']){const d=fixture();mutate(d);const r=await run(d);assert.match(r.answer,/No correlation is calculated/);assert.doesNotMatch(r.answer,/r = /);}});
 test('historical, departmental, causal, individual and selected-filter questions do not silently replace scope',async()=>{for(const text of ['Is department sentiment correlated with turnover?','is HR sentiment correlated with turnover','Is engagement related to turnover last year?','Does engagement cause turnover?','Is employee sentiment correlated with turnover?']){const r=await run(fixture(),{text});assert.equal(r.reads,0);assert.match(r.answer,/not departments/);assert.doesNotMatch(r.answer,/r = /);}assert.equal((await run(fixture(),{filters:{country:'CA',org:'all',level:'all'}})).reads,0);});
@@ -15,4 +16,23 @@ test('paired-metric comparison vocabulary routes generally while unsupported qua
  for(const text of ['Compare survey favorability with voluntary turnover across business units','Contrast engagement versus attrition','Show a comparison between sentiment and turnover','Survey engagement vs turnover']){assert.equal(isHomeAssociationQuestion(text),true);const r=await run(fixture(),{text});assert.equal(r.reads,2);assert.match(r.answer,/r = -1.000/);assert.match(r.answer,/different measurement windows/);}
  for(const text of ['Compare department engagement with turnover','Does survey engagement cause turnover?','Can engagement predict turnover?','Compare engagement versus turnover in 2025','Compare engagement versus turnover for HR']){assert.equal(isHomeAssociationQuestion(text),true);const r=await run(fixture(),{text});assert.equal(r.reads,0);assert.match(r.answer,/separate evidence/);assert.doesNotMatch(r.answer,/r = /);}
  for(const text of ['Compare workforce costs','Compare staffing options','Compare engagement groups','Compare total and voluntary turnover'])assert.equal(isHomeAssociationQuestion(text),false);
+});
+
+
+test('current publication retains the September assessment and rejects a silently redated survey',async()=>{
+ assert.equal(P.cutoff,'2026-10-31');
+ const d=fixture(),before=structuredClone(d),r=await run(d);
+ assert.equal(r.reads,2);assert.match(r.answer,/r = -1.000/);
+ assert.match(r.answer,/Survey cutoff 2026-09-30; workforce cutoff 2026-10-31/);
+ assert.match(r.answer,/2026-01-01 through 2026-10-31/);
+ assert.deepEqual(d,before,'Reading must not advance or rewrite retained assessment facts');
+ for(const mutate of [
+  x=>{x.survey.as_of=P.cutoff;x.survey.engagement_trend[0].close_date=P.cutoff;},
+  x=>{x.survey.engagement_trend[0].close_date=P.cutoff;},
+  x=>{x.attrition.as_of='2026-09-30';},
+ ]){
+  const changed=fixture();mutate(changed);const unavailable=await run(changed);
+  assert.equal(unavailable.reads,2);assert.match(unavailable.answer,/No correlation is calculated/);
+  assert.doesNotMatch(unavailable.answer,/r = /);
+ }
 });
