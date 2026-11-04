@@ -2,11 +2,11 @@
 
 ## Current release state - 4 November 2026
 
-October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. Runtime `319f551c0b68acb2c283da0ead88db4061f63c52`; PR558 and completion records PR559–560 are complete. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
+October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. October data PR558 and completion records PR559-560 are complete. Current runtime a4f5effdcf4359ed16e61011bcada704e23e9611 includes the published PR562 scenario attrition follow-up repair. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
 
 The latest completed external-market milestone was 108/197 non-pay and 59/197 pay against the retained September inventory. Those denominators are **not October coverage counts**. Source expansion remains paused; retained source dates and explicit duty confirmation remain binding.
 
-The next agreed roadmap work is October end-to-end acceptance and deterministic answer regression coverage. [Current acceptance record](october-roadmap-acceptance-2026-11-04.md) records the desktop/mobile position lifecycle and September-survey/October-turnover boundaries. No new planner engine or data model is needed for this batch. Paid provider-answer acceptance remains blocked by the exhausted cumulative API authorization; no paid calls were made.
+October end-to-end acceptance and deterministic answer regression coverage are complete in PR561; [the acceptance record](october-roadmap-acceptance-2026-11-04.md) preserves desktop/mobile lifecycle and historical-period boundaries. The user subsequently authorized USD50 additional API testing. Bounded real-provider acceptance found and verified the PR562 attrition routing repair; exact occupation lookup also passed. [Live acceptance and accounting](live-ai-acceptance-2026-11-04.md) records USD1.087391 spent and USD48.912609 remaining, with historical holds unchanged. This remaining allowance is not a mandate to invent new features or claim universal answer quality. No broader unfinished implementation item was established within this batch.
 
 Prior layout, context-continuity, pricing and turnover fixes remain in place. User-owned Future of Work/Lab validation, overlay publication and broader feature requests remain outside this batch. The dated sections below are historical snapshots, not current queues or coverage totals.
 
