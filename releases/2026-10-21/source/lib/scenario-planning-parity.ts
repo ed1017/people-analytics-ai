@@ -16,6 +16,10 @@ export function offersCapacityExample(text:string){
 }
 export function scenarioRecommendationIntent(text:string){return /^(?:(?:with|under) (?:the )?(?:new|updated|current|revised) budget[, ]*)?(?:(?:which|what) (?:staffing )?option (?:would|do|should) you recommend|(?:what|which) (?:is|would be) (?:your|the) recommendation|recommend (?:a|an|the) (?:staffing )?option)[?.!]?$/i.test(text.trim());}
 export function scenarioComparisonIntent(text:string){return /^(?:please\s+)?(?:compare(?: the)?(?: staffing)? options|recalculate(?: the)?(?: staffing)? options|show(?: me)?(?: the)? staffing options|(?:how (?:would|can|could) (?:you|we) )?close(?: the| a)? \d+(?:\.\d+)? fte capacity gap(?: with a \$[\d,]+(?: USD)? budget)?)\s*[?.!]?$/i.test(text.trim());}
+/** Only bounded hypothetical follow-ups; factual dates/groups remain descriptive queries. */
+export function scenarioAssumptionDiscussionIntent(text:string){
+ return /^(?:what if (?:attrition|turnover) (?:increases?|decreases?|rises?|falls?)(?: (?:by|to) \d+(?:\.\d+)?(?:%| percent))?|what about (?:backfill|backfills|attrition|turnover))(?: (?:in|for) (?:this|the|our) (?:scenario|plan))?\s*[?.!]?$/i.test(text.trim());
+}
 export function scenarioAssumptionText(draft:BundleDraft){const w=guidedWorkloadResult(draft.inputs);return `Explicit fictional scenario: ${draft.inputs.scope.population.value}. ${draft.inputs.scope.startMonth.value} through ${swpEnd(draft)}. Incremental cash budget: $${num(draft.inputs.budget?.amount.value)} USD. Qualified capacity: ${num(w?.qualifiedAllocatedFte)} FTE; additional gap: ${num(w?.additionalFte)} FTE. All workload, internal-pool, cost and readiness inputs remain assumptions. Review the complete inputs beside this conversation. No live AI is used for these calculations.`;}
 export function scenarioRecommendation(draft:BundleDraft,result:Awaited<ReturnType<typeof compareSwpDemo>>){
  const options=swpTradeoffOptions(result.evaluation);

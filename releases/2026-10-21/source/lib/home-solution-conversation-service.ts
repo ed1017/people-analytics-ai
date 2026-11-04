@@ -8,7 +8,7 @@ import {policyEstimateTool} from './home-policy-estimate.mjs';
 import {compactPlanningInput} from './model-planning-context.mjs';
 import {modelCitationCatalog} from './model-citation-catalog.mjs';
 // @ts-expect-error Native Node tests share application source.
-import {scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
+import {scenarioAssumptionDiscussionIntent,scenarioComparisonIntent,scenarioQuestionMismatch,readScenarioChatDraft,compareScenarioForChat} from './scenario-planning-parity.ts';
 import {homeAggregateTool} from './home-aggregate-tool.mjs';
 import {turnoverInvestigationReply} from './home-turnover-investigation.mjs';
 import {businessUnitTurnoverReply} from './home-bu-turnover-chat.mjs';
@@ -128,7 +128,10 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:investigation.answer}].slice(-32);state.questions=[];
   return {requestId:request.requestId,answer:investigation.answer,charts:investigation.charts??[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
- const turnover=!runtime.staffingScenarioOnly&&!runtime.demand?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
+ // A scenario receipt is only usable with the server-resolved dataset identity.
+ const scenarioToken=runtime.scenario?.datasetToken??runtime.natural?.datasetToken;
+ const scenarioDiscussion=!!scenarioToken&&scenarioAssumptionDiscussionIntent(request.message.text)&&!!readScenarioChatDraft(request.goalContext,scenarioToken);
+ const turnover=!runtime.staffingScenarioOnly&&!runtime.demand&&!scenarioDiscussion?turnoverChatReply(request,runtime.grounding,runtime.requestTime??runtime.now?.()??new Date()):null;
  clearTurnoverChat(state);
  if(turnover){
   const {answer,chartQuestion,context}=turnover;
