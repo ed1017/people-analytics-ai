@@ -1,0 +1,132 @@
+{
+  "date": "2026-11-04",
+  "pr": 562,
+  "mergeCommit": "668ebd2b0f5470e6c86fa3f8f05a905c117ed128",
+  "runtimeCommit": "a4f5effdcf4359ed16e61011bcada704e23e9611",
+  "ci": {
+    "run": 41929498942,
+    "result": "success"
+  },
+  "deployment": "dpl_8HDScNWTA2eReKPfc8cJRkgBZ1HS",
+  "host": "people-analytics-gi5qy2n5s-ed-56dc.vercel.app",
+  "publicUrl": "https://www.ed-ai.app",
+  "archiveSha256": "e5b2440171efa91dad43664964ba7dd8f9ba37335e61f49fa38bd93ae59118c3",
+  "rollbackDeployment": "dpl_4JiYtBmiQwn5yW9BNoRM1eCqFwJ9",
+  "dataset": "workforce-demo-9037-public-aggregates-v5:6",
+  "privateInputsChanged": false,
+  "databaseChanged": false,
+  "budgetConfigChanged": false,
+  "spending": {
+    "unit": "microUSD",
+    "baselineAt": "2026-11-04T22:40:13.51651Z",
+    "baselineSettled": 20726833,
+    "baselineHeld": 9600034,
+    "additionalAuthorized": 50000000,
+    "observedAt": "2026-11-04T23:15:10.582233Z",
+    "settled": 21814224,
+    "held": 9600034,
+    "incrementalCharged": 1087391,
+    "incrementalUnsettledHeld": 0,
+    "additionalRemaining": 48912609,
+    "providerReceipts": 7
+  },
+  "live": [
+    {
+      "name": "live-ai-20261104-backfill",
+      "requestId": "f434753c-601d-460c-b189-816d25e40fc8",
+      "usage": {
+        "modelRounds": 1,
+        "toolCalls": 0
+      },
+      "responseSha256": "7f6bf7a62b6888ae75a8c524bbfe8ef8976c63777c5b2fb3ecf095459046337a"
+    },
+    {
+      "name": "live-ai-20261104-attrition-r2",
+      "requestId": "b665c8f6-bab5-4084-a64b-ffa470454a78",
+      "usage": {
+        "modelRounds": 0,
+        "toolCalls": 0
+      },
+      "responseSha256": "a3bd06a175e5bdc24968fb719d650d08ded1ce532c2896ea964943ac86cc4cf2"
+    },
+    {
+      "name": "live-ai-20261104-market-r4",
+      "requestId": "f93fcdeb-a325-4715-9f04-c7585fa01f48",
+      "usage": {
+        "modelRounds": 2,
+        "toolCalls": 1
+      },
+      "responseSha256": "113bfd22e7ec2775f4fc716e1d3344971bdcc59b090915a738be83e04c2f10c2"
+    },
+    {
+      "name": "live-ai-20261104-occupation",
+      "requestId": "b29590a3-9b21-4d67-a226-fa35b9ecd69c",
+      "usage": {
+        "modelRounds": 2,
+        "toolCalls": 1
+      },
+      "responseSha256": "9814dfe9f21f2cce1558d433cea066084161fb3947ee4bf414a197d03553d6bf"
+    },
+    {
+      "name": "live-ai-20261104-attrition-stage-api",
+      "requestId": "7c40b358-eda9-4c37-a66c-0fb7962e6729",
+      "usage": {
+        "modelRounds": 1,
+        "toolCalls": 0
+      },
+      "responseSha256": "36cc731eb4ff18cb512fa699fd82b51114f72c8f98939e861a976e7956f8e372"
+    },
+    {
+      "name": "live-ai-20261104-attrition-public-click",
+      "requestId": "24b74a32-365e-49da-94e2-2d4c9b7d6a10",
+      "usage": {
+        "modelRounds": 1,
+        "toolCalls": 0
+      },
+      "responseSha256": "a93416e6c106a166902721d6fa2f95497483032b67a99ad7ba290dcb0131f9ee"
+    }
+  ],
+  "browser": [
+    {
+      "width": 1440,
+      "checks": [
+        "Recorded recruiting hires and offers show their October 2026 period",
+        "Both ordinary follow-ups retain the exact calculated draft, selection, input key and dataset in local-only mocked requests",
+        "Pending and canceled assumption edits do not replace accepted scenario context",
+        "Accepted edits change the input key and clear selection until explicit recalculation and reselection",
+        "Reload restores full continued scenario context and unsent draft",
+        "Reviewed save preserves the exact saved goal; General exploration starts without consumed scenario context",
+        "Conversation reset does not restore a cleared scenario receipt",
+        "Separate position planner save and source switching retain its allocation records"
+      ],
+      "mockedRequests": 5,
+      "realProviderCalls": 0,
+      "errors": [],
+      "reportSha256": "715df953523f0d4a0394a1b46a0fc4bf9c7222c0f443a4f580011b7e8a2d9378"
+    },
+    {
+      "width": 390,
+      "checks": [
+        "Recorded recruiting hires and offers show their October 2026 period",
+        "Both ordinary follow-ups retain the exact calculated draft, selection, input key and dataset in local-only mocked requests",
+        "Pending and canceled assumption edits do not replace accepted scenario context",
+        "Accepted edits change the input key and clear selection until explicit recalculation and reselection",
+        "Reload restores full continued scenario context and unsent draft",
+        "Reviewed save preserves the exact saved goal; General exploration starts without consumed scenario context",
+        "Conversation reset does not restore a cleared scenario receipt",
+        "Separate position planner save and source switching retain its allocation records"
+      ],
+      "mockedRequests": 5,
+      "realProviderCalls": 0,
+      "errors": [],
+      "reportSha256": "d4ec08facf3bca4876e1c3bc24e52d0c7acf967c6adc056932c537021fb6429f"
+    }
+  ],
+  "limitations": [
+    "Bounded tested answers, not universal provider correctness",
+    "Candidate real test used captured UI payload via authenticated HTTP after protected browser transport readiness delays",
+    "Public repaired flow exercised actual mobile UI and provider",
+    "No attrition calculator or automatic assumption/save mutation added",
+    "Unapproved company-role label remains unavailable; exact occupation lookup succeeded"
+  ]
+}
