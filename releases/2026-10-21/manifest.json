@@ -3954,8 +3954,8 @@
     },
     {
       "path": "tests/public-home-association.test.mjs",
-      "sha256": "33205b7f1f900b9174830bc2a39517cb2807f1e2b1c8a0e9f606045017926e50",
-      "bytes": 5456
+      "sha256": "e565cb18498e0996fab8e823aec51fd4fb579952923a2802435e43232e507294",
+      "bytes": 6563
     },
     {
       "path": "tests/public-home-consumers.test.mjs",
