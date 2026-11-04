@@ -2,7 +2,7 @@
 
 ## Current release state - 4 November 2026
 
-October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. Runtime `319f551c0b68acb2c283da0ead88db4061f63c52`; PR558 and completion records PR559–560 are complete. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
+October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. October data PR558 and completion records PR559-560 are complete. Current runtime a4f5effdcf4359ed16e61011bcada704e23e9611 includes the published PR562 scenario attrition follow-up repair. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
 
 The latest completed external-market milestone was 108/197 non-pay and 59/197 pay against the retained September inventory. Those denominators are **not October coverage counts**. Source expansion remains paused; retained source dates and explicit duty confirmation remain binding.
 
