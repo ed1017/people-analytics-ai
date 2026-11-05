@@ -5839,8 +5839,8 @@
     },
     {
       "path": "components/opening-known-hiring-demo.tsx",
-      "bytes": 5372,
-      "sha256": "4562cd68cb7fed1939c6670b886eb54da53f2b5fdbbbda8bee5ddf69b48b70a4"
+      "bytes": 5451,
+      "sha256": "06460f6e8db25711b420cf1d9b8ff42fb77de56367e7383241b11b83b07f6a42"
     },
     {
       "path": "lib/opening-known-hiring-demo.ts",

@@ -1,6 +1,6 @@
 import {openingKnownReport as report,openingFamilyLabels,openingMethodLabels} from '@/lib/opening-known-hiring-demo';
 import {predictionPercent} from '@/lib/hiring-prediction-demo';
-type Metrics=(typeof report.families)[number]['methods']['logistic-features'];
+type Metrics={openings:number;tp:number;fp:number;fn:number;tn:number;accuracy:number|null;precision:number|null;recall:number|null;specificity:number|null};
 function Matrix({m,label}:{m:Metrics;label:string}){return <div className="min-w-0 rounded border p-3"><h5 className="font-medium">{label}</h5><table className="w-full table-fixed text-left text-xs"><caption className="py-2 text-left">Confusion matrix — {m.openings.toLocaleString('en-US')} simulated openings</caption><thead><tr><th scope="col">Actual / Predicted</th><th scope="col">Start by day 90</th><th scope="col">No start by day 90</th></tr></thead><tbody><tr><th scope="row" className="py-2">Start by day 90</th><td>TP {m.tp}</td><td>FN {m.fn}</td></tr><tr><th scope="row" className="py-2">No start by day 90</th><td>FP {m.fp}</td><td>TN {m.tn}</td></tr></tbody></table><p className="mt-2 text-xs">Accuracy {predictionPercent(m.accuracy)} · Precision {predictionPercent(m.precision)} · Recall {predictionPercent(m.recall)} · Specificity {predictionPercent(m.specificity)}</p></div>;}
 export function OpeningKnownHiringDemo({showMatrices=false}:{showMatrices?:boolean}){
  return <section aria-label="Synthetic hiring prediction" data-opening-known-hiring-demo className="min-w-0 space-y-3 text-sm">
