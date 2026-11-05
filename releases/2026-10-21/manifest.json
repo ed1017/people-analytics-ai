@@ -5064,8 +5064,8 @@
     },
     {
       "path": "tests/exploration-issue-starters.test.mjs",
-      "sha256": "c440d82d0fed7883643e3f3fbed4712c16832b033ded5c77eb84f334d9fefb12",
-      "bytes": 2157
+      "sha256": "b9b50f75241052b1907dbd06c86f69bd95f1fdefdf686872822d0e2510e2b1fa",
+      "bytes": 2278
     },
     {
       "path": "components/home-workforce-kpi-targets.tsx",
