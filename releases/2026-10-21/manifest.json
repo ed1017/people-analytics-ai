@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "6a2bbfde3cd20fafafbe91915664dde753d8df9f19e42e027359c887f30f094b",
-      "bytes": 115616
+      "sha256": "b1042ef704819bb76c808410fa0d10292a7e13d96b323e60c7d3a2c84e5265b4",
+      "bytes": 115757
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -5824,8 +5824,8 @@
     },
     {
       "path": "components/hiring-prediction-demo.tsx",
-      "bytes": 6370,
-      "sha256": "96d59760ea16302bef1d26a6f285648b188ab9643587c18b8c2c0bb51e2b95ad"
+      "bytes": 6443,
+      "sha256": "d8404db6a1b3f98d8e2021b6c8c7c173d268f21cd99d17cdff1eeeb9297cd1f6"
     },
     {
       "path": "lib/data/explore-hiring-classifier-v1.json",
@@ -5834,8 +5834,8 @@
     },
     {
       "path": "lib/hiring-prediction-demo.ts",
-      "bytes": 6244,
-      "sha256": "95d7b2b5a31c8cfd236f0087db9dfb450d58f7d32c00702df8d46e5da8f195a3"
+      "bytes": 7294,
+      "sha256": "db8c7839784ba041fb2c97312cda5a7e58c8e43a2b756522bc6cc8b0188df1d2"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
