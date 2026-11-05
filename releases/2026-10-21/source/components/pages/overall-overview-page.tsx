@@ -1,4 +1,6 @@
 "use client";
+import {hiringPredictionAnswer,localHiringPredictionReply} from '@/lib/hiring-prediction-demo';
+import {HiringPredictionDemo} from '@/components/hiring-prediction-demo';
 import {newMarketChatMessage,readMarketChatState,changeMarketChatMessage,marketChatFollowup,canAskMarketQuestion} from '@/lib/market-chat-message';
 import {HomeMarketContextExplorer} from '@/components/home-market-context-explorer';
 import {PlannerResultsProvider} from '@/components/planner-results';
@@ -380,6 +382,13 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   async function send(question = input, actionPlan = false, scopeConfirmed = false, preserveDraft=false, retainGoalContext=false, responseIntent:'default'|'explanation'|'alternative'='default',starter?:HomeStarterGoal,onAnswered?:()=>void, keepComposer=false) {
     if (actionPlan && (!planRequest || input.trim())) return;
     const message = (actionPlan ? planRequest! : question).trim();
+    // A versioned local experiment is never a plan mutation or a provider request.
+    const localPredictionReply=!actionPlan?localHiringPredictionReply(message,messages.at(-1)?.role==='assistant'?messages.at(-1)?.content:undefined):null;
+    if(localPredictionReply){
+      if(!active||!conversation.storageReady||!conversation.saved||chatLoading||sending.current||conversation.issueEditor)return;
+      setMessages(current=>[...current,{role:'user',content:message},{role:'assistant',content:localPredictionReply}]);setChatError(null);
+      if(!keepComposer)setInput(current=>current.trim()===message?'':current);return;
+    }
     if(marketFollowup?.workspace===marketWorkspace&&!marketQuestionCurrent()){setMarketFollowup(null);setChatError('The selected market or planning context changed. Choose the market again. Your draft is kept.');return;}
     if(!actionPlan&&!selectedMarketMessage&&riskRequest?.context===contextKey&&active&&!chatLoading&&!sending.current){
       const reply=riskCommand.current?.(message)??(isGroupStaffingFollowup(message)?'The trend controls are still loading. Ask again when they appear; your current question and assumptions are kept.':null);
@@ -719,7 +728,7 @@ export function OverallOverviewPage({ overviewEntry=false, renderWelcome, render
   const marketMessagesRef=useRef(messages);marketMessagesRef.current=messages;
   function marketQuestionCurrent(){return marketWorkspaceRef.current===marketWorkspace&&canAskMarketQuestion({selectedPlan:selectedPlanForChat.current,demand:demandContext.current,model:swpModelContext.current,positions:sharedPlannerSource==='positions',scenarioChat})&&marketMessagesRef.current.some(m=>m.marketInsights?.id===marketFollowup?.id&&JSON.stringify(m.marketInsights)===marketFollowup?.signature);}
   function openMarketChat(){if(!active||!conversation.storageReady||!conversation.saved)return;const id=crypto.randomUUID();setMessages(current=>[...current,newMarketChatMessage(id)]);requestAnimationFrame(()=>{const card=conversationViewport.current?.querySelector<HTMLElement>(`[data-market-chat-message="${id}"]`);card?.scrollIntoView({block:'nearest'});card?.querySelector('select')?.focus();});}
-  function renderMarketMessage(message:ChatMessage){const value=readMarketChatState(message.marketInsights);if(!value)return null;const workspace=marketWorkspace;return <div data-market-chat-message={value.id}><HomeMarketContextExplorer value={value} onChange={next=>{if(!active||!conversation.saved||workspace!==marketWorkspaceRef.current)return;setMessages(current=>changeMarketChatMessage(current,value.id,value,next));}} onAsk={marketFollowupAllowed?()=>{if(workspace!==marketWorkspaceRef.current||!canAskMarketQuestion({selectedPlan:selectedPlanForChat.current,demand:demandContext.current,model:swpModelContext.current,positions:sharedPlannerSource==='positions',scenarioChat}))return;setMarketFollowup({workspace,id:value.id,signature:JSON.stringify(value)});focusQuestion();}:undefined}/></div>;}
+  function renderMarketMessage(message:ChatMessage){if(message.role==='assistant'&&message.content===hiringPredictionAnswer)return <HiringPredictionDemo/>;const value=readMarketChatState(message.marketInsights);if(!value)return null;const workspace=marketWorkspace;return <div data-market-chat-message={value.id}><HomeMarketContextExplorer value={value} onChange={next=>{if(!active||!conversation.saved||workspace!==marketWorkspaceRef.current)return;setMessages(current=>changeMarketChatMessage(current,value.id,value,next));}} onAsk={marketFollowupAllowed?()=>{if(workspace!==marketWorkspaceRef.current||!canAskMarketQuestion({selectedPlan:selectedPlanForChat.current,demand:demandContext.current,model:swpModelContext.current,positions:sharedPlannerSource==='positions',scenarioChat}))return;setMarketFollowup({workspace,id:value.id,signature:JSON.stringify(value)});focusQuestion();}:undefined}/></div>;}
   const conversationPanel=(
     <section hidden={messages.length===0&&!chatError&&!chatLoading} aria-label="Overview conversation" className="space-y-3">
       {selectedMarketMessage&&<p role="status" className="text-sm">Next question: {selectedMarketMessage.marketInsights?.role} in {selectedMarketMessage.marketInsights?.country==='US'?'United States':'United Kingdom'}</p>}

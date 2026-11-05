@@ -1,0 +1,320 @@
+{
+  "version": "explore-hiring-classifier-v1",
+  "protocolCommit": "37c308d7",
+  "protocol": {
+    "version": "explore-hiring-classifier-v1",
+    "dataClass": "constructed-synthetic",
+    "generator": "tests/fixtures/hiring-cohort-generator.mjs",
+    "model": "lib/ml/hiring-cohort-model.mjs",
+    "seeds": [
+      90201,
+      90202,
+      90203,
+      90204,
+      90205,
+      90206,
+      90207,
+      90208,
+      90209,
+      90210,
+      90211,
+      90212,
+      90213,
+      90214,
+      90215,
+      90216,
+      90217,
+      90218,
+      90219,
+      90220
+    ],
+    "families": [
+      "stationary",
+      "gradual-improvement",
+      "assessment-reversal"
+    ],
+    "origin": "2025-01-01T00:00:00.000Z",
+    "testMonths": [
+      "2025-01",
+      "2025-02",
+      "2025-03"
+    ],
+    "scoreThrough": "2025-07-01T00:00:00.000Z",
+    "positiveLabel": "Actual start within 90 days",
+    "negativeLabel": "No actual start within 90 days",
+    "threshold": 0.5,
+    "thresholdRule": "Predict positive when probability is greater than or equal to 0.5. Fixed before evaluation; not optimized for an operational cost.",
+    "methods": [
+      "logistic-trend",
+      "recent-3-fraction"
+    ],
+    "selection": "No model selection, seed selection, threshold tuning or test-driven changes. Report both methods and all three families, including failures. Existing model penalties and generator rules remain unchanged.",
+    "evaluation": "Fit only mature released cohorts available at origin, predict the three later test cohorts, then obtain labels. Sum exact opening counts into confusion matrices. Each cohort shares one prediction; counts are not independent individual predictions. Report class support, precision, recall, specificity, accuracy, balanced accuracy, Brier and log loss. Undefined metrics remain null.",
+    "limits": "New fixed seeds, known planted mechanisms: chronological synthetic holdout, not blinded real-world validation. No employee scoring, operational qualification, causal effect, capacity gain or confidence interval. Keep the separate October company dataset and existing frozen experiments unchanged. Do not present these 2025 test dates as current forecasts."
+  },
+  "files": {
+    "docs/explore-hiring-classifier-protocol.json": "1d9c83b9307b2102728dbfb1ca3f86daf616d5b2d96e54f3fd106f493ed1077a",
+    "lib/ml/hiring-classifier-evaluation.mjs": "192d55def4b52eaf035f1209b439daefcdc849f46aa4cab77dd00f22c10be92d",
+    "lib/ml/hiring-cohort-model.mjs": "ad97373995549b7936da22186397ec2e6a499193f399b816be21c0a44d6a9a64",
+    "lib/ml/hiring-domain-adapter.mjs": "48e3ac56b960088d42ad22331a29ad32d974515a864b77dbd7fa279d8152dd07",
+    "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
+    "tests/fixtures/hiring-cohort-generator.mjs": "78e5f0ac536010bd0ee7f7c22f75c9c1b90ae6dcd6ff286236b61b387190a1fc",
+    "tests/fixtures/predictive-readiness.mjs": "7196da3d462913742a7f8d20c352deadd3272f9f4827e05eaf721b97995eef5e",
+    "tests/manual/generate-explore-hiring-classifier.mjs": "98a6d130d4d0091b13e80112f5d0bfbfd723aaa2349f284dee16848bf90958cc"
+  },
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false,
+  "interval": null,
+  "families": [
+    {
+      "family": "stationary",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2159,
+          "tn": 3041,
+          "brierSum": 1262.3382810424873,
+          "logLossSum": 3528.666062195546,
+          "openings": 5200,
+          "positives": 2159,
+          "negatives": 3041,
+          "accuracy": 0.5848076923076924,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.24275736173893986,
+          "logLoss": 0.6785896273452974
+        },
+        "recent-3-fraction": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2159,
+          "tn": 3041,
+          "brierSum": 1266.4374853536224,
+          "logLossSum": 3536.935026446668,
+          "openings": 5200,
+          "positives": 2159,
+          "negatives": 3041,
+          "accuracy": 0.5848076923076924,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.24354567026031199,
+          "logLoss": 0.6801798127782054
+        }
+      },
+      "example": {
+        "seed": 90201,
+        "predictions": [
+          {
+            "month": "2025-01",
+            "pooled-fraction": 0.42670299727520433,
+            "recent-3-fraction": 0.3675889328063241,
+            "logistic-trend": 0.43644727985070536
+          },
+          {
+            "month": "2025-02",
+            "pooled-fraction": 0.42670299727520433,
+            "recent-3-fraction": 0.3675889328063241,
+            "logistic-trend": 0.4368327024352958
+          },
+          {
+            "month": "2025-03",
+            "pooled-fraction": 0.42670299727520433,
+            "recent-3-fraction": 0.3675889328063241,
+            "logistic-trend": 0.43721820132084716
+          }
+        ],
+        "actual": [
+          {
+            "month": "2025-01",
+            "openings": 97,
+            "started": 36
+          },
+          {
+            "month": "2025-02",
+            "openings": 73,
+            "started": 34
+          },
+          {
+            "month": "2025-03",
+            "openings": 90,
+            "started": 35
+          }
+        ]
+      }
+    },
+    {
+      "family": "gradual-improvement",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 3258,
+          "fp": 1942,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1217.6806307254076,
+          "logLossSum": 3438.0450033696525,
+          "openings": 5200,
+          "positives": 3258,
+          "negatives": 1942,
+          "accuracy": 0.6265384615384615,
+          "precision": 0.6265384615384615,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.23416935206257838,
+          "logLoss": 0.6611625006480101
+        },
+        "recent-3-fraction": {
+          "tp": 3258,
+          "fp": 1942,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1227.307222421847,
+          "logLossSum": 3457.8741475316747,
+          "openings": 5200,
+          "positives": 3258,
+          "negatives": 1942,
+          "accuracy": 0.6265384615384615,
+          "precision": 0.6265384615384615,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.23602061969650903,
+          "logLoss": 0.6649757976022451
+        }
+      },
+      "example": {
+        "seed": 90201,
+        "predictions": [
+          {
+            "month": "2025-01",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.6297563374043227
+          },
+          {
+            "month": "2025-02",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.637921639893996
+          },
+          {
+            "month": "2025-03",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.6460080885854909
+          }
+        ],
+        "actual": [
+          {
+            "month": "2025-01",
+            "openings": 97,
+            "started": 55
+          },
+          {
+            "month": "2025-02",
+            "openings": 73,
+            "started": 53
+          },
+          {
+            "month": "2025-03",
+            "openings": 90,
+            "started": 56
+          }
+        ]
+      }
+    },
+    {
+      "family": "assessment-reversal",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 1422,
+          "fp": 3778,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1668.0444919966938,
+          "logLossSum": 4358.4127302272655,
+          "openings": 5200,
+          "positives": 1422,
+          "negatives": 3778,
+          "accuracy": 0.2734615384615385,
+          "precision": 0.2734615384615385,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.32077778692244113,
+          "logLoss": 0.8381562942744741
+        },
+        "recent-3-fraction": {
+          "tp": 1422,
+          "fp": 3778,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1554.7854832914122,
+          "logLossSum": 4121.946375778639,
+          "openings": 5200,
+          "positives": 1422,
+          "negatives": 3778,
+          "accuracy": 0.2734615384615385,
+          "precision": 0.2734615384615385,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.2989972083252716,
+          "logLoss": 0.792681995342046
+        }
+      },
+      "example": {
+        "seed": 90201,
+        "predictions": [
+          {
+            "month": "2025-01",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.6297563374043227
+          },
+          {
+            "month": "2025-02",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.637921639893996
+          },
+          {
+            "month": "2025-03",
+            "pooled-fraction": 0.4141689373297003,
+            "recent-3-fraction": 0.5810276679841897,
+            "logistic-trend": 0.6460080885854909
+          }
+        ],
+        "actual": [
+          {
+            "month": "2025-01",
+            "openings": 97,
+            "started": 20
+          },
+          {
+            "month": "2025-02",
+            "openings": 73,
+            "started": 23
+          },
+          {
+            "month": "2025-03",
+            "openings": 90,
+            "started": 18
+          }
+        ]
+      }
+    }
+  ],
+  "reportSha256": "ea6a7233f1f4321561ec4b594e257f9a73c374c4be8853c73f5029dae31e0700"
+}
