@@ -216,7 +216,8 @@
           "first_inserted": "2026-09-28 02:04:39.68686+00",
           "last_inserted": "2026-09-28 02:04:39.68686+00"
         }
-      ]
+      ],
+      "interpretation": "Legacy COUNT(*) is after a hires join; returned mature_requisitions alias is not verified distinct requisition grain. Status counts overlap. Do not use as model class counts."
     }
   ]
 }
