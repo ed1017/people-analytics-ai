@@ -1,0 +1,18 @@
+{
+  "version": "hiring-blend-holdout-v1",
+  "dataClass": "constructed-synthetic",
+  "seedStart": 91301,
+  "seedCount": 30,
+  "families": ["stationary", "gradual-improvement", "assessment-reversal"],
+  "origin": "2025-01-01T00:00:00.000Z",
+  "testMonths": ["2025-01", "2025-02", "2025-03"],
+  "scoreThrough": "2025-07-01T00:00:00.000Z",
+  "methods": ["pooled-fraction", "recent-3-fraction", "logistic-trend", "equal-blend"],
+  "candidate": "equal-blend",
+  "baseline": "recent-3-fraction",
+  "blend": "Arithmetic mean of logistic-trend and recent-3-fraction probabilities; fixed weight 0.5, no fitting or selection.",
+  "threshold": 0.5,
+  "gate": "Candidate must have strictly lower aggregate Brier and log loss than recent-3-fraction in EVERY family, and no lower balanced accuracy in any family. This descriptive synthetic robustness gate is necessary, not operational qualification or statistical significance.",
+  "custody": "Commit this protocol and evaluator before generating assessment labels. Freeze predictions from mature released origin data before retrieving scoring snapshots. No tuning, seed selection, generator changes or hidden family-specific model selection. Preserve every case and failure. Earlier v1 assessment is development evidence and is not untouched.",
+  "limits": "Fresh simulated histories with known generating mechanisms and later chronological test cohorts; not blind mechanisms, real company data, independent employee observations or individual risk scores. No confidence interval or causal claim. If gate fails, preserve live demo and publish research only. Passing does not establish a meaningful classifier improvement or authorize operational use."
+}

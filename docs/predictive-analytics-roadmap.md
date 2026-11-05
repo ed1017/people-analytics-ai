@@ -8,6 +8,8 @@ Inspected 2026-10-05, using repository contracts plus [read-only Supabase schema
 
 ## Sequence and method distinctions
 
+Follow-up [blend assessment](hiring-blend-assessment.md) tested a prespecified conservative alternative on 90 fresh synthetic histories. It failed the all-family probability-error gate and retained 50% balanced accuracy, so no model was promoted. The next useful option is qualification of existing opening-known features and complete outcome history, rather than tuning against these now-visible assessment results. A richer synthetic generator is a separate design option, not a demonstrated improvement.
+
 | Order / use case | Available support | Essential next evidence | Method status |
 | --- | --- | --- | --- |
 | 1. Aggregate voluntary exits | 33 snapshot months, 32 event-bearing monthly exit counts after excluding Jan 2024's unverified join zero. | Completion/generator evidence and as-known historical vintages; a rate also needs a correct exposure denominator. | Implemented conditional synthetic count demo: recent mean and seasonal baselines plus genuinely fitted exponential smoothing. Baseline wins development selection. |
