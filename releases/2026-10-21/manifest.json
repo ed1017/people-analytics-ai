@@ -444,8 +444,8 @@
     },
     {
       "path": "components/goal-conversation-messages.tsx",
-      "sha256": "1b8b6c54d3db12ed432fd0a8a1d6492b83a21ae8df02a52a51cccbd8e02d2829",
-      "bytes": 4053
+      "sha256": "83bc7f5f41c1005aeb0bc93e890d3aabd3ef82c40216d4557574de166b60a1c5",
+      "bytes": 4077
     },
     {
       "path": "components/goal-progress-entry-review.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "4794e34a753584375e0c2ac9d7857db717653ac137c165f18ea07c229f445191",
-      "bytes": 114712
+      "sha256": "b1042ef704819bb76c808410fa0d10292a7e13d96b323e60c7d3a2c84e5265b4",
+      "bytes": 115757
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "ba30c5c9204a2cf0a17aaa42af26484ce0a1a2e7174bc8c093a889e5eaab034c",
-      "bytes": 46047
+      "sha256": "95c77e37dc9109bd83296b9437dd5a6dfb3727b2fa1095c32ad7ac38093051c7",
+      "bytes": 46253
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -4104,13 +4104,13 @@
     },
     {
       "path": "lib/home-prompt-categories.ts",
-      "sha256": "2d900d9b721ee677f43b79a9817cf64896ccc9ad355aacd44934333fc7887ae5",
-      "bytes": 940
+      "sha256": "f5ea77533d451761949fab3c76aef7a11aef09ffe57f4687f3a842bea80952e4",
+      "bytes": 1097
     },
     {
       "path": "tests/home-prompt-categories.test.mjs",
-      "sha256": "a21c56fa1e323579d8d93f1b809e001d99982f4f94b4644a9e53e4c6c520fdf0",
-      "bytes": 2976
+      "sha256": "cf57f0f59a075dbdf5f1d67d72552e758949be92959a9011602f159591c59116",
+      "bytes": 2994
     },
     {
       "path": "components/chart-pointer-tooltip.tsx",
@@ -5064,8 +5064,8 @@
     },
     {
       "path": "tests/exploration-issue-starters.test.mjs",
-      "sha256": "c440d82d0fed7883643e3f3fbed4712c16832b033ded5c77eb84f334d9fefb12",
-      "bytes": 2157
+      "sha256": "b9b50f75241052b1907dbd06c86f69bd95f1fdefdf686872822d0e2510e2b1fa",
+      "bytes": 2278
     },
     {
       "path": "components/home-workforce-kpi-targets.tsx",
@@ -5379,8 +5379,8 @@
     },
     {
       "path": "tests/home-market-context-explorer.test.mjs",
-      "sha256": "6664cc2432b6f19dda1b0d6c1b0f6913a19d4ba670315df5239df7401c0eb445",
-      "bytes": 9414
+      "sha256": "d1f9f0f32e5e8dbadfb376636435c788c2e98743560751f03c7c282b983172c0",
+      "bytes": 9530
     },
     {
       "path": "lib/data/it-systems-nonpay-mapping-v1.json",
@@ -5821,6 +5821,21 @@
       "path": "tests/october-workforce-periods.test.mjs",
       "sha256": "a6a678e13a5bdd0896a384df641d5fee30358440ad9b4e63a0c23c6717d8f7c2",
       "bytes": 3640
+    },
+    {
+      "path": "components/hiring-prediction-demo.tsx",
+      "bytes": 6455,
+      "sha256": "7255cdb1b74b292017b94480dd3d58d07c698b6fce2618d26203424b9120d738"
+    },
+    {
+      "path": "lib/data/explore-hiring-classifier-v1.json",
+      "bytes": 10187,
+      "sha256": "3f7718216b8430ab830b4b5645fdceb8cf71e85a0c01d56e892eeddcbb4c5e6c"
+    },
+    {
+      "path": "lib/hiring-prediction-demo.ts",
+      "bytes": 7294,
+      "sha256": "db8c7839784ba041fb2c97312cda5a7e58c8e43a2b756522bc6cc8b0188df1d2"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

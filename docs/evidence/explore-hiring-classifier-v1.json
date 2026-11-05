@@ -1,0 +1,4525 @@
+{
+  "version": "explore-hiring-classifier-v1",
+  "protocolCommit": "37c308d7",
+  "protocol": {
+    "version": "explore-hiring-classifier-v1",
+    "dataClass": "constructed-synthetic",
+    "generator": "tests/fixtures/hiring-cohort-generator.mjs",
+    "model": "lib/ml/hiring-cohort-model.mjs",
+    "seeds": [
+      90201,
+      90202,
+      90203,
+      90204,
+      90205,
+      90206,
+      90207,
+      90208,
+      90209,
+      90210,
+      90211,
+      90212,
+      90213,
+      90214,
+      90215,
+      90216,
+      90217,
+      90218,
+      90219,
+      90220
+    ],
+    "families": [
+      "stationary",
+      "gradual-improvement",
+      "assessment-reversal"
+    ],
+    "origin": "2025-01-01T00:00:00.000Z",
+    "testMonths": [
+      "2025-01",
+      "2025-02",
+      "2025-03"
+    ],
+    "scoreThrough": "2025-07-01T00:00:00.000Z",
+    "positiveLabel": "Actual start within 90 days",
+    "negativeLabel": "No actual start within 90 days",
+    "threshold": 0.5,
+    "thresholdRule": "Predict positive when probability is greater than or equal to 0.5. Fixed before evaluation; not optimized for an operational cost.",
+    "methods": [
+      "logistic-trend",
+      "recent-3-fraction"
+    ],
+    "selection": "No model selection, seed selection, threshold tuning or test-driven changes. Report both methods and all three families, including failures. Existing model penalties and generator rules remain unchanged.",
+    "evaluation": "Fit only mature released cohorts available at origin, predict the three later test cohorts, then obtain labels. Sum exact opening counts into confusion matrices. Each cohort shares one prediction; counts are not independent individual predictions. Report class support, precision, recall, specificity, accuracy, balanced accuracy, Brier and log loss. Undefined metrics remain null.",
+    "limits": "New fixed seeds, known planted mechanisms: chronological synthetic holdout, not blinded real-world validation. No employee scoring, operational qualification, causal effect, capacity gain or confidence interval. Keep the separate October company dataset and existing frozen experiments unchanged. Do not present these 2025 test dates as current forecasts."
+  },
+  "files": {
+    "docs/explore-hiring-classifier-protocol.json": "1d9c83b9307b2102728dbfb1ca3f86daf616d5b2d96e54f3fd106f493ed1077a",
+    "lib/ml/hiring-classifier-evaluation.mjs": "192d55def4b52eaf035f1209b439daefcdc849f46aa4cab77dd00f22c10be92d",
+    "lib/ml/hiring-cohort-model.mjs": "ad97373995549b7936da22186397ec2e6a499193f399b816be21c0a44d6a9a64",
+    "lib/ml/hiring-domain-adapter.mjs": "48e3ac56b960088d42ad22331a29ad32d974515a864b77dbd7fa279d8152dd07",
+    "lib/ml/predictive-readiness.ts": "ae0ef0f265afa1bb0ce447912aff1d4a9339570708022d7ff62eed7454754de7",
+    "tests/fixtures/hiring-cohort-generator.mjs": "78e5f0ac536010bd0ee7f7c22f75c9c1b90ae6dcd6ff286236b61b387190a1fc",
+    "tests/fixtures/predictive-readiness.mjs": "7196da3d462913742a7f8d20c352deadd3272f9f4827e05eaf721b97995eef5e",
+    "tests/manual/generate-explore-hiring-classifier.mjs": "98a6d130d4d0091b13e80112f5d0bfbfd723aaa2349f284dee16848bf90958cc"
+  },
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false,
+  "interval": null,
+  "families": [
+    {
+      "family": "stationary",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2159,
+          "tn": 3041,
+          "brierSum": 1262.3382810424873,
+          "logLossSum": 3528.666062195546,
+          "openings": 5200,
+          "positives": 2159,
+          "negatives": 3041,
+          "accuracy": 0.5848076923076924,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.24275736173893986,
+          "logLoss": 0.6785896273452974
+        },
+        "recent-3-fraction": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2159,
+          "tn": 3041,
+          "brierSum": 1266.4374853536224,
+          "logLossSum": 3536.935026446668,
+          "openings": 5200,
+          "positives": 2159,
+          "negatives": 3041,
+          "accuracy": 0.5848076923076924,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.24354567026031199,
+          "logLoss": 0.6801798127782054
+        }
+      },
+      "cases": [
+        {
+          "seed": 90201,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.29551040479011725,
+            "slopePerYear": 0.0188022102465221,
+            "pooled": 0.42670299727520433,
+            "recentP": 0.3675889328063241,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.42670299727520433,
+              "recent-3-fraction": 0.3675889328063241,
+              "logistic-trend": 0.43644727985070536
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.42670299727520433,
+              "recent-3-fraction": 0.3675889328063241,
+              "logistic-trend": 0.4368327024352958
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.42670299727520433,
+              "recent-3-fraction": 0.3675889328063241,
+              "logistic-trend": 0.43721820132084716
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 36
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 34
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 35
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 105,
+              "tn": 155,
+              "brierSum": 62.8775052422273,
+              "logLossSum": 175.95602990921373
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 105,
+              "tn": 155,
+              "brierSum": 62.93794622631192,
+              "logLossSum": 176.1063789268202
+            }
+          }
+        },
+        {
+          "seed": 90202,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.33461657160043523,
+            "slopePerYear": 0.011606520022961657,
+            "pooled": 0.41716621253405994,
+            "recentP": 0.47035573122529645,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.41716621253405994,
+              "recent-3-fraction": 0.47035573122529645,
+              "logistic-trend": 0.42312061625209285
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.41716621253405994,
+              "recent-3-fraction": 0.47035573122529645,
+              "logistic-trend": 0.42335671965412125
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.41716621253405994,
+              "recent-3-fraction": 0.47035573122529645,
+              "logistic-trend": 0.4235928580635019
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 42
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 34
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 40
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 116,
+              "tn": 144,
+              "brierSum": 64.38083350311254,
+              "logLossSum": 178.98227311949267
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 116,
+              "tn": 144,
+              "brierSum": 64.39844396881689,
+              "logLossSum": 179.0140106752866
+            }
+          }
+        },
+        {
+          "seed": 90203,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.34470652945737895,
+            "slopePerYear": -0.005414277552062609,
+            "pooled": 0.4147138964577657,
+            "recentP": 0.4189723320158103,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4147138964577657,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.411879495978198
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4147138964577657,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.41177020646578494
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4147138964577657,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.41166092565430285
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 49
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 29
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 29
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 107,
+              "tn": 153,
+              "brierSum": 62.96165940232524,
+              "logLossSum": 176.11984694972438
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 107,
+              "tn": 153,
+              "brierSum": 62.97975284725585,
+              "logLossSum": 176.15709822201742
+            }
+          }
+        },
+        {
+          "seed": 90204,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.2812840005552297,
+            "slopePerYear": -0.05739747116689731,
+            "pooled": 0.43024523160762945,
+            "recentP": 0.39920948616600793,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.43024523160762945,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.40055842594007013
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.43024523160762945,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.39941049199763645
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.43024523160762945,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.39826366213727815
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 39
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 29
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 42
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 110,
+              "tn": 150,
+              "brierSum": 63.62070383637276,
+              "logLossSum": 177.45898921527152
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 110,
+              "tn": 150,
+              "brierSum": 63.60964864315956,
+              "logLossSum": 177.43593208967525
+            }
+          }
+        },
+        {
+          "seed": 90205,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3437142099383719,
+            "slopePerYear": 0.03608561438913557,
+            "pooled": 0.4149863760217984,
+            "recentP": 0.466403162055336,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4149863760217984,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.4336180922642693
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4149863760217984,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.4343567716836647
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4149863760217984,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.43509574278812607
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 41
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 34
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 37
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 112,
+              "tn": 148,
+              "brierSum": 63.75871329574894,
+              "logLossSum": 177.72784147529296
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 112,
+              "tn": 148,
+              "brierSum": 64.0839881891609,
+              "logLossSum": 178.38392192011327
+            }
+          }
+        },
+        {
+          "seed": 90206,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.31571441059052874,
+            "slopePerYear": 0.03907214062515729,
+            "pooled": 0.4217983651226158,
+            "recentP": 0.4031620553359684,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4217983651226158,
+              "recent-3-fraction": 0.4031620553359684,
+              "logistic-trend": 0.44207025608240613
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4217983651226158,
+              "recent-3-fraction": 0.4031620553359684,
+              "logistic-trend": 0.44287348310313585
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4217983651226158,
+              "recent-3-fraction": 0.4031620553359684,
+              "logistic-trend": 0.44367700898704643
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 41
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 33
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 34
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 108,
+              "tn": 152,
+              "brierSum": 63.34131655860791,
+              "logLossSum": 176.89019046814528
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 108,
+              "tn": 152,
+              "brierSum": 63.17730319173866,
+              "logLossSum": 176.5576680385855
+            }
+          }
+        },
+        {
+          "seed": 90207,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.26989430104512796,
+            "slopePerYear": -0.004672813896703721,
+            "pooled": 0.4329700272479564,
+            "recentP": 0.4505928853754941,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4329700272479564,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.430499208267239
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4329700272479564,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.43040374151041116
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4329700272479564,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.4303082799279062
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 40
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 33
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 41
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 114,
+              "tn": 146,
+              "brierSum": 64.03303378301717,
+              "logLossSum": 178.27997904618337
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 114,
+              "tn": 146,
+              "brierSum": 64.05364870565076,
+              "logLossSum": 178.32144971510178
+            }
+          }
+        },
+        {
+          "seed": 90208,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3245340613035231,
+            "slopePerYear": 0.012226162942630684,
+            "pooled": 0.4196185286103542,
+            "recentP": 0.44664031620553357,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4196185286103542,
+              "recent-3-fraction": 0.44664031620553357,
+              "logistic-trend": 0.42590516202658796
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4196185286103542,
+              "recent-3-fraction": 0.44664031620553357,
+              "logistic-trend": 0.42615429902527424
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4196185286103542,
+              "recent-3-fraction": 0.44664031620553357,
+              "logistic-trend": 0.4264034735156502
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 42
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 36
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 35
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 113,
+              "tn": 147,
+              "brierSum": 63.909088317350914,
+              "logLossSum": 178.03092075199885
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 113,
+              "tn": 147,
+              "brierSum": 63.92605727319596,
+              "logLossSum": 178.06500743109308
+            }
+          }
+        },
+        {
+          "seed": 90209,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3638405524452944,
+            "slopePerYear": -0.00978630704850397,
+            "pooled": 0.4100817438692098,
+            "recentP": 0.43478260869565216,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4100817438692098,
+              "recent-3-fraction": 0.43478260869565216,
+              "logistic-trend": 0.40501384385196354
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4100817438692098,
+              "recent-3-fraction": 0.43478260869565216,
+              "logistic-trend": 0.4048173356617302
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4100817438692098,
+              "recent-3-fraction": 0.43478260869565216,
+              "logistic-trend": 0.4046208579765907
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 35
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 35
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 40
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 110,
+              "tn": 150,
+              "brierSum": 63.551311503242474,
+              "logLossSum": 177.31456886681997
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 110,
+              "tn": 150,
+              "brierSum": 63.49716446124764,
+              "logLossSum": 177.20173229300337
+            }
+          }
+        },
+        {
+          "seed": 90210,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.27438682993764746,
+            "slopePerYear": -0.02487444799300133,
+            "pooled": 0.4318801089918256,
+            "recentP": 0.42292490118577075,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4318801089918256,
+              "recent-3-fraction": 0.42292490118577075,
+              "logistic-trend": 0.4189232056781853
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4318801089918256,
+              "recent-3-fraction": 0.42292490118577075,
+              "logistic-trend": 0.4184186988851704
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4318801089918256,
+              "recent-3-fraction": 0.42292490118577075,
+              "logistic-trend": 0.4179143626949951
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 45
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 30
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 31
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 106,
+              "tn": 154,
+              "brierSum": 62.80340879987722,
+              "logLossSum": 175.80074612974786
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 106,
+              "tn": 154,
+              "brierSum": 62.84494367979503,
+              "logLossSum": 175.8859908731094
+            }
+          }
+        },
+        {
+          "seed": 90211,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.29102824846925895,
+            "slopePerYear": -0.008065111394807143,
+            "pooled": 0.42779291553133514,
+            "recentP": 0.4980237154150198,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.42779291553133514,
+              "recent-3-fraction": 0.4980237154150198,
+              "logistic-trend": 0.4235662483747308
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.42779291553133514,
+              "recent-3-fraction": 0.4980237154150198,
+              "logistic-trend": 0.4234021601007869
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.42779291553133514,
+              "recent-3-fraction": 0.4980237154150198,
+              "logistic-trend": 0.42323808872077795
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 45
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 22
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 38
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 105,
+              "tn": 155,
+              "brierSum": 62.69426802195461,
+              "logLossSum": 175.5823307719907
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 105,
+              "tn": 155,
+              "brierSum": 64.9022012529488,
+              "logLossSum": 180.02266843816844
+            }
+          }
+        },
+        {
+          "seed": 90212,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.2676718746987294,
+            "slopePerYear": -0.0001640836390519467,
+            "pooled": 0.4335149863760218,
+            "recentP": 0.4743083003952569,
+            "iterations": 1,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4335149863760218,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.43339319147091426
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4335149863760218,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.4333898337274622
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4335149863760218,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.43338647599012664
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 38
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 32
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 30
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 100,
+              "tn": 160,
+              "brierSum": 62.156954380159576,
+              "logLossSum": 174.5050966795969
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 100,
+              "tn": 160,
+              "brierSum": 63.63011451514631,
+              "logLossSum": 177.47623227547007
+            }
+          }
+        },
+        {
+          "seed": 90213,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.24550297812329952,
+            "slopePerYear": -0.005842132771317493,
+            "pooled": 0.43896457765667574,
+            "recentP": 0.41106719367588934,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.43896457765667574,
+              "recent-3-fraction": 0.41106719367588934,
+              "logistic-trend": 0.4358785710117199
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.43896457765667574,
+              "recent-3-fraction": 0.41106719367588934,
+              "logistic-trend": 0.4357588653403628
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.43896457765667574,
+              "recent-3-fraction": 0.41106719367588934,
+              "logistic-trend": 0.4356391671564655
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 41
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 30
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 32
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 103,
+              "tn": 157,
+              "brierSum": 62.60255717255234,
+              "logLossSum": 175.40268389902644
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 103,
+              "tn": 157,
+              "brierSum": 62.253979909075284,
+              "logLossSum": 174.6894344241568
+            }
+          }
+        },
+        {
+          "seed": 90214,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.32119224309046446,
+            "slopePerYear": -0.017723982342259217,
+            "pooled": 0.4204359673024523,
+            "recentP": 0.39920948616600793,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4204359673024523,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.411245175157285
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4204359673024523,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.4108876074001545
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4204359673024523,
+              "recent-3-fraction": 0.39920948616600793,
+              "logistic-trend": 0.41053013375595004
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 34
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 21
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 45
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 100,
+              "tn": 160,
+              "brierSum": 61.72786702395455,
+              "logLossSum": 173.6262279085246
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 100,
+              "tn": 160,
+              "brierSum": 61.593838366479716,
+              "logLossSum": 173.34833204962507
+            }
+          }
+        },
+        {
+          "seed": 90215,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.30900488353806776,
+            "slopePerYear": -0.03867883141013348,
+            "pooled": 0.42343324250681197,
+            "recentP": 0.40711462450592883,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.42343324250681197,
+              "recent-3-fraction": 0.40711462450592883,
+              "logistic-trend": 0.4034476955781028
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.42343324250681197,
+              "recent-3-fraction": 0.40711462450592883,
+              "logistic-trend": 0.40267217673727096
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.42343324250681197,
+              "recent-3-fraction": 0.40711462450592883,
+              "logistic-trend": 0.4018971443202887
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 35
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 28
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 38
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 101,
+              "tn": 159,
+              "brierSum": 61.82702531662049,
+              "logLossSum": 173.82285432225024
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 101,
+              "tn": 159,
+              "brierSum": 61.855848396319274,
+              "logLossSum": 173.8826274966574
+            }
+          }
+        },
+        {
+          "seed": 90216,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.30664327290732185,
+            "slopePerYear": 0.010471018171646961,
+            "pooled": 0.42397820163487737,
+            "recentP": 0.4505928853754941,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.42397820163487737,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.42937213205140096
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.42397820163487737,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.4295859387151235
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.42397820163487737,
+              "recent-3-fraction": 0.4505928853754941,
+              "logistic-trend": 0.42979977165398076
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 49
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 28
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 34
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 111,
+              "tn": 149,
+              "brierSum": 63.61851919572585,
+              "logLossSum": 177.44561817745847
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 111,
+              "tn": 149,
+              "brierSum": 63.75720601790372,
+              "logLossSum": 177.7266232608932
+            }
+          }
+        },
+        {
+          "seed": 90217,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3077496329441244,
+            "slopePerYear": 0.00013206944773051386,
+            "pooled": 0.42370572207084467,
+            "recentP": 0.466403162055336,
+            "iterations": 1,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.42370572207084467,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.4237325862689606
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.42370572207084467,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.42373527370047853
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.42370572207084467,
+              "recent-3-fraction": 0.466403162055336,
+              "logistic-trend": 0.4237379611365079
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 42
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 28
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 34
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 104,
+              "tn": 156,
+              "brierSum": 62.54650149424429,
+              "logLossSum": 175.2846264364103
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 104,
+              "tn": 156,
+              "brierSum": 63.54643878204628,
+              "logLossSum": 177.30720068833114
+            }
+          }
+        },
+        {
+          "seed": 90218,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.27886800880133933,
+            "slopePerYear": 0.032096049326377024,
+            "pooled": 0.4307901907356948,
+            "recentP": 0.4743083003952569,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4307901907356948,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.44751207119515246
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4307901907356948,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.44817346267490055
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4307901907356948,
+              "recent-3-fraction": 0.4743083003952569,
+              "logistic-trend": 0.4488350375427121
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 49
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 33
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 46
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 128,
+              "tn": 132,
+              "brierSum": 65.49094948383937,
+              "logLossSum": 181.20623065082458
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 128,
+              "tn": 132,
+              "brierSum": 65.06884969301194,
+              "logLossSum": 180.35623906778187
+            }
+          }
+        },
+        {
+          "seed": 90219,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.2776722920775535,
+            "slopePerYear": -0.005162554965381724,
+            "pooled": 0.4310626702997275,
+            "recentP": 0.4189723320158103,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.4283387111033593
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.42823337041387627
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.4189723320158103,
+              "logistic-trend": 0.4281280362289653
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 37
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 30
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 41
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 108,
+              "tn": 152,
+              "brierSum": 63.18286138402771,
+              "logLossSum": 176.56811078925682
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 108,
+              "tn": 152,
+              "brierSum": 63.14180818322423,
+              "logLossSum": 176.4840917146841
+            }
+          }
+        },
+        {
+          "seed": 90220,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.277867108696154,
+            "slopePerYear": -0.04859572355835755,
+            "pooled": 0.4310626702997275,
+            "recentP": 0.3557312252964427,
+            "iterations": 2,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.3557312252964427,
+              "logistic-trend": 0.40587708330382966
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.3557312252964427,
+              "logistic-trend": 0.40490092210102624
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4310626702997275,
+              "recent-3-fraction": 0.3557312252964427,
+              "logistic-trend": 0.4039255124810282
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 41
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 25
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 32
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 98,
+              "tn": 162,
+              "brierSum": 61.25320332752616,
+              "logLossSum": 172.66089662831632
+            },
+            "recent-3-fraction": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 98,
+              "tn": 162,
+              "brierSum": 61.17830305113344,
+              "logLossSum": 172.51238684609376
+            }
+          }
+        }
+      ]
+    },
+    {
+      "family": "gradual-improvement",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 3258,
+          "fp": 1942,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1217.6806307254076,
+          "logLossSum": 3438.0450033696525,
+          "openings": 5200,
+          "positives": 3258,
+          "negatives": 1942,
+          "accuracy": 0.6265384615384615,
+          "precision": 0.6265384615384615,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.23416935206257838,
+          "logLoss": 0.6611625006480101
+        },
+        "recent-3-fraction": {
+          "tp": 3258,
+          "fp": 1942,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1227.307222421847,
+          "logLossSum": 3457.8741475316747,
+          "openings": 5200,
+          "positives": 3258,
+          "negatives": 1942,
+          "accuracy": 0.6265384615384615,
+          "precision": 0.6265384615384615,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.23602061969650903,
+          "logLoss": 0.6649757976022451
+        }
+      },
+      "cases": [
+        {
+          "seed": 90201,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3651548346407694,
+            "slopePerYear": 0.4221979132359331,
+            "pooled": 0.4141689373297003,
+            "recentP": 0.5810276679841897,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6297563374043227
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.637921639893996
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6460080885854909
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 55
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 53
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 56
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 164,
+              "fp": 96,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 60.49002235947138,
+              "logLossSum": 171.08485889693512
+            },
+            "recent-3-fraction": {
+              "tp": 164,
+              "fp": 96,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.19714415160368,
+              "logLossSum": 172.56016980268407
+            }
+          }
+        },
+        {
+          "seed": 90202,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.45107803816968606,
+            "slopePerYear": 0.4243325062579839,
+            "pooled": 0.39455040871934605,
+            "recentP": 0.6007905138339921,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.6105869687674956
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.618961162626121
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.6272652052799237
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 59
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 50
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 61
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 170,
+              "fp": 90,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.07025230147438,
+              "logLossSum": 168.19166868949188
+            },
+            "recent-3-fraction": {
+              "tp": 170,
+              "fp": 90,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.57802808979987,
+              "logLossSum": 169.2607320095749
+            }
+          }
+        },
+        {
+          "seed": 90203,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.44446859025725033,
+            "slopePerYear": 0.41839034173494716,
+            "pooled": 0.39591280653950955,
+            "recentP": 0.5889328063241107,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6091580285457311
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6174267432554017
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6256280335542639
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 62
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 47
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 47
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 156,
+              "fp": 104,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.667076756324484,
+              "logLossSum": 175.548397466759
+            },
+            "recent-3-fraction": {
+              "tp": 156,
+              "fp": 104,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.43184552172351,
+              "logLossSum": 175.04898983096086
+            }
+          }
+        },
+        {
+          "seed": 90204,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3831311828001374,
+            "slopePerYear": 0.36892889841297305,
+            "pooled": 0.408991825613079,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5987129200831028
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6060764340808802
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6133920798527088
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 53
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 48
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 61
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 162,
+              "fp": 98,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 60.967080577377544,
+              "logLossSum": 172.06272262869913
+            },
+            "recent-3-fraction": {
+              "tp": 162,
+              "fp": 98,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.931947069943284,
+              "logLossSum": 174.05336111939351
+            }
+          }
+        },
+        {
+          "seed": 90205,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.46282932625788176,
+            "slopePerYear": 0.4438599504841528,
+            "pooled": 0.3923705722070845,
+            "recentP": 0.6363636363636364,
+            "iterations": 4,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6176264161857534
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6263229007535966
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6349385042777221
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 54
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 50
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 55
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 159,
+              "fp": 101,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.742362161075874,
+              "logLossSum": 173.64585876043498
+            },
+            "recent-3-fraction": {
+              "tp": 159,
+              "fp": 101,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.925619834710744,
+              "logLossSum": 174.03732675467256
+            }
+          }
+        },
+        {
+          "seed": 90206,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.43450547417335783,
+            "slopePerYear": 0.43795122497794436,
+            "pooled": 0.3986376021798365,
+            "recentP": 0.5691699604743083,
+            "iterations": 4,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.6213460144841495
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.629893797201898
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.638360928046554
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 52
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 48
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 51
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 151,
+              "fp": 109,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 63.88562265498669,
+              "logLossSum": 178.0396383160122
+            },
+            "recent-3-fraction": {
+              "tp": 151,
+              "fp": 109,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 63.33882735240357,
+              "logLossSum": 176.8825396702025
+            }
+          }
+        },
+        {
+          "seed": 90207,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.39918985339674323,
+            "slopePerYear": 0.4186227109333077,
+            "pooled": 0.40626702997275205,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6199995855649528
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6281834588754633
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6362944735786767
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 52
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 45
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 61
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 158,
+              "fp": 102,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.8875707515788,
+              "logLossSum": 173.93123047367175
+            },
+            "recent-3-fraction": {
+              "tp": 158,
+              "fp": 102,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.05811682732116,
+              "logLossSum": 174.29580890763935
+            }
+          }
+        },
+        {
+          "seed": 90208,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.41341829565325444,
+            "slopePerYear": 0.36568484328867484,
+            "pooled": 0.4019073569482289,
+            "recentP": 0.5770750988142292,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.5897497348735614
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.5971020251515547
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.6044109353915281
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 60
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 49
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 54
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 163,
+              "fp": 97,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.07959562703252,
+              "logLossSum": 172.31010305018378
+            },
+            "recent-3-fraction": {
+              "tp": 163,
+              "fp": 97,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.457591901138905,
+              "logLossSum": 173.0889907878915
+            }
+          }
+        },
+        {
+          "seed": 90209,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4492189134554547,
+            "slopePerYear": 0.38202798643982905,
+            "pooled": 0.39400544959128064,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5894825738207738
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5971640466024106
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6047981479936422
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 49
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 47
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 59
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 155,
+              "fp": 105,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.39003686898097,
+              "logLossSum": 174.95240810279472
+            },
+            "recent-3-fraction": {
+              "tp": 155,
+              "fp": 105,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.844990548204166,
+              "logLossSum": 175.88991097066594
+            }
+          }
+        },
+        {
+          "seed": 90210,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.40563010589513737,
+            "slopePerYear": 0.3848254169507995,
+            "pooled": 0.4040871934604905,
+            "recentP": 0.5533596837944664,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6014126261902454
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6090744361017475
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6166828371543783
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 65
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 44
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 61
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 170,
+              "fp": 90,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.37485210245572,
+              "logLossSum": 168.8343899849803
+            },
+            "recent-3-fraction": {
+              "tp": 170,
+              "fp": 90,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.4715118186505,
+              "logLossSum": 173.13715154146288
+            }
+          }
+        },
+        {
+          "seed": 90211,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4191895592645979,
+            "slopePerYear": 0.41632525333091736,
+            "pooled": 0.4016348773841962,
+            "recentP": 0.6403162055335968,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6141212672887394
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6223096285899126
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6304287977458226
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 60
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 44
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 57
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 161,
+              "fp": 99,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.29667516969802,
+              "logLossSum": 172.73889665401236
+            },
+            "recent-3-fraction": {
+              "tp": 161,
+              "fp": 99,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.41944101610711,
+              "logLossSum": 173.0031659515733
+            }
+          }
+        },
+        {
+          "seed": 90212,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.38689723394889775,
+            "slopePerYear": 0.4399075910144881,
+            "pooled": 0.4095367847411444,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6334455347709828
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6419150826864086
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6502969714900598
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 56
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 48
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 53
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 157,
+              "fp": 103,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.56010466375885,
+              "logLossSum": 175.35158876918564
+            },
+            "recent-3-fraction": {
+              "tp": 157,
+              "fp": 103,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.307128685028665,
+              "logLossSum": 174.80452704906577
+            }
+          }
+        },
+        {
+          "seed": 90213,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.34299915737089254,
+            "slopePerYear": 0.42544026090267556,
+            "pooled": 0.4193460490463215,
+            "recentP": 0.5928853754940712,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6365013199057714
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6446637138399101
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6527428168808908
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 57
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 44
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 59
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 160,
+              "fp": 100,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.66753339115859,
+              "logLossSum": 173.50932954799578
+            },
+            "recent-3-fraction": {
+              "tp": 160,
+              "fp": 100,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.670077645331126,
+              "logLossSum": 173.50672119079076
+            }
+          }
+        },
+        {
+          "seed": 90214,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.40345927541047844,
+            "slopePerYear": 0.4261481638461598,
+            "pooled": 0.40544959128065394,
+            "recentP": 0.5533596837944664,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6227538833674939
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.631059771191706
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6392887100497097
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 58
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 45
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 63
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 166,
+              "fp": 94,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.886930056373814,
+              "logLossSum": 169.8412396414273
+            },
+            "recent-3-fraction": {
+              "tp": 166,
+              "fp": 94,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.89838928900624,
+              "logLossSum": 173.99416995705073
+            }
+          }
+        },
+        {
+          "seed": 90215,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.39783913655618175,
+            "slopePerYear": 0.40372338613810993,
+            "pooled": 0.40626702997275205,
+            "recentP": 0.5810276679841897,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6128400141313135
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6207916012762625
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6286788276730387
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 58
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 42
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 59
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 159,
+              "fp": 101,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 61.7147694759253,
+              "logLossSum": 173.58649187131607
+            },
+            "recent-3-fraction": {
+              "tp": 159,
+              "fp": 101,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.00742083144557,
+              "logLossSum": 174.1951372660174
+            }
+          }
+        },
+        {
+          "seed": 90216,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3966495202551775,
+            "slopePerYear": 0.41680879277277744,
+            "pooled": 0.40681198910081745,
+            "recentP": 0.5968379446640316,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.6196907556766917
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.6278419693245733
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.635921119749784
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 75
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 43
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 51
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 169,
+              "fp": 91,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.608791096661335,
+              "logLossSum": 169.31895073625054
+            },
+            "recent-3-fraction": {
+              "tp": 169,
+              "fp": 91,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.88481307316159,
+              "logLossSum": 169.8884486385644
+            }
+          }
+        },
+        {
+          "seed": 90217,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4106359122895891,
+            "slopePerYear": 0.4011481722433416,
+            "pooled": 0.4032697547683924,
+            "recentP": 0.5928853754940712,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6084977492277241
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6164319683721606
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6243046694565167
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 58
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 55
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 59
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 172,
+              "fp": 88,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 58.672156078397194,
+              "logLossSum": 167.38685689078147
+            },
+            "recent-3-fraction": {
+              "tp": 172,
+              "fp": 88,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 59.440828633473416,
+              "logLossSum": 168.9958455203913
+            }
+          }
+        },
+        {
+          "seed": 90218,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3765306560667559,
+            "slopePerYear": 0.40320187620023484,
+            "pooled": 0.4111716621253406,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6176220586967516
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6255252634087318
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.633362088139682
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 66
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 49
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 62
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 177,
+              "fp": 83,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 57.303696774573794,
+              "logLossSum": 164.57912254882174
+            },
+            "recent-3-fraction": {
+              "tp": 177,
+              "fp": 83,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 57.32689153087848,
+              "logLossSum": 164.63016422053727
+            }
+          }
+        },
+        {
+          "seed": 90219,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4052093234494366,
+            "slopePerYear": 0.39347981755418643,
+            "pooled": 0.40435967302452314,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6059091558302179
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.613711061819365
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6214550089823021
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 58
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 52
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 65
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 175,
+              "fp": 85,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 57.96403118050097,
+              "logLossSum": 165.9432916171171
+            },
+            "recent-3-fraction": {
+              "tp": 175,
+              "fp": 85,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 60.236294896030245,
+              "logLossSum": 170.6426256813161
+            }
+          }
+        },
+        {
+          "seed": 90220,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3761674314863673,
+            "slopePerYear": 0.42637911136003237,
+            "pooled": 0.41171662125340597,
+            "recentP": 0.5731225296442688,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6292581836785922
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6375086710058832
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6456789365822033
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 61
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 44
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 49
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 154,
+              "fp": 106,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 63.45147067760117,
+              "logLossSum": 177.18795872278122
+            },
+            "recent-3-fraction": {
+              "tp": 154,
+              "fp": 106,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 62.880313705885115,
+              "logLossSum": 175.95836066121953
+            }
+          }
+        }
+      ]
+    },
+    {
+      "family": "assessment-reversal",
+      "histories": 20,
+      "testCohorts": 60,
+      "methods": {
+        "logistic-trend": {
+          "tp": 1422,
+          "fp": 3778,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1668.0444919966938,
+          "logLossSum": 4358.4127302272655,
+          "openings": 5200,
+          "positives": 1422,
+          "negatives": 3778,
+          "accuracy": 0.2734615384615385,
+          "precision": 0.2734615384615385,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.32077778692244113,
+          "logLoss": 0.8381562942744741
+        },
+        "recent-3-fraction": {
+          "tp": 1422,
+          "fp": 3778,
+          "fn": 0,
+          "tn": 0,
+          "brierSum": 1554.7854832914122,
+          "logLossSum": 4121.946375778639,
+          "openings": 5200,
+          "positives": 1422,
+          "negatives": 3778,
+          "accuracy": 0.2734615384615385,
+          "precision": 0.2734615384615385,
+          "recall": 1,
+          "specificity": 0,
+          "balancedAccuracy": 0.5,
+          "brier": 0.2989972083252716,
+          "logLoss": 0.792681995342046
+        }
+      },
+      "cases": [
+        {
+          "seed": 90201,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3651548346407694,
+            "slopePerYear": 0.4221979132359331,
+            "pooled": 0.4141689373297003,
+            "recentP": 0.5810276679841897,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6297563374043227
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.637921639893996
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4141689373297003,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6460080885854909
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 20
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 23
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 18
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 61,
+              "fp": 199,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 88.94487910391103,
+              "logLossSum": 229.52495293354326
+            },
+            "recent-3-fraction": {
+              "tp": 61,
+              "fp": 199,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 77.88884375634676,
+              "logLossSum": 206.24049954735096
+            }
+          }
+        },
+        {
+          "seed": 90202,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.45107803816968606,
+            "slopePerYear": 0.4243325062579839,
+            "pooled": 0.39455040871934605,
+            "recentP": 0.6007905138339921,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.6105869687674956
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.618961162626121
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39455040871934605,
+              "recent-3-fraction": 0.6007905138339921,
+              "logistic-trend": 0.6272652052799237
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 27
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 21
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 25
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 73,
+              "fp": 187,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 82.21066051506364,
+              "logLossSum": 215.39181151810075
+            },
+            "recent-3-fraction": {
+              "tp": 73,
+              "fp": 187,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 79.13138777359433,
+              "logLossSum": 208.91045239806158
+            }
+          }
+        },
+        {
+          "seed": 90203,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.44446859025725033,
+            "slopePerYear": 0.41839034173494716,
+            "pooled": 0.39591280653950955,
+            "recentP": 0.5889328063241107,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6091580285457311
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6174267432554017
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39591280653950955,
+              "recent-3-fraction": 0.5889328063241107,
+              "logistic-trend": 0.6256280335542639
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 35
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 19
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 21
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 75,
+              "fp": 185,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 81.67016566491819,
+              "logLossSum": 214.28339357462573
+            },
+            "recent-3-fraction": {
+              "tp": 75,
+              "fp": 185,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 76.83896014622945,
+              "logLossSum": 204.1729777820919
+            }
+          }
+        },
+        {
+          "seed": 90204,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3831311828001374,
+            "slopePerYear": 0.36892889841297305,
+            "pooled": 0.408991825613079,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5987129200831028
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6060764340808802
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.408991825613079,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6133920798527088
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 31
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 19
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 29
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 79,
+              "fp": 181,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 78.71997534829849,
+              "logLossSum": 208.13064794123653
+            },
+            "recent-3-fraction": {
+              "tp": 79,
+              "fp": 181,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 72.75803402646503,
+              "logLossSum": 195.82959507019524
+            }
+          }
+        },
+        {
+          "seed": 90205,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.46282932625788176,
+            "slopePerYear": 0.4438599504841528,
+            "pooled": 0.3923705722070845,
+            "recentP": 0.6363636363636364,
+            "iterations": 4,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6176264161857534
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6263229007535966
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.3923705722070845,
+              "recent-3-fraction": 0.6363636363636364,
+              "logistic-trend": 0.6349385042777221
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 30
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 24
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 25
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 79,
+              "fp": 181,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 82.05353123384239,
+              "logLossSum": 215.18570877702996
+            },
+            "recent-3-fraction": {
+              "tp": 79,
+              "fp": 181,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 83.74380165289256,
+              "logLossSum": 218.80658978950638
+            }
+          }
+        },
+        {
+          "seed": 90206,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.43450547417335783,
+            "slopePerYear": 0.43795122497794436,
+            "pooled": 0.3986376021798365,
+            "recentP": 0.5691699604743083,
+            "iterations": 4,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.6213460144841495
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.629893797201898
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.3986376021798365,
+              "recent-3-fraction": 0.5691699604743083,
+              "logistic-trend": 0.638360928046554
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 29
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 18
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 22
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 69,
+              "fp": 191,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 85.28610098007158,
+              "logLossSum": 221.86303481013914
+            },
+            "recent-3-fraction": {
+              "tp": 69,
+              "fp": 191,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 74.68270087019013,
+              "logLossSum": 199.71670389264477
+            }
+          }
+        },
+        {
+          "seed": 90207,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.39918985339674323,
+            "slopePerYear": 0.4186227109333077,
+            "pooled": 0.40626702997275205,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6199995855649528
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6281834588754633
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6362944735786767
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 32
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 21
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 27
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 80,
+              "fp": 180,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 82.10838440354917,
+              "logLossSum": 215.3252956255326
+            },
+            "recent-3-fraction": {
+              "tp": 80,
+              "fp": 180,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 81.48104172850691,
+              "logLossSum": 213.97582393890053
+            }
+          }
+        },
+        {
+          "seed": 90208,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.41341829565325444,
+            "slopePerYear": 0.36568484328867484,
+            "pooled": 0.4019073569482289,
+            "recentP": 0.5770750988142292,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.5897497348735614
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.5971020251515547
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4019073569482289,
+              "recent-3-fraction": 0.5770750988142292,
+              "logistic-trend": 0.6044109353915281
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 27
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 21
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 22
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 70,
+              "fp": 190,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 79.12309140223243,
+              "logLossSum": 208.86625985165483
+            },
+            "recent-3-fraction": {
+              "tp": 70,
+              "fp": 190,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 75.79356028058554,
+              "logLossSum": 201.99132500180954
+            }
+          }
+        },
+        {
+          "seed": 90209,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4492189134554547,
+            "slopePerYear": 0.38202798643982905,
+            "pooled": 0.39400544959128064,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5894825738207738
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.5971640466024106
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.39400544959128064,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6047981479936422
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 23
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 23
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 25
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 71,
+              "fp": 189,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 78.8332790081446,
+              "logLossSum": 208.2747388096516
+            },
+            "recent-3-fraction": {
+              "tp": 71,
+              "fp": 189,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 73.80151228733459,
+              "logLossSum": 197.92850918593516
+            }
+          }
+        },
+        {
+          "seed": 90210,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.40563010589513737,
+            "slopePerYear": 0.3848254169507995,
+            "pooled": 0.4040871934604905,
+            "recentP": 0.5533596837944664,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6014126261902454
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6090744361017475
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4040871934604905,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6166828371543783
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 21
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 18
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 22
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 61,
+              "fp": 199,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 83.0722951825297,
+              "logLossSum": 217.00718781139156
+            },
+            "recent-3-fraction": {
+              "tp": 61,
+              "fp": 199,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 73.10392288584417,
+              "logLossSum": 196.49090336623192
+            }
+          }
+        },
+        {
+          "seed": 90211,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4191895592645979,
+            "slopePerYear": 0.41632525333091736,
+            "pooled": 0.4016348773841962,
+            "recentP": 0.6403162055335968,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6141212672887394
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6223096285899126
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4016348773841962,
+              "recent-3-fraction": 0.6403162055335968,
+              "logistic-trend": 0.6304287977458226
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 32
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 18
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 25
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 75,
+              "fp": 185,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 82.39500988027552,
+              "logLossSum": 215.82289208968024
+            },
+            "recent-3-fraction": {
+              "tp": 75,
+              "fp": 185,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 85.55382836788576,
+              "logLossSum": 222.6025332211092
+            }
+          }
+        },
+        {
+          "seed": 90212,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.38689723394889775,
+            "slopePerYear": 0.4399075910144881,
+            "pooled": 0.4095367847411444,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6334455347709828
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6419150826864086
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4095367847411444,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6502969714900598
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 29
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 20
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 19
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 87.93360223315489,
+              "logLossSum": 227.5562437389349
+            },
+            "recent-3-fraction": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 84.46918402099703,
+              "logLossSum": 220.08044163601767
+            }
+          }
+        },
+        {
+          "seed": 90213,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.34299915737089254,
+            "slopePerYear": 0.42544026090267556,
+            "pooled": 0.4193460490463215,
+            "recentP": 0.5928853754940712,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6365013199057714
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6446637138399101
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4193460490463215,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6527428168808908
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 28
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 16
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 15
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 59,
+              "fp": 201,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 91.12714580624669,
+              "logLossSum": 234.20321214496
+            },
+            "recent-3-fraction": {
+              "tp": 59,
+              "fp": 201,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 80.43292349513351,
+              "logLossSum": 211.47325808331937
+            }
+          }
+        },
+        {
+          "seed": 90214,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.40345927541047844,
+            "slopePerYear": 0.4261481638461598,
+            "pooled": 0.40544959128065394,
+            "recentP": 0.5533596837944664,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6227538833674939
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.631059771191706
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40544959128065394,
+              "recent-3-fraction": 0.5533596837944664,
+              "logistic-trend": 0.6392887100497097
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 25
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 16
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 27
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 85.61894021132645,
+              "logLossSum": 222.55083813945856
+            },
+            "recent-3-fraction": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 72.35688731272165,
+              "logLossSum": 194.9911211389532
+            }
+          }
+        },
+        {
+          "seed": 90215,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.39783913655618175,
+            "slopePerYear": 0.40372338613810993,
+            "pooled": 0.40626702997275205,
+            "recentP": 0.5810276679841897,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6128400141313135
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6207916012762625
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40626702997275205,
+              "recent-3-fraction": 0.5810276679841897,
+              "logistic-trend": 0.6286788276730387
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 20
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 20
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 28
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 83.58352832178907,
+              "logLossSum": 218.2057529952878
+            },
+            "recent-3-fraction": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 76.7544564045681,
+              "logLossSum": 203.95154509868428
+            }
+          }
+        },
+        {
+          "seed": 90216,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3966495202551775,
+            "slopePerYear": 0.41680879277277744,
+            "pooled": 0.40681198910081745,
+            "recentP": 0.5968379446640316,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.6196907556766917
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.6278419693245733
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40681198910081745,
+              "recent-3-fraction": 0.5968379446640316,
+              "logistic-trend": 0.635921119749784
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 39
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 19
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 27
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 85,
+              "fp": 175,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 80.88715378095229,
+              "logLossSum": 212.83161487818165
+            },
+            "recent-3-fraction": {
+              "tp": 85,
+              "fp": 175,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 76.15358777671891,
+              "logLossSum": 202.84223861513925
+            }
+          }
+        },
+        {
+          "seed": 90217,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4106359122895891,
+            "slopePerYear": 0.4011481722433416,
+            "pooled": 0.4032697547683924,
+            "recentP": 0.5928853754940712,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6084977492277241
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6164319683721606
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4032697547683924,
+              "recent-3-fraction": 0.5928853754940712,
+              "logistic-trend": 0.6243046694565167
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 24
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 19
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 25
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 82.88582227172114,
+              "logLossSum": 216.72767708175428
+            },
+            "recent-3-fraction": {
+              "tp": 68,
+              "fp": 192,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 78.76098673624023,
+              "logLossSum": 208.0901013305198
+            }
+          }
+        },
+        {
+          "seed": 90218,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3765306560667559,
+            "slopePerYear": 0.40320187620023484,
+            "pooled": 0.4111716621253406,
+            "recentP": 0.6245059288537549,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6176220586967516
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.6255252634087318
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.4111716621253406,
+              "recent-3-fraction": 0.6245059288537549,
+              "logistic-trend": 0.633362088139682
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 31
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 26
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 27
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 84,
+              "fp": 176,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 80.64674916992581,
+              "logLossSum": 212.29438857146147
+            },
+            "recent-3-fraction": {
+              "tp": 84,
+              "fp": 176,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 80.48499429767688,
+              "logLossSum": 211.94095137319482
+            }
+          }
+        },
+        {
+          "seed": 90219,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.4052093234494366,
+            "slopePerYear": 0.39347981755418643,
+            "pooled": 0.40435967302452314,
+            "recentP": 0.5652173913043478,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6059091558302179
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.613711061819365
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.40435967302452314,
+              "recent-3-fraction": 0.5652173913043478,
+              "logistic-trend": 0.6214550089823021
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 23
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 14
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 26
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 63,
+              "fp": 197,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 83.49320348750751,
+              "logLossSum": 217.9235747649736
+            },
+            "recent-3-fraction": {
+              "tp": 63,
+              "fp": 197,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 74.84499054820415,
+              "logLossSum": 200.0274233016751
+            }
+          }
+        },
+        {
+          "seed": 90220,
+          "model": {
+            "version": "hiring-cohort-logistic-v1",
+            "trainingStart": "2021-01",
+            "trainingEnd": "2024-10",
+            "trainingCohorts": 46,
+            "trainingOpenings": 3668,
+            "center": 24274.5239912759,
+            "intercept": -0.3761674314863673,
+            "slopePerYear": 0.42637911136003237,
+            "pooled": 0.41171662125340597,
+            "recentP": 0.5731225296442688,
+            "iterations": 3,
+            "converged": true
+          },
+          "predictions": [
+            {
+              "month": "2025-01",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6292581836785922
+            },
+            {
+              "month": "2025-02",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6375086710058832
+            },
+            {
+              "month": "2025-03",
+              "pooled-fraction": 0.41171662125340597,
+              "recent-3-fraction": 0.5731225296442688,
+              "logistic-trend": 0.6456789365822033
+            }
+          ],
+          "actual": [
+            {
+              "month": "2025-01",
+              "openings": 97,
+              "started": 24
+            },
+            {
+              "month": "2025-02",
+              "openings": 73,
+              "started": 18
+            },
+            {
+              "month": "2025-03",
+              "openings": 90,
+              "started": 24
+            }
+          ],
+          "counts": {
+            "logistic-trend": {
+              "tp": 66,
+              "fp": 194,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 87.4509739912331,
+              "logLossSum": 226.44350416966736
+            },
+            "recent-3-fraction": {
+              "tp": 66,
+              "fp": 194,
+              "fn": 0,
+              "tn": 0,
+              "brierSum": 75.74987892327641,
+              "logLossSum": 201.88338200729874
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

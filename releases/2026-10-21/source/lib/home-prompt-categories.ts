@@ -1,3 +1,5 @@
+// @ts-expect-error Native tests share canonical TypeScript.
+import {hiringPredictionPrompt} from './hiring-prediction-demo.ts';
 // Ordinary questions submit verbatim; the market starter opens an explicit scoped lookup.
 // @ts-expect-error Native regression tests share the same source.
 import {capacityRiskPrompt} from './group-capacity-risk.ts';
@@ -7,6 +9,7 @@ export const homePromptCategories = [
     capacityRiskPrompt,
     'Which business unit has the highest voluntary turnover, and what should we investigate?',
     marketExplorationPrompt,
+    hiringPredictionPrompt,
   ]},
   {id:'capacity',label:'Capacity Planning',prompts:[
     'How can we close a staffing gap?',
