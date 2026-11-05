@@ -2,6 +2,10 @@
 
 Inspected 2026-10-05, using repository contracts plus [read-only Supabase schema metadata and bounded aggregate hiring checks](predictive-data-inventory.sql) and the [exit qualification](aggregate-exit-qualification.sql). No new records, fields, views, permissions, schema changes or external model inputs were created. Column existence is **not** verification that populated history, completeness or historical availability exists. No person-level employment scoring is proposed.
 
+## 5 November 2026 delivery update
+
+[PR564](https://github.com/ed1017/people-analytics-ai/pull/564) adds the [held-out synthetic hiring evaluation to Explore](explore-hiring-classifier.md). The default response shows cohort probabilities; a confusion matrix appears only on explicit request. All 60 prespecified histories and both methods are retained. Balanced accuracy is 50% across the three families at the frozen threshold, so this is a reproducible evaluation demonstration, **not operational qualification**. No company, employee or current-vacancy prediction is established. Existing data-qualification gaps below remain open; further model development needs a new frozen protocol and a genuinely independent chronological assessment.
+
 ## Sequence and method distinctions
 
 | Order / use case | Available support | Essential next evidence | Method status |

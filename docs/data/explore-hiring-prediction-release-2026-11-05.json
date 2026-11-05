@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "pullRequest": 564,
+  "mergeCommit": "688d550754ad8063bae3af13265ae1b63ef98fd7",
+  "runtimeCommit": "4194de402ab2ff61d2b20a9e26788f9605a389f2",
+  "deployment": "dpl_2pTY7Kijua2oa2CxetwabZ3Nzakb",
+  "ciRun": 41952468563,
+  "apiSpendUsd": 0,
+  "providerAnswerQualityTested": false,
+  "readiness": "Browser fixture; separately verified nonbillable configured receipt. No provider health claim.",
+  "receipts": [
+    {
+      "origin": "https://people-analytics-eeyzwco3g-ed-56dc.vercel.app",
+      "width": 1440,
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "posts": [],
+      "realProviderCalls": 0,
+      "transportErrors": [
+        {
+          "path": "/api/career-mobility",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/career-growth-mobility",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/succession-coverage",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/workforce-planning",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/position-modeling",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/finance",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/favicon.ico",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        },
+        {
+          "path": "/api/attrition",
+          "error": "request.allHeaders: Target page, context or browser has been closed"
+        }
+      ]
+    },
+    {
+      "origin": "https://people-analytics-eeyzwco3g-ed-56dc.vercel.app",
+      "width": 390,
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "posts": [],
+      "realProviderCalls": 0,
+      "transportErrors": []
+    },
+    {
+      "origin": "https://www.ed-ai.app",
+      "width": 1440,
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "posts": [],
+      "realProviderCalls": 0,
+      "transportErrors": []
+    },
+    {
+      "origin": "https://www.ed-ai.app",
+      "width": 390,
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "posts": [],
+      "realProviderCalls": 0,
+      "transportErrors": []
+    }
+  ]
+}
