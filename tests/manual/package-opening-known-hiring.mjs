@@ -1,0 +1,10 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+const root=new URL('../../',import.meta.url),mode=process.argv[2];
+if(!['--write','--check'].includes(mode))throw Error('Use write or check');
+const raw=(await readFile(new URL('docs/evidence/opening-known-hiring-v1.json',root),'utf8')).replace(/\r\n/g,'\n');
+const {cases,...report}=JSON.parse(raw);
+if(report.educationalGatePassed!==true)throw Error('Teaching gate did not pass');
+const text=JSON.stringify({...report,protocolCommit:'2ea42105',evaluatorCommit:'885ead31',reportSha256:createHash('sha256').update(raw).digest('hex')},null,2)+'\n';
+const target=new URL('releases/2026-10-21/source/lib/data/opening-known-hiring-v1.json',root);
+if(mode==='--write')await writeFile(target,text);else if((await readFile(target,'utf8')).replace(/\r\n/g,'\n')!==text)throw Error('Packaged report differs');

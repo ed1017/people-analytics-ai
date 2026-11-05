@@ -1,0 +1,1591 @@
+{
+  "version": "opening-known-hiring-v1",
+  "mode": "assessment",
+  "protocol": {
+    "version": "opening-known-hiring-v1",
+    "dataClass": "constructed-synthetic-separate-experiment",
+    "features": [
+      "definedScope",
+      "panelReserved",
+      "flexibleStartWindow"
+    ],
+    "featureMeaning": "Fictional binary process facts assigned and available at opening; no real effect, person, employer or intervention claim.",
+    "developmentSeeds": [
+      119001,
+      119002,
+      119003,
+      119004
+    ],
+    "assessmentSeedStart": 120001,
+    "assessmentSeedCount": 20,
+    "families": [
+      "stable",
+      "mix-shift",
+      "relationship-reversal"
+    ],
+    "firstMonth": "2022-01",
+    "lastTrainingMonth": "2025-06",
+    "origin": "2025-10-01T00:00:00.000Z",
+    "predictionTime": "Fit and freeze the model at origin. Predict each test cohort at its own opening timestamp using then-available features. November/December features are not claimed known on October1. No test labels update the frozen model.",
+    "testMonths": [
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "scoreThrough": "2026-04-01T00:00:00.000Z",
+    "labelHorizonDays": 90,
+    "labelReleaseDays": 91,
+    "positive": "Actual start within 90 days",
+    "negative": "No actual start within 90 days; simulated cancellations and unresolved searches with full follow-up",
+    "methods": [
+      "pooled-rate",
+      "cell-rate",
+      "logistic-features"
+    ],
+    "threshold": 0.5,
+    "ridgePenalty": 1,
+    "baselineSmoothing": "Add one start and one non-start, both globally and per feature cell. Unseen cells fall back to pooled rate.",
+    "generator": "Eight binary feature cells each month. Normally 40 openings per cell. In mix-shift assessment only, count is 10+10*popcount(mask). Planted logit=-0.2+0.7*(2*definedScope-1)+0.7*(2*panelReserved-1)+0.7*(2*flexibleStartWindow-1). In relationship-reversal assessment only, negate all three slopes; intercept unchanged. Deterministic hash-based Bernoulli draws. Negatives split into floor(0.3*negative) cancelled and remaining unresolved. No changes to the company dataset.",
+    "development": "Use the four named development histories for implementation and method checks only. No hyperparameter, feature, threshold or seed selection. Freeze generator and evaluator code before assessment. Do not optimize to assessment results.",
+    "assessment": "All training labels released by origin; all test feature rows and predictions fixed before any assessment outcome retrieval. Report every family, seed and method. Report calibration bins, Brier, log loss, confusion cells and undefined metrics. Aggregate counts are not independent person-level observations.",
+    "educationalGate": "In BOTH stable and mix-shift assessment, logistic balanced accuracy >=0.60, Brier at least0.02 lower than pooled, and Brier no more than0.005 above cell-rate. Every family and method must retain complete accounting, finite scores and all stress results. Reversal need not pass performance thresholds and must be displayed as failure if it fails. This gate supports a teaching example only, never operational qualification or model superiority over the cell baseline.",
+    "presentation": "Only integrate if the educational gate and engineering tests pass. Probability/comparison view by default; confusion matrices only on explicit request. Preserve old saved experiment answers and source versions. Clearly show planted features, historical test dates, all stress cases and no real-world accuracy/causal claim.",
+    "limits": "Known mechanism synthetic holdout with independent seeds and later temporal cohorts, not blind mechanisms or real outcomes. No spending, source refresh, personal scoring, company forecast or automatic plan mutation. No confidence intervals or statistical-significance claim. Any changed design after assessment needs another version and fresh holdout."
+  },
+  "files": {
+    "docs/opening-known-hiring-protocol.json": "3505144c95de1ee73b43c89ca37e904784a96c9b0554bbb2eb087b9a071068dc",
+    "tests/fixtures/opening-known-hiring.mjs": "9b000ab3cb2a9abd1fef2bf3e9398459f0b2c95824921142a16a63f1ed3b061c",
+    "lib/ml/opening-known-hiring.mjs": "952d16eb31472951d9708b914953236827d170db536df777114b6c8600d7e245",
+    "lib/ml/hiring-classifier-evaluation.mjs": "192d55def4b52eaf035f1209b439daefcdc849f46aa4cab77dd00f22c10be92d",
+    "tests/manual/evaluate-opening-known-hiring.mjs": "39cee6a672d13d21d56ea6cbfbf2141512ba05494269b17d90179f734f335403"
+  },
+  "educationalGatePassed": true,
+  "operationallyQualified": false,
+  "realWorldPerformanceValidated": false,
+  "families": [
+    {
+      "family": "stable",
+      "histories": 20,
+      "testCells": 480,
+      "methods": {
+        "pooled-rate": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8887,
+          "tn": 10313,
+          "brierSum": 4774.348980153366,
+          "logLossSum": 13257.0850920164,
+          "openings": 19200,
+          "positives": 8887,
+          "negatives": 10313,
+          "accuracy": 0.5371354166666666,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.24866400938298783,
+          "logLoss": 0.6904731818758542,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 19200,
+              "started": 8887,
+              "predictedStarts": 8847.754798393118,
+              "meanPrediction": 0.46082056241630825,
+              "observedFraction": 0.46286458333333336
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            }
+          ]
+        },
+        "cell-rate": {
+          "tp": 6545,
+          "fp": 3055,
+          "fn": 2342,
+          "tn": 7258,
+          "brierSum": 3661.9443658178297,
+          "logLossSum": 10795.003759382304,
+          "openings": 19200,
+          "positives": 8887,
+          "negatives": 10313,
+          "accuracy": 0.71890625,
+          "precision": 0.6817708333333333,
+          "recall": 0.7364689996624283,
+          "specificity": 0.7037719383302627,
+          "balancedAccuracy": 0.7201204689963455,
+          "brier": 0.19072626905301196,
+          "logLoss": 0.562239779134495,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 2400,
+              "started": 203,
+              "predictedStarts": 216.38525564803803,
+              "meanPrediction": 0.09016052318668251,
+              "observedFraction": 0.08458333333333333
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 7200,
+              "started": 2139,
+              "predictedStarts": 2078.0975029726515,
+              "meanPrediction": 0.288624653190646,
+              "observedFraction": 0.2970833333333333
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 240,
+              "started": 149,
+              "predictedStarts": 142.18787158145068,
+              "meanPrediction": 0.5924494649227111,
+              "observedFraction": 0.6208333333333333
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 6960,
+              "started": 4307,
+              "predictedStarts": 4331.629013079665,
+              "meanPrediction": 0.6223604903850094,
+              "observedFraction": 0.6188218390804597
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 2089,
+              "predictedStarts": 2080.237812128418,
+              "meanPrediction": 0.8667657550535076,
+              "observedFraction": 0.8704166666666666
+            }
+          ]
+        },
+        "logistic-features": {
+          "tp": 6545,
+          "fp": 3055,
+          "fn": 2342,
+          "tn": 7258,
+          "brierSum": 3660.718658621922,
+          "logLossSum": 10792.843908673838,
+          "openings": 19200,
+          "positives": 8887,
+          "negatives": 10313,
+          "accuracy": 0.71890625,
+          "precision": 0.6817708333333333,
+          "recall": 0.7364689996624283,
+          "specificity": 0.7037719383302627,
+          "balancedAccuracy": 0.7201204689963455,
+          "brier": 0.19066243013655843,
+          "logLoss": 0.5621272869100957,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 2400,
+              "started": 203,
+              "predictedStarts": 218.49155691552903,
+              "meanPrediction": 0.09103814871480376,
+              "observedFraction": 0.08458333333333333
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 7200,
+              "started": 2139,
+              "predictedStarts": 2074.833595319134,
+              "meanPrediction": 0.28817133268321304,
+              "observedFraction": 0.2970833333333333
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 7200,
+              "started": 4456,
+              "predictedStarts": 4469.4268177378935,
+              "meanPrediction": 0.6207537246858186,
+              "observedFraction": 0.6188888888888889
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 2089,
+              "predictedStarts": 2084.8909024741683,
+              "meanPrediction": 0.8687045426975701,
+              "observedFraction": 0.8704166666666666
+            }
+          ]
+        }
+      },
+      "example": {
+        "seed": 120001,
+        "features": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          }
+        ],
+        "predictions": [
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.089179548156956,
+            "logistic-features": 0.0941231865683545,
+            "key": "2025-10/0",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.28953626634958385,
+            "logistic-features": 0.29452811226897063,
+            "key": "2025-10/1",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.3038049940546968,
+            "logistic-features": 0.2909129651298491,
+            "key": "2025-10/2",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6200951248513674,
+            "logistic-features": 0.6224246204847124,
+            "key": "2025-10/3",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.291319857312723,
+            "logistic-features": 0.28924645237203445,
+            "key": "2025-10/4",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.629013079667063,
+            "logistic-features": 0.6205209089357956,
+            "key": "2025-10/5",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6070154577883472,
+            "logistic-features": 0.6164005593502092,
+            "key": "2025-10/6",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.8644470868014269,
+            "logistic-features": 0.8658908183932467,
+            "key": "2025-10/7",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          }
+        ],
+        "actual": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 3,
+            "cancelled": 11,
+            "unresolved": 26
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 13,
+            "cancelled": 8,
+            "unresolved": 19
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 10,
+            "cancelled": 9,
+            "unresolved": 21
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 27,
+            "cancelled": 3,
+            "unresolved": 10
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 16,
+            "cancelled": 7,
+            "unresolved": 17
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 23,
+            "cancelled": 5,
+            "unresolved": 12
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 23,
+            "cancelled": 5,
+            "unresolved": 12
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 33,
+            "cancelled": 2,
+            "unresolved": 5
+          }
+        ]
+      }
+    },
+    {
+      "family": "mix-shift",
+      "histories": 20,
+      "testCells": 480,
+      "methods": {
+        "pooled-rate": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6526,
+          "tn": 5474,
+          "brierSum": 3059.9756635555327,
+          "logLossSum": 8438.0113632943,
+          "openings": 12000,
+          "positives": 6526,
+          "negatives": 5474,
+          "accuracy": 0.45616666666666666,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.25499797196296103,
+          "logLoss": 0.7031676136078583,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 12000,
+              "started": 6526,
+              "predictedStarts": 5529.846748995686,
+              "meanPrediction": 0.46082056241630714,
+              "observedFraction": 0.5438333333333333
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            }
+          ]
+        },
+        "cell-rate": {
+          "tp": 5418,
+          "fp": 2382,
+          "fn": 1108,
+          "tn": 3092,
+          "brierSum": 2341.7137226929603,
+          "logLossSum": 6875.208119939504,
+          "openings": 12000,
+          "positives": 6526,
+          "negatives": 5474,
+          "accuracy": 0.7091666666666666,
+          "precision": 0.6946153846153846,
+          "recall": 0.8302175911737665,
+          "specificity": 0.5648520277676288,
+          "balancedAccuracy": 0.6975348094706977,
+          "brier": 0.19514281022441335,
+          "logLoss": 0.5729340099949587,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 600,
+              "started": 49,
+              "predictedStarts": 54.09631391200951,
+              "meanPrediction": 0.09016052318668251,
+              "observedFraction": 0.08166666666666667
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 3600,
+              "started": 1059,
+              "predictedStarts": 1039.0487514863257,
+              "meanPrediction": 0.288624653190646,
+              "observedFraction": 0.2941666666666667
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 180,
+              "started": 109,
+              "predictedStarts": 106.64090368608802,
+              "meanPrediction": 0.5924494649227112,
+              "observedFraction": 0.6055555555555555
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 5220,
+              "started": 3220,
+              "predictedStarts": 3248.7217598097527,
+              "meanPrediction": 0.6223604903850101,
+              "observedFraction": 0.6168582375478927
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 2089,
+              "predictedStarts": 2080.237812128418,
+              "meanPrediction": 0.8667657550535076,
+              "observedFraction": 0.8704166666666666
+            }
+          ]
+        },
+        "logistic-features": {
+          "tp": 5418,
+          "fp": 2382,
+          "fn": 1108,
+          "tn": 3092,
+          "brierSum": 2341.0113183882054,
+          "logLossSum": 6874.3615399754035,
+          "openings": 12000,
+          "positives": 6526,
+          "negatives": 5474,
+          "accuracy": 0.7091666666666666,
+          "precision": 0.6946153846153846,
+          "recall": 0.8302175911737665,
+          "specificity": 0.5648520277676288,
+          "balancedAccuracy": 0.6975348094706977,
+          "brier": 0.19508427653235044,
+          "logLoss": 0.572863461664617,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 600,
+              "started": 49,
+              "predictedStarts": 54.62288922888226,
+              "meanPrediction": 0.09103814871480376,
+              "observedFraction": 0.08166666666666667
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 3600,
+              "started": 1059,
+              "predictedStarts": 1037.416797659567,
+              "meanPrediction": 0.28817133268321304,
+              "observedFraction": 0.2941666666666667
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 5400,
+              "started": 3329,
+              "predictedStarts": 3352.0701133034254,
+              "meanPrediction": 0.6207537246858195,
+              "observedFraction": 0.6164814814814815
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 2089,
+              "predictedStarts": 2084.8909024741683,
+              "meanPrediction": 0.8687045426975701,
+              "observedFraction": 0.8704166666666666
+            }
+          ]
+        }
+      },
+      "example": {
+        "seed": 120001,
+        "features": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 10
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 20
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 20
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 30
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 20
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 30
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 30
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          }
+        ],
+        "predictions": [
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.089179548156956,
+            "logistic-features": 0.0941231865683545,
+            "key": "2025-10/0",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.28953626634958385,
+            "logistic-features": 0.29452811226897063,
+            "key": "2025-10/1",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.3038049940546968,
+            "logistic-features": 0.2909129651298491,
+            "key": "2025-10/2",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6200951248513674,
+            "logistic-features": 0.6224246204847124,
+            "key": "2025-10/3",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.291319857312723,
+            "logistic-features": 0.28924645237203445,
+            "key": "2025-10/4",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.629013079667063,
+            "logistic-features": 0.6205209089357956,
+            "key": "2025-10/5",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6070154577883472,
+            "logistic-features": 0.6164005593502092,
+            "key": "2025-10/6",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.8644470868014269,
+            "logistic-features": 0.8658908183932467,
+            "key": "2025-10/7",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          }
+        ],
+        "actual": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 10,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 0,
+            "cancelled": 3,
+            "unresolved": 7
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 20,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 5,
+            "cancelled": 4,
+            "unresolved": 11
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 20,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 6,
+            "cancelled": 4,
+            "unresolved": 10
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 30,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 19,
+            "cancelled": 3,
+            "unresolved": 8
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 20,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 8,
+            "cancelled": 3,
+            "unresolved": 9
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 30,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 18,
+            "cancelled": 3,
+            "unresolved": 9
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 30,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 16,
+            "cancelled": 4,
+            "unresolved": 10
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 33,
+            "cancelled": 2,
+            "unresolved": 5
+          }
+        ]
+      }
+    },
+    {
+      "family": "relationship-reversal",
+      "histories": 20,
+      "testCells": 480,
+      "methods": {
+        "pooled-rate": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8851,
+          "tn": 10349,
+          "brierSum": 4771.249441394252,
+          "logLossSum": 13250.870485269355,
+          "openings": 19200,
+          "positives": 8851,
+          "negatives": 10349,
+          "accuracy": 0.5390104166666667,
+          "precision": null,
+          "recall": 0,
+          "specificity": 1,
+          "balancedAccuracy": 0.5,
+          "brier": 0.2485025750726173,
+          "logLoss": 0.6901495044411122,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 19200,
+              "started": 8851,
+              "predictedStarts": 8847.754798393118,
+              "meanPrediction": 0.46082056241630825,
+              "observedFraction": 0.46098958333333334
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            }
+          ]
+        },
+        "cell-rate": {
+          "tp": 2261,
+          "fp": 7339,
+          "fn": 6590,
+          "tn": 3010,
+          "brierSum": 8163.515114926034,
+          "logLossSum": 21991.1600927622,
+          "openings": 19200,
+          "positives": 8851,
+          "negatives": 10349,
+          "accuracy": 0.27453125,
+          "precision": 0.23552083333333335,
+          "recall": 0.2554513614280872,
+          "specificity": 0.29084935742583823,
+          "balancedAccuracy": 0.27315035942696275,
+          "brier": 0.4251830789023976,
+          "logLoss": 1.1453729214980313,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 2400,
+              "started": 2086,
+              "predictedStarts": 216.38525564803803,
+              "meanPrediction": 0.09016052318668251,
+              "observedFraction": 0.8691666666666666
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 7200,
+              "started": 4504,
+              "predictedStarts": 2078.0975029726515,
+              "meanPrediction": 0.288624653190646,
+              "observedFraction": 0.6255555555555555
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 240,
+              "started": 65,
+              "predictedStarts": 142.18787158145068,
+              "meanPrediction": 0.5924494649227111,
+              "observedFraction": 0.2708333333333333
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 6960,
+              "started": 1981,
+              "predictedStarts": 4331.629013079665,
+              "meanPrediction": 0.6223604903850094,
+              "observedFraction": 0.2846264367816092
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 215,
+              "predictedStarts": 2080.237812128418,
+              "meanPrediction": 0.8667657550535076,
+              "observedFraction": 0.08958333333333333
+            }
+          ]
+        },
+        "logistic-features": {
+          "tp": 2261,
+          "fp": 7339,
+          "fn": 6590,
+          "tn": 3010,
+          "brierSum": 8165.403722215145,
+          "logLossSum": 21993.750956848504,
+          "openings": 19200,
+          "positives": 8851,
+          "negatives": 10349,
+          "accuracy": 0.27453125,
+          "precision": 0.23552083333333335,
+          "recall": 0.2554513614280872,
+          "specificity": 0.29084935742583823,
+          "balancedAccuracy": 0.27315035942696275,
+          "brier": 0.4252814438653721,
+          "logLoss": 1.1455078623358597,
+          "calibration": [
+            {
+              "lower": 0,
+              "upper": 0.2,
+              "openings": 2400,
+              "started": 2086,
+              "predictedStarts": 218.49155691552903,
+              "meanPrediction": 0.09103814871480376,
+              "observedFraction": 0.8691666666666666
+            },
+            {
+              "lower": 0.2,
+              "upper": 0.4,
+              "openings": 7200,
+              "started": 4504,
+              "predictedStarts": 2074.833595319134,
+              "meanPrediction": 0.28817133268321304,
+              "observedFraction": 0.6255555555555555
+            },
+            {
+              "lower": 0.4,
+              "upper": 0.6,
+              "openings": 0,
+              "started": 0,
+              "predictedStarts": 0,
+              "meanPrediction": null,
+              "observedFraction": null
+            },
+            {
+              "lower": 0.6,
+              "upper": 0.8,
+              "openings": 7200,
+              "started": 2046,
+              "predictedStarts": 4469.4268177378935,
+              "meanPrediction": 0.6207537246858186,
+              "observedFraction": 0.2841666666666667
+            },
+            {
+              "lower": 0.8,
+              "upper": 1,
+              "openings": 2400,
+              "started": 215,
+              "predictedStarts": 2084.8909024741683,
+              "meanPrediction": 0.8687045426975701,
+              "observedFraction": 0.08958333333333333
+            }
+          ]
+        }
+      },
+      "example": {
+        "seed": 120001,
+        "features": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40
+          }
+        ],
+        "predictions": [
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.089179548156956,
+            "logistic-features": 0.0941231865683545,
+            "key": "2025-10/0",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.28953626634958385,
+            "logistic-features": 0.29452811226897063,
+            "key": "2025-10/1",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.3038049940546968,
+            "logistic-features": 0.2909129651298491,
+            "key": "2025-10/2",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6200951248513674,
+            "logistic-features": 0.6224246204847124,
+            "key": "2025-10/3",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.291319857312723,
+            "logistic-features": 0.28924645237203445,
+            "key": "2025-10/4",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.629013079667063,
+            "logistic-features": 0.6205209089357956,
+            "key": "2025-10/5",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.6070154577883472,
+            "logistic-features": 0.6164005593502092,
+            "key": "2025-10/6",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          },
+          {
+            "pooled-rate": 0.46176164261270647,
+            "cell-rate": 0.8644470868014269,
+            "logistic-features": 0.8658908183932467,
+            "key": "2025-10/7",
+            "predictedAt": "2025-10-01T00:00:00.000Z"
+          }
+        ],
+        "actual": [
+          {
+            "key": "2025-10/0",
+            "month": "2025-10",
+            "mask": 0,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 35,
+            "cancelled": 1,
+            "unresolved": 4
+          },
+          {
+            "key": "2025-10/1",
+            "month": "2025-10",
+            "mask": 1,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 21,
+            "cancelled": 5,
+            "unresolved": 14
+          },
+          {
+            "key": "2025-10/2",
+            "month": "2025-10",
+            "mask": 2,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 20,
+            "cancelled": 6,
+            "unresolved": 14
+          },
+          {
+            "key": "2025-10/3",
+            "month": "2025-10",
+            "mask": 3,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 0
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 13,
+            "cancelled": 8,
+            "unresolved": 19
+          },
+          {
+            "key": "2025-10/4",
+            "month": "2025-10",
+            "mask": 4,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 30,
+            "cancelled": 3,
+            "unresolved": 7
+          },
+          {
+            "key": "2025-10/5",
+            "month": "2025-10",
+            "mask": 5,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 0,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 9,
+            "cancelled": 9,
+            "unresolved": 22
+          },
+          {
+            "key": "2025-10/6",
+            "month": "2025-10",
+            "mask": 6,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 0,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 10,
+            "cancelled": 9,
+            "unresolved": 21
+          },
+          {
+            "key": "2025-10/7",
+            "month": "2025-10",
+            "mask": 7,
+            "openedAt": "2025-10-01T00:00:00.000Z",
+            "featuresAvailableAt": "2025-10-01T00:00:00.000Z",
+            "features": {
+              "definedScope": 1,
+              "panelReserved": 1,
+              "flexibleStartWindow": 1
+            },
+            "openings": 40,
+            "labelAvailableAt": "2025-12-31T00:00:00.000Z",
+            "started": 4,
+            "cancelled": 10,
+            "unresolved": 26
+          }
+        ]
+      }
+    }
+  ],
+  "protocolCommit": "2ea42105",
+  "evaluatorCommit": "885ead31",
+  "reportSha256": "fb2a2236868cc621df0756bae3e096b6b3443eec3b66e0345455e54183a26bcf"
+}

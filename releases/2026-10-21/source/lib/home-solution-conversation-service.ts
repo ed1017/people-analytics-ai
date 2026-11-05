@@ -1,6 +1,8 @@
 // @ts-expect-error Native tests share canonical TypeScript.
 import {hiringPredictionAiContext} from './hiring-prediction-demo.ts';
 // @ts-expect-error Native tests share canonical TypeScript.
+import {openingKnownAiContext} from './opening-known-hiring-demo.ts';
+// @ts-expect-error Native tests share canonical TypeScript.
 import {readMarketContext,marketContextLookupTool} from './market-context-lookup.ts';
 // @ts-expect-error Native regression tests share TypeScript source.
 import {readProjectionDemand} from './projection-demand.ts';
@@ -194,7 +196,7 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  // Only the already selected, standalone comparison can finish from its first tool result.
  const staffingOnly=staffingRequired&&canCompleteRequiredStaffingAlone(request);
  const standaloneStaffing=staffingOnly&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
- const modelContext={...solutionModelContext(request,progress),syntheticHiringExperiment:hiringPredictionAiContext(request.message.text),preparation:solutionPreparation(request,runtime.requestTime??runtime.now?.()??new Date(),runtime.requestTime?'request-start':'conversation-preparation'),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
+ const modelContext={...solutionModelContext(request,progress),syntheticHiringExperiment:openingKnownAiContext(request.message.text)??hiringPredictionAiContext(request.message.text),preparation:solutionPreparation(request,runtime.requestTime??runtime.now?.()??new Date(),runtime.requestTime?'request-start':'conversation-preparation'),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
  const input:unknown[]=[{role:'user',content:'CURRENT AUTHORITATIVE CONTEXT AND CONVERSATION DATA\n'+JSON.stringify({...modelContext,...(entryContext?{progressEntryDraft:entryContext.previous}:{} )})}];
  const planningRefs=new Map<string,PlanningCalculationRef>();
