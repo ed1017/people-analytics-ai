@@ -1,0 +1,19 @@
+{
+  "version": "explore-hiring-classifier-v1",
+  "dataClass": "constructed-synthetic",
+  "generator": "tests/fixtures/hiring-cohort-generator.mjs",
+  "model": "lib/ml/hiring-cohort-model.mjs",
+  "seeds": [90201, 90202, 90203, 90204, 90205, 90206, 90207, 90208, 90209, 90210, 90211, 90212, 90213, 90214, 90215, 90216, 90217, 90218, 90219, 90220],
+  "families": ["stationary", "gradual-improvement", "assessment-reversal"],
+  "origin": "2025-01-01T00:00:00.000Z",
+  "testMonths": ["2025-01", "2025-02", "2025-03"],
+  "scoreThrough": "2025-07-01T00:00:00.000Z",
+  "positiveLabel": "Actual start within 90 days",
+  "negativeLabel": "No actual start within 90 days",
+  "threshold": 0.5,
+  "thresholdRule": "Predict positive when probability is greater than or equal to 0.5. Fixed before evaluation; not optimized for an operational cost.",
+  "methods": ["logistic-trend", "recent-3-fraction"],
+  "selection": "No model selection, seed selection, threshold tuning or test-driven changes. Report both methods and all three families, including failures. Existing model penalties and generator rules remain unchanged.",
+  "evaluation": "Fit only mature released cohorts available at origin, predict the three later test cohorts, then obtain labels. Sum exact opening counts into confusion matrices. Each cohort shares one prediction; counts are not independent individual predictions. Report class support, precision, recall, specificity, accuracy, balanced accuracy, Brier and log loss. Undefined metrics remain null.",
+  "limits": "New fixed seeds, known planted mechanisms: chronological synthetic holdout, not blinded real-world validation. No employee scoring, operational qualification, causal effect, capacity gain or confidence interval. Keep the separate October company dataset and existing frozen experiments unchanged. Do not present these 2025 test dates as current forecasts."
+}
