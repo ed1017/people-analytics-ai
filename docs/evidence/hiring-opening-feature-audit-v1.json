@@ -1,0 +1,223 @@
+{
+  "version": "hiring-opening-feature-audit-v1",
+  "inspectedDate": "2026-11-05",
+  "project": "noykvmztefmmhyuwuppv",
+  "primarySchema": "workforce_october_2026",
+  "primaryCutoff": "2026-10-31",
+  "dataClass": "constructed-synthetic",
+  "queriesReadOnly": true,
+  "rawPersonRecordsExported": false,
+  "modelTrained": false,
+  "operationallyQualified": false,
+  "localFixtureConfirmation": {
+    "mature": 4690,
+    "recorded_starts": 4690,
+    "min_days": 45,
+    "max_days": 45
+  },
+  "sourceFiles": [
+    {
+      "path": "synthetic-october-candidate-20261103/serving-prep/build_adapter.py",
+      "sha256": "b2a66971dd091bc6d458041e84a79a7f243435d7843b894c38b809fa822d7463"
+    },
+    {
+      "path": "synthetic-realism-baseline-20261023/generate.py",
+      "sha256": "d6473a34fc2cfd4c5271c3e0a04878a8a0a91f06b9ff351ef957802233126b12"
+    }
+  ],
+  "audits": [
+    {
+      "name": "hiringAuditOutcome",
+      "query": "with h as (\n select requisition_id,count(*) as hires,count(*) filter(where start_date is null) as missing_start,\n min(start_date) as first_start,max(start_date) as last_start,min(created_at) as first_insert\n from workforce_october_2026.hires group by requisition_id\n)\nselect case when r.opened_date is null then 'missing-opening'\n when r.opened_date+90<=date '2026-10-31' then 'mature-by-cutoff' else 'immature-by-cutoff' end as maturity,\n count(*) as requisitions,sum(r.openings) as declared_openings,\n count(*) filter(where r.openings<>1 or r.openings is null) as non_single_opening,\n count(*) filter(where h.hires>1) as multiple_hire_rows,\n count(*) filter(where h.first_start<=r.opened_date+90 and h.first_start>=r.opened_date) as observed_start_by_90,\n count(*) filter(where h.first_start>r.opened_date+90) as observed_later_start,\n count(*) filter(where h.requisition_id is null) as no_hire_row,\n count(*) filter(where r.requisition_status='cancelled') as currently_cancelled,\n count(*) filter(where r.requisition_status='filled' and h.requisition_id is null) as filled_without_hire,\n count(*) filter(where r.requisition_status<>'filled' and h.requisition_id is not null) as nonfilled_with_hire,\n count(*) filter(where h.first_start<r.opened_date) as start_before_opening,\n count(*) filter(where h.first_start>date '2026-10-31') as future_start,\n count(*) filter(where r.target_start_date=h.first_start) as planned_equals_start,\n min(r.opened_date) as earliest_opening,max(r.opened_date) as latest_opening,\n min(r.created_at) as first_inserted,max(r.created_at) as last_inserted,\n count(*) filter(where r.created_at::date<=r.opened_date) as inserted_by_opening\nfrom workforce_october_2026.requisitions r left join h using(requisition_id)\ngroup by 1 order by 1;",
+      "rows": [
+        {
+          "maturity": "immature-by-cutoff",
+          "requisitions": 455,
+          "declared_openings": 455,
+          "non_single_opening": 0,
+          "multiple_hire_rows": 0,
+          "observed_start_by_90": 293,
+          "observed_later_start": 0,
+          "no_hire_row": 162,
+          "currently_cancelled": 0,
+          "filled_without_hire": 0,
+          "nonfilled_with_hire": 0,
+          "start_before_opening": 0,
+          "future_start": 0,
+          "planned_equals_start": 201,
+          "earliest_opening": "2026-08-03",
+          "latest_opening": "2026-10-28",
+          "first_inserted": "2026-10-17 00:00:00+00",
+          "last_inserted": "2026-10-17 00:00:00+00",
+          "inserted_by_opening": 25
+        },
+        {
+          "maturity": "mature-by-cutoff",
+          "requisitions": 4690,
+          "declared_openings": 4690,
+          "non_single_opening": 0,
+          "multiple_hire_rows": 0,
+          "observed_start_by_90": 4690,
+          "observed_later_start": 0,
+          "no_hire_row": 0,
+          "currently_cancelled": 0,
+          "filled_without_hire": 0,
+          "nonfilled_with_hire": 0,
+          "start_before_opening": 0,
+          "future_start": 0,
+          "planned_equals_start": 0,
+          "earliest_opening": "2023-12-18",
+          "latest_opening": "2026-08-02",
+          "first_inserted": "2026-10-17 00:00:00+00",
+          "last_inserted": "2026-10-17 00:00:00+00",
+          "inserted_by_opening": 0
+        }
+      ]
+    },
+    {
+      "name": "hiringAuditFeatures",
+      "query": "select count(*) as requisitions,\n count(*) filter(where job_profile_id is null) as missing_role,\n count(*) filter(where job_level_id is null) as missing_level,\n count(*) filter(where location_id is null) as missing_location,\n count(*) filter(where org_unit_id is null) as missing_org,\n count(*) filter(where approved_date is null) as missing_approval,\n count(*) filter(where approved_date>opened_date) as approval_after_opening,\n count(*) filter(where budgeted_salary_min is null or budgeted_salary_max is null) as missing_budget,\n count(*) filter(where budgeted_salary_min>budgeted_salary_max) as invalid_budget_range,\n count(distinct job_profile_id) as role_count,count(distinct location_id) as location_count,\n count(distinct created_at) as insertion_timestamps\nfrom workforce_october_2026.requisitions;",
+      "rows": [
+        {
+          "requisitions": 5145,
+          "missing_role": 0,
+          "missing_level": 0,
+          "missing_location": 0,
+          "missing_org": 0,
+          "missing_approval": 0,
+          "approval_after_opening": 0,
+          "missing_budget": 5145,
+          "invalid_budget_range": 0,
+          "role_count": 50,
+          "location_count": 10,
+          "insertion_timestamps": 1
+        }
+      ]
+    },
+    {
+      "name": "hiringAuditQuarters",
+      "query": "select date_trunc('quarter',r.opened_date)::date as opening_quarter,\n count(*) as requisitions,count(*) filter(where r.opened_date+90<=date '2026-10-31') as mature,\n count(*) filter(where h.start_date between r.opened_date and r.opened_date+90 and r.opened_date+90<=date '2026-10-31') as mature_start_by90,\n min(h.start_date-r.opened_date) as min_days,max(h.start_date-r.opened_date) as max_days\nfrom workforce_october_2026.requisitions r left join workforce_october_2026.hires h using(requisition_id)\ngroup by 1 order by 1;",
+      "rows": [
+        {
+          "opening_quarter": "2023-10-01",
+          "requisitions": 56,
+          "mature": 56,
+          "mature_start_by90": 56,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2024-01-01",
+          "requisitions": 409,
+          "mature": 409,
+          "mature_start_by90": 409,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2024-04-01",
+          "requisitions": 429,
+          "mature": 429,
+          "mature_start_by90": 429,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2024-07-01",
+          "requisitions": 426,
+          "mature": 426,
+          "mature_start_by90": 426,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2024-10-01",
+          "requisitions": 418,
+          "mature": 418,
+          "mature_start_by90": 418,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2025-01-01",
+          "requisitions": 497,
+          "mature": 497,
+          "mature_start_by90": 497,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2025-04-01",
+          "requisitions": 397,
+          "mature": 397,
+          "mature_start_by90": 397,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2025-07-01",
+          "requisitions": 492,
+          "mature": 492,
+          "mature_start_by90": 492,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2025-10-01",
+          "requisitions": 410,
+          "mature": 410,
+          "mature_start_by90": 410,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2026-01-01",
+          "requisitions": 487,
+          "mature": 487,
+          "mature_start_by90": 487,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2026-04-01",
+          "requisitions": 456,
+          "mature": 456,
+          "mature_start_by90": 456,
+          "min_days": 45,
+          "max_days": 45
+        },
+        {
+          "opening_quarter": "2026-07-01",
+          "requisitions": 502,
+          "mature": 213,
+          "mature_start_by90": 213,
+          "min_days": 23,
+          "max_days": 59
+        },
+        {
+          "opening_quarter": "2026-10-01",
+          "requisitions": 166,
+          "mature": 0,
+          "mature_start_by90": 0,
+          "min_days": 19,
+          "max_days": 30
+        }
+      ]
+    },
+    {
+      "name": "hiringAuditLegacy",
+      "query": "select count(*) as mature_requisitions,\ncount(*) filter(where h.start_date between r.opened_date and r.opened_date+90) as observed_start_by90,\ncount(*) filter(where h.requisition_id is null) as no_hire_row,\ncount(*) filter(where r.requisition_status='cancelled') as currently_cancelled,\nmin(r.created_at) as first_inserted,max(r.created_at) as last_inserted\nfrom public.requisitions r left join public.hires h using(requisition_id)\nwhere r.opened_date+90<=date '2026-09-30';",
+      "rows": [
+        {
+          "mature_requisitions": 5310,
+          "observed_start_by90": 4580,
+          "no_hire_row": 347,
+          "currently_cancelled": 136,
+          "first_inserted": "2026-09-28 02:04:39.68686+00",
+          "last_inserted": "2026-09-28 02:04:39.68686+00"
+        }
+      ],
+      "interpretation": "Legacy COUNT(*) is after a hires join; returned mature_requisitions alias is not verified distinct requisition grain. Status counts overlap. Do not use as model class counts."
+    }
+  ]
+}

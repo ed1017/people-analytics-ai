@@ -8,6 +8,8 @@ Inspected 2026-10-05, using repository contracts plus [read-only Supabase schema
 
 ## Sequence and method distinctions
 
+[5 November opening-feature audit](hiring-opening-feature-audit.md): the current October mirror has 4,690 mature requisitions, all starting exactly 45 days after opening; its 162 unfilled openings are immature. Role/location fields exist but first-known vintages are not established, budget ranges are incomplete and several fields are outcome-derived. No classifier/duration upgrade is supported by this source. Legacy September data remains a separate unqualified population; the detailed audit records precise alternatives without changing company history.
+
 Follow-up [blend assessment](hiring-blend-assessment.md) tested a prespecified conservative alternative on 90 fresh synthetic histories. It failed the all-family probability-error gate and retained 50% balanced accuracy, so no model was promoted. The next useful option is qualification of existing opening-known features and complete outcome history, rather than tuning against these now-visible assessment results. A richer synthetic generator is a separate design option, not a demonstrated improvement.
 
 | Order / use case | Available support | Essential next evidence | Method status |
