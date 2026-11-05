@@ -1,5 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';import ts from 'typescript';import React from 'react';import {renderToStaticMarkup} from 'react-dom/server';import {createRequire} from 'node:module';
 import * as demo from '../releases/2026-10-21/source/lib/hiring-prediction-demo.ts';
+import {openingKnownAiContext} from '../releases/2026-10-21/source/lib/opening-known-hiring-demo.ts';
 import {homePromptCategories} from '../releases/2026-10-21/source/lib/home-prompt-categories.ts';
 import {converseSolutions} from '../releases/2026-10-21/source/lib/home-solution-conversation-service.ts';
 import {emptySolutionState} from '../releases/2026-10-21/source/lib/home-solution-conversation.ts';
@@ -9,7 +10,7 @@ test('actual model payload carries verified experiment only for explicit experim
  for(const text of ['Explain the synthetic hiring classifier','Discuss training options without making a plan']){
   const request={version:1,requestId:'prediction-context',goal:{id:'',statement:''},scope:'Company-wide',filters:{country:'all',org:'all',level:'all'},timeZone:'UTC',evidence:buildHomePack({},'Company-wide',text),goalContext:null,selectedId:null,catalog:null,state:emptySolutionState(),message:{id:'prediction-question',text}};
   const stop=Error('verified mocked payload');let calls=0;
-  await assert.rejects(converseSolutions(request,{loadProjection:()=>assert.fail('no projection'),complete:async input=>{calls++;const context=JSON.parse(input[0].content.slice(input[0].content.indexOf('{')));assert.deepEqual(context.syntheticHiringExperiment,demo.hiringPredictionAiContext(text));assert.equal(context.goalContext,null);throw stop;}},new AbortController().signal),e=>e===stop);assert.equal(calls,1);
+  await assert.rejects(converseSolutions(request,{loadProjection:()=>assert.fail('no projection'),complete:async input=>{calls++;const context=JSON.parse(input[0].content.slice(input[0].content.indexOf('{')));assert.deepEqual(context.syntheticHiringExperiment,openingKnownAiContext(text)??demo.hiringPredictionAiContext(text));assert.equal(context.goalContext,null);throw stop;}},new AbortController().signal),e=>e===stop);assert.equal(calls,1);
  }
 });
 test('Explore exposes the explicitly synthetic prompt after existing risk and market entries',()=>{const p=homePromptCategories[0].prompts;assert.equal(p.length,4);assert.equal(p[3],demo.hiringPredictionPrompt);assert.ok(demo.isHiringPredictionQuestion(p[3]+'?'));assert.equal(demo.isHiringPredictionQuestion('Predict our October hires'),false);});

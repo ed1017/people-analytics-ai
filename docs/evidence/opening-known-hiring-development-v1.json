@@ -1,0 +1,66 @@
+{
+  "mode": "development",
+  "gate": true,
+  "families": [
+    {
+      "family": "stable",
+      "methods": {
+        "pooled-rate": {
+          "n": 3840,
+          "brier": 0.2496896454253436,
+          "balancedAccuracy": 0.5
+        },
+        "cell-rate": {
+          "n": 3840,
+          "brier": 0.18875819717811354,
+          "balancedAccuracy": 0.7317368082256128
+        },
+        "logistic-features": {
+          "n": 3840,
+          "brier": 0.188660965091412,
+          "balancedAccuracy": 0.7317368082256128
+        }
+      }
+    },
+    {
+      "family": "mix-shift",
+      "methods": {
+        "pooled-rate": {
+          "n": 2400,
+          "brier": 0.25596661313848157,
+          "balancedAccuracy": 0.5
+        },
+        "cell-rate": {
+          "n": 2400,
+          "brier": 0.19278482962688567,
+          "balancedAccuracy": 0.7122419244510236
+        },
+        "logistic-features": {
+          "n": 2400,
+          "brier": 0.19256745955529309,
+          "balancedAccuracy": 0.7122419244510236
+        }
+      }
+    },
+    {
+      "family": "relationship-reversal",
+      "methods": {
+        "pooled-rate": {
+          "n": 3840,
+          "brier": 0.24968336845763053,
+          "balancedAccuracy": 0.5
+        },
+        "cell-rate": {
+          "n": 3840,
+          "brier": 0.42788076951263593,
+          "balancedAccuracy": 0.2760704673354539
+        },
+        "logistic-features": {
+          "n": 3840,
+          "brier": 0.42824913214809435,
+          "balancedAccuracy": 0.2760704673354539
+        }
+      }
+    }
+  ]
+}

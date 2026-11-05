@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "b1042ef704819bb76c808410fa0d10292a7e13d96b323e60c7d3a2c84e5265b4",
-      "bytes": 115757
+      "sha256": "1a8900454bbe160f5f2d415a0cdd6daef528387a03fa2b07892ff8f4975aa9bf",
+      "bytes": 116260
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "95c77e37dc9109bd83296b9437dd5a6dfb3727b2fa1095c32ad7ac38093051c7",
-      "bytes": 46253
+      "sha256": "6342cda56fd8898e27d859e2ed2c2bb074a423b377b378225c728a33197fcdee",
+      "bytes": 46429
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -5379,8 +5379,8 @@
     },
     {
       "path": "tests/home-market-context-explorer.test.mjs",
-      "sha256": "d1f9f0f32e5e8dbadfb376636435c788c2e98743560751f03c7c282b983172c0",
-      "bytes": 9530
+      "sha256": "1417eb2c9a212f9d6edd9a96d1bb0ae2d56845a848c46bdf68a3b9a09f9c9453",
+      "bytes": 9629
     },
     {
       "path": "lib/data/it-systems-nonpay-mapping-v1.json",
@@ -5836,6 +5836,21 @@
       "path": "lib/hiring-prediction-demo.ts",
       "bytes": 7294,
       "sha256": "db8c7839784ba041fb2c97312cda5a7e58c8e43a2b756522bc6cc8b0188df1d2"
+    },
+    {
+      "path": "components/opening-known-hiring-demo.tsx",
+      "bytes": 5491,
+      "sha256": "d6353b66f44897c7e08231c295f885938b8c796ed9160a2f43842f8a59c4f77f"
+    },
+    {
+      "path": "lib/opening-known-hiring-demo.ts",
+      "bytes": 6323,
+      "sha256": "3d1577b27931fb6119dba5c4db7726530731ba2f87e024c29f2e07e317f46fdc"
+    },
+    {
+      "path": "lib/data/opening-known-hiring-v1.json",
+      "bytes": 52943,
+      "sha256": "968f3ee490283cd03affd19fa69155d43005700bcca28ef236b158baadac36cc"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
