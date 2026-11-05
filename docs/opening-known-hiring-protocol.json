@@ -10,6 +10,7 @@
   "firstMonth": "2022-01",
   "lastTrainingMonth": "2025-06",
   "origin": "2025-10-01T00:00:00.000Z",
+  "predictionTime": "Fit and freeze the model at origin. Predict each test cohort at its own opening timestamp using then-available features. November/December features are not claimed known on October1. No test labels update the frozen model.",
   "testMonths": ["2025-10","2025-11","2025-12"],
   "scoreThrough": "2026-04-01T00:00:00.000Z",
   "labelHorizonDays": 90,
