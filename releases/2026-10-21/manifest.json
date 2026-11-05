@@ -444,8 +444,8 @@
     },
     {
       "path": "components/goal-conversation-messages.tsx",
-      "sha256": "1b8b6c54d3db12ed432fd0a8a1d6492b83a21ae8df02a52a51cccbd8e02d2829",
-      "bytes": 4053
+      "sha256": "83bc7f5f41c1005aeb0bc93e890d3aabd3ef82c40216d4557574de166b60a1c5",
+      "bytes": 4077
     },
     {
       "path": "components/goal-progress-entry-review.tsx",
@@ -5824,8 +5824,8 @@
     },
     {
       "path": "components/hiring-prediction-demo.tsx",
-      "bytes": 6443,
-      "sha256": "d8404db6a1b3f98d8e2021b6c8c7c173d268f21cd99d17cdff1eeeb9297cd1f6"
+      "bytes": 6455,
+      "sha256": "7255cdb1b74b292017b94480dd3d58d07c698b6fce2618d26203424b9120d738"
     },
     {
       "path": "lib/data/explore-hiring-classifier-v1.json",
