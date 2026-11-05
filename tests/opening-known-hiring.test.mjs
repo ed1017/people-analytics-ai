@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {openingCohorts,observeOpeningCohorts} from './fixtures/opening-known-hiring.mjs';
 import {fitOpeningModel,predictOpeningModel} from '../lib/ml/opening-known-hiring.mjs';
-import {calibration} from './manual/evaluate-opening-known-hiring.mjs';
+import {calibration,educationalGate,evaluateOpeningKnown} from './manual/evaluate-opening-known-hiring.mjs';
 const origin='2025-10-01T00:00:00.000Z';
 const train=()=>observeOpeningCohorts('stable',119001,openingCohorts('stable',['2024-01','2024-02','2024-03']),origin);
 test('opening features exclude labels and are not known before opening',()=>{
@@ -31,4 +31,21 @@ test('generated outcomes account for all openings; reversal is invisible before 
 test('calibration bins preserve counts and undefined empty bins',()=>{
  const bins=calibration([{openings:10,started:3}],[{m:.3}],'m');
  assert.equal(bins[1].openings,10);assert.equal(bins[1].meanPrediction,.3);assert.equal(bins[1].observedFraction,.3);assert.equal(bins[0].meanPrediction,null);
+});
+test('development creates every prediction before any scoring snapshot is requested',async()=>{
+ const calls=[];const report=await evaluateOpeningKnown('development',(family,seed,rows,asOf)=>{
+  assert.ok(seed>=119001&&seed<=119004);calls.push(asOf);return observeOpeningCohorts(family,seed,rows,asOf);
+ });
+ assert.equal(calls.length,24);assert.ok(calls.slice(0,12).every(x=>x===origin));assert.ok(calls.slice(12).every(x=>x==='2026-04-01T00:00:00.000Z'));
+ assert.equal(report.cases.length,12);
+});
+test('teaching gate requires both ordinary scenarios and complete finite stress results',()=>{
+ const metric={positives:10,negatives:10,brier:.2,logLoss:.5,balancedAccuracy:.6};
+ const families=['stable','mix-shift','relationship-reversal'].map(family=>({family,methods:{'logistic-features':{...metric},'cell-rate':{...metric,brier:.198},'pooled-rate':{...metric,brier:.25}}}));
+ assert.equal(educationalGate(families),true);assert.equal(educationalGate(families.slice(0,2)),false);
+ for(const override of [{balancedAccuracy:.59},{brier:.24},{logLoss:NaN},{positives:0}]){
+  const copy=structuredClone(families);Object.assign(copy[0].methods['logistic-features'],override);assert.equal(educationalGate(copy),false);
+ }
+ const copy=structuredClone(families);copy[2].methods['logistic-features'].balancedAccuracy=.2;assert.equal(educationalGate(copy),true);
+ copy[2].methods['logistic-features'].brier=Infinity;assert.equal(educationalGate(copy),false);
 });
