@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-05",
+  "pullRequest": 568,
+  "mergeCommit": "fc5cc2878486a671c6205f9e3b09122e8be8739c",
+  "runtimeCommit": "ab2654457a5d0cc8e873ef33ffc5b41cea9bb131",
+  "deployment": "dpl_852jykUia55QgfkdCWJBe4PdGvNL",
+  "deploymentHost": "people-analytics-ra3m9hxjx-ed-56dc.vercel.app",
+  "publicHost": "www.ed-ai.app",
+  "ciRun": 41968914850,
+  "ciConclusion": "success",
+  "focusedTests": 31,
+  "typecheck": "pass",
+  "productionBuild": "pass",
+  "archiveSha256": "b2df0b7930479f728bf6e457b9615bbfce98ada509b361ac7c1a184e042b5070",
+  "archiveBytes": 7014903,
+  "archiveEntries": 1313,
+  "privateRuntimeInputsChanged": false,
+  "apiSpendUsd": 0,
+  "browser": [
+    {
+      "environment": "release-stage-retry",
+      "width": 1440,
+      "origin": "https://people-analytics-ra3m9hxjx-ed-56dc.vercel.app",
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "providerPosts": [],
+      "realProviderCalls": 0,
+      "receiptSha256": "e725129416543f8c2cd22b0acf653929029316c3178c7679c91018d7e437696c"
+    },
+    {
+      "environment": "release-stage-retry",
+      "width": 390,
+      "origin": "https://people-analytics-ra3m9hxjx-ed-56dc.vercel.app",
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "providerPosts": [],
+      "realProviderCalls": 0,
+      "receiptSha256": "700684bfb67fb3fc1753a15e5154a213a0a0eb58ddfb4721e63b21810b7403a7"
+    },
+    {
+      "environment": "public",
+      "width": 1440,
+      "origin": "https://www.ed-ai.app",
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "providerPosts": [],
+      "realProviderCalls": 0,
+      "receiptSha256": "594eec8fc33c9365c22eb036bc0786407250742ec147755f1785df5bebd3f738"
+    },
+    {
+      "environment": "public",
+      "width": 390,
+      "origin": "https://www.ed-ai.app",
+      "checks": [
+        "Explore opens saved local result, all three families and both models without changing goals or draft",
+        "No document horizontal overflow",
+        "Reload retains the versioned chat result and unsent draft",
+        "Only an explicit request appends matrices; original forecast remains matrix-free",
+        "Ordinary explanation stays bound to this demo without provider request",
+        "Reset removes demo response without restoring stale context",
+        "Repeated launch preserves draft and remains local"
+      ],
+      "errors": [],
+      "providerPosts": [],
+      "realProviderCalls": 0,
+      "receiptSha256": "4f33a935dbd260c95c65fd35d41e4ae1ca68dd1bfab41b85e85b19c28d6edfb1"
+    }
+  ],
+  "limitations": [
+    "Browser readiness was a local configured fixture; provider POSTs blocked. No fresh provider-answer quality claim.",
+    "Two final-candidate protected browser attempts stalled before producing results; terminated and rerun successfully.",
+    "Known synthetic mechanisms; no real-world or operational accuracy claim."
+  ],
+  "rollbackDeployment": "dpl_2pTY7Kijua2oa2CxetwabZ3Nzakb"
+}
