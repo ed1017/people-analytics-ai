@@ -46,6 +46,8 @@ jobs:
         run: |
           node tests/manual/generate-explore-hiring-classifier.mjs --check
           node --test tests/hiring-classifier-evaluation.test.mjs tests/release-hiring-prediction.test.mjs
+          node tests/manual/evaluate-hiring-blend.mjs --check
+          node --test tests/hiring-blend-holdout.test.mjs
       - name: Verify October periods and preserved historical inventories without provider calls
         working-directory: releases/2026-10-21/source
         run: node --test tests/october-workforce-periods.test.mjs tests/public-workforce-performance.test.mjs tests/home-bu-turnover-chat.test.mjs tests/demo-company-profile.test.mjs tests/group-capacity-risk.test.mjs tests/synthetic-workforce-history-ui.test.mjs tests/synthetic-workforce-history.test.mjs
