@@ -559,8 +559,8 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "827ef510e006600e418ae62f58847e983a73a73d67894fe4ba532e1a522ba050",
-      "bytes": 25248
+      "sha256": "00c61d4eceed5a02011ac8e96ab11083e31505bf1305b0d542ef368a63dfdd0d",
+      "bytes": 25786
     },
     {
       "path": "components/home-chat-welcome.tsx",
@@ -5864,8 +5864,8 @@
     },
     {
       "path": "tests/home-visual-theme.test.mjs",
-      "bytes": 2139,
-      "sha256": "014092f2704a18d4f3eea0d6f5a6482297c40b3b4afcffdcf58c446dac8443af"
+      "bytes": 2797,
+      "sha256": "8963363dc61d8bafaed69a96846773f23f25e71b0c31e177358222d58c6cda89"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

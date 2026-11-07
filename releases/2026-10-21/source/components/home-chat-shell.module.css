@@ -353,3 +353,9 @@
 .historySummary .kpiRow span { color:var(--muted-foreground); }
 .historySummary .historyLine { stroke:var(--primary); }
 .historySummary .historyPoint { fill:var(--primary); }
+
+/* Status colors must outrank generic KPI span typography in both themes. */
+.historySummary .kpiRow [data-kpi-status="red"] { background:#fee2e2; color:#7f1d1d; }
+.historySummary .kpiRow [data-kpi-status="green"] { background:#d1fae5; color:#064e3b; }
+:global(html[data-workspace-preference="slate-blue"]) .historySummary .kpiRow [data-kpi-status="red"] { background:#501b28; color:#ffe4e6; }
+:global(html[data-workspace-preference="slate-blue"]) .historySummary .kpiRow [data-kpi-status="green"] { background:#064e3b; color:#d1fae5; }

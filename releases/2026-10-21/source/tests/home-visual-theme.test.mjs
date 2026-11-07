@@ -22,3 +22,12 @@ test('category navigation uses transparent underlined tabs distinct from questio
  assert.match(source,/role="tablist"/);assert.match(source,/aria-selected=\{selected===index\}/);assert.match(source,/ArrowRight/);assert.match(source,/role="tabpanel"/);
  assert.match(shell,/\.questions button \{[^}]*border-radius: 9px/);
 });
+
+test('Home KPI badges override generic span colors with readable light and dark pairs',()=>{
+ for(const [status,lightBg,lightInk,darkBg,darkInk] of [['red','#fee2e2','#7f1d1d','#501b28','#ffe4e6'],['green','#d1fae5','#064e3b','#064e3b','#d1fae5']]){
+  const selector='.historySummary .kpiRow [data-kpi-status="'+status+'"]';
+  const light=finalRule(shell,selector);assert.ok(light.includes('background:'+lightBg));assert.ok(light.includes('color:'+lightInk));
+  const dark=finalRule(shell,':global(html[data-workspace-preference="slate-blue"]) '+selector);
+  assert.ok(dark.includes('background:'+darkBg));assert.ok(dark.includes('color:'+darkInk));
+ }
+});
