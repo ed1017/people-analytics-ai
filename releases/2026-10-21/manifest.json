@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "85f5863347236f6bc94e3e79e509a8a1d6db195b5b32449648aff9f748697e60",
-      "bytes": 24087
+      "sha256": "827ef510e006600e418ae62f58847e983a73a73d67894fe4ba532e1a522ba050",
+      "bytes": 25248
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "e4055f8ccfba4c0eb11ac24dbb34d880e5d38d97447cdd2795a57e2306e1af03",
-      "bytes": 21130
+      "sha256": "b3785c7078f04dd1e1581d64b2b30487143006b8e11c79a664f8a0e59eb7b33b",
+      "bytes": 21151
     },
     {
       "path": "components/home-data-status.tsx",
@@ -4264,8 +4264,8 @@
     },
     {
       "path": "components/decision-style.module.css",
-      "bytes": 1800,
-      "sha256": "062ea464a56cc88ab4db7f47bc1c38f65240bcfc47218527cc91f834bc8fdd9c"
+      "bytes": 2776,
+      "sha256": "dd2ce8adb1777d8e9df4e44986fec7856ba2573bc1e21ddc72d688ee24344c5d"
     },
     {
       "path": "components/home-plan-jump.module.css",
@@ -5861,6 +5861,11 @@
       "path": "tests/guided-capacity-steps.test.mjs",
       "bytes": 3118,
       "sha256": "f3b919f5b032f2fae01e3b4f87050822f0106920507667cae8a37618774ea1bb"
+    },
+    {
+      "path": "tests/home-visual-theme.test.mjs",
+      "bytes": 2163,
+      "sha256": "870d0098b6b4da47952b128fea6cfb111b66604d2948b21f26828bd49f46c502"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

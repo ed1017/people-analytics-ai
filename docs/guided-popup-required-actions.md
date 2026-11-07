@@ -21,3 +21,7 @@ The guide has no editable assumptions or continue-in-chat shortcut. Close and Es
 - No provider calls or API spend are required by the guide or these tests.
 
 Production browser acceptance and exact release identity are recorded with the release receipt after staging.
+
+## Home visual follow-ups
+
+Explore, Capacity Planning and Future of Work now use compact transparent underline tabs, visually distinct from question prompt cards. The right-hand Workforce snapshot inherits the selected workspace palette, including its KPI and chart surfaces, instead of forcing light colors in dark mode. The adaptive theme class is scoped to Home; other decision surfaces are unchanged. Six category/theme regression checks pass.

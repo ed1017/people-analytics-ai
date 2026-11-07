@@ -14,3 +14,9 @@
 .editor button[type=submit]{background:var(--decision-ink);color:white}
 .editor [role=alert]{color:#9b221b}
 @media(prefers-reduced-motion:reduce){.surface *{scroll-behavior:auto;transition:none;animation:none}}
+
+/* Home evidence follows the selected workspace theme, not a forced light island. */
+.adaptive { color-scheme:inherit;--background:inherit;--foreground:inherit;--card:inherit;--card-foreground:inherit;--popover:inherit;--popover-foreground:inherit;--muted:inherit;--muted-foreground:inherit;--primary:inherit;--primary-foreground:inherit;--secondary:inherit;--secondary-foreground:inherit;--accent:inherit;--accent-foreground:inherit;--border:inherit;--input:inherit;--ring:inherit;--destructive:inherit;--chart-1:inherit;--chart-2:inherit;--chart-3:inherit;--chart-4:inherit;--chart-5:inherit;--decision-ink:var(--foreground);--decision-teal:var(--primary);--decision-line:var(--border);--decision-soft:var(--muted); }
+.adaptive .editor input {background:var(--card);color:var(--foreground);border-color:var(--input)}
+.adaptive .editor button[type=submit] {background:var(--primary);color:var(--primary-foreground)}
+.adaptive .editor [role=alert] {color:var(--destructive)}

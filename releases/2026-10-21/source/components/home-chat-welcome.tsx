@@ -99,7 +99,7 @@ export function HomeHeadcountSummary({overview,receipt,requested,scopeLabel,load
   const plot = history.map(point => ({...point, x: monthSpan ? 12 + 85 * (monthIndex(point.snapshot_date) - startMonth) / monthSpan : 54.5, y: chartY(point.headcount)}));
   const futurePlot = checked ? [{month:snapshotDate,headcount:checked.analysis.inputs.opening},...projected].map(point=>({...point,x:12+85*(monthIndex(point.month)-startMonth)/Math.max(1,monthSpan),y:chartY(point.headcount)})) : [];
   const dateMarks = [...new Set([first?.snapshot_date,history.length>2?history[Math.floor((history.length-1)/2)].snapshot_date:undefined,horizonEnd])].filter((date):date is string=>!!date);
-  return <section aria-label="Workforce snapshot" className={`${decision.surface} ${styles.historySummary}`}>
+  return <section aria-label="Workforce snapshot" className={`${decision.surface} ${decision.adaptive} ${styles.historySummary}`}>
       <section aria-label="Key findings" aria-describedby={scopeId} className={`${decision.hero} ${styles.findingsBanner}`}>
         <h3>Key findings</h3>
         {current ? <ul>{snapshotFindings(current, scopeLabel, true).items.map(item=><li key={item}>{item}</li>)}</ul> : <p role="status">{loading ? 'Updating findings…' : 'Verified findings unavailable.'}</p>}
