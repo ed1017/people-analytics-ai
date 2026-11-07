@@ -66,6 +66,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
   return <section aria-label="Product introduction" className="min-w-0 text-sm">
     <div className="flex flex-wrap items-center justify-between gap-x-3">
       <button ref={trigger} data-orientation-return type="button" disabled={busy||!ready||!active} aria-haspopup="dialog" aria-expanded={open} aria-controls={id} onClick={show} className="min-h-11 rounded-lg border px-3 py-2 text-sm font-medium text-primary hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">Introduction</button>
+      <button type="button" disabled={!demoReady||busy||!ready||!active} aria-haspopup="dialog" onClick={()=>{launching.current=false;start();}} className="min-h-11 rounded-lg bg-primary px-3 py-2 font-semibold text-primary-foreground disabled:opacity-50">Open guided demo</button>
       {status}
     </div>
     {ready&&createPortal(<dialog ref={dialog} id={id} aria-labelledby={id+'-title'} aria-describedby={id+'-purpose'} onClose={finish} onCancel={event=>{event.preventDefault();dismiss();}} onClick={event=>{
@@ -109,8 +110,8 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
           <h3 id={id+'-try'} className="text-base font-bold">Try a planning decision</h3>
           <ol className="mt-2 list-decimal space-y-2 pl-5">
             <li><strong>Review the starting point.</strong> The guided example begins with a fictional 5-FTE capacity gap.</li>
-            <li><strong>Adjust the assumptions.</strong> Change the available workload, timing, staffing and budget inputs to test your approach.</li>
-            <li><strong>Compare the options.</strong> Explore developing people, moving people internally and hiring. Review cost, readiness and uncovered work together.</li>
+            <li><strong>Submit the fixed prompt.</strong> Use the prescribed fictional inputs, then complete each required action in the popup.</li>
+            <li><strong>Compare the options.</strong> Compare developing people, moving people internally and hiring, then select a feasible option. Review cost, readiness and uncovered work together.</li>
             <li><strong>Keep a proposal.</strong> Review and save in this browser, then reopen it to continue.</li>
           </ol>
         </section>

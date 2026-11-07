@@ -559,13 +559,13 @@
     },
     {
       "path": "components/home-chat-shell.module.css",
-      "sha256": "85f5863347236f6bc94e3e79e509a8a1d6db195b5b32449648aff9f748697e60",
-      "bytes": 24087
+      "sha256": "00c61d4eceed5a02011ac8e96ab11083e31505bf1305b0d542ef368a63dfdd0d",
+      "bytes": 25786
     },
     {
       "path": "components/home-chat-welcome.tsx",
-      "sha256": "e4055f8ccfba4c0eb11ac24dbb34d880e5d38d97447cdd2795a57e2306e1af03",
-      "bytes": 21130
+      "sha256": "b3785c7078f04dd1e1581d64b2b30487143006b8e11c79a664f8a0e59eb7b33b",
+      "bytes": 21151
     },
     {
       "path": "components/home-data-status.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "53300d1190bcfd0618cc61f5173adc1e8063c9e4f187e9c8d296afc415b6fd52",
-      "bytes": 10814
+      "sha256": "3367665cf96da9775ca31df868cf55db4b1448ee31fdde7c251dff285246a2fb",
+      "bytes": 11125
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "fd03ecbe8a82f1d90707c4d09ff50fdc1d2837e02a74d19c7ce8261defcc18b4",
-      "bytes": 42426
+      "sha256": "5eabc8816ca42029b27da1252a8f5c5f3d31fe7684bb22aa865c97f6ab4b1342",
+      "bytes": 43639
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -4264,8 +4264,8 @@
     },
     {
       "path": "components/decision-style.module.css",
-      "bytes": 1800,
-      "sha256": "062ea464a56cc88ab4db7f47bc1c38f65240bcfc47218527cc91f834bc8fdd9c"
+      "bytes": 2776,
+      "sha256": "dd2ce8adb1777d8e9df4e44986fec7856ba2573bc1e21ddc72d688ee24344c5d"
     },
     {
       "path": "components/home-plan-jump.module.css",
@@ -5851,6 +5851,21 @@
       "path": "lib/data/opening-known-hiring-v1.json",
       "bytes": 52943,
       "sha256": "968f3ee490283cd03affd19fa69155d43005700bcca28ef236b158baadac36cc"
+    },
+    {
+      "path": "components/guided-capacity-steps.tsx",
+      "bytes": 4263,
+      "sha256": "ff984502565a5801d1e690beaa808521c4bb7cc68ed4d3fd071b432df90ff501"
+    },
+    {
+      "path": "tests/guided-capacity-steps.test.mjs",
+      "bytes": 3085,
+      "sha256": "5f6a5ba6f893db139a45b48257ed8ba1548c530a708ee81fe98e040df6e7121c"
+    },
+    {
+      "path": "tests/home-visual-theme.test.mjs",
+      "bytes": 2797,
+      "sha256": "8963363dc61d8bafaed69a96846773f23f25e71b0c31e177358222d58c6cda89"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
