@@ -22,7 +22,7 @@ export function GuidedCapacitySteps({draft,comparison,selection,reviewing,disabl
    {comparison?.evaluation.context.status==='ready'&&<>
     <SwpOutcomeChart draft={draft} options={comparison.options}/>
     <p className="text-xs">{staffingAssumptions(selected?.draft??draft)}</p>
-    <fieldset disabled={disabled}><legend className="font-semibold">Required action: choose a feasible staffing option</legend>
+    <fieldset disabled={disabled} className="min-w-0 max-w-full"><legend className="font-semibold">Required action: choose a feasible staffing option</legend>
      <StaffingOptionsTable enumerated={comparison.evaluation.report?.summary.enumerated??0} options={options.map(option=>({id:option.id,mix:option.candidate.mix,cash:option.candidate.cash.complete,staffHours:option.candidate.effort?.trainingHours??null,coverageDate:option.candidate.metrics?.fullCoverageDate??null,shortfallHours:guidedOptionEffort(option)?.shortfallHours??null,status:option.candidate.status,reason:option.candidate.reason}))} action={option=><label className="flex min-h-11 items-center gap-2"><input type="radio" name="guided-staffing-option" aria-label={staffingOptionTitle(option.mix)} checked={selection===option.id} disabled={disabled||option.status!=='met'} onChange={()=>onSelect(option.id)}/>{staffingOptionTitle(option.mix)}</label>}/>
     </fieldset>
     {selected&&<StaffingOptionCost draft={selected.draft} cash={selected.candidate.cash}/>}

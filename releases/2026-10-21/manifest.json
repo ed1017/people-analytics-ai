@@ -5854,8 +5854,8 @@
     },
     {
       "path": "components/guided-capacity-steps.tsx",
-      "bytes": 4267,
-      "sha256": "58b9e1a8e91f6a4b256ca5ae645b8bd6185f0c5cb4e5871c43773943f069da88"
+      "bytes": 4263,
+      "sha256": "ff984502565a5801d1e690beaa808521c4bb7cc68ed4d3fd071b432df90ff501"
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
