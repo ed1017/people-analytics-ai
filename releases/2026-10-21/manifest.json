@@ -5859,13 +5859,13 @@
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
-      "bytes": 3118,
-      "sha256": "f3b919f5b032f2fae01e3b4f87050822f0106920507667cae8a37618774ea1bb"
+      "bytes": 3085,
+      "sha256": "5f6a5ba6f893db139a45b48257ed8ba1548c530a708ee81fe98e040df6e7121c"
     },
     {
       "path": "tests/home-visual-theme.test.mjs",
-      "bytes": 2163,
-      "sha256": "870d0098b6b4da47952b128fea6cfb111b66604d2948b21f26828bd49f46c502"
+      "bytes": 2139,
+      "sha256": "014092f2704a18d4f3eea0d6f5a6482297c40b3b4afcffdcf58c446dac8443af"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
