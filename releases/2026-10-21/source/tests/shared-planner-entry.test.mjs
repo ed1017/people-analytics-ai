@@ -28,5 +28,5 @@ test('guided and normal paths preserve exact engine outputs for example and edit
 
 test('entry review does not promise stale calendar dates before the current-date draft exists',async()=>{
  const fs=await import('node:fs');const source=fs.readFileSync(new URL('../components/swp-guided-journey.tsx',import.meta.url),'utf8');
- assert.ok(source.includes('12-month example; exact dates shown before comparison'));assert.equal(source.includes('Nov 2026'),false);
+ assert.ok(source.includes('12-month example; exact dates shown in planner'));assert.equal(source.includes('Nov 2026'),false);
 });
