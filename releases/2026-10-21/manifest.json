@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "5db66aad9d36469963721413fc22359d5a3ec91b28a63c48e9be1d5082fd47a0",
-      "bytes": 45296
+      "sha256": "e262836434a3742d3e68ddae05acb8e7aaea238076a279378bb419acb062dfb8",
+      "bytes": 45330
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -5894,8 +5894,8 @@
     },
     {
       "path": "tests/shared-planner-entry.test.mjs",
-      "bytes": 2593,
-      "sha256": "8d1c44d8a7ae461472206f83d13849f30d0a6f41a35381b4593678c2e8e72734"
+      "bytes": 2974,
+      "sha256": "d4330113831e711fbc5f6fa1f7458645b83d39b28c37a08ecd8ebf1934563b0c"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
