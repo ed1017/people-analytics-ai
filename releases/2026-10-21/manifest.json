@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "a4dc6d66a3b28884b29b3284e967e61a3106a475b87c4aa0d2f0140d4f77500b",
-      "bytes": 93215
+      "sha256": "8787cdf2d341ff522bbf1fa179a9f3f512ef19688d676b0fa34779a1af75a89e",
+      "bytes": 93475
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "26b7c687c0bc4b2162c10b7ff83bb47698c50a523905df3ae7fcc1bc2b7bd8d2",
-      "bytes": 74628
+      "sha256": "3aecff608784668bb54d234c1ae12f137b90fb4407e680dc02c91aaf1feba6b4",
+      "bytes": 75392
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "02e96da60e6cf26e89080a04dd40bf93cedbda89a897195aaed9679766fcc611",
-      "bytes": 11739
+      "sha256": "552b2b13529df6e5c4ee8041d910ace8c56bc015c801c235af18479038bd4853",
+      "bytes": 11845
     },
     {
       "path": "components/site-footer.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "268e48bf6828471d412fd7b0beb8e07cc0ef9e12db7d3003f5dcb518893f7f36",
-      "bytes": 45323
+      "sha256": "fbc01352a3765e56bdfb18c451b9b8a9b2274ad4a2e98c6a0bfe5a0e0039b6b9",
+      "bytes": 45858
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -3334,8 +3334,8 @@
     },
     {
       "path": "lib/scenario-planning-parity.ts",
-      "sha256": "7adaf725418c7899070071b4190372bc8e4dccc48bf033c54d6db1d464eec40f",
-      "bytes": 6606
+      "sha256": "20e6ed73890711b9d1b343bf57474109937a741f96a47727dd2871e4a4a8dd93",
+      "bytes": 7414
     },
     {
       "path": "lib/simple-swp-controls.ts",
@@ -4395,7 +4395,7 @@
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
       "bytes": 7732,
-      "sha256": "15cba306cb672b29e86181283041ef96d3d734ef1586735edd975462f53dac0f"
+      "sha256": "6879592ddd41559c42883e51012744ccd5ce96fbe0cfbdc6a5fa0f014e711eb2"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
@@ -4475,7 +4475,7 @@
     {
       "path": "tests/staffing-priority-presentation.test.mjs",
       "bytes": 6042,
-      "sha256": "db688d7e69527f2d858fc98658ab41663bd669921f79d83ad55fb8d8fb96412b"
+      "sha256": "3b0b5b511cc8985ac22ed8654eef06b3278a671352596ba5f0220ed52f1e0ea6"
     },
     {
       "path": "components/external-workforce-evidence-panel.tsx",
@@ -5854,8 +5854,8 @@
     },
     {
       "path": "components/guided-capacity-steps.tsx",
-      "bytes": 2415,
-      "sha256": "75162905b4e628d5c2fb171e3fd3f90f771cb337cb8c05c5d3df21856deed969"
+      "bytes": 2565,
+      "sha256": "cb1a6a80ba112d45ce204624d7acd4e66616b160005a2aad673a4b7f23a9b975"
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
@@ -5896,6 +5896,16 @@
       "path": "tests/shared-planner-entry.test.mjs",
       "bytes": 2967,
       "sha256": "c434b31f46b469d4ce14c21ede672605c375b92f63a4c3be21203efeda9769fe"
+    },
+    {
+      "path": "tests/closer-staffing-routing.test.mjs",
+      "bytes": 3437,
+      "sha256": "ec90b2b6ee0b6f5d4fbf7217bcb3382968d84b04be020615267d195137c22b34"
+    },
+    {
+      "path": "tests/staffing-flow-parity.test.mjs",
+      "bytes": 5351,
+      "sha256": "cac8b5e38204ee365c8a96b641ba4c147ba8f395e5ad648455e2a23d11aca829"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

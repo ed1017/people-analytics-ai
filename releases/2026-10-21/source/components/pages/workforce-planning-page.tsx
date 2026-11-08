@@ -58,6 +58,7 @@ import type {
 } from "@/lib/types";
 
 type WorkforcePlanningPageProps = {
+  onOpenStaffingPlanner?:()=>void;
   onTrackPositions?:()=>void;
   planningScenarios: PlanningScenario[];
   planningLoading: boolean;
@@ -202,6 +203,7 @@ function createResponseExecutionDrafts(
 }
 
 export function WorkforcePlanningPage({
+  onOpenStaffingPlanner,
   onTrackPositions,
   planningScenarios,
   planningLoading,
@@ -2041,8 +2043,9 @@ export function WorkforcePlanningPage({
           )}
 
           <div hidden={workflowView!=="overview"&&workflowView!=="plan"} className="mb-4 space-y-4">
+            {onOpenStaffingPlanner&&<section aria-label="Develop move and hire planner" className="space-y-2 rounded-xl border border-primary/30 bg-primary/5 p-4"><h3 className="font-semibold">Compare developing, moving and hiring people</h3><p className="text-sm">Use the same editable planner shown in the guided demo. Open Overview, review the staffing question, then send it to review the assumptions. Any question you have already drafted is kept.</p><button type="button" className="min-h-11 rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring" onClick={onOpenStaffingPlanner}>Open staffing question</button></section>}
             <details className="rounded-xl border border-primary/30 bg-primary/5 p-4" data-worked-example-entry>
-              <summary className="min-h-11 cursor-pointer rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Open staffing scenario</summary>
+              <summary className="min-h-11 cursor-pointer rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">Explore a workload projection example</summary>
               <PlanningLanding />
             </details>
             <p className="text-sm text-muted-foreground">Try the populated example above, or enter your own work and team below to save and compare scenarios.</p>

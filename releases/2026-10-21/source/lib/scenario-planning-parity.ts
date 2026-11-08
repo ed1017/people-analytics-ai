@@ -11,7 +11,8 @@ const num=(n:number|null|undefined)=>n==null?'unknown':n.toLocaleString('en-US',
 /** Parse only bounded capacity questions. Extra role, timing or compound instructions
  * remain with the general assistant rather than silently adopting demo assumptions. */
 export function capacityPlanningRequest(text:string):{gap:number;budget:number|null}|null{
- const match=text.trim().match(/^(?:please\s+)?(?:(?:how (?:would|can|could|should) (?:you|we|I) )|(?:(?:help me|help us) (?:to )?))?(?:close|fill|address)(?: the| a| an| our| my)? (\d+(?:\.\d+)?)\s*(?:FTE|full[- ]time equivalent)(?: capacity| staffing)? gap(?: (?:with|on|within|under)(?: a| an| the| our| my)? (?:budget of )?\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(k)?(?: USD)?(?: budget)?)?\s*[?.!]?$/i);
+ const question=text.trim();
+ const match=question.match(/^(?:please\s+)?(?:(?:how (?:would|can|could|should) (?:you|we|I) )|(?:(?:help me|help us) (?:to )?))?(?:close|fill|address)(?: the| a| an| our| my)? (\d+(?:\.\d+)?)\s*-?\s*(?:FTE|full[- ]time equivalent)(?: capacity| staffing)? gap(?: (?:with|on|within|under)(?: a| an| the| our| my)? (?:budget of )?\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(k)?(?: USD)?(?: budget)?)?\s*[?.!]?$/i) ||question.match(/^(?:I|we) have (?:a |an )?(\d+(?:\.\d+)?)\s*-?\s*(?:FTE|full[- ]time equivalent)(?: capacity| staffing)? gap (?:and|with) (?:a |an )?(?:budget of )?\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(k)?(?: USD)?(?: budget)?(?:[.,;]?\s+(?:what are (?:my|our|the) (?:staffing )?options|how (?:can|should) (?:I|we) close it|compare (?:my|our|the|staffing) options))?\s*[?.!]?$/i);
  if(!match)return null;
  const gap=Number(match[1]),budget=match[2]===undefined?null:Number(match[2].replaceAll(',',''))*(match[3]?1000:1);
  return Number.isFinite(gap)&&(budget===null||Number.isFinite(budget))?{gap,budget}:null;
@@ -21,7 +22,8 @@ export function offersCapacityExample(text:string){
  const request=capacityPlanningRequest(text);
  return !!request&&request.gap===5&&(request.budget===null||request.budget===325000);
 }
-export function scenarioRecommendationIntent(text:string){return /^(?:(?:with|under) (?:the )?(?:new|updated|current|revised) budget[, ]*)?(?:(?:which|what) (?:staffing )?option (?:would|do|should) you recommend|(?:what|which) (?:is|would be) (?:your|the) recommendation|recommend (?:a|an|the) (?:staffing )?option)[?.!]?$/i.test(text.trim());}
+/** Priority questions reuse the exact current calculation; they never imply one universal best option. */
+export function scenarioRecommendationIntent(text:string){return /^(?:(?:which|what) (?:staffing )?option (?:is (?:cheapest|lowest[- ]cost)|has (?:the )?(?:least|lowest) (?:uncovered work|workload shortfall))|which is (?:cheapest|lowest[- ]cost)|show (?:me )?(?:the )?(?:lowest[- ]cost|least[- ]uncovered[- ]work) option)[?.!]?$/i.test(text.trim())||/^(?:(?:with|under) (?:the )?(?:new|updated|current|revised) budget[, ]*)?(?:(?:which|what) (?:staffing )?option (?:would|do|should) you recommend|(?:what|which) (?:is|would be) (?:your|the) recommendation|recommend (?:a|an|the) (?:staffing )?option)[?.!]?$/i.test(text.trim());}
 export function scenarioComparisonIntent(text:string){return !!capacityPlanningRequest(text)||/^(?:please\s+)?(?:compare(?: the)?(?: staffing)? options|recalculate(?: the)?(?: staffing)? options|show(?: me)?(?: the)? staffing options)\s*[?.!]?$/i.test(text.trim());}
 /** Only bounded hypothetical follow-ups; factual dates/groups remain descriptive queries. */
 export function scenarioAssumptionDiscussionIntent(text:string){
