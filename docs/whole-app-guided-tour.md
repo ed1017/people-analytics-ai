@@ -2,15 +2,16 @@
 
 This replaces the planning-only entry popup documented in guided-popup-required-actions.md. Both Home and Introduction launch the actual mounted application in a guided window, not a separate mock dashboard.
 
-## Required journey
+## Required staffing journey
 
-1. Overview: inspect the actual snapshot, then open Workforce.
-2. Workforce: inspect the baseline, then open Future of Work through Planning steps.
-3. Future of Work: inspect the actual Lab, then open Scenarios.
-4. Scenarios: explicitly submit the fixed fictional 5 FTE / $325,000 example, compare, select the prescribed feasible 3-develop / 2-move / 0-hire mix, review, and save.
-5. Only the real browser-local save receipt unlocks Action plans.
-6. Action plans: open Track this plan.
-7. Track: inspect the actual saved plan and finish. No progress or achieved outcomes are invented.
+The user selected the staffing scenario when asked which historical guide to restore. The popup now opens directly on Scenarios, without the seven-page Overview/Workforce/Future of Work prelude. It keeps the recent required four-step sequence documented in guided-popup-required-actions.md:
+
+1. Press Enter to submit the prefilled fictional 5 FTE / $325,000 prompt (touch Enter key available).
+2. Explicitly compare staffing options.
+3. Select the prescribed feasible 3-develop / 2-move / 0-hire mix.
+4. Review the proposal, then explicitly save the plan and goal.
+
+Only the real browser-local save receipt unlocks the unnumbered continuation: inspect Action plans, open Track this plan, and finish. No progress or achieved outcomes are invented. The original editable three-step planning path outside the forced demo remains unchanged.
 
 Unrelated actions are inert while the tour is active. The current real navigation action is highlighted; the coach and exit remain available. Escape and browser Back/Forward exit guided mode. Each phase resets the window scroll and focuses its heading. Normal use is restored on exit, and the existing exploration isolation protects saved goals and drafts. No external provider calls are needed.
 

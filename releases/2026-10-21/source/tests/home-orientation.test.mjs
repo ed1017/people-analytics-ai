@@ -185,3 +185,10 @@ test('local guided demo entry does not wait for unrelated Home evidence requests
  assert.doesNotMatch(source,/demoReady=\{ready&&/);
  const h=harness({autoOpen:false,demoReady:true});h.flush();h.button('Open guided demo').props.onClick();h.flush();assert.equal(h.starts,1);
 });
+
+test('introduction describes the restored four staffing actions without page-tour prelude',()=>{
+ const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');
+ for(const label of ['Submit the fixed prompt.','Compare the options.','Choose the staffing mix.','Review and save.'])assert.ok(source.includes(label));
+ assert.match(source,/popup starts directly in the staffing scenario/);
+ assert.doesNotMatch(source,/whole-app demo starts with Overview|Review Future of Work, then/);
+});
