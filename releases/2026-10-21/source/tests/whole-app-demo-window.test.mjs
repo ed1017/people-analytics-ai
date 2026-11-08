@@ -65,9 +65,9 @@ test('actual sidebar destinations and mobile disclosure use the same gated tour 
 test('phone navigation stays bounded only within the guided popup',()=>{
  const css=fs.readFileSync(new URL('../components/whole-app-demo-window.module.css',import.meta.url),'utf8');
  const drawer=css.match(/\.window :global\(\.app-sidebar\[popover\]:popover-open\) \{([^}]+)\}/)?.[1];
- assert.ok(drawer);assert.match(drawer,/inset:0; margin:auto/);
+ assert.ok(drawer);assert.match(drawer,/top:var\(--tour-menu-top,20dvh\)/);assert.match(drawer,/bottom:auto; margin:0 auto/);
  assert.match(drawer,/width:min\(280px,calc\(100vw - 48px\)\)/);
- assert.match(drawer,/height:auto; max-height:65dvh; overflow-y:auto/);
+ assert.match(drawer,/height:auto; max-height:var\(--tour-menu-height,60dvh\); overflow-y:auto/);
  assert.match(drawer,/border-radius:12px/);
 });
 
@@ -75,4 +75,11 @@ test('phase changes and tour exit retire native top-layer navigation',()=>{
  assert.match(source,/return\(\)=>\{for\(const node of surface.querySelectorAll<HTMLElement>\('\[popover\]'\)\)/);
  assert.match(source,/typeof node.hidePopover==='function'&&node.matches\(':popover-open'\)\)node.hidePopover\(\)/);
  assert.match(source,/\[active,title,nextPage\]/);
+});
+
+test('phone menu starts below the coach and restores measured variables on cleanup',()=>{
+ assert.match(source,/coach.getBoundingClientRect\(\).bottom\+8/);
+ assert.match(source,/surface!\.getBoundingClientRect\(\).bottom-8/);
+ assert.match(source,/style.removeProperty\('--tour-menu-top'\)/);
+ assert.match(source,/style.removeProperty\('--tour-menu-height'\)/);
 });

@@ -15,7 +15,7 @@
 
 /* Native top-layer navigation stays visibly inside the guided popup footprint. */
 .window :global(.app-sidebar[popover]:popover-open) {
- position:fixed; inset:0; margin:auto; width:min(280px,calc(100vw - 48px));
- height:auto; max-height:65dvh; overflow-y:auto; border:1px solid var(--border);
+ position:fixed; top:var(--tour-menu-top,20dvh); left:0; right:0; bottom:auto; margin:0 auto; width:min(280px,calc(100vw - 48px));
+ height:auto; max-height:var(--tour-menu-height,60dvh); overflow-y:auto; border:1px solid var(--border);
  border-radius:12px; box-shadow:0 16px 48px rgb(0 0 0 / .45);
 }

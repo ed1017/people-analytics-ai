@@ -5869,13 +5869,13 @@
     },
     {
       "path": "components/whole-app-demo-window.module.css",
-      "sha256": "90ed73c3f4f4948be05f274ff87272935a550e9b07701d8ed9ef5bb2eb8387c5",
-      "bytes": 2086
+      "sha256": "b698e06088ce60d7b6dd528c95fb3872d7c03d468b1d8e73cc094926e1a618d2",
+      "bytes": 2165
     },
     {
       "path": "components/whole-app-demo-window.tsx",
-      "sha256": "30298ab86a7155d88a7cb8787045eacf1d6f0d89b040904d0838f3897922984c",
-      "bytes": 9023
+      "sha256": "b7aadba16fae8cc4c8d2ae6bdbba0e9a4c1d79170150941dd79de14399cd7226",
+      "bytes": 9739
     },
     {
       "path": "lib/whole-app-tour.ts",
@@ -5884,8 +5884,8 @@
     },
     {
       "path": "tests/whole-app-demo-window.test.mjs",
-      "sha256": "36df819060202cdf5ff45577cd065738f2565f2d4acf2922baee87eea5de6dc6",
-      "bytes": 5211
+      "sha256": "37717573833740292ce40dcf636372aba8bdafecda6c53103a1fa6707fe98970",
+      "bytes": 5668
     },
     {
       "path": "tests/whole-app-tour.test.mjs",
