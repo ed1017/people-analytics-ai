@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "8787cdf2d341ff522bbf1fa179a9f3f512ef19688d676b0fa34779a1af75a89e",
-      "bytes": 93475
+      "sha256": "1b369616d13800166ef512b93b1a3c17f76d95bef20a5637675dee1dc2f2c458",
+      "bytes": 93994
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "278a5db6cfb0536772f5102db5074f77e366531a9a41a8af37b4e9a1cfc61476",
-      "bytes": 116202
+      "sha256": "eed42d3b4678f61f389e89ffa5559584a8c8b614e008101e4f3e8bc7a7717c4f",
+      "bytes": 116434
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "3aecff608784668bb54d234c1ae12f137b90fb4407e680dc02c91aaf1feba6b4",
-      "bytes": 75392
+      "sha256": "b1e32c85377d437080455b67be2b3a3b8a2e8459e60bcce0fe69b4e891c375eb",
+      "bytes": 75384
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "552b2b13529df6e5c4ee8041d910ace8c56bc015c801c235af18479038bd4853",
-      "bytes": 11845
+      "sha256": "e9ecfbebcbe79d7258725b8e84caefdd2b06acf0cd2f5962fa331158baef53c5",
+      "bytes": 11882
     },
     {
       "path": "components/site-footer.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "fbc01352a3765e56bdfb18c451b9b8a9b2274ad4a2e98c6a0bfe5a0e0039b6b9",
-      "bytes": 45858
+      "sha256": "724f34aded34980ef6c7583ebb9741269520bfe5fea24867b373b7161ec57521",
+      "bytes": 52307
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -4028,9 +4028,19 @@
       "bytes": 4460
     },
     {
+      "path": "tests/staffing-saved-version.test.mjs",
+      "sha256": "fd598c1f039082fbd99b7d4e80d33d3ac27c9ec233cc94f774ebd8443168330e",
+      "bytes": 2740
+    },
+    {
       "path": "tests/succession-display-release.test.mjs",
       "sha256": "ec41a867e8219f9664f24ba847f073df022cb5bc13b804c6d8a76ad17bac2f17",
       "bytes": 2561
+    },
+    {
+      "path": "tests/unified-staffing-host.test.mjs",
+      "sha256": "a40af1d725d8de6f63a1404d81804f24d30e6968161ea2645e9fe193f3f5dc19",
+      "bytes": 3000
     },
     {
       "path": "tsconfig.json",
@@ -5854,13 +5864,13 @@
     },
     {
       "path": "components/guided-capacity-steps.tsx",
-      "bytes": 2565,
-      "sha256": "cb1a6a80ba112d45ce204624d7acd4e66616b160005a2aad673a4b7f23a9b975"
+      "sha256": "06870f82b0785b1327d45d48a41b0d9724f0bd67e987975f94c3fe3d5b3bfdc9",
+      "bytes": 2639
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
-      "bytes": 4940,
-      "sha256": "38d490f4dcbf6afa2b14d7baf1dd978c2d0d70d0a43f1dae148c9e5d73ad9c6e"
+      "sha256": "9c43c414344f9b4b73e403925b02ab034b4db983abca6d563df81a1253cd304d",
+      "bytes": 5293
     },
     {
       "path": "tests/home-visual-theme.test.mjs",
@@ -5899,13 +5909,13 @@
     },
     {
       "path": "tests/closer-staffing-routing.test.mjs",
-      "bytes": 3437,
-      "sha256": "ec90b2b6ee0b6f5d4fbf7217bcb3382968d84b04be020615267d195137c22b34"
+      "sha256": "91924ce1b3e0e8a2303c10edc7c2f53b5265cb7813f3fbfb877365239a05107b",
+      "bytes": 3352
     },
     {
       "path": "tests/staffing-flow-parity.test.mjs",
-      "bytes": 5351,
-      "sha256": "cac8b5e38204ee365c8a96b641ba4c147ba8f395e5ad648455e2a23d11aca829"
+      "sha256": "a15b2502d939ddc5baf7a7be53ab9636c3e4b2514fec7a38295a15deab98129e",
+      "bytes": 5537
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
