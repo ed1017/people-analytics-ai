@@ -71,18 +71,12 @@ test('actual dataset initialization preserves fresh first-visit observation, con
  const recovery=hydratedStore([],[['insights-to-action.decisions.recovery.v1.dataset.'+token,'{}']]);recovery.api.switchDecisionDataset(token);assert.equal(recovery.api.consumeFirstHomeVisit(),true);
 });
 
-test('explicit intro resume releases only local demo debounce and retains shared duplicate guards',()=>{
+test('intro delegates to whole-app guide without silently submitting a planning question',()=>{
  const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
- const body=source.match(/function startIntroDemo\(\)\{([\s\S]*?)\n  \}/)[1];
- const recentSuggestions={current:new Set(['starter:demo','question:other'])};let launches=0;
- const run=new Function('recentSuggestions','swpDemoPrompt','submitStarterQuestion',body);
- run(recentSuggestions,'demo',prompt=>{assert.equal(prompt,'demo');assert.equal(recentSuggestions.current.has('starter:demo'),false);launches++;});
- assert.equal(launches,1);assert.equal(recentSuggestions.current.has('question:other'),true);
- assert.match(source,/queuedSuggestion.current\|\|chatLoading\|\|sending.current/);
- assert.match(source,/if\(!allowSuggestion\(key,allowDraft\)\)return/);
- assert.doesNotMatch(source,/>Planning Scenario<\/button>/);
+ const body=source.match(/function startIntroDemo\(\)\{([\s\S]*?)\n  \}/)[1];let launches=0;
+ new Function('onStartDemo',body)(()=>launches++);assert.equal(launches,1);
+ assert.doesNotMatch(body,/submitStarterQuestion|swpDemoPrompt/);
  assert.ok(source.includes('onStartDemo={startIntroDemo}'));
- const intro=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(intro,/data-orientation-return[\s\S]*?onClick=\{show\}/);
 });
 test('product introduction keeps neutral attribution and keyboard-scrollable content separate from persistent actions',()=>{
  const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');

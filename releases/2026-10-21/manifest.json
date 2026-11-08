@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "f27581f43d14ff9ae73ce891f31ddf81bac46671a802332c9d92726001814272",
-      "bytes": 91549
+      "sha256": "5830d8c1a27d02d133606414ddd75583719e263e36e9a89238df58a1bc4cd401",
+      "bytes": 93146
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -314,8 +314,8 @@
     },
     {
       "path": "components/app-header.tsx",
-      "sha256": "92ab6ceac12867f7909ac2e8e5f93378872f5bfbca399ac4d99c05c0c8791434",
-      "bytes": 7795
+      "sha256": "d325149246f47e87bd412d8215d8b72bfa7bc54301226f2680586d8adbfb9833",
+      "bytes": 7837
     },
     {
       "path": "components/app-sidebar.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "3367665cf96da9775ca31df868cf55db4b1448ee31fdde7c251dff285246a2fb",
-      "bytes": 11125
+      "sha256": "51fd6f18b6b6753760276b1f6f5e01859aec484d8289efe79b3f2fff381e7a62",
+      "bytes": 11159
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "1a8900454bbe160f5f2d415a0cdd6daef528387a03fa2b07892ff8f4975aa9bf",
-      "bytes": 116260
+      "sha256": "dce392338f88b9896521470b949f6a50b235cd7f89f2ec2be04761734d1349c7",
+      "bytes": 116229
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -869,13 +869,13 @@
     },
     {
       "path": "components/planning-journey.tsx",
-      "sha256": "9097b4f926ae74b1a8b4edd122cad81b20ee43d41da2c0cc23730d5278274eb3",
-      "bytes": 1013
+      "sha256": "f9bb63ac316e8fcf0ba879876b34717da15c766fd22ae2998c5eea1d35d01f06",
+      "bytes": 1040
     },
     {
       "path": "components/planning-support-pages.tsx",
-      "bytes": 7941,
-      "sha256": "2c0a8e63f49c0dc7cf75337ec25359e345900be01d3d6aa36168fc8dd5a39ee1"
+      "bytes": 8004,
+      "sha256": "138e30cc490c386b5b3c654880abc73bdd94eccca239300e7bc8566dc900e916"
     },
     {
       "path": "components/problem-conversation.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "5eabc8816ca42029b27da1252a8f5c5f3d31fe7684bb22aa865c97f6ab4b1342",
-      "bytes": 43639
+      "sha256": "f15f32d2ac7d8419d6e410a3290cc98976fe15179cd8b6d222aaf0aa9385ccf0",
+      "bytes": 44682
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 19042,
-      "sha256": "525b9bbfda2da3aa4879c7957f638253e7bab2dce344446273d6ea1322e9e580"
+      "bytes": 18365,
+      "sha256": "f82528c6cc1238960aa76a328a13760a5b425d0265361ee648c49edafa9356c5"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
@@ -5854,18 +5854,43 @@
     },
     {
       "path": "components/guided-capacity-steps.tsx",
-      "bytes": 4263,
-      "sha256": "ff984502565a5801d1e690beaa808521c4bb7cc68ed4d3fd071b432df90ff501"
+      "bytes": 5134,
+      "sha256": "5d48c188126a676f9a4b39e08125f7aa3cc709434849fa257261ea84036f17f8"
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
-      "bytes": 3085,
-      "sha256": "5f6a5ba6f893db139a45b48257ed8ba1548c530a708ee81fe98e040df6e7121c"
+      "bytes": 3843,
+      "sha256": "0769bfbe2ce20546d7bb3bcb1751c9453fa4731623e30575712d540ec4f2a2d2"
     },
     {
       "path": "tests/home-visual-theme.test.mjs",
       "bytes": 2797,
       "sha256": "8963363dc61d8bafaed69a96846773f23f25e71b0c31e177358222d58c6cda89"
+    },
+    {
+      "path": "components/whole-app-demo-window.module.css",
+      "sha256": "e7111d279d77e8a58b27be945521b53aafe6ccbd0b2cbc704f608fb0703b5a43",
+      "bytes": 1364
+    },
+    {
+      "path": "components/whole-app-demo-window.tsx",
+      "sha256": "fc62fb034a6cb8ba37d45a93f545d75e9b922772ec764202a93b1152c18f0aa2",
+      "bytes": 5135
+    },
+    {
+      "path": "lib/whole-app-tour.ts",
+      "sha256": "a4348bc3f5699526092b7efe1eda26448d9308b4b680f7075a10997658f3dcc4",
+      "bytes": 2554
+    },
+    {
+      "path": "tests/whole-app-demo-window.test.mjs",
+      "sha256": "86e4292bc01705950fd0827c83e4ca2a0e160577ed1031ceb1cc31ffb259db22",
+      "bytes": 2082
+    },
+    {
+      "path": "tests/whole-app-tour.test.mjs",
+      "sha256": "19724ad85e23563bd0d0fc1ff98d9a36948d170c906a467a283660182cbeec9d",
+      "bytes": 1546
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

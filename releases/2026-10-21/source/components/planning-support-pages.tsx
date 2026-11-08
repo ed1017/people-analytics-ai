@@ -27,7 +27,7 @@ export function FutureOfWorkPage({onNavigate}: Navigate) {
       <FoWLabReferenceHandoff jobKey={handoff.jobKey} functionName={handoff.functionName} onNavigate={onNavigate}/>
       <button type="button" className="mt-2 min-h-11 rounded border px-4 text-sm" onClick={()=>setHandoff(null)}>Cancel handoff</button>
     </div>}
-    <div className="flex flex-wrap gap-3"><button type="button" onClick={()=>onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" onClick={()=>onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open Scenarios</button></div>
+    <div className="flex flex-wrap gap-3"><button type="button" onClick={()=>onNavigate('occupational-references')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Explore role references</button><button type="button" data-tour-page="planning-overview" onClick={()=>onNavigate('planning-overview')} className="min-h-11 rounded-md border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Open Scenarios</button></div>
   </section>;
 }
 
@@ -44,7 +44,7 @@ export function PlanningSupportPage({page, onNavigate}: Navigate & {page: 'actio
   return <section aria-label={title} className="mx-auto max-w-5xl space-y-3 p-3 md:p-4">
     <h2 ref={trackingHeading} tabIndex={-1} className="text-2xl font-semibold focus-visible:ring-2 focus-visible:ring-ring">{title}</h2>
     {page==='action-plans'&&storage.ready&&storage.saved&&goal&&<nav aria-label="Continue saved plan" className="flex flex-wrap gap-2">
-      <button type="button" onClick={()=>onNavigate('plan-track')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Track this plan</button>
+      <button type="button" data-tour-page="plan-track" onClick={()=>onNavigate('plan-track')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Track this plan</button>
       <button type="button" onClick={()=>onNavigate('assess-evaluate')} className="min-h-11 rounded border px-4 py-2 text-sm focus-visible:ring-2 focus-visible:ring-ring">Review plan results</button>
     </nav>}
     {!storage.ready ? <p role="status">Loading saved work…</p> : !storage.saved ? <p role="status">Saved work needs review. Existing records are retained.</p> : !goal ? page==='action-plans' ? <PositionTrackingGoal key={scope} fields={storage.data.exploration?.fields??{}} datasetToken={decisionStore.getDatasetToken()} onCreated={()=>requestAnimationFrame(()=>trackingHeading.current?.focus())}/> : <p className="text-sm text-muted-foreground">Select a saved goal on Overview to review its dated measurements. No goal is selected.</p> : page === 'action-plans' ? <>

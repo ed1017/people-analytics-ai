@@ -103,10 +103,10 @@ export function AppHeader({
     <header ref={header} data-mobile-menu-open={mobileMenuOpen?"":undefined} className="app-top-header sticky top-0 z-30 border-b bg-card">
       <div className="calm-header-row">
         <div className="calm-brand"><h1 id="app-page-title">{title}</h1><span tabIndex={0} className="text-xs font-medium text-muted-foreground" title="Workforce records and business-unit names are fictional demo data; public reference sources are identified separately." aria-label="Synthetic data. Workforce records and business-unit names are fictional demo data.">Synthetic data</span>{page.status&&<LimitedPreviewBadge/>}<PageHelp key={activePage} page={activePage} label={page.label}/></div>
-        <button ref={menuButton} type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close workspace':'Workspace'}</button>
+        <button ref={menuButton} data-tour-menu type="button" className="guided-mobile-menu-button" aria-expanded={mobileMenuOpen} aria-controls="guided-header-navigation guided-header-context guided-workspace-controls" onClick={()=>setMobileMenuOpen(open=>!open)}>{mobileMenuOpen?'Close workspace':'Workspace'}</button>
         <div id="guided-header-navigation" className="guided-header-navigation">
         {onNavigate&&<nav aria-label="Main navigation" className="calm-main-nav">
-          {mainNavigation.map(item=><button key={item.page} type="button" aria-current={activePage===item.page?'page':mainNavigationSection(activePage)===item.key?'location':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
+          {mainNavigation.map(item=><button key={item.page} data-tour-page={item.page} type="button" aria-current={activePage===item.page?'page':mainNavigationSection(activePage)===item.key?'location':undefined} onClick={()=>onNavigate(item.page)}>{item.label}</button>)}
         </nav>}
         <details ref={aboutMenu} className="calm-header-menu"><summary>About this project</summary><div className="calm-header-popover max-h-[65dvh] overflow-y-auto">
           <h2 className="font-semibold">Workforce planning by Ed Om</h2>

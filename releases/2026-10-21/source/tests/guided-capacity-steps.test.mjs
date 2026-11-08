@@ -31,3 +31,12 @@ test('pending disables actions; final review hides comparison and option control
  const pending=nodes(exports.GuidedCapacitySteps({...props,disabled:true,pending:true}));assert.equal(pending.find(node=>node.type==='button').props.disabled,true);
  const final=nodes(exports.GuidedCapacitySteps({...props,comparison,reviewing:true}));assert.equal(final.some(node=>node.type==='button'||node.type==='StaffingOptionsTable'),false);
 });
+
+test('whole-app case permits only the prescribed feasible 3 develop / 2 move mix',()=>{
+ const tree=nodes(exports.GuidedCapacitySteps({...props,comparison,forcedChoice:true})),table=tree.find(node=>node.type==='StaffingOptionsTable');
+ const enabled=table.props.options.filter(option=>!nodes(table.props.action(option)).find(node=>node.type==='input').props.disabled);
+ assert.equal(enabled.length,1);assert.deepEqual(JSON.parse(JSON.stringify(enabled[0].mix)),{build:3,move:2,buy:0});
+ for(const other of comparison.options.filter(option=>option.id!==enabled[0].id)){
+  const view=nodes(exports.GuidedCapacitySteps({...props,comparison,forcedChoice:true,selection:other.id}));assert.equal(view.find(node=>node.type==='button').props.disabled,true);
+ }
+});

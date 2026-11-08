@@ -109,10 +109,10 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
         <section aria-labelledby={id+'-try'} className="mt-4">
           <h3 id={id+'-try'} className="text-base font-bold">Try a planning decision</h3>
           <ol className="mt-2 list-decimal space-y-2 pl-5">
-            <li><strong>Review the starting point.</strong> The guided example begins with a fictional 5-FTE capacity gap.</li>
-            <li><strong>Submit the fixed prompt.</strong> Use the prescribed fictional inputs, then complete each required action in the popup.</li>
-            <li><strong>Compare the options.</strong> Compare developing people, moving people internally and hiring, then select a feasible option. Review cost, readiness and uncovered work together.</li>
-            <li><strong>Keep a proposal.</strong> Review and save in this browser, then reopen it to continue.</li>
+            <li><strong>Review the starting point.</strong> The whole-app demo starts with Overview and the real Workforce pages.</li>
+            <li><strong>Submit the fixed prompt.</strong> Review Future of Work, then use the prescribed fictional staffing inputs on Scenarios.</li>
+            <li><strong>Compare the options.</strong> Compare developing, moving and hiring people, then make the prescribed demo choice. Review cost, readiness and uncovered work together.</li>
+            <li><strong>Keep a proposal.</strong> Explicitly save in this browser, inspect Action plans and visit Track. Exit the demo at any time.</li>
           </ol>
         </section>
         <section aria-labelledby={id+'-read'} className="mt-4">
