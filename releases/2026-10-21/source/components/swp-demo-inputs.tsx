@@ -41,7 +41,7 @@ export function SwpDemoInputs({draft,disabled,onReview,onPrimaryChange,onValidit
    {draft.inputs.guidedWorkload&&<><PlanningAssumptionSlider label="Monthly service requests" value={volume} onChange={value=>{setVolume(value);primary(guidedWorkloadLabels.volume,value);}} disabled={disabled} spec={{min:0,max:1000000,precision:0,keyboardStep:100,extent:2500,unit:'requests'}}/><input type="hidden" name="volume" value={volume}/></>}
    <PlanningAssumptionSlider label="Budget for this plan" value={budget} onChange={value=>{setBudget(value);primary('budget',value);}} disabled={disabled} spec={{min:1,max:2000000,precision:0,keyboardStep:5000,extent:500000,unit:'USD'}}/>
    </div>
-   <details><summary className="min-h-11 cursor-pointer py-2 text-sm">Edit detailed assumptions</summary><div className="simple-demo-details">
+   <details><summary className="min-h-11 cursor-pointer py-2 text-sm">{disabled?'View detailed assumptions':'Edit detailed assumptions'}</summary><div className="simple-demo-details">
    {draft.inputs.guidedWorkload&&guidedWorkloadFields.filter(key=>key!=='volume').map(key=><label key={key}>{guidedWorkloadLabels[key]}<input name={key} type="number" min="0" max={key.endsWith('Pct')?100:key==='ftePerPerson'?1:1000000} step={key==='existingPeople'?'1':'0.01'} defaultValue={draft.inputs.guidedWorkload![key].value??''}/></label>)}
    <label>Coverage deadline<input name="deadlineMonth" type="month" defaultValue={deadline}/></label>
    <label>Acceptable uncovered work over this period (hours)<input name="maxUncoveredHours" type="number" min="0" max="100000000" step="0.01" placeholder="Not set" defaultValue={draft.inputs.mixConstraints?.maxUncoveredHours?.value??''}/></label>
