@@ -178,3 +178,10 @@ test('intro scroll region contains boundary scrolling and route dismissal restor
  assert.equal(h.document.documentElement.style.getPropertyValue('overflow'),'');
  assert.equal(h.document.body.style.getPropertyValue('overflow'),'');
 });
+
+test('local guided demo entry does not wait for unrelated Home evidence requests',()=>{
+ const source=fs.readFileSync(new URL('../components/pages/overall-overview-page.tsx',import.meta.url),'utf8');
+ assert.match(source,/demoReady=\{!conversation.issueEditor&&conversation.saved\}/);
+ assert.doesNotMatch(source,/demoReady=\{ready&&/);
+ const h=harness({autoOpen:false,demoReady:true});h.flush();h.button('Open guided demo').props.onClick();h.flush();assert.equal(h.starts,1);
+});

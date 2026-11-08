@@ -50,3 +50,29 @@ test('background snapshot is captured only by the explicit launch event',()=>{
  assert.doesNotMatch(source,/addEventListener\('(?:scroll|resize)',capture/);
  assert.match(source,/source,title'/);
 });
+
+test('actual sidebar destinations and mobile disclosure use the same gated tour contract',()=>{
+ const sidebar=fs.readFileSync(new URL('../components/app-sidebar.tsx',import.meta.url),'utf8');
+ assert.match(sidebar,/data-tour-page=\{item.page\} data-nav-destination=\{item.page\}/);
+ assert.match(sidebar,/data-tour-page=\{page\}\s+data-nav-destination=\{page\}/);
+ assert.match(sidebar,/data-tour-menu popoverTarget="phone-navigation"/);
+ assert.match(source,/destinations.some\(visible\)/);
+ assert.match(source,/surface.addEventListener\('toggle',refresh,true\)/);
+ assert.match(source,/surface.removeEventListener\('toggle',refresh,true\)/);
+ assert.doesNotMatch(sidebar,/<aside[^>]*data-tour-menu/);
+});
+
+test('phone navigation stays bounded only within the guided popup',()=>{
+ const css=fs.readFileSync(new URL('../components/whole-app-demo-window.module.css',import.meta.url),'utf8');
+ const drawer=css.match(/\.window :global\(\.app-sidebar\[popover\]:popover-open\) \{([^}]+)\}/)?.[1];
+ assert.ok(drawer);assert.match(drawer,/inset:0; margin:auto/);
+ assert.match(drawer,/width:min\(280px,calc\(100vw - 48px\)\)/);
+ assert.match(drawer,/height:auto; max-height:65dvh; overflow-y:auto/);
+ assert.match(drawer,/border-radius:12px/);
+});
+
+test('phase changes and tour exit retire native top-layer navigation',()=>{
+ assert.match(source,/return\(\)=>\{for\(const node of surface.querySelectorAll<HTMLElement>\('\[popover\]'\)\)/);
+ assert.match(source,/typeof node.hidePopover==='function'&&node.matches\(':popover-open'\)\)node.hidePopover\(\)/);
+ assert.match(source,/\[active,title,nextPage\]/);
+});

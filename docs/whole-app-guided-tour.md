@@ -19,3 +19,7 @@ Automated contracts cover ordered routing, save gating, prescribed feasible choi
 ## Bounded popup correction
 
 The walkthrough is a centered, bounded popup with visible main-page context behind it, including on phones. The background is a noninteractive visual snapshot, not another running app. The fixed example prompt requires an explicit Enter key action; a labelled on-screen Enter key supplies the same action for touch and assistive access. The walkthrough never submits the prompt automatically.
+
+## Direct-entry reliability correction
+
+The demo is local and no longer waits for unrelated Home evidence requests such as survey sentiment. Browser-storage, active-request and editing safeguards remain. The actual sidebar destinations and phone Browse pages control participate in the required-action navigation, so users do not need a hidden alternate route. Phone navigation stays bounded within the popup. Regression acceptance must use actual coordinate clicks on the main entry under slow/failed evidence, and the visible sidebar/mobile navigation.
