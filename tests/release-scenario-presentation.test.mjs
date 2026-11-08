@@ -39,7 +39,7 @@ test('business question follows accepted gap and budget without treating zero or
 });
 test('shared table retains six bounded options and exact dates with no default selection',()=>{
  const html=render();
- assert.match(html,/<progress aria-label="Planning progress" max="3" value="2"/);assert.match(html,/Calculated staffing priorities/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);
+ assert.match(html,/<progress aria-label="Planning progress" max="4" value="3"/);assert.match(html,/Calculated staffing priorities/);assert.doesNotMatch(html.replace(/<[^>]*>/g,''),/\bdemo\b/i);
  for(const value of ['26,800','319,000','2027-01-01','2026-12-01','1,280','320','$325,000'])assert.ok(html.includes(value),value);
  assert.equal((html.match(/data-staffing-option=/g)||[]).length,6);
  assert.match(html,/combinations evaluated/);assert.match(html,/6 displayed/);assert.match(html,/Backfills assumed: 0/);assert.match(html,/Donor-team capacity loss is not modeled/);assert.match(html,/Attrition is not modeled/);assert.match(html,/no gradual productivity ramp/);

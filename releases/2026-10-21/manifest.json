@@ -4395,7 +4395,7 @@
     {
       "path": "tests/popup-tradeoff-presentation.test.mjs",
       "bytes": 7732,
-      "sha256": "15cba306cb672b29e86181283041ef96d3d734ef1586735edd975462f53dac0f"
+      "sha256": "6879592ddd41559c42883e51012744ccd5ce96fbe0cfbdc6a5fa0f014e711eb2"
     },
     {
       "path": "tests/public-composition-context.test.mjs",
