@@ -87,9 +87,10 @@ export function AppSidebar({
   const [previousPage,setPreviousPage]=useState(activePage);
   if(previousPage!==activePage){setPreviousPage(activePage);if(!primaryPage)setExploreOpen(true);const section=secondaryNavigationSection(activePage);if(section)setOpenGroups(current=>({...current,[section]:true}));}
   return (
-    <><div className="phone-navigation-trigger"><button type="button" popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Browse pages</button></div>
+    <><div className="phone-navigation-trigger"><button type="button" data-tour-menu popoverTarget="phone-navigation" className="min-h-11 rounded border px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring">Browse pages</button></div>
     <aside ref={drawer} id="phone-navigation" popover={phone?"auto":undefined} aria-label="Navigation drawer" onClick={event=>{if(phone&&(event.target as HTMLElement).closest('[data-nav-destination], [aria-label="Overview"]'))drawer.current?.hidePopover();}} className="app-sidebar sticky top-[var(--app-header-height)] h-[calc(100vh-var(--app-header-height))] overflow-y-auto border-r bg-sidebar p-3 max-md:p-2">
       <Button
+        data-tour-menu
         variant="ghost"
         className={
           navCollapsed
@@ -127,16 +128,16 @@ export function AppSidebar({
         {[{page:'home' as AppPage,label:'Overview'},...planningJourney].map(item=>{
           const Icon=pageIcons[item.page];
           const active=activePage===item.page||(item.page==='planning-overview'&&activePage==='workforce-planning');
-          return <Button key={item.page} type="button" data-nav-destination={item.page} aria-label={item.label} title={item.label} aria-current={active?'page':undefined} variant={active?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`h-auto min-h-11 w-full gap-3 px-3 py-2 text-sm ${navCollapsed?'justify-center':'justify-start'}`}>
+          return <Button key={item.page} type="button" data-tour-page={item.page} data-nav-destination={item.page} aria-label={item.label} title={item.label} aria-current={active?'page':undefined} variant={active?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`h-auto min-h-11 w-full gap-3 px-3 py-2 text-sm ${navCollapsed?'justify-center':'justify-start'}`}>
             <Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span className="whitespace-normal text-left">{item.label}</span>}
           </Button>;
         })}
         <section aria-label="Explore data" className="border-t pt-3">
           {!navCollapsed&&<h2 className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Explore data</h2>}
-          {planningEvidence.map(item=>{const Icon=pageIcons[item.page];return <Button key={item.page} type="button" data-nav-destination={item.page} title={item.label} aria-label={item.label} aria-current={activePage===item.page?'page':undefined} variant={activePage===item.page?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`min-h-10 w-full gap-3 px-3 text-sm text-muted-foreground ${navCollapsed?'justify-center':'justify-start'}`}><Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span>{item.label}</span>}</Button>})}
+          {planningEvidence.map(item=>{const Icon=pageIcons[item.page];return <Button key={item.page} type="button" data-tour-page={item.page} data-nav-destination={item.page} title={item.label} aria-label={item.label} aria-current={activePage===item.page?'page':undefined} variant={activePage===item.page?'secondary':'ghost'} onClick={()=>onPageChange(item.page)} className={`min-h-10 w-full gap-3 px-3 text-sm text-muted-foreground ${navCollapsed?'justify-center':'justify-start'}`}><Icon className="h-4 w-4 shrink-0"/>{!navCollapsed&&<span>{item.label}</span>}</Button>})}
         </section>
         <section aria-label="Explore tools" className="border-t pt-2">
-          <button type="button" aria-label="More data and tools" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
+          <button type="button" data-tour-menu aria-label="More data and tools" aria-expanded={exploreOpen} aria-controls="explore-navigation" onClick={()=>setExploreOpen(value=>!value)} className="flex min-h-11 w-full items-center gap-3 rounded px-3 py-2 text-left font-medium hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring">
             <Compass className="h-5 w-5 shrink-0" />{!navCollapsed && <span>More</span>}<span aria-hidden="true" className="ml-auto">{exploreOpen?"−":"+"}</span>
           </button>
           <div id="explore-navigation" hidden={!exploreOpen}>
@@ -156,7 +157,7 @@ export function AppSidebar({
                     : "border-t pt-4"
                 }
               >
-                <h2 className="mb-1.5"><button type="button" aria-label={groupLabel} aria-expanded={expanded} aria-controls={groupId} onClick={()=>setOpenGroups(current=>({...current,[section.key]:!expanded}))} className="nav-group-label flex min-h-11 w-full items-center rounded px-2 py-2 text-left hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring max-md:justify-center max-md:px-0">
+                <h2 className="mb-1.5"><button type="button" data-tour-menu aria-label={groupLabel} aria-expanded={expanded} aria-controls={groupId} onClick={()=>setOpenGroups(current=>({...current,[section.key]:!expanded}))} className="nav-group-label flex min-h-11 w-full items-center rounded px-2 py-2 text-left hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring max-md:justify-center max-md:px-0">
                   <span
                     aria-hidden="true"
                     className={
@@ -196,6 +197,7 @@ export function AppSidebar({
                       return (
                         <Button
                           key={page}
+                          data-tour-page={page}
                           data-nav-destination={page}
                           variant={
                             active

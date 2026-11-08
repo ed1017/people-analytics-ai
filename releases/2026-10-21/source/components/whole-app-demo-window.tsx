@@ -56,6 +56,13 @@ export function WholeAppDemoWindow({active,title,instruction,nextPage,children,o
   return()=>{document.body.style.overflow=previous;if(opener.current?.isConnected)opener.current.focus({preventScroll:true});};
  },[active]);
  useEffect(()=>{
+  const surface=root.current;if(!active||!surface)return;
+  // Popovers live in the browser top layer even though their React owner stays mounted.
+  return()=>{for(const node of surface.querySelectorAll<HTMLElement>('[popover]')){
+   if(typeof node.hidePopover==='function'&&node.matches(':popover-open'))node.hidePopover();
+  }};
+ },[active,title,nextPage]);
+ useEffect(()=>{
   if(!active)return;
   if(content.current){content.current.scrollTop=0;content.current.scrollLeft=0;}
   heading.current?.focus({preventScroll:true});
@@ -65,9 +72,15 @@ export function WholeAppDemoWindow({active,title,instruction,nextPage,children,o
   const changed=new Map<HTMLElement,{inert:boolean;dim:string|null}>();
   const highlighted=new Map<HTMLElement,string|null>();
   function restoreHighlights(){for(const [node,prior] of highlighted){if(prior===null)node.removeAttribute('data-tour-current-action');else node.setAttribute('data-tour-current-action',prior);}highlighted.clear();}
+  const oldMenuTop=surface.style.getPropertyValue('--tour-menu-top'),oldMenuHeight=surface.style.getPropertyValue('--tour-menu-height');
   function refresh(){
+   const coach=surface!.querySelector<HTMLElement>('[data-tour-controls]');
+   if(coach){const top=coach.getBoundingClientRect().bottom+8,bottom=surface!.getBoundingClientRect().bottom-8;surface!.style.setProperty('--tour-menu-top',top+'px');surface!.style.setProperty('--tour-menu-height',Math.max(0,bottom-top)+'px');}
    restoreHighlights();
-   for(const node of surface!.querySelectorAll<HTMLElement>('[data-tour-page]'))if(nextPage&&node.getAttribute('data-tour-page')===nextPage){highlighted.set(node,node.getAttribute('data-tour-current-action'));node.setAttribute('data-tour-current-action','true');}
+   const destinations=[...surface!.querySelectorAll<HTMLElement>('[data-tour-page]')].filter(node=>nextPage&&node.getAttribute('data-tour-page')===nextPage);
+   const visible=(node:HTMLElement)=>node.getClientRects().length>0&&getComputedStyle(node).visibility!=='hidden';
+   const targets=destinations.some(visible)?destinations:nextPage?[...surface!.querySelectorAll<HTMLElement>('[data-tour-menu]')].filter(visible):[];
+   for(const node of targets){highlighted.set(node,node.getAttribute('data-tour-current-action'));node.setAttribute('data-tour-current-action','true');}
    for(const [node,prior] of changed){node.inert=prior.inert;if(prior.dim===null)node.removeAttribute('data-tour-blocked');else node.setAttribute('data-tour-blocked',prior.dim);}changed.clear();
    for(const node of surface!.querySelectorAll<HTMLElement>(controls)){
     if(wholeAppDemoTargetAllowed(node,nextPage)||node.querySelector(controls))continue;
@@ -78,8 +91,9 @@ export function WholeAppDemoWindow({active,title,instruction,nextPage,children,o
    refresh();
    // A required control can unmount after a calculation; only recover genuinely lost focus.
    if(document.activeElement===document.body||document.activeElement===document.documentElement)heading.current?.focus({preventScroll:true});
-  });observer.observe(surface,{childList:true,subtree:true});
-  return()=>{observer.disconnect();restoreHighlights();for(const [node,prior] of changed){node.inert=prior.inert;if(prior.dim===null)node.removeAttribute('data-tour-blocked');else node.setAttribute('data-tour-blocked',prior.dim);}};
+  });observer.observe(surface,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','open']});
+  surface.addEventListener('toggle',refresh,true);window.addEventListener('resize',refresh);
+  return()=>{observer.disconnect();surface.removeEventListener('toggle',refresh,true);window.removeEventListener('resize',refresh);if(oldMenuTop)surface.style.setProperty('--tour-menu-top',oldMenuTop);else surface.style.removeProperty('--tour-menu-top');if(oldMenuHeight)surface.style.setProperty('--tour-menu-height',oldMenuHeight);else surface.style.removeProperty('--tour-menu-height');restoreHighlights();for(const [node,prior] of changed){node.inert=prior.inert;if(prior.dim===null)node.removeAttribute('data-tour-blocked');else node.setAttribute('data-tour-blocked',prior.dim);}};
  },[active,nextPage]);
  useEffect(()=>{
   if(!active)return;

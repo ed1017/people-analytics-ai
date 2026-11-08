@@ -319,8 +319,8 @@
     },
     {
       "path": "components/app-sidebar.tsx",
-      "sha256": "46c7335e2fedc8e6b9e2af0beec29348edb11684cdd2a3d54327ac34ef0cc3ba",
-      "bytes": 11620
+      "sha256": "48e42c486c15cc97f325f1fedfe2b8c4a57a244c8f8001f97f7238e5b015c99c",
+      "bytes": 11790
     },
     {
       "path": "components/assumptions-disclosure.tsx",
@@ -774,8 +774,8 @@
     },
     {
       "path": "components/pages/overall-overview-page.tsx",
-      "sha256": "dce392338f88b9896521470b949f6a50b235cd7f89f2ec2be04761734d1349c7",
-      "bytes": 116229
+      "sha256": "278a5db6cfb0536772f5102db5074f77e366531a9a41a8af37b4e9a1cfc61476",
+      "bytes": 116202
     },
     {
       "path": "components/pages/overview-page.tsx",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 18365,
-      "sha256": "f82528c6cc1238960aa76a328a13760a5b425d0265361ee648c49edafa9356c5"
+      "bytes": 18848,
+      "sha256": "4e8dde3ae733926d4af9cb1608e6b9dc36c360ed6ac5d9ebf3cca7d027b4ff17"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
@@ -5869,13 +5869,13 @@
     },
     {
       "path": "components/whole-app-demo-window.module.css",
-      "sha256": "3c0599e790d12212ccf2fb9de0003d43c438d3f8e7a9e93b42150f65dc6a9253",
-      "bytes": 1727
+      "sha256": "b698e06088ce60d7b6dd528c95fb3872d7c03d468b1d8e73cc094926e1a618d2",
+      "bytes": 2165
     },
     {
       "path": "components/whole-app-demo-window.tsx",
-      "sha256": "e11b2e5d2d865232c9a36ecb852599e5ef0f319400fa266fc0e0118286f8b56d",
-      "bytes": 8095
+      "sha256": "b7aadba16fae8cc4c8d2ae6bdbba0e9a4c1d79170150941dd79de14399cd7226",
+      "bytes": 9739
     },
     {
       "path": "lib/whole-app-tour.ts",
@@ -5884,8 +5884,8 @@
     },
     {
       "path": "tests/whole-app-demo-window.test.mjs",
-      "sha256": "a6ad48aa6dae26430700c225457fc345c8302688150162e57dfc67a2d83d9550",
-      "bytes": 3601
+      "sha256": "37717573833740292ce40dcf636372aba8bdafecda6c53103a1fa6707fe98970",
+      "bytes": 5668
     },
     {
       "path": "tests/whole-app-tour.test.mjs",
