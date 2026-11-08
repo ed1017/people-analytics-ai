@@ -8,14 +8,21 @@ import {guidedWorkloadResult} from './guided-workload.ts';
 // @ts-expect-error Native Node tests share application source.
 import {staffingChoiceSummary} from './staffing-choice-summary.ts';
 const num=(n:number|null|undefined)=>n==null?'unknown':n.toLocaleString('en-US',{maximumFractionDigits:2});
+/** Parse only bounded capacity questions. Extra role, timing or compound instructions
+ * remain with the general assistant rather than silently adopting demo assumptions. */
+export function capacityPlanningRequest(text:string):{gap:number;budget:number|null}|null{
+ const match=text.trim().match(/^(?:please\s+)?(?:(?:how (?:would|can|could|should) (?:you|we|I) )|(?:(?:help me|help us) (?:to )?))?(?:close|fill|address)(?: the| a| an| our| my)? (\d+(?:\.\d+)?)\s*(?:FTE|full[- ]time equivalent)(?: capacity| staffing)? gap(?: (?:with|on|within|under)(?: a| an| the| our| my)? (?:budget of )?\$((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(k)?(?: USD)?(?: budget)?)?\s*[?.!]?$/i);
+ if(!match)return null;
+ const gap=Number(match[1]),budget=match[2]===undefined?null:Number(match[2].replaceAll(',',''))*(match[3]?1000:1);
+ return Number.isFinite(gap)&&(budget===null||Number.isFinite(budget))?{gap,budget}:null;
+}
 /** A matching incomplete question may OFFER the example, never silently adopt it. */
 export function offersCapacityExample(text:string){
- if(!scenarioComparisonIntent(text))return false;
- const match=text.match(/close(?: the| a)? (\d+(?:\.\d+)?) fte capacity gap(?: with a \$([\d,]+)(?: USD)? budget)?/i);
- return !!match&&Number(match[1])===5&&(match[2]===undefined||Number(match[2].replaceAll(',',''))===325000);
+ const request=capacityPlanningRequest(text);
+ return !!request&&request.gap===5&&(request.budget===null||request.budget===325000);
 }
 export function scenarioRecommendationIntent(text:string){return /^(?:(?:with|under) (?:the )?(?:new|updated|current|revised) budget[, ]*)?(?:(?:which|what) (?:staffing )?option (?:would|do|should) you recommend|(?:what|which) (?:is|would be) (?:your|the) recommendation|recommend (?:a|an|the) (?:staffing )?option)[?.!]?$/i.test(text.trim());}
-export function scenarioComparisonIntent(text:string){return /^(?:please\s+)?(?:compare(?: the)?(?: staffing)? options|recalculate(?: the)?(?: staffing)? options|show(?: me)?(?: the)? staffing options|(?:how (?:would|can|could) (?:you|we) )?close(?: the| a)? \d+(?:\.\d+)? fte capacity gap(?: with a \$[\d,]+(?: USD)? budget)?)\s*[?.!]?$/i.test(text.trim());}
+export function scenarioComparisonIntent(text:string){return !!capacityPlanningRequest(text)||/^(?:please\s+)?(?:compare(?: the)?(?: staffing)? options|recalculate(?: the)?(?: staffing)? options|show(?: me)?(?: the)? staffing options)\s*[?.!]?$/i.test(text.trim());}
 /** Only bounded hypothetical follow-ups; factual dates/groups remain descriptive queries. */
 export function scenarioAssumptionDiscussionIntent(text:string){
  return /^(?:what if (?:attrition|turnover) (?:increases?|decreases?|rises?|falls?)(?: (?:by|to) \d+(?:\.\d+)?(?:%| percent))?|what about (?:backfill|backfills|attrition|turnover))(?: (?:in|for) (?:this|the|our) (?:scenario|plan))?\s*[?.!]?$/i.test(text.trim());
@@ -45,9 +52,9 @@ export function readScenarioChatDraft(raw:unknown,datasetToken:string):BundleDra
 }
 
 export function scenarioQuestionMismatch(text:string,draft:BundleDraft):string|null{
- const match=text.match(/close(?: the| a)? (\d+(?:\.\d+)?) fte capacity gap(?: with a \$([\d,]+)(?: USD)? budget)?/i);
- if(!match)return null;
+ const request=capacityPlanningRequest(text);
+ if(!request)return null;
  const gap=guidedWorkloadResult(draft.inputs)?.additionalFte;
- if(Number(match[1])!==gap||match[2]!==undefined&&Number(match[2].replaceAll(',',''))!==draft.inputs.budget?.amount.value)return 'The quantities in your question differ from the current scenario. Review and change the workload inputs or budget beside the chat, then compare again. Existing options do not answer the changed question.';
+ if(request.gap!==gap||request.budget!==null&&request.budget!==draft.inputs.budget?.amount.value)return 'The quantities in your question differ from the current scenario. Review and change the workload inputs or budget beside the chat, then compare again. Existing options do not answer the changed question.';
  return null;
 }

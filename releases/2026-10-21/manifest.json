@@ -919,8 +919,8 @@
     },
     {
       "path": "components/simple-swp-demo.tsx",
-      "sha256": "ad596164f14a73262a15f6b768939584bd69014da716b2c8ef7194e1e9cf66c0",
-      "bytes": 10514
+      "sha256": "02e96da60e6cf26e89080a04dd40bf93cedbda89a897195aaed9679766fcc611",
+      "bytes": 11739
     },
     {
       "path": "components/site-footer.tsx",
@@ -959,8 +959,8 @@
     },
     {
       "path": "components/swp-demo-inputs.tsx",
-      "sha256": "6218acfcda6d2a854ac7fb16dff2a3bfb7d5533ba74be3dad691fc9bd7726dd5",
-      "bytes": 7543
+      "sha256": "b36b34255def32886b68aac5f36949516198706c99f01e87789df1d7d906e4aa",
+      "bytes": 7584
     },
     {
       "path": "components/swp-guided-journey.tsx",
@@ -3334,8 +3334,8 @@
     },
     {
       "path": "lib/scenario-planning-parity.ts",
-      "sha256": "1d1f7d4f4c3db86ca334b4012b312444d6f868f2cf04fc173430c6b55655f405",
-      "bytes": 6034
+      "sha256": "7adaf725418c7899070071b4190372bc8e4dccc48bf033c54d6db1d464eec40f",
+      "bytes": 6606
     },
     {
       "path": "lib/simple-swp-controls.ts",
@@ -5854,13 +5854,13 @@
     },
     {
       "path": "components/guided-capacity-steps.tsx",
-      "bytes": 5134,
-      "sha256": "5d48c188126a676f9a4b39e08125f7aa3cc709434849fa257261ea84036f17f8"
+      "bytes": 2415,
+      "sha256": "75162905b4e628d5c2fb171e3fd3f90f771cb337cb8c05c5d3df21856deed969"
     },
     {
       "path": "tests/guided-capacity-steps.test.mjs",
-      "bytes": 3843,
-      "sha256": "0769bfbe2ce20546d7bb3bcb1751c9453fa4731623e30575712d540ec4f2a2d2"
+      "bytes": 4940,
+      "sha256": "38d490f4dcbf6afa2b14d7baf1dd978c2d0d70d0a43f1dae148c9e5d73ad9c6e"
     },
     {
       "path": "tests/home-visual-theme.test.mjs",
@@ -5891,6 +5891,11 @@
       "path": "tests/whole-app-tour.test.mjs",
       "sha256": "6ee92d4475fe1330991c2fd537ee7897517ba20ddc3c6103d9ff25f83b0c1ed5",
       "bytes": 2839
+    },
+    {
+      "path": "tests/shared-planner-entry.test.mjs",
+      "bytes": 2593,
+      "sha256": "8d1c44d8a7ae461472206f83d13849f30d0a6f41a35381b4593678c2e8e72734"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

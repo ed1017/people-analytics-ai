@@ -24,3 +24,9 @@ The walkthrough is a centered, bounded popup with visible main-page context behi
 ## Direct-entry reliability correction
 
 The demo is local and no longer waits for unrelated Home evidence requests such as survey sentiment. Browser-storage, active-request and editing safeguards remain. The actual sidebar destinations and phone Browse pages control participate in the required-action navigation, so users do not need a hidden alternate route. Phone navigation stays bounded within the popup. Regression acceptance must use actual coordinate clicks on the main entry under slow/failed evidence, and the visible sidebar/mobile navigation.
+
+## Shared planner presentation
+
+The tutorial now uses the normal editable planner component for capacity metrics, assumptions, monthly coverage, tradeoffs, choices and cost breakdown. Guided mode locks those same inputs and permits only the prescribed feasible mix; it is not a separate simplified results screen. Normal mode retains input editing and unrestricted option review. The explicit prompt, comparison, review/save and real Action plans/Track continuation remain required.
+
+Bounded staffing-question paraphrases (for example, "How can we fill our 5 FTE staffing gap on a $325k budget?") offer the same fictional-input review as the original prompt. They never silently accept the example. Different quantities cannot reuse existing calculated results. Questions with additional role/timing context or compound requests stay with the general assistant rather than having that context discarded. This is shared deterministic planning, not a claim that unrestricted live AI reproduces the tutorial.
