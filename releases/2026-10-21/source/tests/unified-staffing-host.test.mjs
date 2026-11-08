@@ -9,7 +9,7 @@ test('hosted controller becomes inactive on all navigation away, including Home'
  assert.ok(owner.includes('active={!!wholeAppDemo||(normalWorkspace?.open?normalWorkspace.active:active)}'));
  assert.ok(app.includes("active:normalStaffingOpen&&activePage==='planning-overview'&&!wholeTour"));
  assert.ok(source.includes('if(ownedIsolation.current&&(opening.current||normalWorkspace?.open))'));
- assert.ok(source.includes('suspended.current=true;endIsolation.current();ownedIsolation.current=null;'));
+ assert.ok(source.includes('setSuspended(true);endIsolation.current();ownedIsolation.current=null;'));
 });
 test('matching requests preserve an edited draft and expose quantity mismatch, rather than resetting defaults',()=>{
  const guard=source.slice(source.indexOf('// Reopening a normal workspace'),source.indexOf('// An explicit supported Home request'));
@@ -19,6 +19,10 @@ test('matching requests preserve an edited draft and expose quantity mismatch, r
 test('parked isolation is scoped to exact origin goal, dataset, discussion and saved receipt',()=>{
  assert.ok(source.includes('const [parkedOrigin,setParkedOrigin]=useState<'));
  assert.equal(source.includes('parkedOrigin.current'),false);
+ assert.ok(source.includes('function setSuspended(value:boolean){suspended.current=value;setIsSuspended(value);}'));
+ const matchLine=source.split('\n').find(line=>line.includes('matches=!!draft'));
+ assert.equal(matchLine.includes('suspended.current'),false);
+ assert.ok(matchLine.includes('isSuspended&&parkedOriginMatches'));
  for(const field of ['goalId===conversation.activeGoalId','datasetToken===token','discussionKey===discussionKey','savedSignature===savedSignature'])assert.ok(source.includes('parkedOrigin.'+field));
  assert.ok(source.includes('suspended.current&&draft&&draftDataset===token&&draftDiscussion.current===discussionKey&&parkedOriginMatches'));
  assert.equal((source.match(/if\(!ownedIsolation.current\)setParkedOrigin\(/g)||[]).length,2);

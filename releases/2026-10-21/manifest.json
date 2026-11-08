@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "8bfeaf98476018d1acd2aefff0de22552d51357f2effb2f7d6ff9b55bc8e0195",
-      "bytes": 52279
+      "sha256": "6c88665527903110dbef4f76b489873c461efd9c6492352198221b65d59f320d",
+      "bytes": 52378
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -4039,8 +4039,8 @@
     },
     {
       "path": "tests/unified-staffing-host.test.mjs",
-      "sha256": "25b875eb0c834ec1cd0a52d368a25c6bd99ee58b73bb471e74fd12c388a6f48b",
-      "bytes": 3128
+      "sha256": "1fac13e11f3c2b47c401f7c5ec16710bfdea4cf9e82617ba2ace7067c30837a2",
+      "bytes": 3453
     },
     {
       "path": "tsconfig.json",

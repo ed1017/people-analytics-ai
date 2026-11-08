@@ -47,6 +47,8 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  const [savedConfirmation,setSavedConfirmation]=useState<{goalId:string;planId:string;datasetToken:string;resetEpoch:number}|null>(null);
  const [inputReview,setInputReview]=useState<{question:string;identity:string}|null>(null);
  const suspended=useRef(false);
+ const [isSuspended,setIsSuspended]=useState(false);
+ function setSuspended(value:boolean){suspended.current=value;setIsSuspended(value);}
  const [parkedOrigin,setParkedOrigin]=useState<{goalId:string;datasetToken:string;discussionKey:string;savedSignature:string}|null>(null);
  const [demandBridge,setDemandBridge]=useState<SwpDemandBridge|null>(null),[demandStale,setDemandStale]=useState(false);
  const ownedIsolation=useRef<string|null>(null),endIsolation=useRef(conversation.endGuidedExploration),resetSeen=useRef(conversation.resetEpoch);
@@ -73,7 +75,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
   if(opening.current&&ownedIsolation.current&&draftDiscussion.current===discussionKey)return;
   if((suspended.current||ownedIsolation.current)&&draftDataset===token&&draftOwner.current===conversation.activeGoalId&&draftDiscussion.current===discussionKey&&draftSavedSignature.current===savedSignature)return;
   const id=conversation.activeGoalId;const identity=JSON.stringify([token,id,conversation.focusedIssue,discussionKey,savedSignature,receiptSignature]);if(restored.current===identity)return;restored.current=identity;
-  setGuided(false);generation.current++;abort.current?.abort();setPending(false);setReview(null);setEdit(null);setComparison(null);setSelection(null);setChatScenario(false);setDemoOpen(false);suspended.current=false;draftOwner.current=id;draftDiscussion.current=discussionKey;draftSavedSignature.current=savedSignature;chatOwner.current=null;
+  setGuided(false);generation.current++;abort.current?.abort();setPending(false);setReview(null);setEdit(null);setComparison(null);setSelection(null);setChatScenario(false);setDemoOpen(false);setSuspended(false);draftOwner.current=id;draftDiscussion.current=discussionKey;draftSavedSignature.current=savedSignature;chatOwner.current=null;
   if(ownedIsolation.current&&id&&id!==ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}
   const continued=readScenarioChatReceipt(ownerFields?.[scenarioChatField],continuityContext);
   if(continued&&(!id||continued.draft.binding.goal===conversation.focusedIssue)){setDraft(continued.draft);setDraftDataset(token);setSelection(continued.selectedCandidateId);setChatScenario(true);setShowOptions(true);setDemandBridge(null);setDemandStale(false);chatOwner.current=id;chatReceipt.current=continued;return;}
@@ -84,11 +86,11 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Select the existing goal's local draft without committing a view change.
  useEffect(()=>{restore();},[conversation.activeGoalId,conversation.focusedIssue,token,discussionKey,savedSignature,receiptSignature,storage.ready]);
  // eslint-disable-next-line react-hooks/set-state-in-effect -- Navigation cancels the currently owned calculation and closes its review.
- useEffect(()=>{if(!active){generation.current++;abort.current?.abort();if(ownedIsolation.current&&(opening.current||normalWorkspace?.open)){suspended.current=true;endIsolation.current();ownedIsolation.current=null;}opening.current=false;setPending(false);setReview(null);}},[active,normalWorkspace?.open]);
- function exit(clearReceipt=true){setGuided(false);if(clearReceipt)forgetChat();else{chatOwner.current=null;modelContextRef.current=null;}setChatScenario(false);suspended.current=false;setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'',discussionKey,JSON.stringify((goals.activeId?decisionStore.getSnapshot().data.workspaces[goals.activeId]?.fields:decisionStore.getSnapshot().data.exploration?.fields)?.[swpDemoField]??null),JSON.stringify((goals.activeId?decisionStore.getSnapshot().data.workspaces[goals.activeId]?.fields:decisionStore.getSnapshot().data.exploration?.fields)?.[scenarioChatField]??null)]);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
+ useEffect(()=>{if(!active){generation.current++;abort.current?.abort();if(ownedIsolation.current&&(opening.current||normalWorkspace?.open)){setSuspended(true);endIsolation.current();ownedIsolation.current=null;}opening.current=false;setPending(false);setReview(null);}},[active,normalWorkspace?.open]);
+ function exit(clearReceipt=true){setGuided(false);if(clearReceipt)forgetChat();else{chatOwner.current=null;modelContextRef.current=null;}setChatScenario(false);setSuspended(false);setDemoOpen(false);setRestartRequested(false);setShowOptions(false);demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);generation.current++;opening.current=false;abort.current?.abort();if(ownedIsolation.current){endIsolation.current();ownedIsolation.current=null;}const goals=decisionStore.getSnapshot().data.goals;restored.current=JSON.stringify([decisionStore.getDatasetToken(),goals.activeId,goals.goals.find(g=>g.id===goals.activeId)?.statement??'',discussionKey,JSON.stringify((goals.activeId?decisionStore.getSnapshot().data.workspaces[goals.activeId]?.fields:decisionStore.getSnapshot().data.exploration?.fields)?.[swpDemoField]??null),JSON.stringify((goals.activeId?decisionStore.getSnapshot().data.workspaces[goals.activeId]?.fields:decisionStore.getSnapshot().data.exploration?.fields)?.[scenarioChatField]??null)]);setDraft(null);setComparison(null);setEdit(null);setReview(null);setSelection(null);setPending(false);setNotice('Example closed. Earlier goals and plans are kept.');}
  const handleReset=useEffectEvent(()=>{if(resetSeen.current!==conversation.resetEpoch){resetSeen.current=conversation.resetEpoch;exit(false);}});
  useEffect(()=>{handleReset();},[conversation.resetEpoch]);
- const draftKey=draft?bundleInputKey(draft):'',matches=!!draft&&(ownedIsolation.current===draft.binding.goalId||suspended.current&&parkedOriginMatches||conversation.activeGoalId===draftOwner.current&&(!conversation.activeGoalId||conversation.activeGoalId===draft.binding.goalId&&conversation.focusedIssue===draft.binding.goal))&&token===draftDataset&&draftDiscussion.current===discussionKey&&(draftSavedSignature.current===savedSignature||suspended.current&&parkedOriginMatches);
+ const draftKey=draft?bundleInputKey(draft):'',matches=!!draft&&(ownedIsolation.current===draft.binding.goalId||isSuspended&&parkedOriginMatches||conversation.activeGoalId===draftOwner.current&&(!conversation.activeGoalId||conversation.activeGoalId===draft.binding.goalId&&conversation.focusedIssue===draft.binding.goal))&&token===draftDataset&&draftDiscussion.current===discussionKey&&(draftSavedSignature.current===savedSignature||isSuspended&&parkedOriginMatches);
  const entryIdentity=JSON.stringify([token,conversation.activeGoalId,conversation.focusedIssue,conversation.resetEpoch,active,discussionKey]);
  const previousEntryIdentity=useRef(entryIdentity);
  // Retire a pending user review permanently when its originating context changes.
@@ -139,7 +141,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  }
  useLayoutEffect(()=>{commandRef.current=handle;modelContextRef.current=active&&(demandBridge||demoOpen||chatScenario)&&draft&&matches&&!demandStale?{conversationMode:SWP_CONVERSATION_MODE,goalId:draft.binding.goalId,classification:'fictional-scenario',acceptedOperationalReview:demandBridge?{spec:demandBridge.review.spec,result:demandBridge.review.result,reviewedAt:demandBridge.reviewedAt,acceptance:'Scenario use only; original provenance retained.'}:null,datasetToken:token,revision:draft.revision,...(chatScenario?{draft:structuredClone(draft),inputKey:draftKey}:{}),selectedCandidateId:currentComparison?.options.some(o=>o.id===selection)?selection:null,selectedSavedPlanId:saved?.selectedPlanId??null,goal:draft.binding.goal,objective:draft.inputs.scope.requirements,scope:draft.inputs.scope,budget:draft.inputs.budget,reviewState:edit?'pending-edits':currentComparison?'calculated-unsaved':'not-calculated',options:currentComparison?.options.map(o=>({id:o.id,label:o.label,mix:o.candidate.mix,wholePeriodEffort:demandBridge?serviceOptionEffort(o,demandBridge):null,conditionalCoverage:o.coverage,fullCoverageDate:o.candidate.metrics?.fullCoverageDate??null,incrementalCash:o.candidate.cash.complete,staffHours:o.candidate.effort?.totalHours??null,addedCompanyEmployees:o.candidate.metrics?.addedEmployees??null,status:o.candidate.status}))??[],limitations:[staffingAssumptions(draft),'End-date staffing and cash limits do not prove whole-period effort coverage; review any separately calculated shortfall.','Additional-role demand is a reviewed assumption, not inferred from growth.','Skill coverage does not establish available staff or causal uplift.','Contract and automate are discussion-only here; no calculated benefit.','Changing staffing inputs requires the displayed local assumption review and recalculation.']} : null;});
  function closeDemo(){forgetChat();setChatScenario(false);
-  suspended.current=true;generation.current++;abort.current?.abort();setPending(false);setDemoOpen(false);
+  setSuspended(true);generation.current++;abort.current?.abort();setPending(false);setDemoOpen(false);
   if(ownedIsolation.current){conversation.endGuidedExploration();ownedIsolation.current=null;}
  }
  function resumeDemo(){setChatScenario(false);
@@ -147,7 +149,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
   if(!draft||draftDataset!==token||busy||pending||!active||!storage.saved)return;
   try{if(conversation.activeGoalId!==draft.binding.goalId){conversation.beginGuidedExploration(draft.binding.goalId);ownedIsolation.current=draft.binding.goalId;}}
   catch(error){setNotice((error as Error).message);return;}
-  suspended.current=false;setDemoOpen(true);setRestartRequested(false);setReview(null);
+  setSuspended(false);setDemoOpen(true);setRestartRequested(false);setReview(null);
  }
  async function restartDemo(){
   if(busy||pending||!active||!storage.saved)return;
@@ -156,7 +158,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
   try{const id='guided-swp-'+crypto.randomUUID(),next=await createSwpDemo(id,new Date().toISOString());
    if(!mounted.current||generation.current!==epoch||decisionStore.getDatasetToken()!==currentToken)return;
    if(ownedIsolation.current)conversation.endGuidedExploration();
-   forgetChat();draftOwner.current='';draftDiscussion.current=discussionKey;draftSavedSignature.current='null';ownedIsolation.current=null;conversation.beginGuidedExploration(id);ownedIsolation.current=id;suspended.current=false;
+   forgetChat();draftOwner.current='';draftDiscussion.current=discussionKey;draftSavedSignature.current='null';ownedIsolation.current=null;conversation.beginGuidedExploration(id);ownedIsolation.current=id;setSuspended(false);
    setDraft(next);setDraftDataset(currentToken);setComparison(null);setEdit(null);setSelection(null);setReview(null);setShowOptions(false);setRestartRequested(false);setDemoOpen(true);setNotice('New fictional example. Saved plans are kept.');
   }catch(error){setNotice((error as Error).message);}finally{if(generation.current===epoch)setPending(false);}
  }
@@ -196,7 +198,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
   if(!draft||!matches||busy||pending||edit||demandStale||!active)return;
   try{if(!demandBridge)keepChat(draft,selection);}catch(e){setNotice((e as Error).message);return;}
   conversation.continueGuidedConversation();ownedIsolation.current=null;draftOwner.current=conversation.activeGoalId;draftDiscussion.current=discussionKey;draftSavedSignature.current=savedSignature;
-  setDemoOpen(false);setChatScenario(true);suspended.current=false;
+  setDemoOpen(false);setChatScenario(true);setSuspended(false);
   conversation.setMessages(current=>[...current,{role:'user',content:'Continue this scenario with its disclosed fictional assumptions.'},{role:'assistant',content:scenarioAssumptionText(draft)+' Ask “Compare staffing options”, or propose an edit such as “Set budget to 100000”. Continuing does not save new changes. Any earlier saved plans are kept.'}]);
   normalWorkspace?.onClose();onNavigate('home');requestAnimationFrame(()=>document.querySelector<HTMLTextAreaElement>('#overview-question')?.focus());
  }
