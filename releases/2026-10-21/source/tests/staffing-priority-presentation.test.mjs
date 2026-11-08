@@ -42,18 +42,18 @@ function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')re
 function planner(props={},valid=true){const exports=component('simple-swp-demo.tsx',{'react':{...React,useState:v=>[typeof v==='boolean'?valid:v,()=>{}]},'@/lib/swp-demo':demo,'@/lib/guided-workload':workload,'@/lib/workforce-input-display':display,'./staffing-priority-summary':{StaffingPrioritySummary:load()}});return exports.SimpleSwpDemo({draft,comparison:null,reviewing:false,edit:null,selection:null,disabled:false,editingDisabled:false,pending:false,alreadySaved:false,onCalculate:()=>{},onSelect:()=>{},onEdit:()=>{},onAccept:()=>{},onCancel:()=>{},onPrepare:()=>{},onPrimaryChange:()=>{},...props});}
 test('progress is not a tab and Compare remains explicit, prominent and guarded',()=>{
  let calls=0;const all=nodes(planner({onCalculate:()=>calls++}));
- const progress=all.find(n=>n.type==='progress');assert.equal(progress.props.value,1);assert.equal(progress.props.max,3);assert.equal(all.some(n=>n.props?.role==='tab'||n.props?.className==='demo-stepper'),false);
+ const progress=all.find(n=>n.type==='progress');assert.equal(progress.props.value,2);assert.equal(progress.props.max,4);assert.equal(all.some(n=>n.props?.role==='tab'||n.props?.className==='demo-stepper'),false);
  const button=all.find(n=>n.type==='button'&&n.props.children==='Compare staffing options');assert.ok(button);assert.equal(calls,0);button.props.onClick();assert.equal(calls,1);
  assert.ok(all.indexOf(button)<all.findIndex(n=>n.props?.scope!==undefined&&n.props?.outcome!==undefined));
  assert.equal(nodes(planner({},false)).find(n=>n.type==='button'&&n.props.children==='Compare staffing options').props.disabled,true);
  assert.equal(nodes(planner({pending:true})).some(n=>n.type==='button'&&n.props.children==='Compare staffing options'),false);
- assert.equal(nodes(planner({comparison:compared})).find(n=>n.type==='progress').props.value,2);
- assert.equal(nodes(planner({comparison:compared,reviewing:true})).find(n=>n.type==='progress').props.value,3);
+ assert.equal(nodes(planner({comparison:compared})).find(n=>n.type==='progress').props.value,3);
+ assert.equal(nodes(planner({comparison:compared,reviewing:true})).find(n=>n.type==='progress').props.value,4);
 });
 test('pending edits keep review/cancel actions and suppress stale hero priorities',()=>{
  let accepted=0,cancelled=0;const edit={changes:[{field:'budget',before:{value:325000},after:{value:200000}}]};
  const all=nodes(planner({comparison:compared,edit,onAccept:()=>accepted++,onCancel:()=>cancelled++}));
- assert.equal(all.find(n=>n.type==='progress').props.value,1);
+ assert.equal(all.find(n=>n.type==='progress').props.value,2);
  assert.equal(all.find(n=>n.props?.scope!==undefined&&n.props?.outcome!==undefined).props.outcome,'Review your input changes.');
  all.find(n=>n.type==='button'&&n.props.children==='Use changes in this draft').props.onClick();all.find(n=>n.type==='button'&&n.props.children==='Cancel changes').props.onClick();assert.equal(accepted,1);assert.equal(cancelled,1);
 });
