@@ -35,3 +35,18 @@ test('document keyboard containment survives unmounted focused controls and clea
  assert.equal((source.match(/event.key==='Escape'/g)??[]).length,1);
  assert.match(source,/document.activeElement===document.body\|\|document.activeElement===document.documentElement/);
 });
+
+test('bounded popup retains only an inert visual snapshot behind the stable live app',()=>{
+ assert.match(source,/key="live-app"/);assert.match(source,/copy.inert=true/);assert.match(source,/host\?\.replaceChildren\(\)/);
+ assert.match(source,/ids.set\(old,replacement\)/);assert.match(source,/node.removeAttribute\('href'\)/);
+ const css=fs.readFileSync(new URL('../components/whole-app-demo-window.module.css',import.meta.url),'utf8');
+ assert.match(css,/width:min\(1100px,calc\(100vw - 80px\)\)/);assert.match(css,/height:82dvh/);assert.match(css,/width:calc\(100vw - 24px\)/);
+});
+
+test('background snapshot is captured only by the explicit launch event',()=>{
+ assert.match(source,/window.addEventListener\('whole-app-demo-start',capture\)/);
+ assert.match(source,/window.removeEventListener\('whole-app-demo-start',capture\)/);
+ assert.doesNotMatch(source,/MutationObserver\(capture\)/);
+ assert.doesNotMatch(source,/addEventListener\('(?:scroll|resize)',capture/);
+ assert.match(source,/source,title'/);
+});

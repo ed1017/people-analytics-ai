@@ -15,3 +15,7 @@ This replaces the planning-only entry popup documented in guided-popup-required-
 Unrelated actions are inert while the tour is active. The current real navigation action is highlighted; the coach and exit remain available. Escape and browser Back/Forward exit guided mode. Each phase resets the window scroll and focuses its heading. Normal use is restored on exit, and the existing exploration isolation protects saved goals and drafts. No external provider calls are needed.
 
 Automated contracts cover ordered routing, save gating, prescribed feasible choice, inline planning, stable child mounting, inert cleanup, and phase focus. Full staged browser acceptance and release evidence are recorded separately.
+
+## Bounded popup correction
+
+The walkthrough is a centered, bounded popup with visible main-page context behind it, including on phones. The background is a noninteractive visual snapshot, not another running app. The fixed example prompt requires an explicit Enter key action; a labelled on-screen Enter key supplies the same action for touch and assistive access. The walkthrough never submits the prompt automatically.

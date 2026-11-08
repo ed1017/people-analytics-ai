@@ -19,3 +19,12 @@ test('app integration uses real save receipt and exits forced mode on browser na
  assert.match(journey,/decisionStore\.getSnapshot\(\)\.data\.goals\.activeId===review\.goal\.id\)wholeAppDemo\?\.onSaved\(\)/);
  assert.match(journey,/createPortal\(<div data-whole-app-demo-plan>\{content\}<\/div>,wholeAppDemo\.target\)/);
 });
+
+test('whole-app prompt waits for explicit Enter with a touch-accessible equivalent',()=>{
+ const source=fs.readFileSync(new URL('../components/swp-guided-journey.tsx',import.meta.url),'utf8');
+ assert.match(source,/autoFocus=\{!!wholeAppDemo\}/);
+ assert.match(source,/wholeAppDemo&&event.key==='Enter'&&!event.nativeEvent.isComposing/);
+ assert.match(source,/event.preventDefault\(\);submitExamplePrompt\(\)/);
+ assert.match(source,/onClick=\{submitExamplePrompt\}/);
+ assert.match(source,/Press Enter in the prompt above/);
+});

@@ -168,7 +168,7 @@ export default function Home() {
     if(wholeTour){const next=advanceWholeAppTour(wholeTour.stage,page);if(!next)return;setWholeTour({...wholeTour,stage:next});}
     setActivePage(page);
   }
-  function startWholeTour(){if(!conversation.storageReady||!conversation.saved||conversation.loading||conversation.issueEditor)return;setDemoActive(false);setWholeTour({stage:'overview',session:crypto.randomUUID()});setActivePage('home');}
+  function startWholeTour(){if(!conversation.storageReady||!conversation.saved||conversation.loading||conversation.issueEditor)return;window.dispatchEvent(new Event('whole-app-demo-start'));setDemoActive(false);setWholeTour({stage:'overview',session:crypto.randomUUID()});setActivePage('home');}
   function exitWholeTour(){setWholeTour(null);setActivePage('home');}
 
   const [developmentSession, setDevelopmentSession] = useGoalWorkspace(conversation.workspaceKey, goalWorkspaceKeys, emptyDevelopmentSession,"development");

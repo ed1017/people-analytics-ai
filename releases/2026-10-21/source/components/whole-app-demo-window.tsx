@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useEffectEvent,useId,useRef,type ReactNode,type SyntheticEvent} from 'react';
+import {useEffect,useEffectEvent,useLayoutEffect,useId,useRef,type ReactNode,type SyntheticEvent} from 'react';
 import styles from './whole-app-demo-window.module.css';
 
 /** Controls are admitted only inside the current real-app tour surface. */
@@ -13,9 +13,42 @@ export function wholeAppDemoTargetAllowed(target:Element,nextPage?:string):boole
 }
 const controls='button,a[href],input,select,textarea,summary,[tabindex],[role="button"],[contenteditable="true"]';
 export function WholeAppDemoWindow({active,title,instruction,nextPage,children,onExit,complete=false,palette}:{active:boolean;title:string;instruction:string;nextPage?:string;children:ReactNode;onExit:()=>void;complete?:boolean;palette?:string}){
+ const snapshotHost=useRef<HTMLDivElement>(null),snapshot=useRef<HTMLElement|null>(null);
  const leave=useEffectEvent(onExit);
  const content=useRef<HTMLDivElement>(null),heading=useRef<HTMLHeadingElement>(null);
  const root=useRef<HTMLDivElement>(null),exit=useRef<HTMLButtonElement>(null),opener=useRef<HTMLElement|null>(null),id=useId();
+ useLayoutEffect(()=>{
+  if(active){
+   const host=snapshotHost.current,copy=snapshot.current;
+   if(host&&copy)host.replaceChildren(copy);
+   return()=>{host?.replaceChildren();};
+  }
+  const surface=root.current;if(!surface)return;
+  const capture=()=>{
+   const box=surface.getBoundingClientRect(),copy=surface.cloneNode(true) as HTMLElement;
+   copy.inert=true;copy.setAttribute('aria-hidden','true');copy.removeAttribute('role');
+   copy.style.position='absolute';copy.style.left=box.left+'px';copy.style.top=box.top+'px';copy.style.width=box.width+'px';copy.style.pointerEvents='none';
+   const ids=new Map<string,string>();
+   for(const node of copy.querySelectorAll<HTMLElement>('[id]')){const old=node.id;const replacement='tour-snapshot-'+id.replace(/[^a-zA-Z0-9]/g,'')+'-'+ids.size;ids.set(old,replacement);node.id=replacement;}
+   // Visual-only DOM: no second React tree, navigation, media loads, or active controls.
+   for(const node of copy.querySelectorAll('script,iframe,object,embed,link,audio,video,source,title'))node.remove();
+   for(const node of copy.querySelectorAll('*')){
+    for(const attribute of [...node.attributes]){
+     if(attribute.name.startsWith('on')||['src','srcset','action','formaction','autofocus'].includes(attribute.name))node.removeAttribute(attribute.name);
+     else {let value=attribute.value;for(const [old,replacement] of ids){value=value.replaceAll('url(#'+old+')','url(#'+replacement+')');if(value==='#'+old)value='#'+replacement;}
+      if(['for','aria-labelledby','aria-describedby','aria-controls','aria-owns','headers'].includes(attribute.name))value=value.split(' ').map(part=>ids.get(part)??part).join(' ');
+      if(value!==attribute.value)node.setAttribute(attribute.name,value);
+     }
+    }
+    if(node.matches('a'))node.removeAttribute('href');
+    if(node instanceof HTMLElement&&node.matches(controls))node.tabIndex=-1;
+   }
+   snapshot.current=copy;
+  };
+  // The launcher dispatches synchronously before activating the tour. No background cloning.
+  window.addEventListener('whole-app-demo-start',capture);
+  return()=>window.removeEventListener('whole-app-demo-start',capture);
+ },[active,id]);
  useEffect(()=>{
   if(!active)return;
   opener.current=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -64,11 +97,11 @@ export function WholeAppDemoWindow({active,title,instruction,nextPage,children,o
   return()=>document.removeEventListener('keydown',keydown,true);
  },[active,nextPage]);
  const gate=(event:SyntheticEvent)=>{if(active&&event.target instanceof Element&&!wholeAppDemoTargetAllowed(event.target,nextPage)){event.preventDefault();event.stopPropagation();}};
- return <div ref={root} data-workspace-palette={palette} className={active?styles.window:undefined} role={active?'dialog':undefined} aria-modal={active?true:undefined} aria-labelledby={active?id:undefined} onClickCapture={gate} onKeyDownCapture={event=>{
+ return <>{active&&<><div ref={snapshotHost} className={styles.snapshot} aria-hidden="true" inert/><div className={styles.backdrop} aria-hidden="true"/></>}<div key="live-app" ref={root} data-workspace-palette={palette} className={active?styles.window:undefined} role={active?'dialog':undefined} aria-modal={active?true:undefined} aria-labelledby={active?id:undefined} onClickCapture={gate} onKeyDownCapture={event=>{
   if(!active)return;
   if(event.key==='Enter'||event.key===' ')gate(event);
  }}>
   {active&&<header className={styles.coach} data-tour-controls><div><h2 ref={heading} tabIndex={-1} id={id}>{title}</h2><p aria-live="polite">{instruction}</p></div><button ref={exit} type="button" onClick={onExit}>{complete?'Finish demo':'Exit demo'}</button></header>}
   <div ref={content} key="app-content" className={active?styles.content:undefined}>{children}</div>
- </div>;
+ </div></>;
 }
