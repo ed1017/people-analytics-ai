@@ -2165,7 +2165,7 @@ export default function Home() {
             }
           />
         ) : wholeTour&&activePage==="planning-overview" ? null : (
-          <WorkforcePlanningPage key={conversation.workspaceKey} onTrackPositions={()=>setActivePage("action-plans")}
+          <WorkforcePlanningPage onOpenStaffingPlanner={()=>{setActivePage("home");conversation.setInput(current=>current.trim()?current:'How would you close a 5 FTE capacity gap with a $325,000 USD budget?');requestAnimationFrame(()=>document.getElementById('overview-question')?.focus());}} key={conversation.workspaceKey} onTrackPositions={()=>setActivePage("action-plans")}
             planningScenarios={planningScenarios}
             planningLoading={planningLoading}
             planningError={planningError}

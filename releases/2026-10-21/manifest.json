@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "a4dc6d66a3b28884b29b3284e967e61a3106a475b87c4aa0d2f0140d4f77500b",
-      "bytes": 93215
+      "sha256": "8787cdf2d341ff522bbf1fa179a9f3f512ef19688d676b0fa34779a1af75a89e",
+      "bytes": 93475
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -809,8 +809,8 @@
     },
     {
       "path": "components/pages/workforce-planning-page.tsx",
-      "sha256": "26b7c687c0bc4b2162c10b7ff83bb47698c50a523905df3ae7fcc1bc2b7bd8d2",
-      "bytes": 74628
+      "sha256": "3aecff608784668bb54d234c1ae12f137b90fb4407e680dc02c91aaf1feba6b4",
+      "bytes": 75392
     },
     {
       "path": "components/pilot-lifecycle-example.tsx",
@@ -5899,8 +5899,8 @@
     },
     {
       "path": "tests/closer-staffing-routing.test.mjs",
-      "bytes": 2541,
-      "sha256": "2da29b950ad12820646675d996fd5ca7f4c9379253f0ffe6845108d2db70a262"
+      "bytes": 3437,
+      "sha256": "ec90b2b6ee0b6f5d4fbf7217bcb3382968d84b04be020615267d195137c22b34"
     },
     {
       "path": "tests/staffing-flow-parity.test.mjs",
