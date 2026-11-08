@@ -11,7 +11,7 @@ The user selected the staffing scenario when asked which historical guide to res
 3. Select the prescribed feasible 3-develop / 2-move / 0-hire mix.
 4. Review the proposal, then explicitly save the plan and goal.
 
-Only the real browser-local save receipt unlocks the unnumbered continuation: inspect Action plans, open Track this plan, and finish. No progress or achieved outcomes are invented. The original editable three-step planning path outside the forced demo remains unchanged.
+Only the real browser-local save receipt unlocks the unnumbered continuation: inspect Action plans, open Track this plan, and finish. No progress or achieved outcomes are invented. The editable normal planning path uses the same four-part sequence without tutorial restrictions.
 
 Unrelated actions are inert while the tour is active. The current real navigation action is highlighted; the coach and exit remain available. Escape and browser Back/Forward exit guided mode. Each phase resets the window scroll and focuses its heading. Normal use is restored on exit, and the existing exploration isolation protects saved goals and drafts. No external provider calls are needed.
 
@@ -37,4 +37,12 @@ Normal and guided staffing use the same four-part sequence: review assumptions, 
 
 The forced tutorial mix demonstrates a lowest-incremental-cash priority, not a universal recommendation. Users still see the uncovered-work tradeoff and other options. Bounded declarative requests ("I have a 5 FTE gap and a $325k budget. What are my options?") and hyphenated FTE wording share explicit assumption review. In an accepted scenario, bounded cheapest/least-uncovered-work questions reuse current calculations. Extra scope, timing or compound instructions are not stripped to force a demo match.
 
-Normal Scenarios now distinguishes its separate workload projection example and offers Open staffing question to the real develop/move/hire planner. This navigates to Overview and fills only an empty composer; it never overwrites an unsent question or submits automatically.
+Normal Scenarios distinguishes its separate workload projection example from the develop/move/hire planner. The earlier Overview-composer handoff is superseded by the shared Scenarios workspace below.
+
+## Same Scenarios workspace
+
+The normal staffing planner and guided staffing exercise share the real Scenarios host. A normal Scenarios entry opens explicit fictional-assumption review without sending or replacing an Overview draft. Matching bounded Overview questions open that same workspace; unrelated questions retain their normal routing. Normal users can edit inputs, choose alternatives, cancel, resume and return to chat. The tutorial adds only its required actions, locked example inputs and whole-app popup framing.
+
+Saved-state messages distinguish the last committed version from later unsaved edits. Continuing a scenario in chat does not itself save changes or erase prior plans. A comparison that still needs inputs must not announce the choose-option step.
+
+Acceptance must compare both paths end-to-end with identical inputs and option choice, then cover alternative normal choices, navigation away/back, reset, interrupted review, prior unsent questions, and saved-version edits. No unrestricted-provider response parity is asserted; no paid calls are necessary for these deterministic checks.

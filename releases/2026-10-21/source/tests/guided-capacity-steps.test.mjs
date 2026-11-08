@@ -42,3 +42,8 @@ test('whole-app case permits only the prescribed feasible mix, normal choices re
  const normalTree=nodes(normal.SimpleSwpDemo({...props,comparison,edit:null,editingDisabled:false,alreadySaved:false}));
  for(const option of table(normalTree).props.options)assert.equal(radio(normalTree,option).props.disabled,option.status==='invalid');
 });
+
+test('a needs-inputs comparison stays on compare step instead of announcing a choice',()=>{
+ const incomplete={...comparison,evaluation:{...comparison.evaluation,context:{...comparison.evaluation.context,status:'needs-inputs',missing:[]}}};
+ const tree=render({comparison:incomplete});assert.equal(tree.find(n=>n.type==='progress').props.value,2);
+});

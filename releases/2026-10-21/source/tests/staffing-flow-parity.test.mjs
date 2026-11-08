@@ -13,7 +13,7 @@ const draft=await swp.createSwpDemo('guided-flow-parity','2026-11-08T12:00:00Z')
 const props={draft,comparison:null,selection:null,reviewing:false,disabled:false,pending:false,editingDisabled:false,edit:null,alreadySaved:false,onCalculate(){},onSelect(){},onPrepare(){}};
 const render=patch=>nodes(exports.SimpleSwpDemo({...props,...patch}));
 test('normal workflow explicitly compares at step 2, chooses at step 3 and reviews at step 4',()=>{
- for(const [patch,step] of [[{},2],[{comparison},3],[{comparison,reviewing:true},4]]){
+ for(const [patch,step] of [[{},2],[{comparison},3],[{comparison,reviewing:true},4],[{comparison:{...comparison,evaluation:{...comparison.evaluation,context:{...comparison.evaluation.context,status:'needs-inputs',missing:[]}}}},2]]){
   const tree=render(patch),progress=tree.find(n=>n.type==='progress');assert.equal(progress.props.max,4);assert.equal(progress.props.value,step);
  }
  const initial=render({});const compare=initial.find(n=>n.type==='button'&&n.props.children==='Compare staffing options');assert.equal(compare.props.onClick,props.onCalculate);assert.equal(compare.props.disabled,false);
@@ -37,8 +37,8 @@ test('post-save next steps require exact committed receipt, goal, dataset and re
  assert.match(source,/const committed=readSwpSaveReview\(decisionStore\.getSnapshot\(\)\.data\.workspaces\[review\.goal\.id\]/);
  assert.match(source,/savedConfirmation\.datasetToken===token&&savedConfirmation\.resetEpoch===conversation\.resetEpoch&&savedConfirmation\.goalId===conversation\.activeGoalId/);
  assert.match(source,/committedConfirmation\.selectedPlanId===savedConfirmation\.planId/);
- assert.match(source,/if\(!draft\|\|!matches\)return savedContinuation/);
- assert.match(source,/Your staffing plan and goal are saved in this browser/);assert.match(source,/not completed staffing work/);
+ assert.ok(source.includes('if(!draft||!matches)return normalHosted?normalPortal(savedContinuation'));
+ assert.match(source,/Last saved staffing plan and goal are available in this browser/);assert.match(source,/not completed staffing work/);
  assert.match(source,/onNavigate\('action-plans'\)/);assert.match(source,/onNavigate\('plan-track'\)/);
 });
 

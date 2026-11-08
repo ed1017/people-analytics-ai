@@ -24,7 +24,7 @@ export function SimpleSwpDemo({reviewing,draft,comparison,edit,selection,disable
  const [valid,setValid]=useState(true),[formVersion,setFormVersion]=useState(0);
  const workload=guidedWorkloadResult(draft.inputs),n=(v:number|null|undefined)=>!valid||v==null?'Unknown':v.toLocaleString('en-US',{maximumFractionDigits:2});
  const demand=workload?.workloadHours!=null&&workload.productiveHoursInHorizon?workload.workloadHours/workload.productiveHoursInHorizon:null,supply=workload?.qualifiedAllocatedFte??null,gap=workload?.additionalFte;
- const progress=reviewing?4:comparison&&!edit&&valid?3:2;
+ const progress=reviewing?4:comparison?.evaluation.context.status==='ready'&&!edit&&valid?3:2;
  const options=comparison?.options??[],primary=comparison?swpTradeoffOptions(comparison.evaluation):[],feasible=primary.filter(o=>o.candidate.status==='met');
  const selected=options.find(o=>o.id===selection);
  const prescribed=(mix:{build:number;move:number;buy:number})=>mix.build===3&&mix.move===2&&mix.buy===0;
