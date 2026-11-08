@@ -17,9 +17,11 @@ test('matching requests preserve an edited draft and expose quantity mismatch, r
  assert.ok(source.includes('setInputReview(current=>current?.identity===entryIdentity?current:null)'));
 });
 test('parked isolation is scoped to exact origin goal, dataset, discussion and saved receipt',()=>{
- for(const field of ['goalId===conversation.activeGoalId','datasetToken===token','discussionKey===discussionKey','savedSignature===savedSignature'])assert.ok(source.includes('parkedOrigin.current.'+field));
+ assert.ok(source.includes('const [parkedOrigin,setParkedOrigin]=useState<'));
+ assert.equal(source.includes('parkedOrigin.current'),false);
+ for(const field of ['goalId===conversation.activeGoalId','datasetToken===token','discussionKey===discussionKey','savedSignature===savedSignature'])assert.ok(source.includes('parkedOrigin.'+field));
  assert.ok(source.includes('suspended.current&&draft&&draftDataset===token&&draftDiscussion.current===discussionKey&&parkedOriginMatches'));
- assert.equal((source.match(/if\(!ownedIsolation.current\)parkedOrigin.current=/g)||[]).length,2);
+ assert.equal((source.match(/if\(!ownedIsolation.current\)setParkedOrigin\(/g)||[]).length,2);
 });
 test('host supports explicit return to chat and scenario tools without changing unrelated prompts',()=>{
  assert.ok(source.includes("normalWorkspace?.onClose();onNavigate('home');requestAnimationFrame"));assert.ok(source.includes('Return to scenario tools'));

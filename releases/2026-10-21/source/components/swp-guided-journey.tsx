@@ -47,7 +47,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  const [savedConfirmation,setSavedConfirmation]=useState<{goalId:string;planId:string;datasetToken:string;resetEpoch:number}|null>(null);
  const [inputReview,setInputReview]=useState<{question:string;identity:string}|null>(null);
  const suspended=useRef(false);
- const parkedOrigin=useRef<{goalId:string;datasetToken:string;discussionKey:string;savedSignature:string}|null>(null);
+ const [parkedOrigin,setParkedOrigin]=useState<{goalId:string;datasetToken:string;discussionKey:string;savedSignature:string}|null>(null);
  const [demandBridge,setDemandBridge]=useState<SwpDemandBridge|null>(null),[demandStale,setDemandStale]=useState(false);
  const ownedIsolation=useRef<string|null>(null),endIsolation=useRef(conversation.endGuidedExploration),resetSeen=useRef(conversation.resetEpoch);
  const opening=useRef(false),generation=useRef(0),abort=useRef<AbortController|null>(null),mounted=useRef(true),live=useRef({draft,active,busy,goalId:conversation.activeGoalId,resetEpoch:conversation.resetEpoch}),token=decisionStore.getDatasetToken();
@@ -57,7 +57,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  const ownerFields=conversation.activeGoalId?storage.data.workspaces[conversation.activeGoalId]?.fields:storage.data.exploration?.fields;
  const savedSignature=JSON.stringify(ownerFields?.[swpDemoField]??null);
  const receiptSignature=JSON.stringify(ownerFields?.[scenarioChatField]??null);
- const parkedOriginMatches=!!parkedOrigin.current&&parkedOrigin.current.goalId===conversation.activeGoalId&&parkedOrigin.current.datasetToken===token&&parkedOrigin.current.discussionKey===discussionKey&&parkedOrigin.current.savedSignature===savedSignature;
+ const parkedOriginMatches=!!parkedOrigin&&parkedOrigin.goalId===conversation.activeGoalId&&parkedOrigin.datasetToken===token&&parkedOrigin.discussionKey===discussionKey&&parkedOrigin.savedSignature===savedSignature;
  const continuityContext={datasetToken:token,ownerGoalId:conversation.activeGoalId,discussionKey,savedSignature};
  function keepChat(next:BundleDraft,choice:string|null){
   const state=decisionStore.getSnapshot(),receipt=scenarioChatReceipt(next,continuityContext,choice),patch=()=>({[scenarioChatField]:receipt as unknown as Json});
@@ -121,7 +121,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
    setDemoOpen(true);setRestartRequested(false);
    setShowOptions(false);
    demandControlRef.current?.close();setDemandBridge(null);setDemandStale(false);forgetChat();draftOwner.current='';draftDiscussion.current=discussionKey;draftSavedSignature.current='null';
-   if(!ownedIsolation.current)parkedOrigin.current={goalId:conversation.activeGoalId,datasetToken:token,discussionKey,savedSignature};
+   if(!ownedIsolation.current)setParkedOrigin({goalId:conversation.activeGoalId,datasetToken:token,discussionKey,savedSignature});
    const id='guided-swp-'+crypto.randomUUID(),job=++generation.current,reset=conversation.resetEpoch;conversation.beginGuidedExploration(id);ownedIsolation.current=id;opening.current=true;setPending(true);
    const current=()=>mounted.current&&live.current.active&&generation.current===job&&ownedIsolation.current===id&&live.current.resetEpoch===reset&&decisionStore.getDatasetToken()===token&&!decisionStore.getSnapshot().data.goals.activeId;
    try{const next=await createSwpDemo(id,new Date().toISOString());if(!current())return '';setDraft(next);setDraftDataset(token);setComparison(null);setEdit(null);setSelection(null);setReview(null);setNotice('');
@@ -151,7 +151,7 @@ export function SwpGuidedJourney({normalWorkspace,wholeAppDemo,onGeneralQuestion
  }
  async function restartDemo(){
   if(busy||pending||!active||!storage.saved)return;
-  if(!ownedIsolation.current)parkedOrigin.current={goalId:conversation.activeGoalId,datasetToken:token,discussionKey,savedSignature};
+  if(!ownedIsolation.current)setParkedOrigin({goalId:conversation.activeGoalId,datasetToken:token,discussionKey,savedSignature});
   const epoch=++generation.current,currentToken=token;abort.current?.abort();setPending(true);
   try{const id='guided-swp-'+crypto.randomUUID(),next=await createSwpDemo(id,new Date().toISOString());
    if(!mounted.current||generation.current!==epoch||decisionStore.getDatasetToken()!==currentToken)return;
