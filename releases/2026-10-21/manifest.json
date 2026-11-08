@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "5830d8c1a27d02d133606414ddd75583719e263e36e9a89238df58a1bc4cd401",
-      "bytes": 93146
+      "sha256": "4e61078670c59a33d54003e62c5fcfc70eb2daf61d271460e2d949589370db8f",
+      "bytes": 93202
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "f15f32d2ac7d8419d6e410a3290cc98976fe15179cd8b6d222aaf0aa9385ccf0",
-      "bytes": 44682
+      "sha256": "8167298dbfe5e7760c874e56c26a4cdacec9136198dc6eb03ae9691cbbb98857",
+      "bytes": 45079
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -5869,28 +5869,28 @@
     },
     {
       "path": "components/whole-app-demo-window.module.css",
-      "sha256": "e7111d279d77e8a58b27be945521b53aafe6ccbd0b2cbc704f608fb0703b5a43",
-      "bytes": 1364
+      "sha256": "3c0599e790d12212ccf2fb9de0003d43c438d3f8e7a9e93b42150f65dc6a9253",
+      "bytes": 1727
     },
     {
       "path": "components/whole-app-demo-window.tsx",
-      "sha256": "92b054407acd4676198874a06e7c2eefa65a1829c1f3cd9132706b5a637de140",
-      "bytes": 5661
+      "sha256": "e11b2e5d2d865232c9a36ecb852599e5ef0f319400fa266fc0e0118286f8b56d",
+      "bytes": 8095
     },
     {
       "path": "lib/whole-app-tour.ts",
-      "sha256": "a4348bc3f5699526092b7efe1eda26448d9308b4b680f7075a10997658f3dcc4",
-      "bytes": 2554
+      "sha256": "eebffa72e5df29de43cfc621452d8d83af9e3f72c21384b4158bca4dbd5cccb4",
+      "bytes": 2566
     },
     {
       "path": "tests/whole-app-demo-window.test.mjs",
-      "sha256": "4ee5d986d473de55be463e8f76469ab4c5e216bea71f5e8990857bcf6bf4db3d",
-      "bytes": 2585
+      "sha256": "a6ad48aa6dae26430700c225457fc345c8302688150162e57dfc67a2d83d9550",
+      "bytes": 3601
     },
     {
       "path": "tests/whole-app-tour.test.mjs",
-      "sha256": "19724ad85e23563bd0d0fc1ff98d9a36948d170c906a467a283660182cbeec9d",
-      "bytes": 1546
+      "sha256": "cec53407ab4650a42d1659b4fee95fed0534e2f346b3d2f8345a7b47c960056e",
+      "bytes": 2077
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
