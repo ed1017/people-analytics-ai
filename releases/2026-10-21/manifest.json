@@ -4029,8 +4029,8 @@
     },
     {
       "path": "tests/staffing-saved-version.test.mjs",
-      "sha256": "fd598c1f039082fbd99b7d4e80d33d3ac27c9ec233cc94f774ebd8443168330e",
-      "bytes": 2740
+      "sha256": "7c8e7034f077485cdf95c1672f03b41d7212ff3b5c856d2fe22b8e085a438824",
+      "bytes": 2739
     },
     {
       "path": "tests/succession-display-release.test.mjs",
@@ -4039,8 +4039,8 @@
     },
     {
       "path": "tests/unified-staffing-host.test.mjs",
-      "sha256": "a40af1d725d8de6f63a1404d81804f24d30e6968161ea2645e9fe193f3f5dc19",
-      "bytes": 3000
+      "sha256": "782c4a160c36ab108642b3e1f348e10d37d16b01dd4d9325c33dcd4c65a7db49",
+      "bytes": 2999
     },
     {
       "path": "tsconfig.json",
