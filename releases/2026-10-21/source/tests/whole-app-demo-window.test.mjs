@@ -40,7 +40,7 @@ test('bounded popup retains only an inert visual snapshot behind the stable live
  assert.match(source,/key="live-app"/);assert.match(source,/copy.inert=true/);assert.match(source,/host\?\.replaceChildren\(\)/);
  assert.match(source,/ids.set\(old,replacement\)/);assert.match(source,/node.removeAttribute\('href'\)/);
  const css=fs.readFileSync(new URL('../components/whole-app-demo-window.module.css',import.meta.url),'utf8');
- assert.match(css,/width:min\(1100px,calc\(100vw - 80px\)\)/);assert.match(css,/height:82dvh/);assert.match(css,/width:calc\(100vw - 24px\)/);
+ assert.match(css,/width:96vw/);assert.match(css,/height:92dvh/);assert.match(css,/width:calc\(100vw - 16px\)/);assert.match(css,/height:94dvh/);
 });
 
 test('background snapshot is captured only by the explicit launch event',()=>{
@@ -82,4 +82,13 @@ test('phone menu starts below the coach and restores measured variables on clean
  assert.match(source,/surface!\.getBoundingClientRect\(\).bottom-8/);
  assert.match(source,/style.removeProperty\('--tour-menu-top'\)/);
  assert.match(source,/style.removeProperty\('--tour-menu-height'\)/);
+});
+
+test('large popup retains real responsive layout without desktop cap or scaling',()=>{
+ const css=fs.readFileSync(new URL('../components/whole-app-demo-window.module.css',import.meta.url),'utf8');
+ const windowRule=css.match(/\.window \{([^}]+)\}/)?.[1]??'';
+ assert.match(windowRule,/width:96vw;height:92dvh;max-height:calc\(100dvh - 32px\)/);
+ assert.doesNotMatch(windowRule,/max-width|width:min\(/);
+ assert.doesNotMatch(css,/scale\(|zoom:/);
+ assert.match(css,/width:calc\(100vw - 16px\);height:94dvh;max-height:calc\(100dvh - 24px\)/);
 });

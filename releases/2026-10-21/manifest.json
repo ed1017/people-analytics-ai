@@ -264,8 +264,8 @@
     },
     {
       "path": "app/page.tsx",
-      "sha256": "4e61078670c59a33d54003e62c5fcfc70eb2daf61d271460e2d949589370db8f",
-      "bytes": 93202
+      "sha256": "a4dc6d66a3b28884b29b3284e967e61a3106a475b87c4aa0d2f0140d4f77500b",
+      "bytes": 93215
     },
     {
       "path": "app/planning/assumptions/page.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "51fd6f18b6b6753760276b1f6f5e01859aec484d8289efe79b3f2fff381e7a62",
-      "bytes": 11159
+      "sha256": "06b9d40b45a8b32d7af67de9110b940eca31f8a979e79e0f413f476ab2e66baa",
+      "bytes": 11223
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -964,8 +964,8 @@
     },
     {
       "path": "components/swp-guided-journey.tsx",
-      "sha256": "8167298dbfe5e7760c874e56c26a4cdacec9136198dc6eb03ae9691cbbb98857",
-      "bytes": 45079
+      "sha256": "5db66aad9d36469963721413fc22359d5a3ec91b28a63c48e9be1d5082fd47a0",
+      "bytes": 45296
     },
     {
       "path": "components/swp-headcount-comparison.tsx",
@@ -4454,8 +4454,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 18848,
-      "sha256": "4e8dde3ae733926d4af9cb1608e6b9dc36c360ed6ac5d9ebf3cca7d027b4ff17"
+      "bytes": 19376,
+      "sha256": "22c5d90728f171707839cbe0aac9a499cc6d146d5175614892afa6413c047fbb"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
@@ -5869,8 +5869,8 @@
     },
     {
       "path": "components/whole-app-demo-window.module.css",
-      "sha256": "b698e06088ce60d7b6dd528c95fb3872d7c03d468b1d8e73cc094926e1a618d2",
-      "bytes": 2165
+      "sha256": "791155287e2d90bc668b6470d3cad939f7ffe71a345890f1797e4b70246987b9",
+      "bytes": 2139
     },
     {
       "path": "components/whole-app-demo-window.tsx",
@@ -5879,18 +5879,18 @@
     },
     {
       "path": "lib/whole-app-tour.ts",
-      "sha256": "eebffa72e5df29de43cfc621452d8d83af9e3f72c21384b4158bca4dbd5cccb4",
-      "bytes": 2566
+      "sha256": "c61303b30b32b74a065b16562ac9773a40786a2f799b2bf0dcf92c4146a32e8b",
+      "bytes": 1575
     },
     {
       "path": "tests/whole-app-demo-window.test.mjs",
-      "sha256": "37717573833740292ce40dcf636372aba8bdafecda6c53103a1fa6707fe98970",
-      "bytes": 5668
+      "sha256": "8c5a366394e7ac7d52db1c56453c9319eee033364aa78a5a9bf610ada1c65fbc",
+      "bytes": 6217
     },
     {
       "path": "tests/whole-app-tour.test.mjs",
-      "sha256": "cec53407ab4650a42d1659b4fee95fed0534e2f346b3d2f8345a7b47c960056e",
-      "bytes": 2077
+      "sha256": "6ee92d4475fe1330991c2fd537ee7897517ba20ddc3c6103d9ff25f83b0c1ed5",
+      "bytes": 2839
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
