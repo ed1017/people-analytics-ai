@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useId,useRef,type ReactNode,type SyntheticEvent} from 'react';
+import {useEffect,useEffectEvent,useId,useRef,type ReactNode,type SyntheticEvent} from 'react';
 import styles from './whole-app-demo-window.module.css';
 
 /** Controls are admitted only inside the current real-app tour surface. */
@@ -13,6 +13,7 @@ export function wholeAppDemoTargetAllowed(target:Element,nextPage?:string):boole
 }
 const controls='button,a[href],input,select,textarea,summary,[tabindex],[role="button"],[contenteditable="true"]';
 export function WholeAppDemoWindow({active,title,instruction,nextPage,children,onExit,complete=false,palette}:{active:boolean;title:string;instruction:string;nextPage?:string;children:ReactNode;onExit:()=>void;complete?:boolean;palette?:string}){
+ const leave=useEffectEvent(onExit);
  const content=useRef<HTMLDivElement>(null),heading=useRef<HTMLHeadingElement>(null);
  const root=useRef<HTMLDivElement>(null),exit=useRef<HTMLButtonElement>(null),opener=useRef<HTMLElement|null>(null),id=useId();
  useEffect(()=>{
@@ -40,20 +41,32 @@ export function WholeAppDemoWindow({active,title,instruction,nextPage,children,o
     changed.set(node,{inert:node.inert,dim:node.getAttribute('data-tour-blocked')});node.inert=true;node.setAttribute('data-tour-blocked','true');
    }
   }
-  refresh();const observer=new MutationObserver(refresh);observer.observe(surface,{childList:true,subtree:true});
+  refresh();const observer=new MutationObserver(()=>{
+   refresh();
+   // A required control can unmount after a calculation; only recover genuinely lost focus.
+   if(document.activeElement===document.body||document.activeElement===document.documentElement)heading.current?.focus({preventScroll:true});
+  });observer.observe(surface,{childList:true,subtree:true});
   return()=>{observer.disconnect();restoreHighlights();for(const [node,prior] of changed){node.inert=prior.inert;if(prior.dim===null)node.removeAttribute('data-tour-blocked');else node.setAttribute('data-tour-blocked',prior.dim);}};
  },[active,nextPage]);
- const gate=(event:SyntheticEvent)=>{if(active&&event.target instanceof Element&&!wholeAppDemoTargetAllowed(event.target,nextPage)){event.preventDefault();event.stopPropagation();}};
- return <div ref={root} data-workspace-palette={palette} className={active?styles.window:undefined} role={active?'dialog':undefined} aria-modal={active?true:undefined} aria-labelledby={active?id:undefined} onClickCapture={gate} onKeyDownCapture={event=>{
+ useEffect(()=>{
   if(!active)return;
-  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();onExit();return;}
+  const keydown=(event:KeyboardEvent)=>{
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();leave();return;}
   if(event.key==='Tab'){
    const available=[...(root.current?.querySelectorAll<HTMLElement>(controls)??[])].filter(node=>wholeAppDemoTargetAllowed(node,nextPage)&&!node.closest('[inert]')&&!node.matches(':disabled')&&node.tabIndex>=0&&node.getClientRects().length&&getComputedStyle(node).visibility!=='hidden');
    const first=available[0],last=available.at(-1),focused=document.activeElement;
    if(!first){event.preventDefault();return;}
    if(event.shiftKey&&(focused===first||focused===heading.current||!root.current?.contains(focused))){event.preventDefault();last?.focus();}
    else if(!event.shiftKey&&(focused===last||!root.current?.contains(focused))){event.preventDefault();first.focus();}
-  }else if(event.key==='Enter'||event.key===' ')gate(event);
+  }
+  };
+  document.addEventListener('keydown',keydown,true);
+  return()=>document.removeEventListener('keydown',keydown,true);
+ },[active,nextPage]);
+ const gate=(event:SyntheticEvent)=>{if(active&&event.target instanceof Element&&!wholeAppDemoTargetAllowed(event.target,nextPage)){event.preventDefault();event.stopPropagation();}};
+ return <div ref={root} data-workspace-palette={palette} className={active?styles.window:undefined} role={active?'dialog':undefined} aria-modal={active?true:undefined} aria-labelledby={active?id:undefined} onClickCapture={gate} onKeyDownCapture={event=>{
+  if(!active)return;
+  if(event.key==='Enter'||event.key===' ')gate(event);
  }}>
   {active&&<header className={styles.coach} data-tour-controls><div><h2 ref={heading} tabIndex={-1} id={id}>{title}</h2><p aria-live="polite">{instruction}</p></div><button ref={exit} type="button" onClick={onExit}>{complete?'Finish demo':'Exit demo'}</button></header>}
   <div ref={content} key="app-content" className={active?styles.content:undefined}>{children}</div>

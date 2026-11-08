@@ -27,3 +27,11 @@ test('phase changes reset internal scroll and announce coach without mutation fo
  assert.match(source,/focused===heading.current/);assert.match(source,/restoreHighlights\(\)/);
  const refresh=source.split('function refresh(){')[1].split('refresh();const observer')[0];assert.doesNotMatch(refresh,/\.focus\(/);
 });
+
+test('document keyboard containment survives unmounted focused controls and cleans up',()=>{
+ assert.match(source,/document.addEventListener\('keydown',keydown,true\)/);
+ assert.match(source,/document.removeEventListener\('keydown',keydown,true\)/);
+ assert.match(source,/const leave=useEffectEvent\(onExit\)/);
+ assert.equal((source.match(/event.key==='Escape'/g)??[]).length,1);
+ assert.match(source,/document.activeElement===document.body\|\|document.activeElement===document.documentElement/);
+});

@@ -3929,8 +3929,8 @@
     },
     {
       "path": "tests/polish-findings.test.mjs",
-      "sha256": "2b8803547962844af953c9700a23fce8e2f59f7fcfb48cb6a4a8aed411dc2d38",
-      "bytes": 2104
+      "sha256": "be97b5e296a8f5ba1f3a95ab4d74577c12722180f898e71fb93b31500a9ec11f",
+      "bytes": 2156
     },
     {
       "path": "tests/private-9037-recovery.test.mjs",
@@ -5874,8 +5874,8 @@
     },
     {
       "path": "components/whole-app-demo-window.tsx",
-      "sha256": "fc62fb034a6cb8ba37d45a93f545d75e9b922772ec764202a93b1152c18f0aa2",
-      "bytes": 5135
+      "sha256": "92b054407acd4676198874a06e7c2eefa65a1829c1f3cd9132706b5a637de140",
+      "bytes": 5661
     },
     {
       "path": "lib/whole-app-tour.ts",
@@ -5884,8 +5884,8 @@
     },
     {
       "path": "tests/whole-app-demo-window.test.mjs",
-      "sha256": "86e4292bc01705950fd0827c83e4ca2a0e160577ed1031ceb1cc31ffb259db22",
-      "bytes": 2082
+      "sha256": "4ee5d986d473de55be463e8f76469ab4c5e216bea71f5e8990857bcf6bf4db3d",
+      "bytes": 2585
     },
     {
       "path": "tests/whole-app-tour.test.mjs",

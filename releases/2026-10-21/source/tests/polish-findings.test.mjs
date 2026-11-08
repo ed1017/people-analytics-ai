@@ -16,10 +16,10 @@ test('recruiting and exit shares require matching nonzero valid totals',()=>{
  assert.match(attritionFindings({summary:{total_exits:100,voluntary_exits:70}}).items.join(' '),/70% of recorded exits/);
  assert.doesNotMatch(attritionFindings({summary:{total_exits:1,voluntary_exits:2}}).items.join(' '),/200%/);
 });
-test('scope mismatch remains visible outside disclosure and history restoration is untouched',()=>{
+test('scope mismatch remains visible outside disclosure and history restoration cancels requests and exits guided mode',()=>{
  const scope=fs.readFileSync(new URL('../components/evidence-scope-notice.tsx',import.meta.url),'utf8');
  assert.ok(scope.indexOf('selected filters are not applied')<scope.indexOf('<details'));
  const page=fs.readFileSync(new URL('../app/page.tsx',import.meta.url),'utf8');
  assert.match(page,/window\.scrollTo\(\{top: 0, left: 0, behavior: "instant"\}\)/);
- assert.match(page,/const restore = \(\) => cancelHistoryRequest\(\)/);
+ assert.match(page,/const restore = \(\) => \{setWholeTour\(null\);cancelHistoryRequest\(\);\}/);
 });
