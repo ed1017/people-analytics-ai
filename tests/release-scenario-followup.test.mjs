@@ -30,7 +30,9 @@ function harness(store,problemPort=null){
  function render(){let rounds=0;do{dirty=false;cursor=0;layouts=[];effects=[];tree=problemPort?module.exports.useProblemConversation():module.exports.SwpGuidedJourney(props);layouts.forEach(fn=>fn());effects.forEach(fn=>fn());assert.ok(++rounds<30,'hooks must settle');}while(dirty);return tree;}
  function nodes(node){return Array.isArray(node)?node.flatMap(n=>nodes(n)):node&&typeof node==='object'?[node,...nodes(node.props?.children)]:[];}
  async function settle(){for(let i=0;i<12;i++){render();await new Promise(resolve=>setImmediate(resolve));}render();}
- return {props,render,settle,nodes,find:type=>nodes(tree).find(n=>n.type===type),button:text=>nodes(tree).find(n=>n.type==='button'&&n.props.children===text)};
+ // Crypto-backed preparation resolves outside a fixed number of immediate turns on CI.
+ async function until(predicate){const deadline=Date.now()+5000;do{await settle();if(predicate())return;await new Promise(resolve=>setTimeout(resolve,10));}while(Date.now()<deadline);assert.ok(predicate(),'async component state must settle before its deadline');}
+ return {props,render,settle,until,nodes,find:type=>nodes(tree).find(n=>n.type===type),button:text=>nodes(tree).find(n=>n.type==='button'&&n.props.children===text)};
 }
 test('receipt validation binds exact dataset, discussion, goal and saved revision; serialized round trip preserves draft',async()=>{
  const store=new DecisionStore();store.initialize(storage());const draft=await createSwpDemo('guided-followup',at),ctx=context(store),receipt=scenarioChatReceipt(draft,ctx,'candidate-a');
@@ -66,7 +68,7 @@ test('empty workspace renders safely; continued scenario saves receipt and revie
  const port=storage(),store=new DecisionStore();store.initialize(port);const empty=harness(store);empty.render();assert.equal(empty.props.modelContextRef.current,null);assert.equal(await empty.props.commandRef.current('What about backfill?'),null);
  const draft=await createSwpDemo('guided-save-followup',at);store.commitExplorationFields(store.getSnapshot().data.revision,at,()=>({[scenarioChatField]:scenarioChatReceipt(draft,context(store),null)}));
  const h=harness(store);await h.settle();assert.ok(h.props.modelContextRef.current.draft);
- const option=h.find('SimpleSwpDemo').props.comparison.options.find(o=>o.candidate.status==='met');assert.ok(option);h.find('SimpleSwpDemo').props.onSelect(option.id);h.render();h.find('SimpleSwpDemo').props.onPrepare();await h.settle();
+ const option=h.find('SimpleSwpDemo').props.comparison.options.find(o=>o.candidate.status==='met');assert.ok(option);h.find('SimpleSwpDemo').props.onSelect(option.id);h.render();h.find('SimpleSwpDemo').props.onPrepare();await h.until(()=>{const save=h.button('Save reviewed plan and goal');return Boolean(save&&!save.props.disabled);});
  const save=h.button('Save reviewed plan and goal');assert.ok(save&&!save.props.disabled);save.props.onClick();await h.settle();
  const snapshot=store.getSnapshot();assert.equal(snapshot.data.goals.activeId,draft.binding.goalId);assert.ok(snapshot.data.workspaces[draft.binding.goalId].fields[swpDemoField]);assert.equal(snapshot.data.workspaces[draft.binding.goalId].fields[scenarioChatField],null);
  const reopened=new DecisionStore();reopened.initialize(port);assert.deepEqual(reopened.getSnapshot().data.workspaces[draft.binding.goalId],snapshot.data.workspaces[draft.binding.goalId]);
