@@ -1,8 +1,14 @@
+// @ts-expect-error Native Node fixtures share TypeScript source.
+import {staffingRequirementPattern} from './home-required-staffing.ts';
 /** Explicit user delivery timing, separate from calculator cost periods and model prose. */
 export type StaffingDeliveryCapture={months:number|null;turnId:string;quote:string;issue:string|null};
 const words=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty','twenty one','twenty two','twenty three','twenty four'];
 const amount='(?:\\d+(?:\\.\\d+)?|twenty[ -](?:one|two|three|four)|'+words.slice(1,21).join('|')+')';
 const clarify='Please clarify one staffing delivery deadline in whole months (1–24), or explicitly remove the deadline. The cost horizon is separate.';
+// Remove only a complete trailing comparison of known staffing strategies. The
+// original source is retained below; unknown suffixes must still be reviewed.
+const deliveryStrategy=String.raw`(?:hir(?:e|ing)|recruit(?:ing|ment)?|train(?:ing)?|upskill(?:ing)?|redeploy(?:ment|ing)?|internal[- ]transfers?|transferring internally)`;
+const trailingDeliveryStrategies=new RegExp(String.raw`\s*,?\s+\b(?:by|via|using)\s+${deliveryStrategy}(?:(?:\s+(?:or|and)\s+|\s*[,/]\s*(?:(?:and|or)\s+)?)${deliveryStrategy}){1,2}\s*$`,'i');
 /** Deliberately bounded grammar: unfamiliar or contradictory timing is not guessed. */
 export function captureStaffingDelivery(turn:{id:string;text:string},clarification=false):StaffingDeliveryCapture|null{
  const values:number[]=[],text=turn.text.trim();let uncertain=false,calendar=false;
@@ -18,10 +24,11 @@ export function captureStaffingDelivery(turn:{id:string;text:string},clarificati
  for(let index=0;index<clauses.length;index+=2){
   const sourceClause=clauses[index].trim();if(!sourceClause)continue;
   const question=clauses[index+1]==='?';
-  const clause=bare?'Delivery deadline: '+sourceClause:sourceClause;
+  const timingClause=sourceClause.replace(trailingDeliveryStrategies,'').trimEnd();
+  const clause=bare?'Delivery deadline: '+timingClause:timingClause;
   const named=/\b(?:delivery (?:target|deadline)|staffing deadline|deadline)\b/i.test(clause);
   const standalone=new RegExp('^(?:(?:actually|instead|to clarify|make it|change it to|use)\\s*[, :]?\\s*)?(?:within|in(?: the next)?|by(?: the end of)?|no later than)\\s+(?:the next\\s+)?'+amount+'\\s+months?$','i').test(clause);
-  const demand=/\bdeliver\b/i.test(clause)||new RegExp('\\b(?:need|require|required|fill|cover|staff)\\s+(?:exactly\\s+)?'+amount+'(?:\\s+[\\w-]+){0,3}\\s+(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)\\b','i').test(clause);
+  const demand=/\bdeliver\b/i.test(clause)||new RegExp(staffingRequirementPattern,'i').test(clause);
   if(!named&&!standalone&&!demand)continue;
   const expressions=[new RegExp('\\b(?:within|in(?: the next)?|no later than|by(?: the end of)?)\\s+(?:the next\\s+)?('+amount+')\\s+months?\\b','gi'),new RegExp('\\bby (?:the end of )?month\\s+('+amount+')\\b','gi'),new RegExp('\\b(?:delivery (?:target|deadline)|staffing deadline|deadline)\\s*(?:is|of|:|=|to)?\\s*('+amount+')\\s*[- ]months?\\b','gi'),new RegExp('\\b('+amount+')[- ]months?\\s+(?:delivery )?deadline\\b','gi')];
   expressions.push(new RegExp('\\b('+amount+')\\s+months?\\s+from now\\b','gi'));
