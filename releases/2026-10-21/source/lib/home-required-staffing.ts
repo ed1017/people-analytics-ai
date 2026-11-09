@@ -56,18 +56,31 @@ export function staffingDeliveryConflict(option:RequiredStaffingOption,input:Req
  return targetMonths!==null&&activeReadiness.some(months=>months!==null&&months>targetMonths);
 }
 export const requiredStaffingView=(s:RequiredStaffingReview|null)=>s?{revision:s.revision,origins:s.origins,...calculateRequiredStaffing(s.inputs)}:null;
-/** Explicit people/role requirement; independent of the model's chosen tool. */
+/** Routing recognition only: never extracts values or confirms that a role/pool exists. */
+const staffingRequiredCount=String.raw`(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)`;
+const staffingRoleNouns=String.raw`(?:roles?|positions?|people|employees?|staff|engineers?|developers?|analysts?|agents?|nurses?|consultants?|specialists?|operators?|designers?|managers?|technicians?|accountants?|representatives?|reps?|scientists?|recruiters?|coordinators?|associates?|officers?)`;
+export const staffingRequirementPattern=String.raw`\b(?:fill|staff|cover|need|require|required)\s+(?:(?:exactly|another|additional)\s+)?${staffingRequiredCount}\s+(?!(?:months?|weeks?|days?|years?|hours?|tickets?|cases?|dollars?|percent|FTE)\b)(?:(?!(?:months?|weeks?|days?|years?|hours?|tickets?|cases?|dollars?|percent|FTE|for|and|or|to|with)\b)[a-z-]+\s+){0,5}?${staffingRoleNouns}\b`;
 export function hasExplicitStaffingRequirement(text:string){
- const count='(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)';
- const requirement=new RegExp('\\b(?:fill|staff|cover|need|require|required)\\s+(?:exactly\\s+)?'+count+'(?:\\s+[\\w-]+){0,3}\\s+(?:roles?|positions?|people|employees?|engineers?|developers?|analysts?)\\b','i');
- return requirement.test(text);
+ for(const match of text.matchAll(new RegExp(staffingRequirementPattern,'gi'))){
+  const prefix=text.slice(0,match.index).split(/[.!?;\n]/).at(-1)??'';
+  if(!/\b(?:not|never|no longer|don't|don\u2019t|do not|did not|didn't|didn\u2019t|if|suppose|hypothetically)\b/i.test(prefix))return true;
+ }
+ return false;
 }
-/** Routing only: the model still supplies typed, provenance-checked inputs. */
+const staffingDiscussionOnly=/\b(?:do not|don't|don\u2019t)\s+(?:calculate|compare|plan|propose|recommend)\b|\b(?:explain|discuss)\s+only\b|\bno\s+(?:plan|calculation|comparison|recommendation)\b|^(?:please\s+)?(?:explain\b|define\b|what\s+(?:does\b.*\bmean|is\s+(?:a\s+)?(?:redeployment|upskilling|training|hiring)\b)|why\b)/i;
+/** Routing only: unfamiliar requests keep the full model loop and typed provenance checks. */
 export function requiresRequiredStaffing(request:SolutionRequest){
  const text=request.message.text;
- const strategies=[/\bhir(?:e|es|ing)\b/i,/\btrain(?:ing|ee|ees|able)?\b/i,/\bredeploy(?:ment|able|ing)?\b/i].filter(pattern=>pattern.test(text)).length;
+ if(staffingDiscussionOnly.test(text))return false;
+ const strategies=[/\b(?:hir(?:e|es|ing)|recruit(?:ing|ment)?)\b/i,/\b(?:train(?:ing|ee|ees|able)?|upskill(?:ing)?)\b/i,/\b(?:redeploy(?:ment|able|ing)?|internal(?:ly)?[- ]transfer(?:s|ring)?|transfer(?:s|ring)?\s+internally)\b/i].filter(pattern=>pattern.test(text)).length;
  if(strategies>=2&&hasExplicitStaffingRequirement(text))return true;
- return !!request.state.requiredStaffing&&(/\b(?:numerical|numbers|totals?|recalculate|recompute|compare|comparison|options?|mixes)\b/i.test(text)||/\b(?:change|make|set|use|clear|remove|update|keep)\b/i.test(text)&&/\b(?:training|trainee|hire|hiring|redeploy\w*|backfill|budget|month\w*|horizon|currency|role\w*|pool\w*|hours?|cost\w*|USD|EUR|GBP)\b/i.test(text));
+ if(!request.state.requiredStaffing)return false;
+ const named=/\b(?:staffing\s+(?:comparison|options?|mix(?:es)?|costs?|budget|inputs?)|fixed[- ]role\s+(?:comparison|plan))\b/i.test(text);
+ // Generic references cannot select an older review when another calculator is present.
+ if(!named&&(request.state.hiringBudget||request.state.businessPlanning||/\b(?:that|those)\b/i.test(text)||(request.state.currentCalculationKinds?.length&&!request.state.currentCalculationKinds.includes('required-staffing'))))return false;
+ const numeric=/\b(?:numerical|numbers|totals?|recalculate|recompute|compare|comparison|options?|mixes)\b/i.test(text);
+ const edit=/\b(?:change|make|set|use|clear|remove|update|keep)\b/i.test(text)&&/\b(?:training|trainee|upskill\w*|hire|hiring|redeploy\w*|transfer\w*|backfill|budget|month\w*|horizon|currency|role\w*|pool\w*|hours?|cost\w*|USD|EUR|GBP)\b/i.test(text);
+ return (numeric||edit)&&! /\b(?:do not|don't|don\u2019t|never)\s+(?:change|make|set|use|clear|remove|update|recalculate|recompute)\b/i.test(text);
 }
 // Performance gate, not a general intent classifier. Every clause must fit a
 // bounded staffing request/premise grammar; unfamiliar wording keeps the full loop.
@@ -153,14 +166,25 @@ export function editRequiredStaffing(request:SolutionRequest,datasetToken:string
  if(before.role!==null&&before.role!==s.inputs.role)requireRestated(requiredStaffingFields.filter(f=>!['role','requiredRoles','months','currency','budget'].includes(f)));
  s.revision++;return readRequiredStaffingReview(s)!;
 }
-export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: staffingDeliveryTarget in the supplied context is the explicit user delivery deadline, captured separately from cost months. Preserve it; months in this calculator is only the cost horizon. Never replace that deadline with an annual cost period or claim readiness from a target alone. When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
+export const requiredStaffingInstructions=`FIXED REQUIRED STAFFING: staffingDeliveryTarget in the supplied context is the explicit user delivery deadline, captured separately from cost months. Preserve it; months in this calculator is only the cost horizon. Never replace that deadline with an annual cost period or claim readiness from a target alone. When the user supplies a required count and wants hiring/training/redeployment combinations, use compare_required_staffing directly. Recognize ordinary role names, upskilling as training and internal transfers as redeployment; do not require example wording. For a normal request, capture only supplied role, count, cost period, currency, budget and premises. Keep absent costs, internal pools, overlap, release and readiness null; never import sample figures or silently treat unknown as zero. If role or count is missing, ask one focused question for it; if timing is missing, distinguish delivery deadline from cost horizon. Preserve supplied timing without treating it as readiness. Ask only the next essential missing detail, not a full intake questionnaire. The native staffing card is the editable planner; do not manufacture workload/FTE inputs or a demo to open another planner. For ambiguous follow-ups such as "that", identify the intended current review before changing it. Factual questions, explicit no-plan requests and negated requirements do not require a fresh comparison. A stated count does not require ticket volume, contracts, productivity rates, baseline population or a workload review. Keep the existing workload tools for workload-derived requirements; review_hiring_budget remains the annual-pay/timing calculator for hire-only budgeting. Use the explicit period hire cost and PER-TRAINEE cash/hours. Never copy per-person training rates into total-path fields of compare_service_staffing. Preserve all supplied pools and rates on follow-ups; call compare_required_staffing with empty changes to obtain current numerical totals, and quote the current user for corrections. The tool calculates bounded combinations and returns up to three representative options; show the numeric comparisons, one conditional recommendation and one next step. Keep unknown release, overlap, readiness, backfill and complete costs visible without blocking useful listed-cash arithmetic. If a hire-only scenario includes no planned training, say new-hire training requirements are not specified unless the user supplied them; do not assert zero training needed. No salary feed, company-population lookup, saved Action Plan or operational verification is required or implied. New figures must come from this turn's successful tool output. Its option IDs are not candidate or projection IDs: leave candidateIds, analysisIds and verifiedMetrics empty for a standalone staffing comparison; its compact card displays the checked values. Do not fabricate a verifiedMetricReference for these results.`;
 
+/** Missing identity can be filled only before any identity-dependent premises exist. */
+export function canFillStaffingIdentity(review:RequiredStaffingReview):boolean{
+ const affected=requiredStaffingFields.filter(field=>!['role','currency','requiredRoles','months'].includes(field));
+ return !affected.some(field=>review.inputs[field]!==null)&&!Object.values(review.costBasis?.rates??{}).some(rate=>rate.amount!==null)&&review.costBasis?.budget.amount==null;
+}
 /** Explicit local controls use the same provenance and scope checks as interpreted edits. */
 export function editRequiredStaffingLocally(request:SolutionRequest,datasetToken:string,expected:string,input:RequiredStaffingInput,costBasis?:RequiredStaffingCostBasis){
  const previous=currentRequiredStaffing(request,datasetToken);
  if(!previous||JSON.stringify(previous)!==expected)throw Error('The staffing comparison changed. Reopen its current inputs.');
  const next=costBasis?resolveRequiredStaffingCostBasis(input,costBasis):readRequiredStaffingInput(input);
- if(next.role!==previous.inputs.role||next.currency!==previous.inputs.currency)throw Error('Change role or currency in the conversation so its scope can be reviewed.');
+ const identityChanged=next.role!==previous.inputs.role||next.currency!==previous.inputs.currency;
+ if(identityChanged){
+  const knownChanged=next.role!==previous.inputs.role&&previous.inputs.role!==null||next.currency!==previous.inputs.currency&&previous.inputs.currency!==null;
+  // Initial identity entry cannot silently reinterpret previously entered premises.
+  if(knownChanged||!canFillStaffingIdentity(previous))throw Error('Change role or currency in the conversation so its scope can be reviewed.');
+ }
+
  const priorBasis=previous.costBasis??defaultRequiredStaffingCostBasis(previous.inputs),basis=costBasis?readRequiredStaffingCostBasis(costBasis):undefined;
  const restated=new Set<StaffingInputField>();
  if(basis){

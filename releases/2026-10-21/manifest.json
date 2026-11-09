@@ -109,8 +109,8 @@
     },
     {
       "path": "app/api/home-solution-conversation/route.ts",
-      "sha256": "cd67664f5761c902e02ab4082fe71badeaa5a62738829f83bef27c529a4f28d3",
-      "bytes": 9679
+      "sha256": "e64e72841c01cecda361ebdd1f0c748837e24abcf4e98d2e46a56a2eae8bdf58",
+      "bytes": 9881
     },
     {
       "path": "app/api/internal-talent-readiness/route.ts",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "b646f3f905b6aba324039872dec92445ecdb73cfb2e266265afaaeca91728463",
-      "bytes": 15183
+      "sha256": "e70c25f33a3454589ad1e8430127abe5771309a86db65a4c2d5e5e5b0af3daf1",
+      "bytes": 16609
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -2584,8 +2584,8 @@
     },
     {
       "path": "lib/home-required-staffing.ts",
-      "sha256": "1b1ebc1832fbe305eeea57b4d534443b0dd6798d6a00e4c1888ba2c6faf99145",
-      "bytes": 23282
+      "sha256": "c9169e9a0c9196349990d8100789eb93cd2b3b5659d551ae4fc81f29d894e2f9",
+      "bytes": 27026
     },
     {
       "path": "lib/home-role-recruiting.mjs",
@@ -2609,13 +2609,13 @@
     },
     {
       "path": "lib/home-solution-conversation-schema.ts",
-      "sha256": "ce76e5720321eceb168c18385191d14a6d034b9f2e71e403ccc69467df98410c",
-      "bytes": 40948
+      "sha256": "39708723d9593f6a61e0b9faea4c6b17ab39bf51f7d436bd7677794ca6067e88",
+      "bytes": 41573
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "6342cda56fd8898e27d859e2ed2c2bb074a423b377b378225c728a33197fcdee",
-      "bytes": 46429
+      "sha256": "89e643a5de0da82b7c6be4af107546992e35d2d9cdc038a049d0fba6d11d8dd6",
+      "bytes": 47795
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -2674,8 +2674,8 @@
     },
     {
       "path": "lib/home-staffing-delivery.ts",
-      "sha256": "39ba8c6ac2da0515192535ac2c420604c149d827a76ea1f761650e66c1e030d0",
-      "bytes": 6319
+      "sha256": "052121b225476e3f9d03b73278851ae1a2a7e6b52c7d8197b6c8028a94bc63ca",
+      "bytes": 6915
     },
     {
       "path": "lib/home-staffing-intake.ts",
@@ -5916,6 +5916,21 @@
       "path": "tests/staffing-flow-parity.test.mjs",
       "sha256": "a15b2502d939ddc5baf7a7be53ab9636c3e4b2514fec7a38295a15deab98129e",
       "bytes": 5537
+    },
+    {
+      "path": "lib/normal-staffing-intake.ts",
+      "sha256": "58c6b8a0ea2f649eca1b5bc20ed215cee22249c40e3ec2113af9aa2f649328c3",
+      "bytes": 5555
+    },
+    {
+      "path": "tests/normal-staffing-intake.test.mjs",
+      "sha256": "9cec3ff2eaf0d13851ae3b6fc3a5dcecb6b8d9c6acaa26be981fe7533f326577",
+      "bytes": 9587
+    },
+    {
+      "path": "tests/normal-staffing-routing.test.mjs",
+      "sha256": "3b6ec2aa2a66195a29df76c4a1878d451205c9fdd65dd86195d2e7f9fdd2fb4d",
+      "bytes": 8648
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

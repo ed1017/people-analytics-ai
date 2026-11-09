@@ -1,3 +1,4 @@
+import {normalStaffingIntake} from '@/lib/normal-staffing-intake';
 import {trackingPreviewBudgetEnabled,trackingPreviewLimits,createTrackingPreviewBudget,PreviewBudgetError} from '@/lib/home-preview-budget';
 import {readStaffingScenario} from '@/lib/home-staffing-scenario';
 import {requiredStaffingInstructions,requiredStaffingTool} from '@/lib/home-required-staffing';
@@ -39,15 +40,16 @@ async function handlePOST(request:Request){
   const swpModel=swpConversationModel(request.headers.get(SWP_CONVERSATION_HEADER),parsed,datasetRouter.current().token,{profile:process.env.SWP_DEMO_MODEL_PROFILE,modelId:process.env.SWP_DEMO_MODEL_ID});
   if(swpModel.model&&swpModel.model!==homeSolutionModel.model)throw Error('Configured SWP model conflicts with the Home conversation policy.');
   const demand=request.headers.get(SWP_CONVERSATION_HEADER)===SWP_DEMAND_MODE?requestDemandContext(parsed,datasetRouter.current().token):null;
-  if(!process.env.OPENAI_API_KEY)throw Error('Model unavailable');
+  const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
+  const normalStaffingOnly=natural&&normalStaffingIntake(parsed)!==null;
+  if(!process.env.OPENAI_API_KEY&&!normalStaffingOnly)throw Error('Model unavailable');
   signal=AbortSignal.any([request.signal,AbortSignal.timeout(90000)]);
   signal.throwIfAborted();
-  const natural=request.headers.get(SWP_CONVERSATION_HEADER)===null;
   const staffingScenarioOnly=readStaffingScenario(parsed,{natural,datasetToken:datasetRouter.current().token})!==null;
   diagnostics.stage('grounding');
   const grounding=staffingScenarioOnly?undefined:await groundSolutionRequest(parsed,signal,diagnostics.groundingResult);
   diagnostics.stage(staffingScenarioOnly?'conversation_preparation':'model_setup');
-  const client=staffingScenarioOnly?null:new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
+  const client=staffingScenarioOnly||normalStaffingOnly?null:new OpenAI({...openAIProxyTransport(),apiKey:process.env.OPENAI_API_KEY,maxRetries:0});
   const planningInstructions=staffingScenarioOnly?'':solutionPlanningInstructions(parsed,demand)+(natural?'\n'+businessPlanningInstructions+'\n'+hiringBudgetInstructions+'\n'+requiredStaffingInstructions:'');
   diagnostics.stage('conversation_preparation');
   const reply=await converseSolutions(parsed,{
@@ -57,7 +59,7 @@ async function handlePOST(request:Request){
    ...(natural?{natural:{datasetToken:datasetRouter.current().token}}:{}),
    progress:{enabled:goalProgressConversationEnabled,datasetToken:datasetRouter.current().token},
    complete:async(input,finalOnly,signal,capabilities)=>{
-    if(staffingScenarioOnly||!client)throw Error('Illustrative staffing calculations cannot dispatch a model.');
+    if(staffingScenarioOnly||normalStaffingOnly||!client)throw Error('This deterministic staffing request cannot dispatch a model.');
     const progressContract=progressModelContract(goalProgressConversationEnabled,capabilities.progressEntryEnabled);
     const conversationTools=capabilities.requiredStaffingCalculation?[requiredStaffingTool]:demand?demandReferenceModelContract.tools:[...solutionTools,...progressContract.tools,...(natural?businessPlanningModelTools:[])];
     const instructions=(demand?demandReferenceModelContract.instructions:solutionConversationInstructions+'\n'+solutionCompletionInstructions+progressContract.instructions)+planningInstructions;

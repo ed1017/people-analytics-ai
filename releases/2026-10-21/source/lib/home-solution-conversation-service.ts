@@ -40,6 +40,8 @@ import {turnoverChatReply,clearTurnoverChat,retainTurnoverChat} from './home-tur
 // @ts-expect-error Native fixtures share source.
 import {headcountChatReply} from './home-headcount-chat.ts';
 // @ts-expect-error Native fixtures share source.
+import {normalStaffingIntake} from './normal-staffing-intake.ts';
+// @ts-expect-error Native fixtures share source.
 import {staffingStarterIntake,initialStaffingTemplateBudget} from './home-staffing-intake.ts';
 // @ts-expect-error Native Node tests share application source.
 import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
@@ -113,6 +115,7 @@ export function solutionModelContext(request:SolutionRequest,progress?:GoalProgr
 /** Bounded model-directed read/calculation loop. No write, model switch or automatic retry. */
 export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,signal:AbortSignal):Promise<SolutionReply>{
  const original=readSolutionRequest(raw),request=structuredClone(original),state=request.state;
+ const routingRequest={...request,state:{...state,currentCalculationKinds:[...(state.currentCalculationKinds??[])]}};
  abort(signal);
  // Calculation visibility belongs to this answer, not retained scenario memory.
  // Deterministic replies can return before the model path sets fresh markers.
@@ -149,6 +152,16 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:headcount.answer}].slice(-32);
   state.questions=[];
   return {requestId:request.requestId,...headcount,candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
+ const normalIntake=runtime.natural&&!runtime.staffingScenarioOnly&&!runtime.demand?normalStaffingIntake(request):null;
+ if(normalIntake){
+  const changes=Object.entries(normalIntake.inputs).filter(([,value])=>value!==null).map(([field,value])=>({field,value,basis:{kind:'user-supplied',turnId:request.message.id,quote:request.message.text,explanation:'Explicit initial staffing request; missing inputs remain unknown and are not operational verification.'}}));
+  state.requiredStaffing=editRequiredStaffing(request,runtime.natural!.datasetToken,changes);
+  const delivery=captureStaffingDelivery(request.message);if(delivery)state.staffingDeliveryTarget=delivery;
+  state.currentCalculationKinds=['required-staffing'];
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:normalIntake.answer}].slice(-32);
+  state.questions=normalIntake.questions;
+  return {requestId:request.requestId,answer:normalIntake.answer,charts:[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
  const intake=!runtime.staffingScenarioOnly&&!runtime.demand?staffingStarterIntake(request):null;
  if(intake){
@@ -192,9 +205,9 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
  const referenced=!!demand&&runtime.demand?.referenceContract===true;let referenceStep=0;
  let currentDemandReference=referenced?demandReferenceId(request.requestId,referenceStep):'';
  let natural=runtime.natural?currentBusinessPlanning(request,runtime.natural.datasetToken):null,naturalStep=0;
- let staffingRequired=!!runtime.natural&&requiresRequiredStaffing(request),staffingCalculated=false;
+ let staffingRequired=!!runtime.natural&&requiresRequiredStaffing(routingRequest),staffingCalculated=false;
  // Only the already selected, standalone comparison can finish from its first tool result.
- const staffingOnly=staffingRequired&&canCompleteRequiredStaffingAlone(request);
+ const staffingOnly=staffingRequired&&canCompleteRequiredStaffingAlone(routingRequest);
  const standaloneStaffing=staffingOnly&&!demand&&!entryContext&&!request.goal.id&&!request.goal.statement&&!request.goalContext&&!request.selectedId&&!request.catalog&&!state.working.length&&!state.analyses.length&&!state.constraints.length&&!state.verifiedMetrics.length&&!state.focusCandidateId;
  const modelContext={...solutionModelContext(request,progress),syntheticHiringExperiment:openingKnownAiContext(request.message.text)??hiringPredictionAiContext(request.message.text),preparation:solutionPreparation(request,runtime.requestTime??runtime.now?.()??new Date(),runtime.requestTime?'request-start':'conversation-preparation'),...(runtime.grounding?{evidenceGrounding:runtime.grounding}:{}),...(runtime.natural?{requiredStaffing:requiredStaffingView(currentRequiredStaffing(request,runtime.natural.datasetToken)),businessPlanning:businessPlanningView(natural,request.requestId,naturalStep),hiringBudget:hiringBudgetView(currentHiringBudget(request,runtime.natural.datasetToken))}:{})};
  if(referenced&&demand){const goalContext=structuredClone(request.goalContext) as {scenarioReview:Record<string,unknown>};goalContext.scenarioReview.demandProposal=demand.demandProposal?referencedDemandView(demand.demandProposal,demand,currentDemandReference):null;modelContext.goalContext=goalContext;}
