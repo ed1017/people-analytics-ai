@@ -38,6 +38,7 @@ export function normalStaffingIntake(request:SolutionRequest){
  if(clauses.length<1||clauses.length>2)return null;
  const m=clauses[0].match(requirement);
  if(!m||!(m[8]||clauses.length===2&&comparison.test(clauses[1]))||m[8]&&clauses.length!==1)return null;
+ if(/\b(?:and|or|not|no|if|unless|without|versus|vs)\b/i.test(m[2]))return null;
  const inputs=emptyRequiredStaffing(),people=amount(m[1]),months=m[4]?amount(m[4]):null;
  if(people>20||months!==null&&(months<1||months>24))return null;
  inputs.requiredRoles=people;
