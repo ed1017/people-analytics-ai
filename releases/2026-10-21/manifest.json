@@ -1049,8 +1049,8 @@
     },
     {
       "path": "components/use-home-solution-conversation.ts",
-      "sha256": "8f4c268c38227f2d1cd7dd167688b342f76cd49f992b0345c309b90566e800d0",
-      "bytes": 40891
+      "bytes": 41266,
+      "sha256": "a38b8281e0d9fb5dd8466cb0ad2b99830bbf4d982ef1ef3b143af89a8e86cd63"
     },
     {
       "path": "components/use-navigation-preference.ts",
@@ -5936,6 +5936,16 @@
       "path": "tests/staffing-budget-period-continuity.test.mjs",
       "bytes": 11878,
       "sha256": "c872f2be8b44d5468d002ffafbf1f2ab35afeedd0eb5fcac7fd570eda630183c"
+    },
+    {
+      "path": "lib/home-independent-workforce-question.ts",
+      "bytes": 2384,
+      "sha256": "35f3b3e757ca62019b32a6af68291145a558cad918ecd6d403dc04ae3ce6b43b"
+    },
+    {
+      "path": "tests/home-independent-workforce-question.test.mjs",
+      "bytes": 7424,
+      "sha256": "bbf350d8eec7beff9bbffdfc64e81363ccf86ad124e459b36997c4f8bbc7aa49"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
