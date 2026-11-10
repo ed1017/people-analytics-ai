@@ -1,12 +1,14 @@
 # Active roadmap - November 10
 
-## Current work - ordinary staffing continuation, 10 November 2026
+## Current work - staffing continuity and post-demo chat, 10 November 2026
 
-Normal staffing intake and concise missing-input replies are being extended through the existing chat and editable planner. The budgeted missing-role repair in PR580 is merged and published; merge commit 478470c873b2004da423fd9e8746f49685a8c33d has the same tree as the reviewed 94492433 base used for this next bounded change.
+[PR581](https://github.com/ed1017/people-analytics-ai/pull/581) is live. A budget given before its cost period is known stays visible and pending when the period is later supplied, until explicitly confirmed or cleared. Chat and the editable planner now apply the same rule, including zero budgets and confirmation provenance.
 
-The next candidate preserves an unperiodized budget when the first cost horizon is supplied. Its amount remains visible and pending until explicitly confirmed or cleared for that period, rather than becoming active through chat while remaining pending in the editor. Current-turn confirmation retains provenance, and currency changes cannot silently discard or reinterpret the retained quote. See [budget-period continuity candidate](staffing-budget-period-continuity-2026-11-10.md) for scope and validation limits. Independent review and hosted release acceptance remain pending; this entry does not claim publication.
+[PR582](https://github.com/ed1017/people-analytics-ai/pull/582) and [PR583](https://github.com/ed1017/people-analytics-ai/pull/583) are now promoted, with the tested deployment confirmed on both public domains. They preserve a saved guided plan while answering a supported independent business-unit turnover question, and make staffing prose agree with the cards when a delivery deadline is missed. Independent review, exact-head CI, restored-runtime build and focused offline checks passed. Post-promotion public HTTP, static asset and capability checks passed. The public guided-demo flow passed through review, save, Action plans and Track. Fresh reload persistence and direct-public browser POST journeys remain unverified. See the [release record](staffing-continuity-release-2026-11-10.md) for identities, coverage and limits.
 
-External-source expansion remains paused. User-owned Future of Work/Lab validation and overlay publication are outside this work. The dated sections below remain historical records rather than current queues or budget authority.
+Fresh cloud checks passed ten focused tests and three actual-route repeat/follow-up requests grounded in current public GET evidence, with no provider attempts. No paid provider calls were made for this batch; cumulative spending headroom has not been verified. The post-demo fix is limited to recognized business-unit turnover questions. Business-unit level/tenure turnover and cost breakdowns still need verified evidence contracts; aggregate counts alone do not establish rates, causes or costs.
+
+External-source expansion remains paused. User-owned Future of Work/Lab validation and overlay publication remain outside this work. The dated sections below are historical records, not current queues or budget authority.
 
 ## Historical release state - 4 November 2026
 

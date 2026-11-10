@@ -92,7 +92,8 @@
       "feat/shared-planner-inputs": false,
       "fix/home-tool-replay-template": false,
       "feat/market-intelligence-explorer": false,
-      "feat/talent-inventory-position-scenarios": false
+      "feat/talent-inventory-position-scenarios": false,
+      "docs/staffing-release-verification-20261110": false
     }
   }
 }
