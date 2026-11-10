@@ -1,6 +1,14 @@
-# Active roadmap - November 4
+# Active roadmap - November 10
 
-## Current release state - 4 November 2026
+## Current work - ordinary staffing continuation, 10 November 2026
+
+Normal staffing intake and concise missing-input replies are being extended through the existing chat and editable planner. The budgeted missing-role repair in PR580 is merged and published; merge commit 478470c873b2004da423fd9e8746f49685a8c33d has the same tree as the reviewed 94492433 base used for this next bounded change.
+
+The next candidate preserves an unperiodized budget when the first cost horizon is supplied. Its amount remains visible and pending until explicitly confirmed or cleared for that period, rather than becoming active through chat while remaining pending in the editor. Current-turn confirmation retains provenance, and currency changes cannot silently discard or reinterpret the retained quote. See [budget-period continuity candidate](staffing-budget-period-continuity-2026-11-10.md) for scope and validation limits. Independent review and hosted release acceptance remain pending; this entry does not claim publication.
+
+External-source expansion remains paused. User-owned Future of Work/Lab validation and overlay publication are outside this work. The dated sections below remain historical records rather than current queues or budget authority.
+
+## Historical release state - 4 November 2026
 
 October workforce data is live through **2026-10-31**: 9,092 people, 8,904.8 FTE and 162 vacancies. October data PR558 and completion records PR559-560 are complete. Current runtime a4f5effdcf4359ed16e61011bcada704e23e9611 includes the published PR562 scenario attrition follow-up repair. The sealed private Supabase mirror is verified; the public app still uses its packaged aggregate runtime. See [October data record](synthetic-october-2026.md).
 

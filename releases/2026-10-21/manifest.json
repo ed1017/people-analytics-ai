@@ -2584,8 +2584,8 @@
     },
     {
       "path": "lib/home-required-staffing.ts",
-      "sha256": "f9f6e6001a582c058e95a38d184c95590f68a6e1328a13aa1727461819855974",
-      "bytes": 27658
+      "sha256": "b605c52cd85527b5e881a49e5a677b19d5edc68b7926aa1dac8b2b08ce52a982",
+      "bytes": 30543
     },
     {
       "path": "lib/home-role-recruiting.mjs",
@@ -2614,8 +2614,8 @@
     },
     {
       "path": "lib/home-solution-conversation-service.ts",
-      "sha256": "ba995dde8ba081d8b73a3ec9e8658e710b60c6a45107ae4da5b8cc9fd9255e70",
-      "bytes": 49227
+      "sha256": "261e4370ed3d9687acfd83f4275be365bd7b2596c315c4a5a0737a7a95a86996",
+      "bytes": 49404
     },
     {
       "path": "lib/home-solution-conversation.ts",
@@ -5931,6 +5931,11 @@
       "path": "tests/normal-staffing-routing.test.mjs",
       "sha256": "f8f1d699d846ff5c54bd35888fc502d1ca8264835476d085632184a106db912f",
       "bytes": 12696
+    },
+    {
+      "path": "tests/staffing-budget-period-continuity.test.mjs",
+      "bytes": 11878,
+      "sha256": "c872f2be8b44d5468d002ffafbf1f2ab35afeedd0eb5fcac7fd570eda630183c"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",
