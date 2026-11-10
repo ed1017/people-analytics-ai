@@ -109,3 +109,19 @@ test('missing and changed currency require current-user budget restatement or cl
   assert.throws(()=>editRequiredStaffing(base,'test-budget-period',[change(base,'currency','EUR'),proposed]),/explicit user correction|Confirm or clear/);
  }
 });
+
+
+test('an entered zero-cost comparison cannot bypass pending positive or zero funding confirmation',()=>{
+ for(const amount of [240000,0]){
+  const q=seeded(amount),pending=edit(q,{months:12,hireCostPerPerson:0,hireTrainingHoursPerPerson:0,hireReadyAfterMonths:0,costsComplete:true});
+  const before=structuredClone(pending),calculated=calculateRequiredStaffing(pending.inputs),optionId=calculated.recommendation.optionId;
+  assert.equal(calculated.options.find(o=>o.id===optionId).completeCash,0);
+  assert.equal(requiredStaffingView(pending).recommendation,null);
+  assert.doesNotMatch(requiredStaffingAnswer(pending),/Recommendation:/);
+  assert.throws(()=>requiredStaffingPlanFacts({version:1,review:pending,optionId,deliveryTarget:null}),/Confirm the scenario budget/);
+  q.state.requiredStaffing=pending;q.message={id:'zero-confirmation',text:`The GBP ${amount} budget covers those 12 months`};
+  const confirmed=edit(q,{budget:amount}),facts=requiredStaffingPlanFacts({version:1,review:confirmed,optionId,deliveryTarget:null});
+  assert.equal(requiredStaffingView(confirmed).recommendation.optionId,optionId);assert.equal(facts.option.completeCash,0);
+  assert.equal(confirmed.inputs.budget,amount);assert.equal(confirmed.origins.budget.turnId,'zero-confirmation');assert.deepEqual(pending,before);
+ }
+});

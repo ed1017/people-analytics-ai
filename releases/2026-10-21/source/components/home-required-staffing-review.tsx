@@ -7,10 +7,24 @@ import {InteractivePlanner} from './interactive-planner';
 import {calculateRequiredStaffing,defaultRequiredStaffingCostBasis,resolveRequiredStaffingCostBasis,staffingRateFields,type RequiredStaffingCostBasis,type StaffingRateField,readRequiredStaffingInput,staffingFlagFields,requiredStaffingFields,staffingInputLabels,type RequiredStaffingInput,type StaffingInputField,type RequiredStaffingOption} from '@/lib/required-staffing';
 import {canFillStaffingIdentity,staffingDeliveryConflict,type RequiredStaffingReview} from '@/lib/home-required-staffing';
 const number=(n:number|null)=>n===null?'Unknown':n.toLocaleString('en-US',{maximumFractionDigits:2});
-export function StaffingOptionSummary({option:o,currency,costMonths,deliveryMonths}:{option:RequiredStaffingOption;currency:string|null;costMonths:number|null;deliveryMonths:number|null}){
- const cash=o.completeCash??o.listedCash??o.knownSubtotal,training=o.totalTrainingHours??(o.train>0?o.plannedTrainingHours:null);
- return <ul className="list-disc space-y-1 pl-5">{cash!==null&&currency&&<li>{o.completeCash===null?'Known cost subtotal':'Scenario cost'}: <strong>{number(cash)} {currency}</strong></li>}{o.budgetStatus==='over'&&<li className="font-semibold">Over budget</li>}{training!==null&&<li>{o.totalTrainingHours===null?'Planned training':'Training'}: <strong>{number(training)} hours</strong></li>}{o.readyAfterMonths!==null&&<li>Timing: <strong>{o.readyAfterMonths===0?'Ready at start':`After ${o.readyAfterMonths} months`}</strong></li>}{deliveryMonths!==null&&<li>Delivery target: {deliveryMonths} months</li>}{costMonths!==null&&cash!==null&&currency&&<li>Cost horizon: {costMonths} months</li>}</ul>;
-
+export function StaffingOptionSummary({option:o,input,deliveryMonths}:{option:RequiredStaffingOption;input:RequiredStaffingInput;deliveryMonths:number|null}){
+ const cash=o.completeCash??o.listedCash??o.knownSubtotal,training=o.totalTrainingHours??(o.train>0?o.plannedTrainingHours:null),internal=o.train+o.redeploy;
+ return <ul className="list-disc space-y-1 pl-5">
+  {cash!==null&&input.currency&&<li>{o.completeCash===null?'Known cost subtotal':'Scenario cost'}: <strong>{number(cash)} {input.currency}</strong></li>}
+  {o.completeCash===null&&<li>Complete incremental cost is unconfirmed.</li>}
+  {o.budgetStatus==='over'&&<li className="font-semibold">Over budget</li>}
+  {o.coverage==='not-met'&&<li className="font-semibold">Coverage assumptions not met</li>}
+  {training!==null&&<li>{o.totalTrainingHours===null?'Planned training':'Training'}: <strong>{number(training)} hours</strong></li>}
+  {o.newHireTrainingUnspecified&&<li>New-hire training requirements: Unknown.</li>}
+  <li>Timing: <strong>{o.readyAfterMonths===null?'Unknown':o.readyAfterMonths===0?'Ready at start':`After ${o.readyAfterMonths} month${o.readyAfterMonths===1?'':'s'}`}</strong>{o.readyAfterMonths===null?'. Confirm readiness before committing.':o.readyAfterMonths>0?'. Coverage is not from the period start.':null}</li>
+  {internal>0&&<>
+   <li>Internal release: <strong>{input.internalRelease===null?'Unknown':input.internalRelease?'Assumed available; not verified':'Not available'}</strong>.</li>
+   <li>Backfill cash per internal person: <strong>{input.backfillCostPerInternalPerson===null?'Unknown, not zero':`${number(input.backfillCostPerInternalPerson)} ${input.currency??'(currency unknown)'}`}</strong>{input.backfillCostPerInternalPerson===null?'. Confirm the cost for this period.':input.backfillCostPerInternalPerson===0?' for the period (entered zero).':' for the period.'}</li>
+   {o.train>0&&o.redeploy>0&&input.poolsDistinct!==true&&<li>Overlap between the training and redeployment pools is unknown.</li>}
+  </>}
+  {deliveryMonths!==null&&<li>Delivery target: {deliveryMonths} months</li>}
+  {input.months!==null&&cash!==null&&input.currency&&<li>Cost horizon: {input.months} months</li>}
+ </ul>;
 }
 export function HomeRequiredStaffingReview({review,onApply,onClear,onPin,disabled,pinned,deliveryMonths=null,deliveryIssue,notes}:{review:RequiredStaffingReview;onApply?:(expected:string,inputs:RequiredStaffingInput,costBasis?:RequiredStaffingCostBasis)=>void;onClear:()=>void;onPin?:(id:string)=>void;disabled:boolean;pinned?:(id:string)=>number|undefined;deliveryMonths?:number|null;deliveryIssue?:string|null;notes?:string}){
  const radioId=useId(),canFillRole=canFillStaffingIdentity(review,'role'),canFillCurrency=canFillStaffingIdentity(review,'currency');
@@ -32,12 +46,27 @@ export function HomeRequiredStaffingReview({review,onApply,onClear,onPin,disable
  if(budgetReviewPending||deliveryIssue||r.options.some(o=>o.id===r.recommendation?.optionId&&staffingDeliveryConflict(o,r.input,deliveryMonths)))r.recommendation=null;
  const selected=r.options.find(o=>o.id===r.recommendation?.optionId),missing=[inputs.internalRelease===null&&selected&&(selected.train+selected.redeploy)>0?'whether internal staff can be released':null,selected?.readyAfterMonths===null?'readiness dates':null,inputs.backfillCostPerInternalPerson===null&&selected&&(selected.train+selected.redeploy)>0?'backfill costs':null].filter(Boolean);
  const choiceKey=JSON.stringify([inputs,deliveryMonths,deliveryIssue]),shown=r.options.find(o=>o.id===(choice?.key===choiceKey?choice.id:selected?.id))??null;
+ const recommendationBlocker=budgetReviewPending?'Confirm the budget for this cost horizon before reviewing a recommendation.':deliveryIssue?deliveryIssue:costRecommendation?'The lowest listed-cash mix misses the delivery target. Review readiness or inspect the alternatives below.':'Review the supplied role, headcount, costs, budget and coverage conditions below.';
  return <section aria-label="Fixed-role staffing comparison" className="min-w-0 space-y-3 rounded border p-3 text-sm">
   {budgetReviewPending&&<p role="status">Confirm the budget for this horizon to review a recommendation.</p>}
   {dirty&&<p role="status" className="font-semibold">Unapplied changes</p>}
   <p className="font-semibold">Editable staffing planner</p>
   <p role="status">{staffingInputQuestion(inputs,deliveryMonths!==null)}</p>
   <p className="text-xs">Only supplied inputs are retained. Blank means unknown, not zero. These controls do not verify staffing availability or save a plan.</p>
+  <section aria-label="Staffing recommendation" className="space-y-2 rounded border p-3">
+   <h3 className="font-semibold">{r.recommendation?'Conditional recommendation':'No conditional recommendation'}</h3>
+   {invalid?<p role="status">Last valid inputs shown. Correct invalid values and apply the revision before pinning.</p>:dirty?<p role="status">Preview of unapplied changes. Apply the revision before pinning.</p>:null}
+   {r.recommendation&&selected?<>
+    <p>{r.recommendation.text}</p>
+    <p>Listed cash basis: <strong>{number(selected.listedCash)} {unit}</strong> over the {number(r.input.months)}-month cost horizon.</p>
+    {selected.completeCash===null&&<p>Known subtotal only. Complete incremental cost is unconfirmed.</p>}
+    {r.input.budget===null&&<p>Budget ceiling: Unknown for this horizon.</p>}
+    <p>Listed cash does not establish total employer cost or operational feasibility. Actual people and skills remain unverified.</p>
+    {selected.unknowns.length>0&&<div><p className="font-semibold">Conditions to resolve</p><ul className="list-disc space-y-1 pl-5">{selected.unknowns.map(line=><li key={line}>{line}</li>)}</ul></div>}
+    <p>Next step: {r.recommendation.nextStep}</p>
+    {shown&&shown.id!==selected.id&&<p>The chart is inspecting another mix. The conditional recommendation above is unchanged.</p>}
+   </>:<p>{recommendationBlocker}</p>}
+  </section>
   <InteractivePlanner compact scope={`${catalogProseDisplay(r.input.role??'Role unknown')} · ${r.input.months??'Unknown'}-month cost horizon · delivery ${deliveryMonths??'unknown'} months`}
    outcome={shown?`Review ${shown.train} train, ${shown.redeploy} redeploy and ${shown.hire} hire under these assumptions.`:'Compare staffing options'}
    metrics={[{label:'Required people',value:number(r.input.requiredRoles)},{label:'Selected allocation',value:shown?number(shown.coveredRoles)+' people':'Not selected'},{label:'Complete period cost',value:shown?number(shown.completeCash)+' '+unit:'Not selected'},{label:'Ready after',value:shown?number(shown.readyAfterMonths)+' months':'Not selected'}]}
@@ -51,10 +80,10 @@ export function HomeRequiredStaffingReview({review,onApply,onClear,onPin,disable
   {r.missing.map(line=><p key={line}>{line}</p>)}
   {onApply&&(!!missing.length||r.options.some(o=>o.listedCash===null||o.readyAfterMonths===null))&&<button type="button" className="min-h-11 rounded border px-3" onClick={()=>setCostsOpen(true)}>Add costs and ready dates</button>}
   <div className="grid min-w-0 gap-3 md:grid-cols-3">{r.options.map(o=><article key={o.id} aria-label={`Train ${o.train}, redeploy ${o.redeploy}, hire ${o.hire}`} className={`min-w-0 space-y-2 rounded border p-3 ${r.recommendation?.optionId===o.id?'border-primary bg-muted/30':''}`}>
-   {r.recommendation?.optionId===o.id&&<p className="text-xs font-semibold">Recommended</p>}
+   {r.recommendation?.optionId===o.id&&<p className="text-xs font-semibold">Conditional recommendation</p>}
    <h4 className="font-semibold">{[o.redeploy?`Redeploy ${o.redeploy}`:null,o.train?`Train ${o.train}`:null,o.hire?`Hire ${o.hire}`:null].filter(Boolean).join(' · ')}</h4>
    {staffingDeliveryConflict(o,r.input,deliveryMonths)&&<p role="status">Misses the {deliveryMonths}-month delivery target.</p>}
-   <StaffingOptionSummary option={o} currency={r.input.currency} costMonths={r.input.months} deliveryMonths={deliveryMonths}/>
+   <StaffingOptionSummary option={o} input={r.input} deliveryMonths={deliveryMonths}/>
    {r.recommendation?.optionId===o.id&&onPin&&<button type="button" className="min-h-11 rounded border px-3 py-2 disabled:opacity-50" disabled={disabled||dirty||!!pinned?.(o.id)||o.coverage==='not-met'||o.budgetStatus==='over'} onClick={()=>onPin(o.id)}>{pinned?.(o.id)?`Pinned Action Plan #${pinned(o.id)}`:'Pin Action Plan'}</button>}
   </article>)}</div>
 

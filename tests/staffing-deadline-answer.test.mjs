@@ -5,6 +5,8 @@ import {fixedChanges,fixedValues} from './fixtures/required-staffing.mjs';
 for(const prefix of ['../releases/2026-10-21/source/']){
  const {requiredStaffingAnswer,editRequiredStaffing,resolveStaffingDeliveryTarget}=await import(prefix+'lib/home-required-staffing.ts');
  const {converseSolutions}=await import(prefix+'lib/home-solution-conversation-service.ts');
+ const {calculateRequiredStaffing}=await import(prefix+'lib/required-staffing.ts');
+ const {requiredStaffingPlanFacts}=await import(prefix+'lib/home-required-staffing-plan.ts');
  const label='release';
  const request=solutionRequest('We need 10 engineering roles within 3 months. Compare hiring, training and redeployment. Use a 12-month cost horizon and USD 1000000 budget. Each hire costs USD 160000 for the entire period.');
  const review=editRequiredStaffing(request,'legacy-v1:0',fixedChanges(request,{...fixedValues,hireReadyAfterMonths:2,trainingReadyAfterMonths:4,redeployReadyAfterMonths:1}));
@@ -24,6 +26,18 @@ for(const prefix of ['../releases/2026-10-21/source/']){
   const answer=requiredStaffingAnswer(unknown,{months:3,issue:null});
   assert.match(answer,/Readiness: Unknown/);assert.doesNotMatch(answer,/Misses/);assert.match(answer,/remains conditional/);
   assert.doesNotMatch(requiredStaffingAnswer(review,{months:4,issue:'Restate the target.'}),/Recommendation:/);
+ });
+ test(label+' a late path with unknown combined readiness remains unpinnable without changing listed cash',()=>{
+  const partial=editRequiredStaffing(request,'legacy-v1:0',fixedChanges(request,{...fixedValues,hireReadyAfterMonths:2,trainingReadyAfterMonths:4,redeployReadyAfterMonths:null}));
+  const before=structuredClone(partial),result=calculateRequiredStaffing(partial.inputs),option=result.options.find(o=>o.id===result.recommendation.optionId);
+  assert.equal(option.readyAfterMonths,null);assert.equal(option.listedCash,30000);
+  const receipt={version:1,review:partial,optionId:option.id,deliveryTarget:{months:3,turnId:request.message.id,quote:request.message.text}};
+  assert.throws(()=>requiredStaffingPlanFacts(receipt),/misses the stated delivery target/);
+  const afterReview=requiredStaffingPlanFacts({...receipt,deliveryTarget:{...receipt.deliveryTarget,months:4}});
+  assert.equal(afterReview.option.listedCash,30000);assert.equal(afterReview.option.readyAfterMonths,null);
+  assert.ok(afterReview.option.unknowns.includes('Readiness and coverage timing are unknown.'));
+  assert.doesNotMatch(requiredStaffingAnswer(partial,{months:3,issue:null}),/Recommendation:/);
+  assert.deepEqual(partial,before);
  });
  test(label+' mixed requests cannot retain a contradictory provider recommendation',async()=>{
   const mixed=solutionRequest(request.message.text+' Also explain the tradeoffs for the leadership team.'),port=fixtureRuntime([{name:'compare_required_staffing',args:{changes:fixedChanges(mixed,review.inputs)}},final('I recommend training for delivery on time.')]);port.natural={datasetToken:'legacy-v1:0'};

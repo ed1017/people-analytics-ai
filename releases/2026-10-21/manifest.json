@@ -299,8 +299,8 @@
     },
     {
       "path": "components/action-plan-quick-summary.tsx",
-      "sha256": "8d91a9607bd0524e0abcc514c56f58aef7043ee92d8e125cde6ee0f824aef534",
-      "bytes": 15148
+      "sha256": "f34cd264e7067ddd94fc2536dc0c6b7ae4db796b72aaa353a35f3783fbadc005",
+      "bytes": 15100
     },
     {
       "path": "components/ai-panel.tsx",
@@ -589,8 +589,8 @@
     },
     {
       "path": "components/home-getting-started.tsx",
-      "sha256": "06b9d40b45a8b32d7af67de9110b940eca31f8a979e79e0f413f476ab2e66baa",
-      "bytes": 11223
+      "sha256": "598f1edb6bbca046314396caa93b7a474fb652cd8b415ee313acc754f3a0af84",
+      "bytes": 9331
     },
     {
       "path": "components/home-guided-actions.tsx",
@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "8023fda6ca3dd7d266a381133746fd1a163e69bfd3377b2039b22cb60dea9a99",
-      "bytes": 16718
+      "sha256": "a20cdde43d8c96c484739084f68143a4c379318c56eaf9ec93d403de8e576a49",
+      "bytes": 19627
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -4464,8 +4464,8 @@
     },
     {
       "path": "tests/home-orientation.test.mjs",
-      "bytes": 19376,
-      "sha256": "22c5d90728f171707839cbe0aac9a499cc6d146d5175614892afa6413c047fbb"
+      "bytes": 26924,
+      "sha256": "5515f8960db9aed3cbb5f3bd049d7760d2cd8ac013d781a601b0d07ad1571dd3"
     },
     {
       "path": "tests/about-project-profile.test.mjs",
@@ -5044,8 +5044,8 @@
     },
     {
       "path": "tests/required-staffing-card-presentation.test.mjs",
-      "sha256": "a6b7adf4be3d6728f378eb43dc8e7052eb1704613f1f47e5bb24ed973a9b3405",
-      "bytes": 4543
+      "sha256": "b86ad579b13a2efd931a9df657d658ce54f3593643ceb08702db7ae9329837e2",
+      "bytes": 18302
     },
     {
       "path": "tests/required-staffing-cost-basis.test.mjs",
@@ -5934,8 +5934,8 @@
     },
     {
       "path": "tests/staffing-budget-period-continuity.test.mjs",
-      "bytes": 11878,
-      "sha256": "c872f2be8b44d5468d002ffafbf1f2ab35afeedd0eb5fcac7fd570eda630183c"
+      "bytes": 13189,
+      "sha256": "0e706d6aece0d789186a85715fac5a16db134c2528e136d97347ef8b9f169036"
     },
     {
       "path": "lib/home-independent-workforce-question.ts",
