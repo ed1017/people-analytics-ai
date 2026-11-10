@@ -44,7 +44,7 @@ import {normalStaffingIntake,normalStaffingClarification,staffingInputQuestion} 
 // @ts-expect-error Native fixtures share source.
 import {staffingStarterIntake,initialStaffingTemplateBudget} from './home-staffing-intake.ts';
 // @ts-expect-error Native Node tests share application source.
-import {hasExplicitStaffingRequirement,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,staffingBudgetPeriodMessage,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
+import {hasExplicitStaffingRequirement,staffingDeliveryConflict,resolveStaffingDeliveryTarget,retainStaffingDeliveryTarget,requiredStaffingTool,currentRequiredStaffing,requiredStaffingView,staffingBudgetPeriodMessage,editRequiredStaffing,requiresRequiredStaffing,canCompleteRequiredStaffingAlone,requiredStaffingAnswer} from './home-required-staffing.ts';
 import type {verifySolutionEvidence} from './home-solution-grounding.mjs';
 // @ts-expect-error Native Node tests share TypeScript source.
 import {homeAnswerScopeViolation} from './home-answer-scope.ts';
@@ -357,23 +357,31 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
    if(final)break;
   }
   if(standaloneStaffing&&round===0&&output.calls.length===1&&output.calls[0].name===requiredStaffingTool.name&&staffingCalculated&&state.requiredStaffing){
-   final={answer:{discussionOnly:requiredStaffingAnswer(state.requiredStaffing)},candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
+   final={answer:{discussionOnly:requiredStaffingAnswer(state.requiredStaffing,resolveStaffingDeliveryTarget({...state,turns:[...state.turns,{...request.message,role:'user' as const}]},request.catalog))},candidateIds:[],analysisIds:[],verifiedMetrics:[],constraintUpdates:[],rejected:[],questions:[],focusCandidateId:null};
    assertSolutionShape(final,solutionFinalSchema,'answer');
    break;
   }
  }
  if(!final)throw new SolutionResponseError('incomplete_output','No complete conversational answer was returned.');
+ state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
  let answer=solutionAnswerText(final,staffingCalculated);
  if(staffingCalculated&&state.requiredStaffing){
+  const delivery=resolveStaffingDeliveryTarget({...state,turns:[...state.turns,{...request.message,role:'user' as const}]},request.catalog);
+  const checkedAnswer=requiredStaffingAnswer(state.requiredStaffing,delivery);
+  const deliveryNeedsReview=!!delivery.issue||requiredStaffingView(state.requiredStaffing)!.options.some(o=>staffingDeliveryConflict(o,state.requiredStaffing!.inputs,delivery.months));
   if(staffingOnly){
    if(final.candidateIds.length||final.analysisIds.length||final.verifiedMetrics.length||final.constraintUpdates.length||final.rejected.length||final.focusCandidateId!==null)throw Error('Keep the fixed-role comparison separate from Action Plan and projection changes.');
-   answer=requiredStaffingAnswer(state.requiredStaffing);final.questions=[];
-  }else answer+='\n\nChecked fixed-role comparison:\n'+requiredStaffingAnswer(state.requiredStaffing);
+   answer=checkedAnswer;final.questions=[];
+  }else if(deliveryNeedsReview){
+   if(final.candidateIds.length||final.analysisIds.length||final.verifiedMetrics.length||final.constraintUpdates.length||final.rejected.length||final.focusCandidateId!==null||progressProposal||demandReview||evaluated.size||analyses.size||naturalStep>0||[...planningRefs.values()].some(ref=>ref.kind!=='fixed-staffing'))throw new SolutionResponseError('calculation_reference','The staffing deadline needs review before combining it with other planning results. Ask for the staffing comparison separately; earlier state is retained.');
+   // Do not retain unchecked prose that could recommend a late option above the checked warning.
+   answer=checkedAnswer+'\n\nOnly the checked staffing comparison is answered here because its delivery target needs review. Ask the other parts separately.';final.questions=[];
+  }else answer+='\n\nChecked fixed-role comparison:\n'+checkedAnswer;
   assertSolutionShape(final,solutionFinalSchema,'answer');
  }
  if(answer.length>10000)throw new SolutionResponseError('output_bounds','The combined answer exceeds the response budget. Narrow the request; earlier state is retained.');
  if(homeAnswerScopeViolation(answer,request.evidence))throw new SolutionResponseError('scope_rejected','The answer attributes source evidence to an unsupported population.');
- state.constraints=mergeSolutionConstraints(request,state.constraints,final.constraintUpdates);
+
  if(typeof final.answer!=='string'&&('recommendedPlan' in final.answer||'unsupportedPlan' in final.answer||'conditionalHiringPlan' in final.answer)){
   const refs=('recommendedPlan' in final.answer?final.answer.recommendedPlan:'conditionalHiringPlan' in final.answer?final.answer.conditionalHiringPlan:final.answer.unsupportedPlan).calculationRefs;
   if('conditionalHiringPlan' in final.answer&&(!state.hiringBudget||!canReviewConditionalHiringPlan(state.hiringBudget)||canReviewCostedHiringPlan(state.hiringBudget)||refs.length!==1||planningRefs.get(refs[0])?.kind!=='hiring'))throw new SolutionResponseError('calculation_reference','An exploratory hiring plan needs the current supported count calculation.','conditional_hiring_ineligible');
