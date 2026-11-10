@@ -72,14 +72,14 @@ export function normalStaffingClarification(request:SolutionRequest,datasetToken
  const text=request.message.text.trim().replace(/\.$/,'');
  if(text.length>120||/[!?;\n]/.test(text))return null;
  let field:'role'|'months'|'currency',value:string|number;
- if(input.role===null&&canFillStaffingIdentity(review)){
+ if(input.role===null&&canFillStaffingIdentity(review,'role')){
   const match=text.match(new RegExp('^(?:The role is |Use )?('+clarificationRole+')$','i'));
   if(!match)return null;
   field='role';value=match[1];
  }else if(input.role!==null&&input.requiredRoles!==null&&input.months===null){
   const match=text.match(new RegExp('^(?:(?:Use |Over |For )|(?:(?:The )?cost horizon is ))?('+count+') months?$','i'));
   if(!match)return null;field='months';value=amount(match[1]);if(value>24)return null;
- }else if(input.role!==null&&input.requiredRoles!==null&&input.months!==null&&input.currency===null&&canFillStaffingIdentity(review)){
+ }else if(input.role!==null&&input.requiredRoles!==null&&input.months!==null&&input.currency===null&&canFillStaffingIdentity(review,'currency')){
   const match=text.match(/^(?:Use |The currency is )?(USD|EUR|GBP|CAD|AUD|JPY|INR|SGD|CHF|CNY)$/i);
   if(!match)return null;field='currency';value=match[1].toUpperCase();
  }else return null;

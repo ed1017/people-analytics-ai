@@ -659,8 +659,8 @@
     },
     {
       "path": "components/home-required-staffing-review.tsx",
-      "sha256": "78acac3fd9eec6c02b95c89fe883d0eaced62fbbe60d3ef393a35eed0acf5598",
-      "bytes": 16646
+      "sha256": "8023fda6ca3dd7d266a381133746fd1a163e69bfd3377b2039b22cb60dea9a99",
+      "bytes": 16718
     },
     {
       "path": "components/home-response-reveal.ts",
@@ -2584,8 +2584,8 @@
     },
     {
       "path": "lib/home-required-staffing.ts",
-      "sha256": "c9169e9a0c9196349990d8100789eb93cd2b3b5659d551ae4fc81f29d894e2f9",
-      "bytes": 27026
+      "sha256": "f9f6e6001a582c058e95a38d184c95590f68a6e1328a13aa1727461819855974",
+      "bytes": 27658
     },
     {
       "path": "lib/home-role-recruiting.mjs",
@@ -5044,8 +5044,8 @@
     },
     {
       "path": "tests/required-staffing-card-presentation.test.mjs",
-      "sha256": "4bc51ede4b75bea8ee2f6f0eb447de9d8b79fa1a527c12e18f611efd2e91b7f8",
-      "bytes": 2245
+      "sha256": "a6b7adf4be3d6728f378eb43dc8e7052eb1704613f1f47e5bb24ed973a9b3405",
+      "bytes": 4543
     },
     {
       "path": "tests/required-staffing-cost-basis.test.mjs",
@@ -5919,18 +5919,18 @@
     },
     {
       "path": "lib/normal-staffing-intake.ts",
-      "sha256": "24c46f5394b228bb87632ac1051cd3e27eecd852e6c99837c2e96261dd4ccee8",
-      "bytes": 9170
+      "sha256": "76a1095ac9ce71ca0e43931b197d193ab59ef3060f41450ed6f325819044b388",
+      "bytes": 9188
     },
     {
       "path": "tests/normal-staffing-intake.test.mjs",
-      "sha256": "d0749a1612510dd2a88c18ad1b4b625d2f0f2a4edc58f19021d52f3ec7f2f1db",
-      "bytes": 16573
+      "sha256": "cbf7c1e13900dd8553a696b88f9386379011f07939e830fdb9e22bfe557c6689",
+      "bytes": 19447
     },
     {
       "path": "tests/normal-staffing-routing.test.mjs",
-      "sha256": "3b6ec2aa2a66195a29df76c4a1878d451205c9fdd65dd86195d2e7f9fdd2fb4d",
-      "bytes": 8648
+      "sha256": "f8f1d699d846ff5c54bd35888fc502d1ca8264835476d085632184a106db912f",
+      "bytes": 12696
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

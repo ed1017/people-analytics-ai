@@ -103,3 +103,32 @@ test('unsupported clarification uses full conversation and failures or aborts pr
  await assert.rejects(converseSolutions(q,{...noProvider,complete:async()=>{calls++;throw Error('provider deliberately denied');}},new AbortController().signal),/provider deliberately denied/);assert.equal(calls,1);assert.equal(JSON.stringify(q),before);
  const abort=new AbortController();abort.abort();const simple=continueRequest(first,'12 months'),snapshot=JSON.stringify(simple);await assert.rejects(converseSolutions(simple,noProvider,abort.signal));assert.equal(JSON.stringify(simple),snapshot);
 });
+
+
+test('missing role reply retains an explicitly denominated budget and its original provenance',async()=>{
+ for(const budget of ['240k','0']){
+  const first=await converseSolutions(fullRequest('We need five people over 12 months with a GBP '+budget+' budget by hiring or training'),noProvider,new AbortController().signal);
+  const before=structuredClone(first.state.requiredStaffing),q=continueRequest(first,'Clinical nurses','budgeted-role');
+  const reply=await converseSolutions(q,noProvider,new AbortController().signal),review=reply.state.requiredStaffing;
+  assert.equal(review.inputs.role,'Clinical nurses');
+  assert.deepEqual({...review.inputs,role:null},before.inputs);
+  assert.deepEqual(review.origins.budget,before.origins.budget);assert.deepEqual(review.origins.currency,before.origins.currency);
+  assert.equal(review.origins.role.quote,'Clinical nurses');assert.equal(review.origins.role.turnId,'budgeted-role');
+  assert.match(reply.state.questions[0],/hire cost/);assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});
+  assert.deepEqual(readSolutionState(reply.state),reply.state);assert.deepEqual(first.state.requiredStaffing,before);
+  assert.equal(review.inputs.hireCostPerPerson,null);assert.equal(review.inputs.trainablePeople,null);assert.equal(review.inputs.internalRelease,null);
+  assert.deepEqual(reply.state.working,[]);assert.match(reply.answer,/Nothing was saved or applied/);
+ }
+});
+
+test('budgeted role replies retain active-question, scope and role-dependent premise safeguards',async()=>{
+ const first=await converseSolutions(fullRequest('We need five people within 6 months with a GBP 240k budget by hiring or training'),noProvider,new AbortController().signal);
+ const reply=await converseSolutions(continueRequest(first,'Clinical nurses','budgeted-deadline-role'),noProvider,new AbortController().signal);
+ assert.equal(reply.state.staffingDeliveryTarget.months,6);assert.equal(reply.state.requiredStaffing.inputs.months,null);assert.match(reply.state.questions[0],/cost horizon/);
+ for(const patch of [r=>r.goal.id='saved',r=>r.state.questions=['Other question'],r=>r.state.turns.at(-1).text='Unrelated response',r=>r.state.currentCalculationKinds=[]]){
+  const q=continueRequest(first,'Clinical nurses');patch(q);assert.equal(normalStaffingClarification(q,'test-normal'),null);
+ }
+ for(const text of ['Maybe nurses','Clinical nurses and save it','Clinical nurses?','Clinical nurses or data analysts'])assert.equal(normalStaffingClarification(continueRequest(first,text),'test-normal'),null);
+ const q=continueRequest(first,'Clinical nurses');q.filters.country='CA';assert.throws(()=>normalStaffingClarification(q,'test-normal'),/another goal, dataset or workforce scope/);
+ assert.throws(()=>normalStaffingClarification(continueRequest(first,'Clinical nurses'),'other-dataset'),/another goal, dataset or workforce scope/);
+});
