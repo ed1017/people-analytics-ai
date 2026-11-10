@@ -142,6 +142,9 @@ jobs:
       - name: Verify planning empty states and public error references
         working-directory: releases/2026-10-21/source
         run: node --test tests/planning-empty-progress.test.mjs tests/home-public-error-reference.test.mjs tests/staffing-priority-presentation.test.mjs
+      - name: Verify independent turnover questions after saved demo
+        working-directory: releases/2026-10-21/source
+        run: node --test tests/home-independent-workforce-question.test.mjs tests/public-evidence-recovery.test.mjs
       - name: Verify editorial clarity and actionable FTE answers
         working-directory: releases/2026-10-21/source
         run: node --test tests/home-bu-turnover-chat.test.mjs tests/canonical-worked-example.test.mjs tests/home-fte-investigation.test.mjs tests/market-reference-editorial.test.mjs tests/module-editorial-presentation.test.mjs tests/planner-editorial-presentation.test.mjs tests/projection-save-retry.test.mjs tests/public-recruiting-cohort-recovery.test.mjs tests/home-dataset-query.test.mjs tests/demo-company-profile.test.mjs tests/about-project-profile.test.mjs
