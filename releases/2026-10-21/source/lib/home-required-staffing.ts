@@ -133,16 +133,18 @@ export function canCompleteRequiredStaffingAlone(request:SolutionRequest){
  return requests.length===1&&clauses.every(clause=>[...staffingRequestPatterns,...staffingPremisePatterns].some(pattern=>pattern.test(clause)));
 }
 /** Numerical prose shares the cards' calculator, so unknown requirements cannot become zero. */
-export function requiredStaffingAnswer(review:RequiredStaffingReview){
+export function requiredStaffingAnswer(review:RequiredStaffingReview,delivery:{months:number|null;issue:string|null}={months:null,issue:null}){
  const r=requiredStaffingView(review)!;
  if(!r.options.length)return 'The staffing comparison needs more inputs: '+r.missing.join(' ')+' Nothing was saved.';
+ const missesTarget=(o:RequiredStaffingOption)=>staffingDeliveryConflict(o,r.input,delivery.months);
+ if(delivery.issue||r.options.some(o=>o.id===r.recommendation?.optionId&&missesTarget(o)))r.recommendation=null;
  const show=(n:number|null)=>n===null?'Unknown':String(n),unit=r.input.currency??'(currency unknown)';
  const lines=r.options.map(o=>{
   const training=[o.train?`${show(o.plannedTrainingHours)} planned training hours`:null,o.newHireTrainingUnspecified?'new-hire training not specified':o.hire?`${show(o.totalTrainingHours)} total training hours in this scenario`:null].filter(Boolean).join('; ')||'No trainee or new-hire training is modeled.';
-  return `Train ${o.train}, redeploy ${o.redeploy}, hire ${o.hire}: ${show(o.listedCash)} ${unit} known incremental cash${o.completeCash===null?' (subtotal)':''}${o.budgetStatus==='over'?' — over budget':''}; ${training}. Readiness: ${o.readyAfterMonths===null?'Unknown':o.readyAfterMonths+' months'}. Coverage: ${o.coverage}.`;
+  return `Train ${o.train}, redeploy ${o.redeploy}, hire ${o.hire}: ${show(o.listedCash)} ${unit} known incremental cash${o.completeCash===null?' (subtotal)':''}${o.budgetStatus==='over'?' — over budget':''}; ${training}. Readiness: ${o.readyAfterMonths===null?'Unknown':o.readyAfterMonths+' months'}. Coverage: ${missesTarget(o)?'not-met':o.coverage}.${missesTarget(o)?` Misses the ${delivery.months}-month delivery target.`:''}`;
  });
  const unknowns=[...new Set(r.options.flatMap(o=>o.unknowns))];
- return ['Calculated from the stated scenario; actual people and skills are unverified.',...lines,r.recommendation?`Recommendation: ${r.recommendation.text} Next step: ${r.recommendation.nextStep}`:'Next step: confirm the missing inputs before choosing an option.',...r.missing,...unknowns,'Nothing was saved or applied.'].join('\n');
+ return ['Calculated from the stated scenario; actual people and skills are unverified.',...(delivery.months===null?[]:[`Delivery target: ${delivery.months} months. Cost horizon: ${show(r.input.months)} months; period costs are unchanged.`]),...(delivery.issue?[delivery.issue]:[]),...lines,r.recommendation?`Recommendation: ${r.recommendation.text} Next step: ${r.recommendation.nextStep}`:r.options.some(missesTarget)?'Next step: review readiness against the delivery target before choosing an option. The deadline has not been relaxed.':'Next step: confirm the missing inputs before choosing an option.',...r.missing,...unknowns,'Nothing was saved or applied.'].join('\n');
 }
 export function editRequiredStaffing(request:SolutionRequest,datasetToken:string,raw:unknown):RequiredStaffingReview{
  const s=currentRequiredStaffing(request,datasetToken)??{version:1 as const,revision:0,datasetToken,scopeKey:key(request),inputs:emptyRequiredStaffing(),origins:{},basisTurns:[]};

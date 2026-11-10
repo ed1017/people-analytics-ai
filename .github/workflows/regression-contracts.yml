@@ -125,6 +125,8 @@ jobs:
       - name: Verify Australian categorical shortage references
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-australia-shortage.test.mjs tests/position-australia-shortage-ui.test.mjs tests/position-australia-shortage-context.test.mjs tests/position-australia-osca-shortage.test.mjs tests/position-australia-osca-context.test.mjs
+      - name: Verify staffing deadline answer consistency
+        run: node --test tests/staffing-deadline-answer.test.mjs
       - name: Verify position scenario type graph
         working-directory: releases/2026-10-21/source
         run: node tests/manual/check-position-feature-types.mjs
