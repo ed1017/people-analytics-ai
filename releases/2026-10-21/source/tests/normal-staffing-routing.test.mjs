@@ -78,3 +78,52 @@ test('identity availability helper matches local missing-identity controls',()=>
  assert.equal(canFillStaffingIdentity(localRequest().state.requiredStaffing),true);
  for(const values of [{budget:0},{trainingHoursPerPerson:0},{internalRelease:false},{trainablePeople:0}])assert.equal(canFillStaffingIdentity(localRequest(values).state.requiredStaffing),false);
 });
+
+
+test('role-only local entry preserves a known-currency budget including zero',()=>{
+ for(const budget of [240000,0]){
+  const req=localRequest({currency:'GBP',months:12,budget}),before=structuredClone(req.state.requiredStaffing);
+  assert.equal(canFillStaffingIdentity(before,'role'),true);assert.equal(canFillStaffingIdentity(before,'currency'),false);
+  for(const costBasis of [undefined,defaultRequiredStaffingCostBasis(before.inputs)]){
+   const next=edit(req,{role:'Clinical nurses'},costBasis);
+   assert.equal(next.inputs.role,'Clinical nurses');assert.deepEqual({...next.inputs,role:null},before.inputs);
+   assert.deepEqual(next.origins.budget,before.origins.budget);assert.deepEqual(next.origins.currency,before.origins.currency);
+   assert.equal(next.origins.role.turnId,'u2');assert.deepEqual(req.state.requiredStaffing,before);
+   if(costBasis)assert.deepEqual(next.costBasis,costBasis);
+  }
+ }
+});
+
+test('role fill preserves retained budget periods without silently confirming them',()=>{
+ for(const quotedMonths of [12,6,null]){
+  const req=localRequest({currency:'GBP',months:12}),basis=defaultRequiredStaffingCostBasis(req.state.requiredStaffing.inputs);
+  basis.budget={amount:240000,quotedMonths};req.state.requiredStaffing=edit(req,{},basis);req.message.id='u3';
+  const before=structuredClone(req.state.requiredStaffing),next=edit(req,{role:'Clinical nurses'});
+  assert.equal(next.inputs.budget,quotedMonths===12?240000:null);assert.deepEqual(next.costBasis,before.costBasis);
+  assert.deepEqual(next.origins.budget,before.origins.budget);assert.deepEqual(req.state.requiredStaffing,before);
+ }
+});
+
+test('field-specific role completion never unlocks currency or role-dependent premises',()=>{
+ for(const values of [{budget:0},{budget:240000}]){
+  const req=localRequest(values);assert.equal(canFillStaffingIdentity(req.state.requiredStaffing,'role'),false);assert.equal(canFillStaffingIdentity(req.state.requiredStaffing,'currency'),false);
+  assert.throws(()=>edit(req,{role:'Nurse',currency:'GBP'}),/scope/);assert.throws(()=>edit(req,{currency:'GBP'}),/scope/);
+ }
+ for(const values of [{hireCostPerPerson:0},{trainingCostPerPerson:0},{trainingHoursPerPerson:0},{hireTrainingHoursPerPerson:0},{redeploymentCostPerPerson:0},{backfillCostPerInternalPerson:0},{trainablePeople:0},{redeployablePeople:0},{poolsDistinct:false},{internalRelease:false},{costsComplete:false},{hireReadyAfterMonths:0},{trainingReadyAfterMonths:0},{redeployReadyAfterMonths:0}]){
+  const req=localRequest({currency:'GBP',months:12,budget:240000,...values});assert.equal(canFillStaffingIdentity(req.state.requiredStaffing,'role'),false);assert.throws(()=>edit(req,{role:'Nurse'}),/scope/);
+ }
+ const priced=localRequest({currency:'GBP',months:12,budget:240000}),basis=defaultRequiredStaffingCostBasis(priced.state.requiredStaffing.inputs);
+ basis.rates.hireCostPerPerson={kind:'annual',amount:0,quotedMonths:12,fullPeriod:false};priced.state.requiredStaffing=edit(priced,{},basis);priced.message.id='u3';
+ assert.equal(priced.state.requiredStaffing.inputs.hireCostPerPerson,null);assert.equal(canFillStaffingIdentity(priced.state.requiredStaffing,'role'),false);assert.throws(()=>edit(priced,{role:'Nurse'}),/scope/);
+ assert.throws(()=>edit(localRequest({role:'Analyst',currency:'GBP',budget:240000}),{role:'Nurse'}),/scope/);
+ assert.throws(()=>edit(localRequest({currency:'GBP',budget:240000}),{role:'Nurse',currency:'USD'}),/scope/);
+});
+
+
+test('unresolved budget quotes without a currency keep both identity fields guarded',()=>{
+ const req=localRequest({months:12}),basis=defaultRequiredStaffingCostBasis(req.state.requiredStaffing.inputs);
+ basis.budget={amount:0,quotedMonths:6};req.state.requiredStaffing=edit(req,{},basis);req.message.id='u3';
+ assert.equal(req.state.requiredStaffing.inputs.budget,null);
+ for(const field of ['role','currency'])assert.equal(canFillStaffingIdentity(req.state.requiredStaffing,field),false);
+ assert.throws(()=>edit(req,{role:'Nurse'}),/scope/);assert.throws(()=>edit(req,{currency:'GBP'}),/scope/);
+});
