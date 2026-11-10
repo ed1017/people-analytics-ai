@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalStaffingIntake,staffingInputQuestion} from '../lib/normal-staffing-intake.ts';
+import {normalStaffingIntake,normalStaffingClarification,staffingInputQuestion} from '../lib/normal-staffing-intake.ts';
 import {emptySolutionState} from '../lib/home-solution-conversation.ts';
 import {emptyRequiredStaffing} from '../lib/required-staffing.ts';
 const request=text=>({goal:{id:'',statement:''},selectedId:null,catalog:null,goalContext:null,state:emptySolutionState(),message:{id:'request',text}});
@@ -63,4 +63,43 @@ test('inline staffing choices and questioned requirements agree with the retaine
   const result=await converseSolutions(fullRequest(text),noProvider,new AbortController().signal);assert.equal(result.state.staffingDeliveryTarget?.months??null,months);assert.equal(result.state.staffingDeliveryTarget?.issue??null,null);assert.equal(result.state.requiredStaffing.inputs.months,costMonths);
  }
  assert.equal(normalStaffingIntake(request('We need 4 nurses within 6 months? Should we hire or train?')),null);
+});
+
+const continueRequest=(reply,text,id='clarify')=>({...fullRequest(text),requestId:id,message:{id,text},state:readSolutionState(reply.state)});
+test('active cost horizon and currency answers update only the missing field with exact provenance',async()=>{
+ const first=await converseSolutions(fullRequest('We need 4 nurses within 6 months. Should we hire or train?'),noProvider,new AbortController().signal);
+ const q=continueRequest(first,'12 months','horizon'),before=JSON.stringify(q);
+ const horizon=await converseSolutions(q,noProvider,new AbortController().signal);
+ assert.equal(JSON.stringify(q),before);assert.equal(horizon.state.requiredStaffing.inputs.months,12);assert.equal(horizon.state.staffingDeliveryTarget.months,6);assert.equal(horizon.state.requiredStaffing.inputs.currency,null);assert.equal(horizon.state.requiredStaffing.origins.months.turnId,'horizon');assert.equal(horizon.state.requiredStaffing.origins.months.quote,'12 months');assert.match(horizon.state.questions[0],/currency/);assert.deepEqual(horizon.usage,{modelRounds:0,toolCalls:0});
+ const currency=await converseSolutions(continueRequest(horizon,'Use GBP.','currency'),noProvider,new AbortController().signal);
+ assert.equal(currency.state.requiredStaffing.inputs.currency,'GBP');assert.equal(currency.state.requiredStaffing.inputs.months,12);assert.equal(currency.state.staffingDeliveryTarget.months,6);assert.equal(currency.state.requiredStaffing.inputs.hireCostPerPerson,null);assert.equal(currency.state.requiredStaffing.inputs.trainablePeople,null);assert.equal(currency.state.requiredStaffing.inputs.internalRelease,null);assert.match(currency.state.questions[0],/hire cost/);assert.deepEqual(currency.usage,{modelRounds:0,toolCalls:0});assert.deepEqual(readSolutionState(currency.state),currency.state);assert.deepEqual(currency.state.working,[]);
+});
+test('role clarification advances through missing cost period and currency without example assumptions',async()=>{
+ let reply=await converseSolutions(fullRequest('We need five people. Should we hire or train?'),noProvider,new AbortController().signal);
+ for(const [text,id,field,expected] of [['Clinical nurses.','role','role','Clinical nurses'],['For nine months','period','months',9],['EUR','unit','currency','EUR']]){
+  reply=await converseSolutions(continueRequest(reply,text,id),noProvider,new AbortController().signal);assert.equal(reply.state.requiredStaffing.inputs[field],expected);assert.equal(reply.state.requiredStaffing.origins[field].quote,text);assert.deepEqual(reply.usage,{modelRounds:0,toolCalls:0});
+ }
+ assert.equal(reply.state.requiredStaffing.inputs.requiredRoles,5);assert.equal(reply.state.requiredStaffing.inputs.budget,null);assert.equal(reply.state.staffingDeliveryTarget??null,null);assert.equal(reply.state.requiredStaffing.inputs.hireCostPerPerson,null);
+});
+test('ambiguous, extra, correction and deadline replies never become a missing cost horizon',async()=>{
+ const first=await converseSolutions(fullRequest('We need 4 nurses within 6 months. Should we hire or train?'),noProvider,new AbortController().signal);
+ for(const text of ['12','in 12 months','within 12 months','by May 2027','12 months?','12 months, but no hires','12 months. Use GBP','12 months\nDo not change anything','0 months','25 months','2.5 months','a year','not 12 months','12 or 6 months','12 months; save it'])assert.equal(normalStaffingClarification(continueRequest(first,text),'test-normal'),null,text);
+ const withCurrency=await converseSolutions(continueRequest(first,'12 months'),noProvider,new AbortController().signal);
+ for(const text of ['dollars','USD or CAD','USD?','Use USD and save it','Do not use USD'])assert.equal(normalStaffingClarification(continueRequest(withCurrency,text),'test-normal'),null,text);
+ const generic=await converseSolutions(fullRequest('We need five people. Should we hire or train?'),noProvider,new AbortController().signal);
+ for(const text of ['people','Nurses or analysts','Not nurses','Registered nurses?','Nurses in Canada','Nurses. Save it','Maybe nurses','Possibly nurses','Any people','Those employees','Forget nurses','Hire nurses','Consider registered nurses','Some data analysts','We nurses','Support roles','What about nurses','Unsure about nurses','Exclude nurses','Likely nurses'])assert.equal(normalStaffingClarification(continueRequest(generic,text),'test-normal'),null,text);
+});
+test('stale clarification, other contexts, changed scope and identity-dependent inputs stay guarded',async()=>{
+ const first=await converseSolutions(fullRequest('We need 4 nurses. Should we hire or train?'),noProvider,new AbortController().signal);
+ for(const patch of [r=>r.state.questions=['Other question'],r=>r.state.turns.at(-1).text='Unrelated response',r=>r.state.currentCalculationKinds=[],r=>r.state.currentCalculationKinds=['hiring-budget'],r=>r.goal.id='saved',r=>r.goal.statement='Saved goal',r=>r.goalContext={},r=>r.catalog={},r=>r.selectedId='saved',r=>r.state.hiringBudget={},r=>r.state.businessPlanning={},r=>{r.state.requiredStaffing.inputs.months=6;r.state.requiredStaffing.origins.months=r.state.requiredStaffing.origins.requiredRoles;},r=>r.state.staffingDeliveryTarget={months:null,issue:'ambiguous',turnId:'x',quote:'unknown'}]){
+  const q=continueRequest(first,'12 months');patch(q);assert.equal(normalStaffingClarification(q,'test-normal'),null);
+ }
+ const q=continueRequest(first,'12 months');q.filters.country='CA';assert.throws(()=>normalStaffingClarification(q,'test-normal'),/another goal, dataset or workforce scope/);assert.throws(()=>normalStaffingClarification(continueRequest(first,'12 months'),'foreign'),/another goal, dataset or workforce scope/);
+ const withRate=structuredClone(first);withRate.state.requiredStaffing.inputs.hireCostPerPerson=100;withRate.state.requiredStaffing.origins.hireCostPerPerson=withRate.state.requiredStaffing.origins.requiredRoles;
+ assert.equal(normalStaffingClarification(continueRequest(withRate,'12 months'),'test-normal'),null);
+});
+test('unsupported clarification uses full conversation and failures or aborts preserve the earlier draft',async()=>{
+ const first=await converseSolutions(fullRequest('We need 4 nurses within 6 months. Should we hire or train?'),noProvider,new AbortController().signal),q=continueRequest(first,'in 12 months'),before=JSON.stringify(q);let calls=0;
+ await assert.rejects(converseSolutions(q,{...noProvider,complete:async()=>{calls++;throw Error('provider deliberately denied');}},new AbortController().signal),/provider deliberately denied/);assert.equal(calls,1);assert.equal(JSON.stringify(q),before);
+ const abort=new AbortController();abort.abort();const simple=continueRequest(first,'12 months'),snapshot=JSON.stringify(simple);await assert.rejects(converseSolutions(simple,noProvider,abort.signal));assert.equal(JSON.stringify(simple),snapshot);
 });
