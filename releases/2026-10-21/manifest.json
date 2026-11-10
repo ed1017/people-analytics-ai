@@ -3119,8 +3119,8 @@
     },
     {
       "path": "lib/public-9037-options.mjs",
-      "sha256": "939c3e2748f0664087c4c2693f6fa02cd8b2ea2e745b1ea7c474a8d71925941d",
-      "bytes": 1967
+      "sha256": "8a82534a50eb235a7a86a320abb095642307576f9e5501d598b84da1a602b80f",
+      "bytes": 1981
     },
     {
       "path": "lib/public-9037-projection.mjs",
