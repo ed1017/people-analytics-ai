@@ -4,7 +4,7 @@
 
 Workforce Intelligence connects workforce evidence with staffing decisions. Recruiters, hiring managers and workforce planners can identify a gap, compare developing people, moving people internally and hiring, then adjust the plan and see its cost, timing and uncovered work change.
 
-The demo uses a fictional company with 9,037 people as of September 30, 2026.
+The demo uses a fictional company with 9,092 people as of October 31, 2026.
 
 ## Try a planning decision
 
@@ -32,7 +32,7 @@ Ed Om defined the workforce-planning problem, product requirements and acceptanc
 
 ## Next steps
 
-The [active roadmap](docs/roadmap-status-2026-10-17.md) tracks answer-quality improvements, end-to-end acceptance and additional external recruitment evidence. [Acceptance records](docs/public-portfolio-mvp-acceptance.md) document tested behavior and remaining evidence gaps.
+The [active roadmap](docs/roadmap-status-2026-10-17.md) tracks answer-quality improvements and end-to-end acceptance. Expansion of external recruitment evidence is paused. [Acceptance records](docs/public-portfolio-mvp-acceptance.md) document tested behavior and remaining evidence gaps.
 
 ## Source and local development
 

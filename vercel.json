@@ -93,7 +93,8 @@
       "fix/home-tool-replay-template": false,
       "feat/market-intelligence-explorer": false,
       "feat/talent-inventory-position-scenarios": false,
-      "docs/staffing-release-verification-20261110": false
+      "docs/staffing-release-verification-20261110": false,
+      "docs/readme-current-state-20261110": false
     }
   }
 }
