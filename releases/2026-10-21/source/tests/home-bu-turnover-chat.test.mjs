@@ -54,7 +54,12 @@ test('standalone BU question after last-year exchange uses explicitly dated curr
  assert.equal(readChatEvidenceSeries(reply.charts,'bu-followup',P.token).length,1);assert.match(reply.answer,/Voluntary YTD turnover/);assert.match(reply.answer,/January-October 2026/);assert.doesNotMatch(reply.answer,/2025|unsupported|cross-domain join/);
  const source=await(await binding.handle(new Request('https://'+hostname+'/api/attrition'))).json();
  const expected=source.business_units.map(r=>({code:r.org_code,value:r.voluntary_turnover_ytd_pct})).sort((a,b)=>b.value-a.value);
- assert.deepEqual(reply.charts[0].points.map(p=>({code:p.date,value:p.value})),expected);assert.equal(expected[0].code,'BU-MGSVC');assert.equal(expected[0].value,13.6);assert.deepEqual(reply.state.turns.slice(0,2),prior);assert.deepEqual(reply.state.working,[]);
+ assert.deepEqual(reply.charts[0].points.map(p=>({code:p.date,value:p.value})),expected);assert.equal(expected[0].code,'BU-MGSVC');if(actualSource){
+  const history=await binding.turnoverHistory({...filters,org:'BU-MGSVC'}),cutoff=P.cutoff.slice(0,7)+'-01',start=P.cutoff.slice(0,4)+'-01-01';
+  const months=history.rows.filter(row=>row.month>=start&&row.month<=cutoff);assert.equal(months.length,Number(P.cutoff.slice(5,7)));
+  const exits=months.reduce((sum,row)=>sum+row.voluntary_exits,0),average=months.reduce((sum,row)=>sum+row.headcount,0)/months.length;
+  assert.ok(average>0);assert.equal(expected[0].value,Math.round(exits/average*1000)/10);
+ }else assert.equal(expected[0].value,13.6);assert.deepEqual(reply.state.turns.slice(0,2),prior);assert.deepEqual(reply.state.working,[]);
 });
 test('rank plus generic drivers returns full chart, winner and investigation guidance without causal finding',async()=>{
  for(const text of ['Which business unit has the highest voluntary turnover, and what should an HR leader investigate before acting?','Which business unit has the highest attrition and what are the key drivers?','Show voluntary turnover by BU and possible drivers']){

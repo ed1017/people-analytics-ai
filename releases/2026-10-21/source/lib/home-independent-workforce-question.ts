@@ -1,13 +1,15 @@
+import {tenureExitsIntent} from './home-tenure-exits.mjs';
 // @ts-expect-error Native offline tests share application source.
 import {emptySolutionState,readSolutionRequest,readSolutionState,type SolutionRequest,type SolutionState} from './home-solution-conversation.ts';
 import {businessUnitTurnoverIntent} from './home-bu-turnover-chat.mjs';
+import {levelTurnoverIntent} from './home-level-turnover.mjs';
 
 /** A bounded workforce question is not a request to use or edit the selected plan.
  * Keep the saved workspace intact and verify fresh public evidence separately.
  * Scenario discussions and unrecognized questions retain the strict plan route. */
 export function independentWorkforceQuestion(request:SolutionRequest):SolutionRequest|null {
  if(request.goalContext&&typeof request.goalContext==='object'&&'scenarioReview' in request.goalContext)return null;
- if(!businessUnitTurnoverIntent(request.message.text,request.state.turns))return null;
+ if(!tenureExitsIntent(request.message.text,request.state.turns)&&!businessUnitTurnoverIntent(request.message.text,request.state.turns)&&!levelTurnoverIntent(request.message.text,request.state.turns))return null;
  return readSolutionRequest({version:1,requestId:request.requestId,goal:{id:'',statement:''},scope:request.scope,filters:request.filters,timeZone:request.timeZone,evidence:request.evidence,goalContext:null,selectedId:null,catalog:null,state:{...emptySolutionState(),turns:request.state.turns},message:request.message});
 }
 

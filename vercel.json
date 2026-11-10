@@ -94,7 +94,13 @@
       "feat/market-intelligence-explorer": false,
       "feat/talent-inventory-position-scenarios": false,
       "docs/staffing-release-verification-20261110": false,
-      "docs/readme-current-state-20261110": false
+      "docs/readme-current-state-20261110": false,
+      "feat/bu-level-turnover-20261110": false,
+      "test/saved-evidence-fixtures-20261110": false,
+      "feat/sourced-workforce-case-20261110": false,
+      "integrate/roadmap-20261110": false,
+      "feat/company-tenure-exits-20261110": false,
+      "test/home-restoration-fixtures-20261110": false
     }
   }
 }

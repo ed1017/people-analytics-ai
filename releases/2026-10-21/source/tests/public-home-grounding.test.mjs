@@ -8,7 +8,7 @@ import {actionBinding} from '../lib/home-action-drafts.ts';
 import {verifySolutionEvidence} from '../lib/home-solution-grounding.mjs';
 const hostname='people-analytics-test-ed-56dc.vercel.app',digest='a'.repeat(64),filters={country:'all',org:'all',level:'all'},scope='All countries; All business units; All levels';
 function setup(){
- const data={data_meta:public9037Metadata(digest),overview:{headcount:12,snapshot_date:P.cutoff},trend:[{snapshot_date:P.cutoff,headcount:12,fte:10}],workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:scope,basis:'Invented aggregate fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'}};
+ const data={data_meta:public9037Metadata(digest),overview:{headcount:12,snapshot_date:P.cutoff},trend:[{snapshot_date:P.cutoff,headcount:12,fte:10}],workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:scope,basis:'Invented aggregate fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-calendar-month-average-stock-v3',stockStatus:'positive'}};
  const pack=buildHomePack({dashboard:{status:'loaded',data}},scope);
  let calls=0,token=P.token;
  const binding={router:{bootstrapToken:()=>token,current:()=>({datasetId:P.datasetId,token,digest,generation:P.generation})},handle:async r=>{calls++;assert.equal(new URL(r.url).pathname+new URL(r.url).search,'/api/dashboard?country=all&org=all&level=all');return Response.json(data,{headers:{'x-workforce-dataset':P.token}});}};
@@ -33,9 +33,10 @@ test('receipt extensions, changed facts/rows/scope, stale identity and private c
   f=>f.request.evidence.extra='must not be normalized away',
   f=>f.pack.sources.find(s=>s.id==='W1').facts.extra='must not be normalized away',
   f=>f.data.workforce_filter_scope.stockStatus='known-empty',
+  f=>f.data.workforce_filter_scope.metricContract='voluntary-ytd-nine-month-average-stock-v2',
   f=>f.binding.router.current=()=>({datasetId:P.datasetId,token:P.token,digest,generation:3}),
  ];
- for(const mutate of mutations){const f=setup();mutate(f);await assert.rejects(createPublicHomeGrounding({enabled:true,hostname,loadPublicBinding:async()=>f.binding}).verify(f.request));}
+ for(const mutate of mutations){const f=setup(),checker=createPublicHomeGrounding({enabled:true,hostname,loadPublicBinding:async()=>f.binding});await checker.verify(f.request);mutate(f);await assert.rejects(checker.verify(f.request));}
 });
 test('load and reader stalls respect total deadline without late evidence acceptance',async()=>{
  for(const stall of ['load','read']){

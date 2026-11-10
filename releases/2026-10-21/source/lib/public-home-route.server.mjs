@@ -1,3 +1,7 @@
+import {tenureExitsIntent} from './home-tenure-exits.mjs';
+import {readPublicTenureExits} from './public-tenure-exits.server.mjs';
+import {levelTurnoverIntent} from './home-level-turnover.mjs';
+import {readPublicLevelTurnover} from './public-level-turnover.server.mjs';
 import {quarterlyTurnoverIntent} from './home-quarterly-turnover.mjs';
 import {readPublicQuarterlyTurnover} from './public-quarterly-turnover.server.mjs';
 import {homeDatasetQueryTool,readDatasetQuestions} from './home-dataset-query.mjs';
@@ -87,6 +91,18 @@ export function createPublicHomeRouteTestAdapter({enabled=PUBLIC_HOME_ROUTE_ENAB
     const result=await readPublicHomeAssociation({binding,hostname,identity,filters:parsed.filters,text:parsed.message.text,signal});current();
     const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
     return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),charts:[],candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
+   }
+   const levelTurnover=natural&&!staffingScenarioOnly?levelTurnoverIntent(parsed.message.text,parsed.state.turns):null;
+   if(levelTurnover){
+    const result=levelTurnover.answer?{answer:levelTurnover.answer,charts:[]}:await readPublicLevelTurnover({binding,hostname,identity,filters:parsed.filters,selection:levelTurnover,signal});current();
+    const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
+    return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
+   }
+   const tenureExits=natural&&!staffingScenarioOnly?tenureExitsIntent(parsed.message.text,parsed.state.turns):null;
+   if(tenureExits){
+    const result=tenureExits.answer?{answer:tenureExits.answer,charts:[]}:await readPublicTenureExits({binding,hostname,identity,filters:parsed.filters,selection:tenureExits,signal});current();
+    const state=structuredClone(parsed.state);delete state.turnoverChat;state.currentCalculationKinds=[];state.questions=[];state.turns=[...state.turns,{...parsed.message,role:'user'},{id:'reply-'+parsed.requestId.slice(0,70),role:'assistant',text:result.answer}].slice(-32);
+    return Response.json({requestId:parsed.requestId,...result,state:readSolutionState(state),candidateIds:[],analysisIds:[],usage:{modelRounds:0,toolCalls:0}},{headers});
    }
    const quarterly=natural&&!staffingScenarioOnly?quarterlyTurnoverIntent(parsed.message.text,parsed.state.turns):null;
    if(quarterly){

@@ -10,6 +10,12 @@ export default function AboutPage(){return <main className="mx-auto max-w-4xl sp
   <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Turn workforce evidence into a staffing decision.</h1>
   <p className="max-w-2xl leading-relaxed">Workforce Intelligence connects people analytics with adjustable planning scenarios. Explore the workforce, compare staffing choices, and keep the assumptions behind a recommendation visible.</p>
  </header>
+ <section aria-labelledby="about-workforce-case" className="space-y-2 rounded-xl border p-5">
+  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Published problem · Synthetic planning scenario</p>
+  <h2 id="about-workforce-case" className="text-xl font-semibold">Grow AI capability while other work contracts</h2>
+  <p className="text-sm leading-relaxed">Explore an Accenture-informed services-company case. Compare hiring, redeployment and development, then change the deadline to see the decision change.</p>
+  <Link href="/case-study" className={linkStyle}>Explore the workforce case study</Link>
+ </section>
  <ProjectCaseStudy expanded/>
  <section aria-labelledby="about-contact" className="border-t pt-3">
   <h2 id="about-contact" className="text-xl font-semibold">Connect with Ed Om</h2>
