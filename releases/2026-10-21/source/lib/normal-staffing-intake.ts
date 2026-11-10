@@ -4,6 +4,8 @@ import {emptyRequiredStaffing,readRequiredStaffingInput,type RequiredStaffingInp
 
 // @ts-expect-error Native Node tests share application source.
 import {captureStaffingDelivery} from './home-staffing-delivery.ts';
+// @ts-expect-error Native Node tests share application source.
+import {currentRequiredStaffing,canFillStaffingIdentity} from './home-required-staffing.ts';
 
 const words=['one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
 const count='(?:[1-9]\\d?|'+words.join('|')+')';
@@ -52,4 +54,35 @@ export function normalStaffingIntake(request:SolutionRequest){
  try{readRequiredStaffingInput(inputs);}catch{return null;}
  const question=staffingInputQuestion(inputs,deliveryMonths!==null);
  return {inputs,deliveryMonths,questions:[question],answer:`I kept your requirement for ${people} ${inputs.role??'people'}${deliveryMonths!==null?`, needed within ${deliveryMonths} months`:''}. ${question}\n\nContinue in the editable staffing planner below, or reply in chat. Missing costs, staffing pools and readiness stay unknown. No example assumptions were inserted, and nothing was saved or applied.`};
+}
+
+// Only familiar professional modifiers are deterministic; unfamiliar labels remain conversational.
+const clarificationRole='(?:(?:clinical|registered|licensed|practical|research|data|business|financial|finance|sales|systems|network|cybersecurity|information|technology|software|frontend|backend|full-stack|machine|learning|AI|project|product|program|programme|account|customer|support|service|operations|call|center|supply|chain|quality|assurance|test|recruitment|recruiting|talent|human|resources|healthcare|technical|field|senior|junior|principal|lead|staff|executive|management|associate|health|safety|security|workforce|people|analytics|mechanical|electrical|civil) ){0,3}(?:engineers?|developers?|analysts?|nurses?|agents?|consultants?|specialists?|operators?|designers?|managers?|technicians?|accountants?|representatives?|reps|scientists?|recruiters?|coordinators?|associates?|officers?)';
+
+/** A complete answer to the currently displayed clarification, never a general edit.
+ * Known premises, costs and ambiguous language stay with the typed model workflow. */
+export function normalStaffingClarification(request:SolutionRequest,datasetToken:string){
+ const s=request.state;
+ if(request.goal.id||request.goal.statement||request.selectedId||request.catalog||request.goalContext||request.progressEntry||s.constraints.length||s.working.length||s.analyses.length||s.verifiedMetrics.length||s.rejected.length||s.focusCandidateId||s.hiringBudget||s.businessPlanning||s.staffingDeliveryTarget?.issue)return null;
+ if(request.goalProgress!=null){const progress=request.goalProgress as {goalId?:unknown;ledger?:unknown};if(progress.goalId!==''||progress.ledger!==null)return null;}
+ if(s.currentCalculationKinds?.length!==1||s.currentCalculationKinds[0]!=='required-staffing'||s.questions.length!==1)return null;
+ const review=currentRequiredStaffing(request,datasetToken);if(!review||review.costBasis||Object.entries(review.inputs).some(([field,value])=>!['role','requiredRoles','months','currency','budget'].includes(field)&&value!==null))return null;
+ const input=review.inputs,question=staffingInputQuestion(input,s.staffingDeliveryTarget?.months!=null),last=s.turns.at(-1);
+ if(s.questions[0]!==question||last?.role!=='assistant'||!last.text.includes(question))return null;
+ const text=request.message.text.trim().replace(/\.$/,'');
+ if(text.length>120||/[!?;\n]/.test(text))return null;
+ let field:'role'|'months'|'currency',value:string|number;
+ if(input.role===null&&canFillStaffingIdentity(review)){
+  const match=text.match(new RegExp('^(?:The role is |Use )?('+clarificationRole+')$','i'));
+  if(!match)return null;
+  field='role';value=match[1];
+ }else if(input.role!==null&&input.requiredRoles!==null&&input.months===null){
+  const match=text.match(new RegExp('^(?:(?:Use |Over |For )|(?:(?:The )?cost horizon is ))?('+count+') months?$','i'));
+  if(!match)return null;field='months';value=amount(match[1]);if(value>24)return null;
+ }else if(input.role!==null&&input.requiredRoles!==null&&input.months!==null&&input.currency===null&&canFillStaffingIdentity(review)){
+  const match=text.match(/^(?:Use |The currency is )?(USD|EUR|GBP|CAD|AUD|JPY|INR|SGD|CHF|CNY)$/i);
+  if(!match)return null;field='currency';value=match[1].toUpperCase();
+ }else return null;
+ try{readRequiredStaffingInput({...input,[field]:value});}catch{return null;}
+ return {field,value};
 }

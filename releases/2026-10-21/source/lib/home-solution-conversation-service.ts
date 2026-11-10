@@ -40,7 +40,7 @@ import {turnoverChatReply,clearTurnoverChat,retainTurnoverChat} from './home-tur
 // @ts-expect-error Native fixtures share source.
 import {headcountChatReply} from './home-headcount-chat.ts';
 // @ts-expect-error Native fixtures share source.
-import {normalStaffingIntake} from './normal-staffing-intake.ts';
+import {normalStaffingIntake,normalStaffingClarification,staffingInputQuestion} from './normal-staffing-intake.ts';
 // @ts-expect-error Native fixtures share source.
 import {staffingStarterIntake,initialStaffingTemplateBudget} from './home-staffing-intake.ts';
 // @ts-expect-error Native Node tests share application source.
@@ -152,6 +152,16 @@ export async function converseSolutions(raw:unknown,runtime:SolutionRuntime,sign
   state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:headcount.answer}].slice(-32);
   state.questions=[];
   return {requestId:request.requestId,...headcount,candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
+ }
+ const clarification=runtime.natural&&!runtime.staffingScenarioOnly&&!runtime.demand?normalStaffingClarification(routingRequest,runtime.natural.datasetToken):null;
+ if(clarification){
+  state.requiredStaffing=editRequiredStaffing(request,runtime.natural!.datasetToken,[{...clarification,basis:{kind:'user-supplied',turnId:request.message.id,quote:request.message.text,explanation:'Explicit answer to the current missing staffing input; not operational verification.'}}]);
+  const question=staffingInputQuestion(state.requiredStaffing.inputs,state.staffingDeliveryTarget?.months!=null);
+  const label=clarification.field==='months'?'cost horizon':clarification.field;
+  const answer=`I kept your ${label} as ${clarification.value}${clarification.field==='months'?' months':''}. ${question}\n\nContinue in the editable staffing planner below, or reply in chat. Other inputs are unchanged; missing costs, staffing pools and readiness stay unknown. Nothing was saved or applied.`;
+  state.currentCalculationKinds=['required-staffing'];state.questions=[question];
+  state.turns=[...state.turns,{...request.message,role:'user' as const},{id:'reply-'+request.requestId.slice(0,70),role:'assistant' as const,text:answer}].slice(-32);
+  return {requestId:request.requestId,answer,charts:[],candidateIds:[],analysisIds:[],state:readSolutionState(state),usage:{modelRounds:0,toolCalls:0}};
  }
  const normalIntake=runtime.natural&&!runtime.staffingScenarioOnly&&!runtime.demand?normalStaffingIntake(request):null;
  if(normalIntake){
