@@ -151,7 +151,7 @@ jobs:
         run: node --test tests/fow-lab.test.mjs tests/fow-lab-reference.test.mjs tests/home-answer-acceptance.test.mjs tests/home-turnover-groups.test.mjs tests/catalog-display.test.mjs tests/business-answer-presentation.test.mjs tests/home-historical-reply-clarity.test.mjs tests/overview-projection-entry.test.mjs tests/fow-work-model.test.mjs tests/home-cross-domain-acceptance.test.mjs tests/public-workforce-performance.test.mjs tests/workforce-ratings-placement.test.mjs tests/public-occupational-detail.test.mjs tests/manual-plan-results.test.mjs tests/plan-result-review.test.mjs tests/decision-backup.test.mjs tests/decision-backup-store.test.mjs
       - name: Verify normal staffing intake without provider calls
         working-directory: releases/2026-10-21/source
-        run: node --test tests/normal-staffing-intake.test.mjs tests/normal-staffing-routing.test.mjs
+        run: node --test tests/normal-staffing-intake.test.mjs tests/normal-staffing-routing.test.mjs tests/staffing-budget-period-continuity.test.mjs
       - name: Verify guided popup required actions
         working-directory: releases/2026-10-21/source
         run: node --test tests/whole-app-tour.test.mjs tests/whole-app-demo-window.test.mjs tests/guided-capacity-steps.test.mjs tests/shared-planner-entry.test.mjs tests/closer-staffing-routing.test.mjs tests/staffing-flow-parity.test.mjs tests/staffing-saved-version.test.mjs tests/unified-staffing-host.test.mjs tests/guided-demo-release.test.mjs tests/home-orientation.test.mjs tests/home-visual-theme.test.mjs tests/home-prompt-categories.test.mjs
