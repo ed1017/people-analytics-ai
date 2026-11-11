@@ -15,6 +15,7 @@ This changes intent selection only. It does not add tenure turnover-rate denomin
 - Changed-file ESLint, root TypeScript and generated-artifact checks passed. The source manifest verifies all 1,195 published files.
 - The related grounding, saved-evidence, evidence-recovery and projection tests passed 55 checks, with two existing private-runtime integration checks skipped. A skipped check is not a pass.
 - Complete production-runtime build and publication remain pending. The available public checkout excludes runtime-only inputs. It is not a deployable substitute for the complete prior release source.
+- The first source push automatically built a Git preview of the historical root app. It finished before cancellation and is not release-runtime evidence. The branch is now included in the existing automatic-deployment disable list. The public app remains on the prior PR587 deployment; this candidate has not been promoted.
 
 ## Current public UI acceptance
 
