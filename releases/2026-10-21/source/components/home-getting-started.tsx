@@ -82,7 +82,7 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
     }} className="m-auto max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-4xl overscroll-none overflow-hidden rounded-2xl border bg-card p-0 text-foreground shadow-xl backdrop:bg-black/60 open:flex open:flex-col">
       <header className="shrink-0 border-b px-5 py-4 sm:px-6">
         <h2 ref={title} id={id+'-title'} tabIndex={-1} className="mt-1 text-2xl font-bold tracking-tight focus:outline-none">Workforce Intelligence</h2>
-        <p id={id+'-purpose'} className="mt-2 text-base font-semibold">Turn workforce evidence into a staffing decision.</p>
+        <p id={id+'-purpose'} className="mt-2 text-base font-semibold">Plan how to close a staffing gap within the time and budget available.</p>
       <div className="mt-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <button type="button" disabled={!demoReady||busy||!active} onClick={start} className="min-h-11 rounded-lg bg-primary px-4 py-2 font-semibold text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50">Start guided demo</button>
@@ -97,41 +97,22 @@ export function HomeGettingStarted({busy,active,ready,autoOpen,deferAutoOpen=fal
       </div>
       </header>
       <div tabIndex={0} role="region" aria-label="About Workforce Intelligence" className="min-h-0 overscroll-contain overflow-y-auto px-5 py-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-6">
-        <section aria-labelledby={id+'-why'}>
-          <h3 id={id+'-why'} className="text-base font-bold">Purpose of the project</h3>
-          <p className="mt-1">Workforce decisions connect people, work and budgets. This project brings those decisions into one place: understand the workforce, compare staffing options and develop a plan.</p>
-          <p className="mt-2">Start with the workforce you have, identify a priority and compare ways to respond.</p>
+        <section aria-labelledby={id+'-role'}>
+          <h3 id={id+'-role'} className="text-base font-bold">Ed&apos;s contribution</h3>
+          <p className="mt-1">Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing.</p>
         </section>
-        <section aria-labelledby={id+'-explore'} className="mt-4">
-          <h3 id={id+'-explore'} className="text-base font-bold">What you can do</h3>
-          <p className="mt-1">Explore workforce trends, recruiting, skills and employee listening. Use the suggested questions or your own question to investigate the evidence. Adjust scenario inputs to update the numbers and charts together.</p>
+        <section aria-labelledby={id+'-decision'} className="mt-4">
+          <h3 id={id+'-decision'} className="text-base font-bold">Compare staffing options</h3>
+          <p className="mt-1">Compare developing people, moving people internally and hiring against cost, readiness and uncovered work. The guided demo uses a fictional 5-FTE capacity gap.</p>
         </section>
-        <section aria-labelledby={id+'-try'} className="mt-4">
-          <h3 id={id+'-try'} className="text-base font-bold">Try a planning decision</h3>
-          <ol className="mt-2 list-decimal space-y-2 pl-5">
-            <li><strong>Submit the fixed prompt.</strong> The popup starts directly in the staffing scenario. Press Enter to send the prefilled fictional 5-FTE capacity-gap question.</li>
-            <li><strong>Compare the options.</strong> Click Compare staffing options to calculate developing, moving and hiring responses.</li>
-            <li><strong>Choose the staffing mix.</strong> Select Develop and move your team: 3 develop, 2 move and 0 hire. Review cost, readiness and uncovered work together.</li>
-            <li><strong>Review and save.</strong> Review the proposal, then explicitly save in this browser. Afterwards, inspect Action plans and Track. Exit the demo at any time.</li>
-          </ol>
-        </section>
-        <section aria-labelledby={id+'-read'} className="mt-4">
-          <h3 id={id+'-read'} className="text-base font-bold">How to read the results</h3>
-          <p className="mt-1">Compare cost, readiness and uncovered work. Methods and sources are available in Details.</p>
-        </section>
-        <section aria-labelledby={id+'-role'} className="mt-4">
-          <h3 id={id+'-role'} className="text-base font-bold">Project development</h3>
-          <p className="mt-1">Product design focused on workforce decisions and practical tradeoffs. AI assisted with implementation, design and testing.</p>
-          <a href="/about" target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center rounded text-sm text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">About this project<span className="sr-only"> (opens a new tab)</span></a>
-        </section>
-        <section aria-labelledby={id+'-contact'} className="mt-4">
-          <h3 id={id+'-contact'} className="text-base font-bold">Contact Ed Om</h3>
-          <p className="mt-1">Questions, feedback and conversations about the project are welcome.</p>
+        <footer className="mt-4 border-t pt-2">
+          <a href="/about" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded text-sm text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">About this project<span className="sr-only"> (opens a new tab)</span></a>
+          <p className="mt-2 font-medium">Contact Ed Om</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             <a href="mailto:edwinom.nyc@gmail.com" className="inline-flex min-h-11 min-w-0 items-center rounded text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring"><span className="break-all">edwinom.nyc@gmail.com</span></a>
             <a href="https://www.linkedin.com/in/ed-om-62a57818" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded text-primary underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring">LinkedIn<span className="sr-only"> (opens a new tab)</span></a>
           </div>
-        </section>
+        </footer>
       </div>
 
     </dialog>,document.body)}

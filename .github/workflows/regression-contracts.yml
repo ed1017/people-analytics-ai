@@ -2,7 +2,7 @@ name: Regression contracts
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, integrate/roadmap-20261110]
   push:
     branches: [main]
   workflow_dispatch:

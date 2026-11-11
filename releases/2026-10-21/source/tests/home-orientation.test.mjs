@@ -7,6 +7,7 @@ import ts from 'typescript';
 import React from 'react';
 import * as onboarding from '../lib/home-onboarding.ts';
 import {lockIntroPageScroll} from '../lib/intro-scroll-lock.ts';
+import {wholeAppTourSteps} from '../lib/whole-app-tour.ts';
 const require=createRequire(import.meta.url);
 const empty={getItem:()=>null},token='workforce-demo-9037-public-aggregates-v4:5';
 test('only explicit opt-out suppresses a new load; legacy dismissal and saved state do not',()=>{
@@ -17,19 +18,20 @@ test('only explicit opt-out suppresses a new load; legacy dismissal and saved st
  assert.equal(onboarding.isFirstHomeVisit({getItem:()=>{throw Error('blocked');}},empty,token),true);
 });
 function nodes(tree){const out=[];function walk(n){if(!n||typeof n!=='object')return;out.push(n);React.Children.forEach(n.props?.children,walk);}walk(tree);return out;}
+function textContent(tree){if(tree==null||typeof tree==='boolean')return '';if(typeof tree!=='object')return String(tree);if(Array.isArray(tree))return tree.map(textContent).join(' ');return textContent(tree.props?.children);}
 function harness(initial={}){
- let cursor=0,props={busy:false,active:true,ready:true,autoOpen:true,dismissKey:'one',onNavigate:()=>{},onStartDemo:()=>{starts++;},...initial},starts=0,focus='',writes=[],listeners={},current;
+ let cursor=0,props={busy:false,active:true,ready:true,autoOpen:true,dismissKey:'one',onNavigate:page=>navigations.push(page),onStartDemo:()=>{starts++;},...initial},starts=0,focus='',writes=[],navigations=[],requests=[],listeners={},current;
  const states=[],refs=[],deps=[],effects=[],cleanups=[],storage=new Map(initial.storedOptOut?[[onboarding.HOME_INTRO_OPT_OUT_KEY,'1']]:[]);
- const fallback={focus:()=>{focus='fallback';}},title={focus:()=>{focus='title';}},trigger={getClientRects:()=>[],focus:()=>{focus='trigger';}};
+ const fallback={focus:()=>{focus='fallback';document.activeElement=fallback;}},title={focus:()=>{focus='title';document.activeElement=title;}},trigger={getClientRects:()=>props.triggerVisible?[{}]:[],focus:()=>{focus='trigger';document.activeElement=trigger;}};
  const native={open:false,shown:0,showModal(){this.open=true;this.shown++;},close(){if(this.open){this.open=false;nodes(current).find(n=>n.type==='dialog').props.onClose();}}};
  const source=ts.transpileModule(fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8'),{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,exports={};
  const style=()=>{const values=new Map();return {getPropertyValue:key=>values.get(key)?.value??'',getPropertyPriority:key=>values.get(key)?.priority??'',setProperty:(key,value,priority='')=>values.set(key,{value,priority}),removeProperty:key=>values.delete(key)};};
  const document={documentElement:{style:style()},body:{style:style()},activeElement:null,querySelector:()=>fallback};
- vm.runInNewContext(source,{exports,document,localStorage:{getItem:key=>storage.get(key)??null,setItem:(...args)=>{if(props.storageFails)throw Error('blocked');storage.set(...args);writes.push(args);},removeItem:key=>{if(props.storageFails)throw Error('blocked');storage.delete(key);writes.push([key,null]);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(()=>{cleanups[i]?.();cleanups[i]=effect();});}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:name==='@/lib/intro-scroll-lock'?{lockIntroPageScroll}:require(name)});
+ vm.runInNewContext(source,{exports,document,fetch:(...args)=>{requests.push(args);throw Error('Introduction must not request a provider or other network service');},localStorage:{getItem:key=>{if(props.storageReadFails)throw Error('blocked');return storage.get(key)??null;},setItem:(...args)=>{if(props.storageFails)throw Error('blocked');storage.set(...args);writes.push(args);},removeItem:key=>{if(props.storageFails)throw Error('blocked');storage.delete(key);writes.push([key,null]);}},window:{addEventListener:(name,fn)=>{listeners[name]=fn;},removeEventListener:()=>{}},require:name=>name==='react'?{...React,useCallback:fn=>fn,useId:()=>':intro:',useState:initial=>{const i=cursor++;if(!(i in states))states[i]=initial;return [states[i],v=>{states[i]=typeof v==='function'?v(states[i]):v;}];},useRef:value=>{const i=cursor++;return refs[i]??(refs[i]={current:value});},useEffect:(effect,next)=>{const i=cursor++;if(!deps[i]||next.some((v,j)=>v!==deps[i][j])){deps[i]=next;effects.push(()=>{cleanups[i]?.();cleanups[i]=effect();});}}}:name==='react-dom'?{createPortal:x=>x}:name==='@/lib/home-onboarding'?onboarding:name==='@/lib/intro-scroll-lock'?{lockIntroPageScroll}:require(name)});
  const render=()=>{cursor=0;current=exports.HomeGettingStarted(props);for(const n of nodes(current)){if(n.type==='dialog')n.props.ref.current=native;if(n.type==='h2')n.props.ref.current=title;if(n.type==='button'&&n.props.ref)n.props.ref.current=trigger;}return current;};
  const flush=(next={})=>{props={...props,...next};render();for(const e of effects.splice(0))e();return render();};
  const button=text=>nodes(current).find(n=>n.type==='button'&&n.props.children===text);
- return {document,flush,unmount:()=>cleanups.forEach(cleanup=>cleanup?.()),button,checkbox:()=>nodes(current).find(n=>n.type==='input'&&n.props.type==='checkbox'),native,get starts(){return starts;},get focus(){return focus;},writes,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
+ return {document,flush,unmount:()=>cleanups.forEach(cleanup=>cleanup?.()),button,checkbox:()=>nodes(current).find(n=>n.type==='input'&&n.props.type==='checkbox'),native,get starts(){return starts;},get focus(){return focus;},writes,navigations,requests,dialog:()=>nodes(current).find(n=>n.type==='dialog'),listeners};
 }
 test('first visit waits for safe active readiness, opens once, dismisses and reopens explicitly',()=>{
  const h=harness({ready:false});h.flush();assert.equal(h.native.shown,0);h.flush({ready:true,busy:true});assert.equal(h.native.shown,0);
@@ -78,15 +80,24 @@ test('intro delegates to whole-app guide without silently submitting a planning 
  assert.doesNotMatch(body,/submitStarterQuestion|swpDemoPrompt/);
  assert.ok(source.includes('onStartDemo={startIntroDemo}'));
 });
-test('product introduction keeps neutral attribution and keyboard-scrollable content separate from persistent actions',()=>{
+test('compact introduction leads with the planning problem and supported creator attribution',()=>{
  const h=harness(),all=nodes(h.flush()),region=all.find(n=>n.props?.role==='region'),header=all.find(n=>n.type==='header');
  assert.equal(region.props.tabIndex,0);assert.match(region.props.className,/overflow-y-auto/);assert.match(header.props.className,/shrink-0/);
  const headings=all.filter(n=>n.type==='h3').map(n=>n.props.children);
- assert.deepEqual(headings,['Purpose of the project','What you can do','Try a planning decision','How to read the results','Project development','Contact Ed Om']);
+ assert.deepEqual(headings,["Ed's contribution",'Compare staffing options']);
+ const purpose=all.find(n=>n.props?.id===h.dialog().props['aria-describedby']);
+ assert.match(textContent(purpose),/staffing gap within the time and budget available/);
+ assert.ok(all.indexOf(purpose)<all.indexOf(region));
+ const attribution=nodes(region).find(n=>n.type==='p');
+ assert.equal(textContent(attribution),'Ed Om defined the workforce-planning problem, product requirements and acceptance criteria. AI assisted with implementation, design and testing.');
+ const caseStudy=fs.readFileSync(new URL('../components/project-case-study.tsx',import.meta.url),'utf8');
+ assert.ok(caseStudy.includes(textContent(attribution)),'creator attribution matches the existing case study');
+ assert.ok(all.indexOf(attribution)<all.findIndex(n=>n.type==='h3'&&n.props.children==='Compare staffing options'));
+ assert.ok(textContent(h.dialog()).trim().split(/\s+/).length<=120,'intro remains short, including action labels and contact links');
+ assert.equal(all.some(n=>n.type==='ol'),false,'detailed steps belong in the tutorial');
  assert.equal(nodes(header).filter(n=>n.type==='button').length,2);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');assert.match(source,/\[tabindex="0"\]/);assert.match(source,/AI assisted with implementation, design and testing/);
- assert.doesNotMatch(source,/Developed by Ed Om|Ed Om defined/);
- assert.match(source,/Product design focused on workforce decisions and practical tradeoffs/);
+ assert.doesNotMatch(source,/Developed by Ed Om|Product design focused on workforce decisions/);
  assert.equal(region.props['aria-label'],'About Workforce Intelligence');
  assert.ok(all.some(n=>n.type==='h2'&&n.props.children==='Workforce Intelligence'));
  assert.ok(all.some(n=>n.type==='a'&&n.props.href==='/about'));
@@ -186,9 +197,79 @@ test('local guided demo entry does not wait for unrelated Home evidence requests
  const h=harness({autoOpen:false,demoReady:true});h.flush();h.button('Open guided demo').props.onClick();h.flush();assert.equal(h.starts,1);
 });
 
-test('introduction describes the restored four staffing actions without page-tour prelude',()=>{
+test('introduction summarizes fictional staffing tradeoffs while the tutorial keeps detailed steps',()=>{
+ const h=harness();h.flush();const copy=textContent(h.dialog());
+ assert.match(copy,/developing people, moving people internally and hiring against cost, readiness and uncovered work/);
+ assert.match(copy,/guided demo uses a fictional 5-FTE capacity gap/);
+ for(const label of ['Submit the fixed prompt.','Compare the options.','Choose the staffing mix.','Review and save.','3 develop, 2 move and 0 hire'])assert.equal(copy.includes(label),false);
+ for(const step of ['press Enter to submit the prefilled prompt','compare staffing options','choose Develop and move your team','then review and save'])assert.ok(wholeAppTourSteps.scenario.instruction.includes(step));
+ assert.match(wholeAppTourSteps.scenario.instruction,/fictional inputs stay fixed/);
+});
+
+test('loading, busy and inactive states guard both intro and demo entry callbacks',()=>{
+ for(const blocked of [{ready:false},{busy:true},{active:false}]){
+  const h=harness({autoOpen:false,...blocked});h.flush();
+  assert.equal(h.native.shown,0);assert.equal(h.button('Introduction').props.disabled,true);assert.equal(h.button('Open guided demo').props.disabled,true);
+  h.button('Introduction').props.onClick();h.button('Open guided demo').props.onClick();h.flush();
+  assert.equal(h.native.shown,0);assert.equal(h.starts,0);assert.deepEqual(h.writes,[]);assert.deepEqual(h.requests,[]);
+  h.flush({ready:true,busy:false,active:true});h.button('Introduction').props.onClick();h.flush();assert.equal(h.native.open,true);
+ }
+});
+
+test('manual introduction during recovery explains disabled demo but still permits exploration',()=>{
+ const h=harness({deferAutoOpen:true,demoReady:false});h.flush();h.button('Introduction').props.onClick();const tree=h.flush();
+ assert.equal(h.native.open,true);assert.equal(h.button('Start guided demo').props.disabled,true);
+ assert.match(textContent(nodes(tree).find(n=>n.props?.role==='status')),/Finish loading or recover unsaved work/);
+ h.button('Start guided demo').props.onClick();assert.equal(h.starts,0);assert.equal(h.native.open,true);
+ h.button('Explore on my own').props.onClick();h.flush({deferAutoOpen:false,demoReady:true});
+ assert.equal(h.native.open,false);assert.equal(h.native.shown,1);assert.deepEqual(h.navigations,[]);assert.deepEqual(h.writes,[]);assert.deepEqual(h.requests,[]);
+ h.button('Open guided demo').props.onClick();assert.equal(h.starts,1);assert.deepEqual(h.requests,[]);
+});
+
+test('dialog name, description and expanded state survive close and reopen with visible-trigger focus',()=>{
+ const h=harness({triggerVisible:true});h.flush();
+ for(const action of ['explore','escape','backdrop']){
+  const dialog=h.dialog(),all=nodes(dialog),title=all.find(n=>n.props?.id===dialog.props['aria-labelledby']);
+  assert.equal(textContent(title),'Workforce Intelligence');assert.equal(title.props.tabIndex,-1);
+  assert.equal(h.focus,'title');assert.equal(h.button('Introduction').props['aria-expanded'],true);
+  assert.equal(h.button('Introduction').props['aria-controls'],dialog.props.id);
+  if(action==='explore')h.button('Explore on my own').props.onClick();
+  if(action==='escape')dialog.props.onCancel({preventDefault(){}});
+  if(action==='backdrop'){const target={getBoundingClientRect:()=>({left:10,right:90,top:10,bottom:90})};dialog.props.onClick({target,currentTarget:target,clientX:1,clientY:1});}
+  h.flush();assert.equal(h.native.open,false);assert.equal(h.button('Introduction').props['aria-expanded'],false);assert.equal(h.focus,'trigger');
+  h.button('Introduction').props.onClick();h.flush();
+ }
+ assert.equal(h.starts,0);assert.deepEqual(h.writes,[]);
+});
+
+test('keyboard handler wraps from title and enabled boundary controls without intercepting middle navigation',()=>{
+ for(const demoReady of [true,false]){
+  const h=harness({demoReady});h.flush();let focused=null,prevented=0;
+  const dialog=h.dialog(),controls=nodes(dialog).filter(n=>((n.type==='button'||n.type==='input')&&!n.props.disabled)||(n.type==='a'&&n.props.href)||n.props.tabIndex===0).map(node=>{const control={node,focus:()=>{focused=control;h.document.activeElement=control;}};return control;});
+  const currentTarget={querySelectorAll:()=>controls},event=shiftKey=>({key:'Tab',shiftKey,currentTarget,preventDefault(){prevented++;}}),first=controls[0],last=controls.at(-1);
+  assert.equal(textContent(first.node),demoReady?'Start guided demo':'Explore on my own');
+  assert.ok(controls.some(c=>c.node.type==='input'));assert.ok(controls.some(c=>c.node.props.role==='region'));
+  dialog.props.onKeyDown(event(true));assert.equal(focused,last,'Shift+Tab from the initially focused title');
+  dialog.props.onKeyDown(event(false));assert.equal(focused,first,'Tab from the last link');
+  dialog.props.onKeyDown(event(true));assert.equal(focused,last,'Shift+Tab from the first enabled action');
+  h.document.activeElement=controls[1];dialog.props.onKeyDown(event(false));assert.equal(prevented,3,'middle controls keep native Tab behavior');
+  h.document.activeElement=last;dialog.props.onKeyDown({...event(false),key:'ArrowDown'});assert.equal(prevented,3,'other keys retain native behavior');
+ }
+});
+
+test('preference read failure reports the limitation without blocking dismissal or a later retry',()=>{
+ const h=harness({storageReadFails:true});let tree=h.flush();
+ assert.equal(h.native.open,true);assert.match(textContent(nodes(tree).find(n=>n.props?.role==='alert')),/could not read the saved introduction preference/);
+ h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.native.open,false);
+ h.flush({storageReadFails:false});h.button('Introduction').props.onClick();tree=h.flush();
+ assert.equal(h.native.open,true);assert.equal(nodes(tree).some(n=>n.props?.role==='alert'),false);assert.deepEqual(h.writes,[]);
+});
+
+test('intro and demo entry remain local and distinct from exploring without automatic submission',()=>{
+ const h=harness();h.flush();assert.equal(h.starts,0);assert.deepEqual(h.requests,[]);
+ h.button('Explore on my own').props.onClick();h.flush();assert.equal(h.starts,0);assert.deepEqual(h.navigations,[]);
+ h.button('Introduction').props.onClick();h.flush();h.button('Start guided demo').props.onClick();h.flush();
+ assert.equal(h.starts,1);assert.deepEqual(h.navigations,[]);assert.deepEqual(h.writes,[]);assert.deepEqual(h.requests,[]);
  const source=fs.readFileSync(new URL('../components/home-getting-started.tsx',import.meta.url),'utf8');
- for(const label of ['Submit the fixed prompt.','Compare the options.','Choose the staffing mix.','Review and save.'])assert.ok(source.includes(label));
- assert.match(source,/popup starts directly in the staffing scenario/);
- assert.doesNotMatch(source,/whole-app demo starts with Overview|Review Future of Work, then/);
+ assert.doesNotMatch(source,/fetch\s*\(|XMLHttpRequest|\/api\//);
 });

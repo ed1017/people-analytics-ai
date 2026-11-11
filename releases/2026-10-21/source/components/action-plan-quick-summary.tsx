@@ -7,7 +7,7 @@ import {actionPlanQuickSummary} from '@/lib/action-plan-quick-summary';
 const number=(value:number|null)=>value===null?'Unknown':value.toLocaleString('en-US',{maximumFractionDigits:1});
 const money=(value:number|null)=>value===null?'Unknown':`$${value.toLocaleString('en-US',{maximumFractionDigits:2})}`;
 export function ActionPlanQuickSummary({draft,result,compact=false,fallbackActions=[]}:{draft:BundleDraft|null;result?:BundleResult|null;compact?:boolean;fallbackActions?:readonly {id:string;step:string}[]}){
- if(draft?.inputs.requiredStaffingPlan&&result?.inputKey===bundleInputKey(draft)){const f=requiredStaffingPlanFacts(draft.inputs.requiredStaffingPlan);return <section aria-label="Action Plan quick summary"><StaffingOptionSummary option={f.option} currency={f.review.inputs.currency} costMonths={f.review.inputs.months} deliveryMonths={f.deliveryTarget?.months??null}/></section>;}
+ if(draft?.inputs.requiredStaffingPlan&&result?.inputKey===bundleInputKey(draft)){const f=requiredStaffingPlanFacts(draft.inputs.requiredStaffingPlan);return <section aria-label="Action Plan quick summary"><StaffingOptionSummary option={f.option} input={f.review.inputs} deliveryMonths={f.deliveryTarget?.months??null}/></section>;}
  if(compact)return <CompactPlanSummary draft={draft} result={result} fallbackActions={fallbackActions}/>;
  const value=actionPlanQuickSummary(draft,result);
  const planning=value.planning;
