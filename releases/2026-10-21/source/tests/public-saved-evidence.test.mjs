@@ -11,11 +11,11 @@ import {emptySolutionState,evaluateSolutionCandidate} from '../lib/home-solution
 import {createPublicHomeGroundingTestAdapter} from '../lib/public-home-grounding.server.mjs';
 import {createPublicSavedEvidence,createPublicSavedEvidenceTestAdapter,readPublicSavedEvidenceRecipe} from '../lib/public-saved-evidence.server.mjs';
 import {loadPublic9037Binding} from '../lib/public-9037.server.mjs';
-import {loadPublicProjectionSource} from '../lib/public-projection-source.server.mjs';
+import {loadPublicProjectionSource,createPublicProjectionTestAdapter} from '../lib/public-projection-source.server.mjs';
 import {calculateHeadcountProjection} from '../lib/home-solution-projection.ts';
 const filters={country:'all',org:'all',level:'all'},scope='All countries; All business units; All levels',digest='a'.repeat(64),hostname='people-analytics-test-ed-56dc.vercel.app';
 const version=d=>({datasetId:P.datasetId,datasetToken:P.token,publicDigest:d,cutoff:P.cutoff,provenance:'approved-public-projection-v1',contract:P.contract,publicationReceiptId:P.approval});
-function documents(){return {data_meta:public9037Metadata(digest),overview:{headcount:12,snapshot_date:P.cutoff},trend:[{snapshot_date:P.cutoff,headcount:12,fte:10}],workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:scope,basis:'Invented aggregate fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-nine-month-average-stock-v2',stockStatus:'positive'}};}
+function documents(){return {data_meta:public9037Metadata(digest),overview:{headcount:12,snapshot_date:P.cutoff},trend:[{snapshot_date:P.cutoff,headcount:12,fte:10}],workforce_filter_scope:{version:3,status:'verified_public_aggregate',requested:filters,effective:filters,label:scope,basis:'Invented aggregate fixture',datasetToken:P.token,contract:P.contract,cutoff:P.cutoff,metricContract:'voluntary-ytd-calendar-month-average-stock-v3',stockStatus:'positive'}};}
 async function requestFor(pack,source){
  const draft=await createSwpDemo('guided-saved-goal','2026-10-20T12:00:00.000Z');
  draft.binding=await actionBinding('guided-saved-goal',draft.binding.goal,pack,null);
@@ -27,10 +27,15 @@ async function requestFor(pack,source){
 }
 async function setup(){
  const data=documents(),pack=buildHomePack({dashboard:{status:'loaded',data}},scope),raw=await requestFor(pack,version(digest));
- const binding={router:{current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:P.generation}),bootstrapToken:async()=>P.token},handle:async()=>Response.json(data,{headers:{'x-workforce-dataset':P.token}})};
+ const binding={router:{current:()=>({datasetId:P.datasetId,token:P.token,digest,generation:P.generation}),bootstrapToken:async()=>P.token},handle:async request=>{
+  const path=new URL(request.url).pathname;
+  const docs={'/api/dashboard':data,'/api/scenario-modeler':{data_meta:public9037Metadata(digest),as_of:P.cutoff,defaults:{annual_growth_pct:0,salary_inflation_pct:0,annual_attrition_pct:0,fill_rate_pct:0,productivity_hiring_reduction_pct:0}},'/api/workforce-planning':{data_meta:public9037Metadata(digest),scenarios:[{scenario_name:'Baseline',points:[]}]}};
+  assert.ok(Object.hasOwn(docs,path),'Unexpected fixture request: '+path);
+  return Response.json(docs[path],{headers:{'x-workforce-dataset':P.token}});
+ }};
  const grounding=createPublicHomeGroundingTestAdapter({enabled:true,hostname,loadPublicBinding:async()=>binding});
  const checker=createPublicSavedEvidenceTestAdapter({enabled:true,verifyHome:(r,s)=>grounding.verify(r,s),loadProjection:()=>{throw Error('No analysis requested');}});
- return {data,raw,checker};
+ return {data,raw,checker,binding,grounding};
 }
 test('disabled factory reads nothing; verified saved evidence preserves serialized plan identities/hashes',async()=>{
  const f=await setup(),before=JSON.stringify(f.raw);
@@ -40,7 +45,7 @@ test('disabled factory reads nothing; verified saved evidence preserves serializ
 });
 for(const [name,mutate] of [
  ['goal statement',r=>r.request.goal.statement='Different goal'],['goal identity',r=>r.current.goal.id='other'],['selection',r=>r.request.selectedId='missing-plan'],['scope',r=>r.current.filters.country='US'],['stale source',r=>r.current.source.publicDigest='b'.repeat(64)],['changed evidence',r=>{r.current.evidence.sources.find(s=>s.id==='W1').facts.headcount=13;}],['changed planning inputs',r=>r.current.planningInputs={budget:20}],['missing public recipe',r=>r.current=null],['private recipe',r=>{r.current.source={datasetId:'candidate',datasetToken:'candidate:1',bundleDigest:digest,cutoff:P.cutoff};}],['missing source receipt',r=>delete r.current.source.publicationReceiptId],['recipe extension',r=>r.current.hidden='not allowed'],['unbounded recipes',r=>r.previous=Array(17).fill(r.current)],['plan arithmetic',r=>r.request.catalog.plans[0].result.inputKey='tampered']
-])test('saved verification rejects '+name,async()=>{const f=await setup();mutate(f.raw);await assert.rejects(f.checker.verify(f.raw));});
+])test('saved verification rejects '+name,async()=>{const f=await setup();await f.checker.verify(f.raw);mutate(f.raw);await assert.rejects(f.checker.verify(f.raw));});
 test('matching retained evidence recipe permits earlier evidence; no recipe is guessed',async()=>{
  const f=await setup(),old=structuredClone(f.raw.current);
  // A changed packet note changes its hash but is valid normalized evidence; the saved packet remains exact.
@@ -60,13 +65,25 @@ test('bounded total verification cancels stalled dependencies and oversized reci
  await assert.rejects(checker.verify(f.raw),/aborted/);assert.equal(signal.aborted,true);
  assert.throws(()=>readPublicSavedEvidenceRecipe({...f.raw.current,planningInputs:{text:'x'.repeat(170000)}}));
 });
+test('invented public fixtures verify saved projection continuity and reject changed input digests',async()=>{
+ const f=await setup(),source=createPublicProjectionTestAdapter(f.binding,{hostname}),inputs=await source.projection(filters);
+ assert.equal(inputs.opening,12);assert.equal(inputs.asOf,P.cutoff);
+ const spec={id:'saved-fixture-flow',base:null,method:'monthly_flow',months:1,changes:[['monthly_hires',20],['monthly_exits',10]].map(([field,value])=>({field,kind:'literal',value,basis:'illustrative',turnId:null,interpretation:'Explicit invented test assumption.'}))};
+ f.raw.request.state.analyses=[await calculateHeadcountProjection(spec,inputs,[],[])];
+ const checker=createPublicSavedEvidenceTestAdapter({enabled:true,verifyHome:(r,s)=>f.grounding.verify(r,s),loadProjection:async()=>source});
+ const before=JSON.stringify(f.raw),checked=await checker.verify(f.raw);
+ assert.equal(checked.verifiedProjectionIds[0].id,spec.id);assert.equal(JSON.stringify(f.raw),before);
+ assert.deepEqual(await checker.verify(JSON.parse(before)),checked);
+ const bad=structuredClone(f.raw);bad.request.state.analyses[0].inputDigest='b'.repeat(64);
+ await assert.rejects(checker.verify(bad),/projection inputs changed/i);
+});
 test('actual public9037 saved-plan continuity and projection currentness',{skip:!fs.existsSync(new URL('../.private-9037',import.meta.url))},async()=>{
  const binding=await loadPublic9037Binding({hostname,production:false}),response=await binding.handle(new Request('https://'+hostname+'/api/dashboard?'+new URLSearchParams(filters))),data=await response.json();
  const pack=buildHomePack({dashboard:{status:'loaded',data}},scope),raw=await requestFor(pack,version(binding.router.current().digest));
  const source=await loadPublicProjectionSource({hostname,production:false}),inputs=await source.projection(filters);
  const spec={id:'saved-public-flow',base:null,method:'monthly_flow',months:1,changes:[['monthly_hires',20],['monthly_exits',10]].map(([field,value])=>({field,kind:'literal',value,basis:'illustrative',turnId:null,interpretation:'Explicit test assumption.'}))};
  raw.request.state.analyses=[await calculateHeadcountProjection(spec,inputs,[],[])];
- const checked=await createPublicSavedEvidence({enabled:true,hostname}).verify(raw);assert.equal(checked.verifiedProjectionIds[0].id,spec.id);assert.equal(inputs.opening,9037);
+ const checked=await createPublicSavedEvidence({enabled:true,hostname}).verify(raw);assert.equal(checked.verifiedProjectionIds[0].id,spec.id);assert.equal(inputs.opening,data.overview.headcount);assert.equal(inputs.asOf,P.cutoff);
  const bad=structuredClone(raw);bad.request.state.analyses[0].inputDigest='b'.repeat(64);await assert.rejects(createPublicSavedEvidence({enabled:true,hostname}).verify(bad),/projection inputs changed/i);
 });
 test('exploration follow-ups verify each candidate recipe without adopting a goal',async()=>{

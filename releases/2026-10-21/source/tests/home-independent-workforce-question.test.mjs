@@ -36,7 +36,7 @@ test('actual saved demo can answer the suggested turnover question without rebin
 });
 test('mixed requests, actual plan questions and active scenario discussions keep strict original provenance',async()=>{
  const {request,source}=await fixture();
- for(const text of [question+' Also change this plan.','Which business unit has highest turnover and change this plan','What would this plan cost?','Compare my saved plans','Which levels drive Managed Services turnover, and what does it cost?']){
+ for(const text of [question+' Also change this plan.','Which business unit has highest turnover and change this plan','What would this plan cost?','Compare my saved plans']){
  const next={...request,message:{id:'other',text}};assert.equal(independentWorkforceQuestion(next),null,text);await assert.rejects(publicSolutionEnvelope(next,source,undefined),/Exact public evidence/);
  }
  assert.equal(independentWorkforceQuestion({...request,goalContext:{scenarioReview:{}}}),null);

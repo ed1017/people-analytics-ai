@@ -23,7 +23,7 @@ test('About exposes the case study while the shared header variant remains colla
 });
 test('About includes verified public destinations without unverified resume links',()=>{
  const page=load('../app/about/page.tsx',{'next/link':{default:props=>React.createElement('a',props)},'@/components/project-case-study':study}).default();
- const all=nodes(page),links=all.filter(n=>n.type==='a');assert.deepEqual(links.map(n=>n.props.href),['/','mailto:edwinom.nyc@gmail.com','https://www.linkedin.com/in/ed-om-62a57818','https://github.com/ed1017/people-analytics-ai']);
+ const all=nodes(page),links=all.filter(n=>n.type==='a');assert.deepEqual(links.map(n=>n.props.href),['/','/case-study','mailto:edwinom.nyc@gmail.com','https://www.linkedin.com/in/ed-om-62a57818','https://github.com/ed1017/people-analytics-ai']);
  for(const link of links.filter(n=>n.props.target==='_blank')){assert.match(link.props.rel,/noopener/);assert.match(link.props.rel,/noreferrer/);assert.match(text(link),/opens a new tab/);}
  assert.equal(all.filter(n=>n.type==='h1').length,1);assert.ok(all.some(n=>n.type==='h2'&&n.props.id==='about-case-study'));assert.doesNotMatch(text(page),/resume|résumé|not verified business outcomes|does not approve/i);
 });

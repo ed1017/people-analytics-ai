@@ -19,8 +19,8 @@
     },
     {
       "path": "app/about/page.tsx",
-      "bytes": 1947,
-      "sha256": "4d40b857c0af94242a720ca9fc000541242662d267350445697edcf00b60190b"
+      "bytes": 2594,
+      "sha256": "84af54e95615827e2351679cc3265579c8335449720997279e6503dc04981ef9"
     },
     {
       "path": "app/api/attrition/route.ts",
@@ -3119,8 +3119,8 @@
     },
     {
       "path": "lib/public-9037-options.mjs",
-      "sha256": "939c3e2748f0664087c4c2693f6fa02cd8b2ea2e745b1ea7c474a8d71925941d",
-      "bytes": 1967
+      "sha256": "8a82534a50eb235a7a86a320abb095642307576f9e5501d598b84da1a602b80f",
+      "bytes": 1981
     },
     {
       "path": "lib/public-9037-projection.mjs",
@@ -3189,8 +3189,8 @@
     },
     {
       "path": "lib/public-home-route.server.mjs",
-      "sha256": "3695e2f9dbf791165c83e53c7ccb3933fafce9a11d408381c6ed390eba8c7a74",
-      "bytes": 15228
+      "sha256": "bc8efd9bdc800bc262ffbdb028d03c7a764a8909962f698de9acbaa3c2c7d96c",
+      "bytes": 17078
     },
     {
       "path": "lib/public-other-routes.server.mjs",
@@ -3964,13 +3964,13 @@
     },
     {
       "path": "tests/public-home-grounding.test.mjs",
-      "bytes": 4496,
-      "sha256": "7a5af7e3d65f60fde6e9eaa61f39fe60259a5e5039433a70430f3231227cc073"
+      "bytes": 4643,
+      "sha256": "ab4f401021f54f6a6d52ba23d877bc1f555830b984104745cf6e4157c92475c2"
     },
     {
       "path": "tests/public-home-integration.test.mjs",
-      "sha256": "99621d12ea9560f7ed0e736834b1cbc5eb0eb86709c50df5170629b957dec766",
-      "bytes": 20808
+      "sha256": "b8a2906fe02edde0d0e4fe73bb305ff91feaa1b0cecf0adc4055262928b29251",
+      "bytes": 21406
     },
     {
       "path": "tests/public-home-route-approved.test.mjs",
@@ -3994,13 +3994,13 @@
     },
     {
       "path": "tests/public-projection-restoration.test.mjs",
-      "sha256": "bacdd85f61dfbc130afb7918c7ede0f9a7df01f7fc74a4fbdcaf6868c493735f",
-      "bytes": 10024
+      "sha256": "1908cb094d19111fd0342196754abe26dd3bd3a61766a9889efde76bf34f0629",
+      "bytes": 10714
     },
     {
       "path": "tests/public-saved-evidence.test.mjs",
-      "bytes": 9959,
-      "sha256": "8cc46dee16e3a7b6d82678d6aa84dad496f372d4ff6f64c086c51d70245471a0"
+      "bytes": 11824,
+      "sha256": "47ff64c9587e9b8daa7cdd9df85f915f30ef3bbd60a56aff572dd68037f1e107"
     },
     {
       "path": "tests/realism-version-transition.test.mjs",
@@ -4469,8 +4469,8 @@
     },
     {
       "path": "tests/about-project-profile.test.mjs",
-      "bytes": 3214,
-      "sha256": "7431a697c184031758a02286d62f955df7334f05b996c5bc859e0a142198bfb8"
+      "bytes": 3228,
+      "sha256": "20d9196f5681bd5640f52b125e67b37f5795d40f8de0090240bd15811bc164dc"
     },
     {
       "path": "tests/scenario-route-aliases.test.mjs",
@@ -4714,8 +4714,8 @@
     },
     {
       "path": "tests/home-bu-turnover-chat.test.mjs",
-      "bytes": 12331,
-      "sha256": "75ddf309c2d23fff18cf26a3acce518643e1ae5488b1280e86c38f4639f70dc3"
+      "bytes": 12859,
+      "sha256": "3039c53d4a8965670157f93ae318df55a31cfa8be9550cec766bee4fbe3d8ccf"
     },
     {
       "path": "components/fow-lab-reference.tsx",
@@ -5939,13 +5939,53 @@
     },
     {
       "path": "lib/home-independent-workforce-question.ts",
-      "bytes": 2384,
-      "sha256": "35f3b3e757ca62019b32a6af68291145a558cad918ecd6d403dc04ae3ce6b43b"
+      "bytes": 2631,
+      "sha256": "e8966f390f5f8a91021f19a8f78cb0da30fecf55c6de4c3a7c8ce4b23904e040"
     },
     {
       "path": "tests/home-independent-workforce-question.test.mjs",
-      "bytes": 7424,
-      "sha256": "bbf350d8eec7beff9bbffdfc64e81363ccf86ad124e459b36997c4f8bbc7aa49"
+      "bytes": 7351,
+      "sha256": "e721a3bfc2e86684f094da1e8f6e8ad13df9194cb322d2ec2aeef269818d53f5"
+    },
+    {
+      "path": "lib/home-level-turnover.mjs",
+      "bytes": 7913,
+      "sha256": "ca2cfc1737de474b0c54f38d0af2f62277571071a7d943145474cb545abfdabb"
+    },
+    {
+      "path": "lib/public-level-turnover.server.mjs",
+      "bytes": 7344,
+      "sha256": "b52854da622208864046dd71c2c1b6322724f5aa5e2bb6b1c2102c3bb1b985cb"
+    },
+    {
+      "path": "lib/home-tenure-exits.mjs",
+      "sha256": "e78b4e3d5f792ef684c9d826a7fd96715050042787d962226f3b6e57d4e90fd1",
+      "bytes": 5979
+    },
+    {
+      "path": "lib/public-tenure-exits.server.mjs",
+      "sha256": "ea54437c9a849bc01d225b1d8dbf504e1677a4005358a190622d9e692bb4e5d9",
+      "bytes": 3399
+    },
+    {
+      "path": "app/case-study/page.tsx",
+      "bytes": 8128,
+      "sha256": "b9cfe20e263a1575e2cb03e35b371c0f0b37746bd824a9289f35eec0ced42a03"
+    },
+    {
+      "path": "components/workforce-case-comparison.tsx",
+      "bytes": 5254,
+      "sha256": "41eb690be566ddeeab9a0372fe6fe729ce5169eb2ba789cb1fe1d61413f2f258"
+    },
+    {
+      "path": "lib/workforce-case-study.ts",
+      "bytes": 4602,
+      "sha256": "9c99b96b4e446c38cf28c9369f0a0336af45740047e64b881f9df2aa091c9163"
+    },
+    {
+      "path": "tests/workforce-case-study.test.mjs",
+      "bytes": 6567,
+      "sha256": "99bdb7983f0d3e40afb0a59fc941798b6e2203319140d05624827dbe3b82719b"
     }
   ],
   "candidateArchiveSha256": "d641dec000071c32482dbe2dc9839097ef3201ed7e210d021f29cb014afef0f8",

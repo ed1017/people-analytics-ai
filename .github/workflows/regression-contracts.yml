@@ -125,6 +125,8 @@ jobs:
       - name: Verify Australian categorical shortage references
         working-directory: releases/2026-10-21/source
         run: node --test tests/position-australia-shortage.test.mjs tests/position-australia-shortage-ui.test.mjs tests/position-australia-shortage-context.test.mjs tests/position-australia-osca-shortage.test.mjs tests/position-australia-osca-context.test.mjs
+      - name: Verify business-unit level turnover without provider calls
+        run: node --test tests/release-level-turnover.test.mjs tests/release-tenure-exits.test.mjs
       - name: Verify staffing deadline answer consistency
         run: node --test tests/staffing-deadline-answer.test.mjs
       - name: Verify position scenario type graph
@@ -146,7 +148,7 @@ jobs:
         run: node --test tests/planning-empty-progress.test.mjs tests/home-public-error-reference.test.mjs tests/staffing-priority-presentation.test.mjs
       - name: Verify independent turnover questions after saved demo
         working-directory: releases/2026-10-21/source
-        run: node --test tests/home-independent-workforce-question.test.mjs tests/public-evidence-recovery.test.mjs
+        run: node --test tests/home-independent-workforce-question.test.mjs tests/public-evidence-recovery.test.mjs tests/public-home-grounding.test.mjs tests/public-saved-evidence.test.mjs tests/public-projection-restoration.test.mjs
       - name: Verify editorial clarity and actionable FTE answers
         working-directory: releases/2026-10-21/source
         run: node --test tests/home-bu-turnover-chat.test.mjs tests/canonical-worked-example.test.mjs tests/home-fte-investigation.test.mjs tests/market-reference-editorial.test.mjs tests/module-editorial-presentation.test.mjs tests/planner-editorial-presentation.test.mjs tests/projection-save-retry.test.mjs tests/public-recruiting-cohort-recovery.test.mjs tests/home-dataset-query.test.mjs tests/demo-company-profile.test.mjs tests/about-project-profile.test.mjs
