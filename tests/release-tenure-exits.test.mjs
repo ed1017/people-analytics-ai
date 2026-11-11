@@ -84,3 +84,47 @@ test('boundary repeats retain the refusal rather than dispatching or inventing c
 test('planning exclusions remain identical after supported or refused tenure answers',()=>{
  for(const prior of ['Current-YTD total exits by tenure: All company.','Tenure exit composition unavailable.'])for(const text of ['What about saved scenarios?','What about creating a plan?','What about remove tenure from this plan?','What about add a scenario?'])assert.equal(tenureExitsIntent(text,[{role:'assistant',text:prior}]),null);
 });
+
+
+test('explicit tenure metric follow-ups override the prior metric without mixing or changing saved work',async()=>{
+ for(const totalWord of ['total','overall']){
+  const f=fixture();let {request,source}=await savedRequest(f,'Show voluntary exits by tenure');
+  request.state.questions=['Retain this'];const original=structuredClone(request);
+  for(const [i,[text,metric,count]] of [
+   ['Show voluntary exits by tenure','voluntary',100],
+   [`What about ${totalWord} exits?`,'total',150],
+   ['Show that again','total',150],
+   ['What about voluntary exits?','voluntary',100],
+   ['Show the shares','voluntary',100],
+  ].entries()){
+   request={...request,requestId:'metric-'+i,message:{id:'metric-message-'+i,text}};
+   const prior=request.state.turns,selection=tenureExitsIntent(text,prior);
+   assert.equal(selection.metric,metric,text);assert.equal(selection.answer,undefined,text);
+   const before=JSON.stringify(request),detached=independentWorkforceQuestion(request);assert(detached,text);
+   const reply=await post(f,await publicSolutionEnvelope(detached,source,undefined));
+   assert.match(reply.answer,new RegExp(`Current-YTD ${metric} exits by tenure: All company`));
+   assert.match(reply.answer,new RegExp(`Company total: ${count} ${metric} exits`));
+   assert.equal(reply.usage.modelRounds,0);assert.equal(f.providerAttempts,0);
+   const state=retainIndependentWorkforceAnswer(request,reply);
+   assert.equal(JSON.stringify(request),before);assert.deepEqual({...state,turns:[]},{...original.state,turns:[]});
+   for(const key of ['goal','catalog','selectedId','filters'])assert.deepEqual(request[key],original[key]);
+   request=JSON.parse(JSON.stringify({...request,state}));
+  }
+  for(const text of [`What about ${totalWord} and voluntary exits?`,`Show ${totalWord} and voluntary exits by tenure`]){
+   assert.match(tenureExitsIntent(text,request.state.turns).answer,/Choose total or voluntary/);
+   const next={...request,requestId:'mixed',message:{id:'mixed-message',text}};
+   const reply=await post(f,await publicSolutionEnvelope(independentWorkforceQuestion(next),source,undefined));
+   assert.match(reply.answer,/Choose total or voluntary/);assert.doesNotMatch(reply.answer,/Company total:/);
+   assert.equal(reply.usage.modelRounds,0);assert.equal(f.providerAttempts,0);
+  }
+ }
+});
+
+test('metric overrides keep planner, named-scope and historical-period exclusions',()=>{
+ for(const metric of ['total','voluntary']){
+  const turns=[{role:'assistant',text:`Current-YTD ${metric} exits by tenure: All company.`}];
+  for(const text of ['What about total exits and change my plan?','What about overall exits and saved scenarios?'])assert.equal(tenureExitsIntent(text,turns),null,text);
+  for(const text of ['What about total exits in India?','What about overall exits in Managed Services?','What about total exits at level L1?'])assert.match(tenureExitsIntent(text,turns).answer,/not supported/,text);
+  for(const text of ['What about total exits last year?','What about overall exits in 2025?'])assert.match(tenureExitsIntent(text,turns).answer,/not supported|not been substituted/,text);
+ }
+});

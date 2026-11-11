@@ -101,7 +101,8 @@
       "integrate/roadmap-20261110": false,
       "feat/company-tenure-exits-20261110": false,
       "test/home-restoration-fixtures-20261110": false,
-      "integrate/remaining-ui-20261110": false
+      "integrate/remaining-ui-20261110": false,
+      "fix/tenure-metric-followup-20261111": false
     }
   }
 }

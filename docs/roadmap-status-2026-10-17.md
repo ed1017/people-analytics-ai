@@ -1,6 +1,16 @@
-# Active roadmap - November 10
+# Active roadmap - November 11
 
-## Current work - staffing continuity and post-demo chat, 10 November 2026
+## Current work - bounded follow-up reliability, 11 November 2026
+
+PR586/587 are published on main `21fc3cfa`. Supported company-wide tenure exit composition, business-unit level turnover, the sourced fictional AI-workforce case, shorter introduction and conditional staffing recommendations are included. Company tenure shares remain distinct from rates; costs and business-unit tenure breakdowns remain unsupported.
+
+Fresh cloud-browser checks passed all eighteen public case-study constraint combinations, reset and keyboard behavior, plus Home introduction close/reopen and focus handling. Mobile viewport, 200% reflow and opt-out persistence remain unverified. These checks do not establish arbitrary model-answer quality.
+
+The next bounded correction addresses a reproduced tenure follow-up bug: explicit total/overall requests after voluntary answers must override the prior metric. Source and actual-route regression checks pass with provider execution forbidden and saved work preserved. Complete-runtime build and release are pending; no incomplete runtime will be deployed. See the [follow-up and acceptance record](tenure-followup-acceptance-2026-11-11.md).
+
+External-source expansion remains paused. No paid AI calls are included, and cumulative spending headroom remains unverified. User-owned Future of Work/Lab validation and overlay publication remain outside this work.
+
+## Historical release state - staffing continuity and post-demo chat, 10 November 2026
 
 [PR581](https://github.com/ed1017/people-analytics-ai/pull/581) is live. A budget given before its cost period is known stays visible and pending when the period is later supplied, until explicitly confirmed or cleared. Chat and the editable planner now apply the same rule, including zero budgets and confirmation provenance.
 
