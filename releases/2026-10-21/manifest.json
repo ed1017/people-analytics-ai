@@ -5959,8 +5959,8 @@
     },
     {
       "path": "lib/home-tenure-exits.mjs",
-      "sha256": "e78b4e3d5f792ef684c9d826a7fd96715050042787d962226f3b6e57d4e90fd1",
-      "bytes": 5979
+      "sha256": "84719846192b941aa802a72c328ba575aa69b8588eb57e3172b75e323a28ee07",
+      "bytes": 6075
     },
     {
       "path": "lib/public-tenure-exits.server.mjs",

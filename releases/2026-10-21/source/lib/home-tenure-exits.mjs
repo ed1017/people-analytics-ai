@@ -8,12 +8,13 @@ export function tenureExitsIntent(question,turns=[]){
  const prior=turns.at(-1),match=prior?.role==='assistant'&&prior.text?.match(/^Current-YTD (total|voluntary) exits by tenure: All company\./);
  const follow=/^(?:show (?:that|it) again|show (?:the )?(?:counts|shares|rates)|what does it cost|what about .+|what should we investigate)[.!?]?$/;
  if(prior?.role==='assistant'&&prior.text?.startsWith('Tenure exit composition unavailable.')&&follow.test(text))return {metric:'total',cost:false,rate:false,answer:prior.text};
- if(match&&follow.test(text))text=`show ${/\bvoluntary\b/.test(text)?'voluntary':match[1]} exits by tenure and ${text}`;
+ // Inherit the previous metric only when the follow-up does not name one.
+ if(match&&follow.test(text))text=`show ${/\b(?:total|overall|voluntary)\b/.test(text)?'':match[1]} exits by tenure and ${text}`;
  if(!/\btenure\b/.test(text)||! /\b(?:exits?|turnover|attrition|rates?|costs?)\b/.test(text))return null;
  text=text.replace(/\b(?:by tenure|all company|company-wide|company wide|for the company|across the company)\b/g,'tenure').replace(/\b(?:2026 ytd|ytd 2026|january(?:-| to | through )october 2026|as of 2026-10-31)\b/g,'current');
  const cost=/\bcosts?\b/.test(text),rate=/\brates?\b/.test(text),voluntary=/\bvoluntary\b/.test(text);
  const period=/\bcurrent (?:calendar )?year\b/.test(text)||/\b(?:20\d{2}|last|previous|next|this|today|months?|monthly|annual|annualized|quarter|q[1-4]|january|february|march|april|may|june|july|august|september|october|november|december)\b/.test(text);
- const unsupported=/\b(?:involuntary|regrettable|retirement)\b/.test(text)||(voluntary&&/\btotal\b/.test(text));
+ const unsupported=/\b(?:involuntary|regrettable|retirement)\b/.test(text)||(voluntary&&/\b(?:total|overall)\b/.test(text));
  text=text.replace(/\bwhat (?:is|are)\b/g,'what').replace(/\bwhat does it cost\b/g,'cost').replace(/\bshow it again\b/g,'show that again').replace(/\bshow me\b/g,'show');
  const remainder=text.replace(/\b(?:20\d{2}|q[1-4]|show|please|the|our|what|and|also|about|that|again|exits?|turnover|attrition|tenure|bands?|breakdown|composition|counts?|shares?|rates?|costs?|total|overall|voluntary|involuntary|regrettable|retirement|current|latest|available|ytd|year-to-date|last|previous|next|this|today|year|months?|monthly|annual|annualized|quarter|january|february|march|april|may|june|july|august|september|october|november|december)\b/g,'').replace(/[\s,.!?]/g,'');
  if(remainder)return {metric:voluntary?'voluntary':'total',cost,rate,answer:'Tenure exit composition unavailable. This tenure request is not supported as phrased. Verified tenure evidence covers company-wide total or voluntary exit composition for January-October 2026 only. Business-unit, country and level tenure breakdowns, other periods, rates and causes are unavailable. Your filters and saved work are kept; no broader scope or metric has been substituted.'};
